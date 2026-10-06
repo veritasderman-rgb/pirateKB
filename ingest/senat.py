@@ -134,8 +134,10 @@ def senator_detail(pid: str, o: int, cur: int) -> dict:
         det["obvod_cislo"] = int(m.group(1))
     det["kluby"] = sorted({a.get_text(" ", strip=True) for a in soup.find_all("a", href=True)
                            if "organy/index.php" in a["href"] and "klub" in a.get_text().lower()})
-    h1 = soup.find("h1")
-    det["cele_jmeno"] = h1.get_text(" ", strip=True) if h1 else None
+    # první <h1> je hlavička webu („Senát Parlamentu České republiky“); jméno s tituly je
+    # v <title> („Mgr. Jan Novák, MPA: Senát PČR“)
+    title = soup.title.get_text(" ", strip=True) if soup.title else ""
+    det["cele_jmeno"] = title.split(":")[0].strip() or None
     return det
 
 
@@ -278,11 +280,34 @@ def parse_rss(raw: bytes) -> list[dict]:
     return out
 
 
+def merge_senators(path, nalezeni: list[dict]) -> list[dict]:
+    """Uložený seznam + nově nalezení (podle pid); mandáty se slučují podle období.
+
+    Používá se s ``--aktualni``: starší období se znovu neprochází, takže senátoři,
+    kteří v aktuálním období nejsou, zůstanou z uloženého seznamu."""
+    import json
+    stavajici = ([json.loads(l) for l in path.open(encoding="utf-8") if l.strip()]
+                 if path.exists() else [])
+    by_pid = {s["pid"]: s for s in stavajici}
+    for s in nalezeni:
+        old = by_pid.get(s["pid"])
+        if old is None:
+            by_pid[s["pid"]] = s
+            continue
+        mandaty = {m["obdobi_cislo"]: m for m in old.get("mandaty", [])}
+        mandaty.update({m["obdobi_cislo"]: m for m in s.get("mandaty", [])})
+        by_pid[s["pid"]] = {**old, **s, "mandaty": [mandaty[k] for k in sorted(mandaty)]}
+    return list(by_pid.values())  # pořadí uloženého seznamu, noví na konci (stabilní diff)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--od-obdobi", type=int, default=FIRST_TERM, help="první funkční období Senátu")
     ap.add_argument("--jen-rss", action="store_true",
                     help="nehledat senátory znovu, vzít je z data/senat/senatori.jsonl")
+    ap.add_argument("--aktualni", action="store_true",
+                    help="hledat senátory jen v aktuálním funkčním období a sloučit s uloženým "
+                         "seznamem (rychlá měsíční kontrola nových mandátů)")
     ap.add_argument("--vcetne-koalicnich", action="store_true",
                     help="zahrnout i senátory jiných stran zvolené za koalici s Piráty")
     args = ap.parse_args()
@@ -296,7 +321,10 @@ def main() -> None:
         senatori = [json.loads(l) for l in (OUT / "senatori.jsonl").open(encoding="utf-8")]
     else:
         try:
-            senatori = find_senators(args.od_obdobi)
+            od = current_term() if args.aktualni else args.od_obdobi
+            senatori = find_senators(od)
+            if args.aktualni:
+                senatori = merge_senators(OUT / "senatori.jsonl", senatori)
         except RuntimeError as e:
             sys.exit(f"CHYBA: {e}\nSenát může blokovat automatické požadavky (WAF F5). "
                      "Zkuste to později nebo spusťte s --jen-rss (použije uložený seznam senátorů).")

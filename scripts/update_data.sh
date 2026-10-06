@@ -111,7 +111,13 @@ case "$MODE" in
     # Regionální a tematické weby z Majáku: po dávkách (stav v data/subweby/stav.json),
     # aby se týdenní běh vešel do limitu jobu; hotové weby se jen obnovují.
     run_src subweby       subweby --z-majaku --limit-webu 15 --max-pozadavku 2500
-    run_src senat         senat --jen-rss
+    # Seznam pirátských senátorů se první týdenní běh v měsíci zkontroluje v aktuálním
+    # funkčním období (volby, rezignace, nové mandáty; ~80 profilů); jinak jen RSS hlasování.
+    if [ "$(date -u +%d)" -le 7 ]; then
+      run_src senat       senat --aktualni
+    else
+      run_src senat       senat --jen-rss
+    fi
     run_src ep            ep
     run_src dokumenty     dokumenty
     run_src systemy       systemy
