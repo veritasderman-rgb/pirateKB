@@ -1,0 +1,154 @@
+# Účty pirátských poslanců na sociálních sítích (vstup pro ingest/socialni_site.py).
+#
+# Soubor je kurátorovaný ručně: skript ho jen čte. Vygenerováno 2026-10-06 z
+# data/psp/poslanci.jsonl (klub 1745 = období 2025, 19 poslanců), z pole `socialni_site`
+# profilů na pirati.cz (data/pirati-web/lide/*.md) a z vyhledávání
+# app.bsky.actor.searchActors / getProfile na public.api.bsky.app.
+#
+# Pole:
+#   jmeno         jméno poslance (bez titulů), jde do `osoba` ve výstupu
+#   x             uživatelské jméno na X/Twitteru bez @, nebo null
+#   bluesky       handle na Bluesky (např. jmeno.bsky.social), nebo null
+#   overit        false = oba účty ověřené; true = žádný z účtů nebyl spolehlivě ověřen;
+#                 seznam platforem (např. [bluesky]) = jen tyto účty jsou nejisté (shoda jen
+#                 podle jména, prázdný profil apod.). Nejisté účty skript stahuje jen
+#                 s přepínačem --i-neoverene.
+#   zdroj_odkazu  odkud odkaz pochází (URL profilu na pirati.cz, nebo popis hledání)
+#   poznamka      volný text pro kurátora
+#
+# Pokud poslanec má účet, který tu chybí, doplňte ho a spusťte skript znovu; výstupy
+# se slučují podle id příspěvku, nic se nemaže.
+
+ucty:
+  - jmeno: Hana Ančincová
+    x: HanaAncincova
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/hana-ancincova/
+    poznamka: Bluesky nenalezeno (searchActors "Hana Ančincová", getProfile hanaancincova.bsky.social neexistuje).
+
+  - jmeno: Ivan Bartoš
+    x: PiratIvanBartos
+    bluesky: bartosivan.bsky.social
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/ivan-bartos-poslanec/
+    poznamka: Bluesky profil „Politik, poslanec Parlamentu ČR 2017-*, vicepremiér pro digitalizaci…“; ivanbartos.bsky.social je označený parodický účet, nepoužívat.
+
+  - jmeno: Katerina Demetrashvili
+    x: kxtyush
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/katerina-demetrashvili-poslankyne/
+    poznamka: Bluesky nenalezeno.
+
+  - jmeno: Irena Ferčíková Konečná
+    x: null          # profil na pirati.cz/lide neexistuje, odkaz na X nenalezen; doplnit ručně
+    bluesky: null
+    overit: false
+    zdroj_odkazu: null
+    poznamka: Na pirati.cz/lide není profil, Bluesky vyhledávání bez výsledku.
+
+  - jmeno: Andrea Hoffmannová
+    x: ahoffmannova
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/andrea-hoffmanova/
+    poznamka: Na webu psána jako „Hoffmanová“; odkaz twitter.com/ahoffmannova?lang=cs. Bluesky nenalezeno.
+
+  - jmeno: Zdeněk Hřib
+    x: ZdenekHrib
+    bluesky: zdenekhrib.bsky.social
+    overit: [bluesky]
+    zdroj_odkazu: https://www.pirati.cz/lide/zdenek-hrib/
+    poznamka: Bluesky účet zdenekhrib.bsky.social existuje (93 sledujících), ale nemá jméno, popis ani příspěvky; může jít o rezervaci jména cizí osobou. Ověřit u kanceláře předsedy.
+
+  - jmeno: Veronika Kovářová
+    x: piratkaVeronika
+    bluesky: veronikakovarova.bsky.social
+    overit: [bluesky]
+    zdroj_odkazu: https://www.pirati.cz/lide/veronika-kovarova/
+    poznamka: Bluesky profil „Architektka, pirátka, výtvarnice, lektorka“, 0 příspěvků; shoda jména, totožnost neověřena.
+
+  - jmeno: Šárka Kučerová
+    x: null          # profil na pirati.cz/lide neexistuje, odkaz na X nenalezen; doplnit ručně
+    bluesky: null
+    overit: false
+    zdroj_odkazu: null
+    poznamka: Na pirati.cz/lide není profil, Bluesky vyhledávání bez výsledku.
+
+  - jmeno: Lenka Martínková Španihelová
+    x: null          # profil https://www.pirati.cz/lide/lenka-martinkova-spanihelova/ odkaz na X neuvádí; doplnit ručně
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/lenka-martinkova-spanihelova/
+    poznamka: Bluesky vyhledávání bez výsledku.
+
+  - jmeno: Michaela Moricová
+    x: null          # profil https://www.pirati.cz/lide/michaela-moricova/ odkaz na X neuvádí; doplnit ručně
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/michaela-moricova/
+    poznamka: Bluesky vyhledávání bez výsledku.
+
+  - jmeno: Jana Patková
+    x: PatkovaJana
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/jana-patkova/
+    poznamka: Bluesky nenalezeno.
+
+  - jmeno: Barbora Pipášová
+    x: BarboraPipasova
+    bluesky: barborapipasova.bsky.social
+    overit: [bluesky]
+    zdroj_odkazu: https://www.pirati.cz/lide/barbora-pipasova/
+    poznamka: Bluesky účet existuje (6 sledujících), bez jména, popisu a příspěvků; totožnost neověřena.
+
+  - jmeno: Olga Richterová
+    x: olgarichterova
+    bluesky: olgarichterova.bsky.social
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/olga-richterova/
+    poznamka: Bluesky profil „Poslankyně za Piráty, máma, expertka na sociální politiku…“.
+
+  - jmeno: Kateřina Stojanová
+    x: katerinastojan
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/katerina-stojanova/
+    poznamka: Bluesky nenalezeno.
+
+  - jmeno: Vendula Svobodová
+    x: VendulaSvobodo4
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/vendula-svobodova/
+    poznamka: Bluesky nenalezeno.
+
+  - jmeno: Gabriela Svárovská
+    x: null          # profil na pirati.cz/lide neexistuje (zvolena za Zelené na pirátské kandidátce); odkaz na X doplnit ručně
+    bluesky: gabrielasva.bsky.social
+    overit: false
+    zdroj_odkazu: searchActors "Gabriela Svárovská" (public.api.bsky.app)
+    poznamka: Bluesky profil „Poslankyně Parlamentu, Spolupředsedkyně Zelených“.
+
+  - jmeno: Samuel Volpe
+    x: samuel_volpe_
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/samuel-volpe/
+    poznamka: Bluesky nenalezeno (volpe.bsky.social je jiná osoba).
+
+  - jmeno: Martin Šmída
+    x: Martinpunkie
+    bluesky: smidamartin.bsky.social
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/martin-smida-poslanec/
+    poznamka: Bluesky profil „Martin Punkie Šmída, Pirát“.
+
+  - jmeno: Eva Šrámková
+    x: PiratkaSramkova
+    bluesky: null
+    overit: false
+    zdroj_odkazu: https://www.pirati.cz/lide/eva-sramkova/
+    poznamka: Bluesky nenalezeno.

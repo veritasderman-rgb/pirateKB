@@ -46,12 +46,14 @@ DOC_PAGE_CHARS = 7000     # velikost stránky pro get_document
 
 DOC_TYPES = ["tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument",
              "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
-             "materialy", "prispevek-socialni-site"]
+             "materialy", "prispevek-socialni-site", "schuzka", "navod", "system",
+             "clanek-media"]
 SOCIAL_PLATFORMS = ["x", "bluesky"]
 TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev"]
 BRAND_PARTS = ["vse", "barvy", "fonty", "loga", "pravidla"]
 
 AUTORITA_POPIS = {
+    "externi-media": "externí média (není výstup strany, může být kritické i nepřesné)",
     "program": "program (schválený programový dokument strany)",
     "usneseni": "usnesení orgánu strany (CF/RV/RP)",
     "stanovisko": "oficiální stanovisko / usnesení",
