@@ -34,3 +34,16 @@ jobs:
 
       - name: Testy serveru
         run: python3 -m pytest server/tests -q
+
+      # Kvalita odpovědí: 60 otázek z evals/otazky.yaml přímo nad tooly serveru (index se
+      # postaví z data/). Pod prahem 85 % prošlých otázek CI selže; viz server/README.md.
+      - name: Evals (kvalita odpovědí)
+        run: python3 evals/run.py --prah 0.85
+
+      - name: Výsledky evals jako artefakt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evals-vysledky
+          path: evals/vysledky.json
+          if-no-files-found: ignore

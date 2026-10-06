@@ -8,8 +8,9 @@
 # --dry-run (-n) jen vypíše, co by se spustilo; nic nestahuje ani nezapisuje.
 #
 # Selhání jednoho zdroje nezastaví ostatní: zapíše se řádek "CHYBA: <zdroj>" a běh pokračuje.
-# Na konci se spustí ingest/validate.py, zapíše se data/AKTUALIZACE.md (stav po zdrojích) a
-# přestaví se index (python -m server.kb.build -q).
+# Na konci se spustí ingest/validate.py, zapíše se data/AKTUALIZACE.md (stav po zdrojích),
+# přestaví se index (python -m server.kb.build -q) a informativně proběhnou evals
+# (evals/run.py; výsledek neovlivní návratový kód ani commit dat).
 #
 # Návratový kód: 0 = vše v pořádku, 1 = některý zdroj selhal (ostatní data i stav jsou zapsané),
 #                2 = selhala kontrola dat (validate) nebo stavba indexu, 64 = chybné použití.
@@ -123,7 +124,7 @@ case "$MODE" in
 esac
 
 if [ "$DRY" = 1 ]; then
-  echo "==> [dry-run] by následovalo: validate, zápis data/AKTUALIZACE.md, python -m server.kb.build -q"
+  echo "==> [dry-run] by následovalo: validate, zápis data/AKTUALIZACE.md, python -m server.kb.build -q, evals (informativně)"
   exit 0
 fi
 
@@ -153,6 +154,14 @@ BUILD_RC=0
 "$PYTHON" -m server.kb.build -q || BUILD_RC=$?
 if [ "$BUILD_RC" -ne 0 ]; then
   echo "CHYBA: server.kb.build (kód $BUILD_RC)" >>"$LOG"
+fi
+
+# Evals jen informativně: skóre se vypíše do logu, ale návratový kód ani commit dat neblokuje
+# (CI je na pull requestech pouští s prahem). Zapisují jen evals/vysledky.json, nic do data/.
+if [ "$BUILD_RC" -eq 0 ] && [ -f evals/run.py ]; then
+  echo "==> evals (informativně)"
+  "$PYTHON" evals/run.py --prah 0.85 \
+    || echo "varování: evals pod prahem nebo selhaly (neblokuje aktualizaci dat)" >&2
 fi
 
 if [ -s "$LOG" ]; then

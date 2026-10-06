@@ -10,3 +10,8 @@ __pycache__/
 
 # Vybudovaný SQLite index (python -m server.kb.build)
 index/
+
+# Lokální zápisy MCP serveru (telemetrie, hlášení report_gap); trvalá evidence jsou GitHub issues
+data/telemetry/
+data/gaps/
+evals/vysledky.json

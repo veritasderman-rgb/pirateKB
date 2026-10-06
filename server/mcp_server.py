@@ -86,7 +86,8 @@ psp.cz, styleguide.pirati.cz, X, Bluesky) a nejsou kurátorovaná. Pravidla pro 
 4. Začni toolem search_kb nebo get_position; pro lidi find_people, pro brand get_brand,
    pro šablony get_template, pro vyjádření poslanců na sítích get_social_posts.
 5. Když báze nemá přesnou odpověď, řekni to a doporuč konkrétní osobu s kontaktem
-   (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu."""
+   (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu.
+6. Když nenajdeš odpověď ani po find_expert, zavolej report_gap s původní otázkou."""
 
 
 # =============================================================================
@@ -1297,8 +1298,11 @@ def tiskova_zprava(tema: str, mluvci: str | None = None) -> str:
         "6. Pod TZ uveď: seznam zdrojů (URL) s úrovní autority, co je potřeba ověřit, a připomínku "
         "schvalovacího procesu (mluvčí odsouhlasí citace, mediální odbor schválí vydání).",
     ]
+    hlidac = ("Pokud je k dispozici MCP Hlídače státu a TZ stojí na konkrétní smlouvě, zakázce, dotaci, "
+              "firmě nebo sponzorovi strany, ověř čísla a fakta tam a cituj URL z hlidacstatu.cz "
+              "(postoj Pirátů ber vždy jen ze znalostní báze).")
     return (f"Napiš návrh tiskové zprávy Pirátů na téma: {tema}" + (f" (mluvčí: {m})" if m else "") +
-            ".\n\nPostup:\n" + "\n".join(kroky) + "\n\n" + _PRAVIDLA_PROMPTU)
+            ".\n\nPostup:\n" + "\n".join(kroky) + "\n\n" + hlidac + "\n\n" + _PRAVIDLA_PROMPTU)
 
 
 @mcp.prompt(title="Scénář Reels")
@@ -1351,8 +1355,11 @@ def brief_k_tematu(tema: str) -> str:
         "protiargumenty označ, kdo je říká, a odpověz věcně.",
         "8. Sekce „Co ověřit / co v KB chybí“ je povinná; uveď, koho se zeptat (z find_expert).",
     ]
+    hlidac = ("Pokud je k dispozici MCP Hlídače státu, doplň do faktů relevantní smlouvy, veřejné zakázky, "
+              "dotace a sponzory stran (s URL z hlidacstatu.cz a označením „externí zdroj“), postoj Pirátů "
+              "ale ber jen ze znalostní báze.")
     return (f"Připrav interní brief k tématu: {tema}.\n\nPostup:\n" + "\n".join(kroky) +
-            "\n\n" + _PRAVIDLA_PROMPTU)
+            "\n\n" + hlidac + "\n\n" + _PRAVIDLA_PROMPTU)
 
 
 @mcp.prompt(title="Odpověď občanovi")
@@ -1463,17 +1470,30 @@ def http_app(host: str = "0.0.0.0", stateless: bool | None = None,
     Ochrana proti DNS rebinding (kontrola hlavičky Host) se v mcp zapíná jen pro
     ``host`` 127.0.0.1/localhost; při ``0.0.0.0`` je vypnutá, aby prošel libovolný
     veřejný hostname (``<projekt>.vercel.app``, vlastní doména).
+
+    Aplikace je zabalená middlewary (zvenku dovnitř): omezení počtu požadavků na ``/mcp``
+    (``server/ratelimit.py``, env ``PIRATEKB_RATE_PER_MIN`` / ``PIRATEKB_RATE_PER_DAY``)
+    a volitelná autentizace Bearer tokeny z Keycloaku (``server/auth.py``, zapíná
+    ``PIRATEKB_AUTH=keycloak``). ``/health`` a ``/`` nejsou omezené ani chráněné.
     """
+    try:
+        from server import auth as _auth, ratelimit as _ratelimit
+    except ImportError:  # pragma: no cover - spuštěno jako skript server/mcp_server.py
+        import auth as _auth  # type: ignore[no-redef]
+        import ratelimit as _ratelimit  # type: ignore[no-redef]
+
     if stateless is None:
         stateless = _env_flag("PIRATEKB_STATELESS", True)
     if json_response is None:
         json_response = _env_flag("PIRATEKB_JSON_RESPONSE", True)
-    return mcp.streamable_http_app(
+    app = mcp.streamable_http_app(
         streamable_http_path="/mcp",
         stateless_http=stateless,
         json_response=json_response,
         host=host,
     )
+    app = _auth.wrap(app)
+    return _ratelimit.wrap(app)
 
 
 def run(transport: str = "stdio", host: str = "127.0.0.1", port: int = 8765,
@@ -1493,6 +1513,96 @@ def run(transport: str = "stdio", host: str = "127.0.0.1", port: int = 8765,
     else:
         log.info("stdio transport, index: %s", _state["db_path"])
         mcp.run("stdio")
+
+
+# =============================================================================
+# Zpětná vazba (report_gap) a telemetrie
+# =============================================================================
+# Přidáno na konec souboru: nový tool a resource, telemetrie obaluje už zaregistrované
+# tooly (těla toolů se nemění). Musí stát před blokem ``if __name__ == "__main__"``,
+# aby se zaregistrovalo i při spuštění ``python server/mcp_server.py``.
+
+if str(REPO_ROOT) not in sys.path:  # i pro `python server/mcp_server.py` (bez balíčku server)
+    sys.path.insert(0, str(REPO_ROOT))
+from server import gaps as _gaps  # noqa: E402
+from server import telemetry as _telemetry  # noqa: E402
+
+REPORT_GAP_VETA = ("Odpověz uživateli, že báze odpověď nemá a hlášení bylo zaznamenáno; "
+                   "doporuč find_expert.")
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def report_gap(otazka: str, poznamka: str = "", tool: str = "") -> str:
+    """Nahlásí, že znalostní báze nemá odpověď na otázku uživatele (podnět pro kurátory
+    k doplnění dat). Zavolej, když odpověď nenajdeš ani po find_expert.
+
+    Argumenty: otazka = původní otázka uživatele (bez osobních údajů, max. 500 znaků);
+    poznamka = volitelně co jsi zkoušel nebo co v bázi chybí; tool = volitelně název
+    toolu, který odpověď nenašel. Hlášení se uloží do evidence serveru a, je-li to
+    nastaveno, založí se GitHub issue pro kurátory (stejná otázka max. jednou za 7 dní)."""
+    q = _clean(otazka)
+    if not q:
+        return "Chybí otázka. Zavolej `report_gap(otazka=\"<původní otázka uživatele>\")`."
+    res = _gaps.report_gap(q, poznamka=_s(poznamka), tool=_s(tool))
+    out = [f"Hlášení zaznamenáno: „{res['zaznam']['otazka']}“."]
+    if res.get("issue_url"):
+        out.append(f"Založeno GitHub issue pro kurátory: {res['issue_url']}")
+    elif res.get("duplikat"):
+        out.append("Stejná otázka už byla nahlášena v posledních 7 dnech"
+                   + (f" ({res['duplikat_url']})" if res.get("duplikat_url") else "") + "; nové issue se nezakládá.")
+    if not res.get("soubor"):
+        out.append("(Uložení do lokální evidence se nepodařilo; hlášení je jen v logu serveru.)")
+    out.append("")
+    out.append(REPORT_GAP_VETA)
+    return "\n".join(out)
+
+
+@mcp.resource("kb://gaps/posledni", name="gaps_posledni", title="Poslední hlášení „báze nemá odpověď“",
+              description="Posledních 50 hlášení z toolu report_gap (lokální evidence serveru).",
+              mime_type="text/markdown")
+def resource_gaps_posledni() -> str:
+    try:
+        return _gaps.format_recent(50)
+    except Exception as exc:  # noqa: BLE001
+        return f"Hlášení nejsou k dispozici: {exc}"
+
+
+def _with_telemetry_summary(fn: Callable[..., str]) -> Callable[..., str]:
+    """kb_stats + souhrn telemetrie od startu (tělo kb_stats zůstává beze změny)."""
+
+    @functools.wraps(fn)
+    def wrapper(*args: Any, **kwargs: Any) -> str:
+        out = fn(*args, **kwargs)
+        try:
+            return out + "\n\n" + _telemetry.summary_markdown()
+        except Exception as exc:  # noqa: BLE001
+            log.warning("souhrn telemetrie selhal: %s", exc)
+            return out
+
+    return wrapper
+
+
+def _install_telemetry() -> None:
+    """Obalí funkce zaregistrovaných toolů telemetrií.
+
+    Mění se jen ``Tool.fn``; JSON schéma (``parameters``) i popis toolu vznikly už při
+    registraci z podpisu a docstringu, takže ``tools/list`` zůstává stejný."""
+    manager = getattr(mcp, "_tool_manager", None)
+    if manager is None:  # pragma: no cover - jiná verze mcp
+        log.warning("telemetrie: tool manager nenalezen, volání se neměří")
+        return
+    for t in manager.list_tools():
+        fn = t.fn
+        if getattr(fn, "__telemetry__", False):
+            continue
+        if t.name == "kb_stats":
+            fn = _with_telemetry_summary(fn)
+        t.fn = _telemetry.wrap(fn, t.name)
+
+
+kb_stats = _with_telemetry_summary(kb_stats)  # i resource kb://stats ukazuje telemetrii
+_install_telemetry()
 
 
 if __name__ == "__main__":  # python server/mcp_server.py == stdio

@@ -26,7 +26,14 @@ Workflow [`.github/workflows/update-data.yml`](../.github/workflows/update-data.
    MCP server má nová data bez dalšího zásahu.
 
 Druhý workflow, [`ci.yml`](../.github/workflows/ci.yml), na každém pull requestu a pushi do `main`
-spouští `ingest/validate.py` a `pytest server/tests`.
+spouští `ingest/validate.py`, `pytest server/tests` a nakonec **evals**: `python3 evals/run.py`
+položí 60 typických otázek z [`evals/otazky.yaml`](../evals/otazky.yaml) přímo toolům serveru
+(nad indexem postaveným z `data/`) a ověří, že odpověď obsahuje očekávaný údaj a citaci zdroje.
+Pod 85 % prošlých otázek CI selže; tabulka výsledků je v logu a `evals/vysledky.json` jako
+artefakt `evals-vysledky`. `scripts/update_data.sh` pouští evals na konci každé aktualizace
+dat jen informativně (skóre v logu, commit dat neblokuje). Když otázka selže proto, že se
+změnila data (nový předseda, jiné vedení jednotky), opraví se otázka v YAML, ne práh.
+Podrobnosti: [server/README.md, sekce Zpětná vazba a evals](../server/README.md#zpětná-vazba-a-evals).
 
 Dva běhy aktualizace nikdy neběží současně (`concurrency`); druhý počká na prvního.
 GitHub může plánované běhy zpozdit o desítky minut, přesný čas tedy není zaručen.
