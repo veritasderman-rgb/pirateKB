@@ -54,6 +54,14 @@ data/
     <rok>/<id>-<slug>.md jedna schůzka = jeden soubor (popis, přijaté/poskytnuté výhody, účastníci)
     schuzky.jsonl        jedna schůzka na řádek (id, datum, název, popis, výhody, účastníci, autor, publikováno, url)
     autori.jsonl         autoři zpráv (pirátští politici): id, jméno, počet zpráv, url
+  media/                 mediální monitoring: články o Pirátech a jejich poslancích v externích médiích
+    clanky.jsonl         jeden článek na řádek (url, titulek, médium, datum, úryvek, zmíněné osoby, zdroj monitoringu)
+    <rok>/<rok>-<mesic>.md  přehled článků za měsíc po dnech (typ clanek-media, autorita externi-media)
+    stav.json            stav historického dotahování po měsících (GDELT, Google News)
+  systemy/               audit systémů a adres Pirátů (*.pirati.cz, externí služby strany)
+    systemy.jsonl        jedna adresa na řádek (url, název, kategorie, technologie, stav, vyžaduje přihlášení, popis, kam s čím, zdroj objevení)
+    systemy.md           tabulky po kategoriích (typ system); kam-s-problemem.md: průvodce „mám problém → kam jít“ (typ navod, návrh ke schválení)
+    neaktivni.jsonl      sondované adresy bez odpovědi; neproverene.jsonl: kandidáti nad limit sondy (místní weby, testovací domény)
 ```
 
 ## Formát: Markdown s YAML frontmatter
@@ -64,7 +72,7 @@ Každý `.md` soubor začíná blokem `---` … `---`. Povinná pole:
 |---|---|---|
 | `zdroj` | URL stránky nebo datové sady, ze které text pochází; slouží jako citace | URL |
 | `nazev` | název dokumentu (titulek článku, název orgánu, osoby…) | text |
-| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka`, `prispevek-socialni-site`, `navod` |
+| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka`, `prispevek-socialni-site`, `navod`, `clanek-media` |
 | `viditelnost` | vrstva přístupu v MCP serveru | `verejne` (bez přihlášení), `clenske` (jen přihlášení piráti); v `data/` je dnes vše `verejne` |
 | `stazeno` | kdy skript dokument stáhl (stáří dat) | `YYYY-MM-DD` |
 
@@ -73,7 +81,7 @@ Volitelná pole:
 | Pole | Význam | Hodnoty |
 |---|---|---|
 | `datum` | datum vydání dokumentu (článku, usnesení); chybí, pokud ho zdroj neuvádí | `YYYY-MM-DD`, u exportů i ISO 8601 |
-| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, `vyjadreni-politika` (vlastní příspěvek poslance na sociální síti, ne stanovisko strany), později `nazor-jednotlivce` |
+| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, `vyjadreni-politika` (vlastní příspěvek poslance na sociální síti, ne stanovisko strany), `externi-media` (externí média: článek o Pirátech, není výstup strany, může být kritický i nepřesný), později `nazor-jednotlivce` |
 
 Skripty přidávají další pole podle zdroje: `autor`, `tagy` (články), `telefon`,
 `socialni_site` (profily na webu), `druh`, `zkratka`, `nadrazeny`, `kontakty`, `role`
@@ -94,6 +102,7 @@ příslušného skriptu a u PSP v `data/psp/README.md`.
 | peer.pirati.cz, majak.pirati.cz | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) podle patičky webů (stejná šablona jako pirati.cz) | PDF hospodářské strategie na majak.pirati.cz licenci neuvádí; před dalším šířením ověřit u PEER |
 | X/Twitter, Bluesky | veřejné příspěvky politiků; autorská práva k textu má autor, X podmínky dovolují zobrazení veřejného obsahu s odkazem na původní příspěvek | ukládáme jen text, datum, odkaz a počty reakcí; žádné obrázky ani videa, žádné odpovědi třetích osob; u citace vždy odkaz na původní příspěvek |
 | evidence.pirati.cz | veřejný registr schůzek (Open Lobby, AGPL software); licence dat na stránce neuvedena, strana ho zveřejňuje záměrně kvůli transparentnosti lobbingu | jména protistran jsou údaje třetích osob, viz GDPR níže; `evidence.py --bez-tretich-osob` je neuloží |
+| Google News, GDELT, RSS médií | ukládáme jen metadata (titulek, médium, datum, URL), perex z RSS do 300 znaků a zmíněná jména; plné texty článků jsou autorské dílo médií a zůstávají jen na původní URL | média monitorujeme bez placených služeb; perex z RSS je určen k šíření, přesto při kurátorství nekopírovat dál |
 
 Před zařazením čehokoli do `content/` nebo do veřejné vrstvy serveru zkontrolujte,
 že licence dovoluje další šíření. To platí zvlášť pro fotky a fonty.

@@ -37,7 +37,9 @@ ALLOWED_TYP = (
     "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
     "materialy", "prispevek-socialni-site",  # sociální sítě poslanců (socialni_site.py)
     "schuzka",  # evidence.pirati.cz (evidence.py)
+    "clanek-media",  # mediální monitoring: články o Pirátech v externích médiích (media.py)
     "navod",  # nápověda a postupy pro správce webů (majak.pirati.cz, subweby.py)
+    "system",  # audit systémů *.pirati.cz (systemy.py; používá i `navod` pro kam-s-problemem.md)
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$")

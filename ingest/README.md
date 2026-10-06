@@ -20,6 +20,8 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 | [Pirátská hospodářská strategie](https://majak.pirati.cz/documents/647/Piratska_Hospodarska_strategie.pdf) (PDF, PEER) | `dokumenty.py` | `data/dokumenty/hospodarska-strategie/00-cely-dokument.md`, `NN-<kapitola>.md` | obecný převod PDF -> Markdown (pdfplumber): nadpisy podle velikosti písma, tabulky, popisky grafů jako `> Graf:`; celý text a 7 kapitol s rozsahem stran; profily dokumentů v `DOKUMENTY` | při vydání nového dokumentu (přidat profil) |
 | [peer.pirati.cz](https://peer.pirati.cz) | `subweby.py` | `data/subweby/peer/*.md` | úvodní stránka s členy PEER (rozcestník), stránka strategie (programový dokument), články „Co si o tom myslíme“ (aktuality); konfigurace `WEBY` je připravená pro další weby z Majáku | týdně |
 | [majak.pirati.cz](https://majak.pirati.cz) | `subweby.py` | `data/majak/seznam-webu.md`, `napoveda/*.md`, `zalozeni-webu.md`, `uvod.md` | seznam všech pirátských webů v Majáku (mapa webů strany), nápověda a postupy pro správce webů; `/admin/` a `/trash-can/` se vynechávají | měsíčně |
+| audit systémů `*.pirati.cz` (crt.sh, odkazy v datech, patičky webů, Maják seznam webů, seznam známých názvů) | `systemy.py` | `data/systemy/systemy.jsonl`, `systemy.md`, `kam-s-problemem.md`, `neaktivni.jsonl`, `neproverene.jsonl` | každá adresa: stav (funguje / přesměrování / vyžaduje přihlášení / chráněno / nefunguje), title, meta, odhad technologie, kategorie, k čemu slouží; průvodce „mám problém → kam jít“ (návrh ke schválení kurátorem); jen HTTP GET bez přihlášení, max 150 adres, interval 1 s | měsíčně (`--max 150`), crt.sh bývá 502, skript to zkouší opakovaně nebo použije cache |
+| Mediální monitoring: Google News RSS, GDELT DOC API, RSS českých médií (`media_zdroje.yaml`, klíčová slova `media_klicova_slova.yaml`) | `media.py` | `data/media/clanky.jsonl`, `<rok>/<rok>-<mesic>.md`, `stav.json` | články externích médií o Pirátech a jejich poslancích (současných i bývalých): titulek, médium, datum, URL, perex z RSS, zmíněné osoby; žádné plné texty (autorita `externi-media`) | denně `--denne` (Google News + RSS + GDELT za 7 dní); jednorázově `--historie --od 2017-01` (GDELT a Google News po měsících, lze přerušit a dotáhnout) |
 | kontrola výstupů | `validate.py` | jen výpis na stdout | ověří frontmatter `.md` a validitu `.jsonl`, souhrn podle složek a typů | po každém běhu ingestu a v CI |
 
 **Evidence schůzek a třetí osoby.** Registr je veřejný záměrně (transparentnost lobbingu) a jména ostatních, nepirátských účastníků v něm strana zveřejňuje oficiálně. Přesto jde o údaje třetích osob: kurátor by měl rozhodnout, zda je indexovat celé, nebo jen naše účastníky. Výchozí stav ukládá vše tak, jak je na webu; `python3 evidence.py --bez-tretich-osob --plne` pole `ostatni_ucastnici` / `ucastnici_ostatni` vynechá (popis schůzky může jména obsahovat i tak). Autoři se ukládají jen jako id, jméno, počet zpráv a odkaz (ne login ani odkaz na fórum).
@@ -64,6 +66,32 @@ počty reakcí. Parametry: `--platforma x|bluesky|vse`, `--limit N` (příspěvk
   řádově 10–15 tisíc přečtených tweetů měsíčně, Pro tier 5 000 USD. Token nepatří do repozitáře.
   Větev je napsaná podle dokumentace, bez tokenu nebyla vyzkoušena; bez tokenu skript jen
   varuje na stderr a použije prohlížeč.
+
+**Mediální monitoring (`media.py`).** Databáze článků, které vyšly o Pirátech a jejich poslancích,
+bez placených služeb (Monitora, Newton Media, Anopress by daly úplnější pokrytí včetně tisku,
+rozhlasu a televize). Ukládají se jen metadata a krátký úryvek (titulek, médium, datum, URL,
+perex z RSS do 300 znaků, zmíněná jména), nikdy plné texty: ty jsou autorské dílo médií a uživatel
+je má na odkazu. Klíčová slova (všichni pirátští poslanci z `data/psp/poslanci.jsonl`, republikové
+předsednictvo z `data/lide/osoby.jsonl`, názvy strany) jsou v `media_klicova_slova.yaml`, kanály a
+názvy médií v `media_zdroje.yaml`; oba soubory kurátor upravuje ručně (návod v hlavičce). Omezení:
+
+- **RSS kanály médií** dávají jen posledních 20 až 150 položek (Respekt 2000), tedy pokrývají jen
+  poslední dny; proto se musí běžet denně. Filtr hledá kmen příjmení a slova „pirát…“ v titulku a
+  perexu bez diakritiky, tolerantně ke skloňování. Samotné příjmení platí jen spolu se zmínkou strany.
+- **Google News RSS** vrací ~100 nejnovějších položek na dotaz; s `after:`/`before:` jen vzorek
+  (20 až 40 za měsíc). Perex nedává. Odkazy vedou přes news.google.com; skript je rozbaluje na
+  skutečnou URL (2 požadavky a ~120 kB na článek, výchozí 300 na běh, `--rozbalit N`), zbytek
+  dokončí další běhy. Vlastní web pirati.cz se vylučuje (pokrývá ho `pirati_web.py`).
+- **GDELT** indexuje jen část českých médií, nedává perex, vrací max. 250 záznamů na dotaz
+  (skript okno dělí) a limituje na 1 požadavek za 5 s na IP adresu; ze sdílené adresy (cloud,
+  proxy) často vrací 429 i při pomalejším tempu. Skript čeká a opakuje, neúspěšný měsíc nechá
+  v `data/media/stav.json` jako nehotový; další `--historie --od …` ho zkusí znovu.
+- **Falešné shody**: slovo „piráti“ ve sportu (hokejoví Piráti Chomutov), u somálských pirátů,
+  Pirátů z Karibiku, pirátů silnic nebo pirátských kopií ruší seznam `strana.vylouceni`;
+  u dotazu na stranu musí být strana i v titulku (přesnost před úplností), u dotazu na jméno se
+  jméno bere z dotazu (`shoda: dotaz`), protože vyhledávač viděl celý text. Kurátor by měl
+  občas projít záznamy se `shoda: dotaz` a doplnit vyloučení.
+- Dedup podle normalizované URL (bez utm parametrů) a podle (titulek, doména, den); běh nic nemaže.
 
 Sdílený kód je v `common.py` (`polite_get`, `write_markdown`, `write_jsonl`, `slugify`,
 `clean_text`, `today`).
