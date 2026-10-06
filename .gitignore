@@ -5,3 +5,5 @@ node_modules/
 
 # Stažené originály z externích zdrojů (velké, necommitují se)
 raw/
+.cache/
+__pycache__/

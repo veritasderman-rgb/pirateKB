@@ -143,9 +143,10 @@ def main() -> None:
         "Kódy hlasování v původních datech: A=ano, B/N=ne, C/K=zdržel se, F=nehlasoval, @=nepřítomen, "
         "M=omluven, W=před slibem.\n"
     )
-    write_markdown(out / "README.md", {"zdroj": "https://www.psp.cz/sqw/hp.sqw?k=1300", "stazeno": today(),
-                                       "viditelnost": "verejne", "autorita": "oficialni-data-psp",
-                                       "typ": "hlasovani"}, body)
+    write_markdown(out / "README.md", {"zdroj": "https://www.psp.cz/sqw/hp.sqw?k=1300",
+                                       "nazev": "Hlasování pirátských poslanců (otevřená data PSP)",
+                                       "stazeno": today(), "viditelnost": "verejne",
+                                       "autorita": "oficialni-data-psp", "typ": "hlasovani"}, body)
 
 
 if __name__ == "__main__":
