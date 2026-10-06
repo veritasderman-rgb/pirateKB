@@ -1,0 +1,37 @@
+---
+zdroj: https://evidence.pirati.cz/report/3019/
+nazev: návštěva velvyslance Španělského království v ČR (J. E. pan Angel LOSSADA TORRES QUEVEDO)
+typ: schuzka
+autorita: oficialni-evidence
+datum: '2019-02-19'
+autor: Magdalena Valdmanova
+autor_url: https://evidence.pirati.cz/author/340/
+ucastnici_nasi:
+- Zdeněk Hřib
+ucastnici_ostatni: []
+publikovano: '2019-04-18T14:07:12+02:00'
+upraveno: '2019-04-18T14:07:12+02:00'
+viditelnost: verejne
+stazeno: '2026-10-06'
+---
+
+# návštěva velvyslance Španělského království v ČR (J. E. pan Angel LOSSADA TORRES QUEVEDO)
+
+Schůzka 19. 2. 2019. Zapsal/a: Magdalena Valdmanova (zveřejněno 2019-04-18 v Evidenci kontaktů a schůzek).
+
+Velvyslanec se představil a nabídl součinnost pro případnou budoucí spolupráci se španělskými městy.
+Účastníci za HMP/MHMP: Zdeněk Hřib, primátor HMP, zástupci oddělení zahraničních vztahů a protokolárních záležitostí Magistrátu hl. m. Prahy
+
+## Přijaté výhody
+
+neuvedeno
+
+## Poskytnuté výhody
+
+neuvedeno
+
+## Účastníci
+
+Naši účastníci: Zdeněk Hřib
+
+Ostatní účastníci: neuvedeno

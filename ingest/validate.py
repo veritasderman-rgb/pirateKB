@@ -35,7 +35,8 @@ VIDITELNOST = ("verejne", "clenske")
 ALLOWED_TYP = (
     "tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument",
     "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
-    "materialy",
+    "materialy", "prispevek-socialni-site",  # sociální sítě poslanců (socialni_site.py)
+    "schuzka",  # evidence.pirati.cz (evidence.py)
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$")

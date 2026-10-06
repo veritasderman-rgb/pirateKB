@@ -36,6 +36,10 @@ data/
   flickr/                fotoalba Pirátů na Flickru (jen metadata, ne fotky)
     alba.md              tabulka alb od nejnovějších s odkazy, počtem fotek a licencí
     alba.jsonl           jedno album na řádek (id, název, popis, počet fotek, url, náhled, data, licence)
+  evidence/              Evidence kontaktů a schůzek (evidence.pirati.cz, Open Lobby): registr lobbistických schůzek
+    <rok>/<id>-<slug>.md jedna schůzka = jeden soubor (popis, přijaté/poskytnuté výhody, účastníci)
+    schuzky.jsonl        jedna schůzka na řádek (id, datum, název, popis, výhody, účastníci, autor, publikováno, url)
+    autori.jsonl         autoři zpráv (pirátští politici): id, jméno, počet zpráv, url
 ```
 
 ## Formát: Markdown s YAML frontmatter
@@ -46,7 +50,7 @@ Každý `.md` soubor začíná blokem `---` … `---`. Povinná pole:
 |---|---|---|
 | `zdroj` | URL stránky nebo datové sady, ze které text pochází; slouží jako citace | URL |
 | `nazev` | název dokumentu (titulek článku, název orgánu, osoby…) | text |
-| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy` |
+| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka` |
 | `viditelnost` | vrstva přístupu v MCP serveru | `verejne` (bez přihlášení), `clenske` (jen přihlášení piráti); v `data/` je dnes vše `verejne` |
 | `stazeno` | kdy skript dokument stáhl (stáří dat) | `YYYY-MM-DD` |
 
@@ -55,7 +59,7 @@ Volitelná pole:
 | Pole | Význam | Hodnoty |
 |---|---|---|
 | `datum` | datum vydání dokumentu (článku, usnesení); chybí, pokud ho zdroj neuvádí | `YYYY-MM-DD`, u exportů i ISO 8601 |
-| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `oficialni-evidence` (lide.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, později `nazor-jednotlivce` |
+| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, později `nazor-jednotlivce` |
 
 Skripty přidávají další pole podle zdroje: `autor`, `tagy` (články), `telefon`,
 `socialni_site` (profily na webu), `druh`, `zkratka`, `nadrazeny`, `kontakty`, `role`
@@ -73,6 +77,7 @@ příslušného skriptu a u PSP v `data/psp/README.md`.
 | styleguide.pirati.cz | licence na stránce neuvedena; provozuje stejný technický odbor jako pirati.cz | barvy a názvy písem nejsou autorské dílo, samotné fonty (soubory) ale ano, viz jejich licence |
 | psp.cz otevřená data | otevřená data Poslanecké sněmovny, volně k dalšímu užití s uvedením zdroje | <https://www.psp.cz/sqw/hp.sqw?k=1300> |
 | lide.pirati.cz | veřejná evidence České pirátské strany (organizační struktura a funkcionáři) | vytěžujeme jen veřejnou část bez přihlášení |
+| evidence.pirati.cz | veřejný registr schůzek (Open Lobby, AGPL software); licence dat na stránce neuvedena, strana ho zveřejňuje záměrně kvůli transparentnosti lobbingu | jména protistran jsou údaje třetích osob, viz GDPR níže; `evidence.py --bez-tretich-osob` je neuloží |
 
 Před zařazením čehokoli do `content/` nebo do veřejné vrstvy serveru zkontrolujte,
 že licence dovoluje další šíření. To platí zvlášť pro fotky a fonty.
