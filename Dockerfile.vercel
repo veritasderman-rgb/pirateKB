@@ -1,5 +1,5 @@
 # MCP server Pirátské znalostní báze (Streamable HTTP na /mcp, port z env PORT, výchozí 8765)
-# Stejný obsah má Dockerfile.vercel (Vercel buildí image z něj); při změně upravte oba.
+# Kopie Dockerfile pro Vercel (nasazení OCI image, viz vercel.json / server/README.md); při změně upravte oba.
 FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1 \

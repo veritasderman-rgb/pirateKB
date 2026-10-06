@@ -5,3 +5,7 @@ __pycache__
 *.pyc
 .pytest_cache
 raw
+# Vercel (Python funkce) - v Docker image nemají co dělat
+api
+vercel.json
+.vercel

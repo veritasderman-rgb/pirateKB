@@ -103,6 +103,21 @@ docker compose up --build
 Image obsahuje hotový index (staví se při `docker build`) a naslouchá na portu 8765.
 Podrobnosti jsou v [`Dockerfile`](../Dockerfile) a [`docker-compose.yml`](../docker-compose.yml).
 
+### Nasazení na Vercel
+
+Cíl je veřejná adresa `https://<projekt>.vercel.app/mcp`, kterou si lidé přidají v claude.ai
+jako custom connector (server nemá autentizaci, obsahuje jen veřejná data). Dvě varianty:
+
+- **Kontejner (primární):** Vercel postaví OCI image z [`deploy/Dockerfile.vercel` (pro kontejnerové nasazení zkopírujte do kořene jako `Dockerfile.vercel`)](../Dockerfile.vercel)
+  (stejný obsah jako `Dockerfile`, index se staví při buildu). Server čte port z env `PORT`
+  a naslouchá na `0.0.0.0`; `GET /` a `/health` vrací `{"status":"ok",...}`.
+- **Python funkce (záložní):** [`api/index.py`](../api/index.py) vystavuje ASGI `app`,
+  [`vercel.json`](../vercel.json) přesměruje všechny cesty na ni a `buildCommand` vybuduje
+  index; pokud by při běhu chyběl, vybuduje se do `/tmp/kb.sqlite`.
+
+HTTP běží stateless (bez session ID, JSON odpovědi), takže funguje za load balancerem i při
+více instancích. Ověření: `curl https://<projekt>.vercel.app/health`.
+
 ## Aktualizace dat
 
 Data se obnovují skripty z [`ingest/`](../ingest/README.md). Vše najednou, včetně

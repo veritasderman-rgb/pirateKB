@@ -1151,6 +1151,45 @@ def resource_stats() -> str:
 # Spuštění
 # =============================================================================
 
+def _env_flag(name: str, default: bool) -> bool:
+    val = os.environ.get(name)
+    if val is None or val == "":
+        return default
+    return val.strip().lower() not in ("0", "false", "no", "off")
+
+
+@mcp.custom_route("/", methods=["GET"], include_in_schema=False)
+@mcp.custom_route("/health", methods=["GET"], include_in_schema=False)
+async def _health(request: Any) -> Any:
+    """Jednoduchá kontrola běhu (load balancer, Vercel, ruční curl). MCP je na /mcp."""
+    from starlette.responses import JSONResponse
+
+    return JSONResponse({"status": "ok", "name": "piratekb", "mcp": "/mcp"})
+
+
+def http_app(host: str = "0.0.0.0", stateless: bool | None = None,
+             json_response: bool | None = None) -> Any:
+    """Vrátí ASGI (Starlette) aplikaci: Streamable HTTP na ``/mcp`` + ``GET /`` a ``/health``.
+
+    Výchozí režim je *stateless* (bez session ID) s JSON odpověďmi: každý požadavek je
+    samostatný, což je nutné za load balancerem, při více instancích a v serverless
+    prostředí (Vercel). Přepnout lze env ``PIRATEKB_STATELESS=0`` / ``PIRATEKB_JSON_RESPONSE=0``.
+    Ochrana proti DNS rebinding (kontrola hlavičky Host) se v mcp zapíná jen pro
+    ``host`` 127.0.0.1/localhost; při ``0.0.0.0`` je vypnutá, aby prošel libovolný
+    veřejný hostname (``<projekt>.vercel.app``, vlastní doména).
+    """
+    if stateless is None:
+        stateless = _env_flag("PIRATEKB_STATELESS", True)
+    if json_response is None:
+        json_response = _env_flag("PIRATEKB_JSON_RESPONSE", True)
+    return mcp.streamable_http_app(
+        streamable_http_path="/mcp",
+        stateless_http=stateless,
+        json_response=json_response,
+        host=host,
+    )
+
+
 def run(transport: str = "stdio", host: str = "127.0.0.1", port: int = 8765,
         db_path: str | os.PathLike | None = None) -> None:
     """Spustí server. Index se při startu vybuduje, pokud chybí (nikdy nevyhodí výjimku)."""
@@ -1159,8 +1198,12 @@ def run(transport: str = "stdio", host: str = "127.0.0.1", port: int = 8765,
     if _state["error"]:
         log.warning("server startuje bez funkčního indexu: %s", _state["error"])
     if transport == "http":
-        log.info("Streamable HTTP na http://%s:%d/mcp", host, port)
-        mcp.run("streamable-http", host=host, port=port, streamable_http_path="/mcp")
+        import uvicorn
+
+        app = http_app(host=host)
+        log.info("Streamable HTTP na http://%s:%d/mcp (stateless=%s)", host, port,
+                 _env_flag("PIRATEKB_STATELESS", True))
+        uvicorn.run(app, host=host, port=port, log_level="info")
     else:
         log.info("stdio transport, index: %s", _state["db_path"])
         mcp.run("stdio")
