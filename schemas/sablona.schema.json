@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/veritasderman-rgb/pirateKB/schemas/sablona.schema.json",
+  "title": "content/sablony/: šablony textů (tisková zpráva, příspěvek, projev)",
+  "allOf": [{"$ref": "content.schema.json"}],
+  "required": ["reviewed_at"],
+  "properties": {
+    "typ": {"const": "sablona"},
+    "pro": {"type": "string", "description": "Pro jaký výstup šablona je (tiskova-zprava, social-post, projev…)."}
+  }
+}

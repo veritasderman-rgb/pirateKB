@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/veritasderman-rgb/pirateKB/schemas/content.schema.json",
+  "title": "Frontmatter dokumentu v content/ a inbox/",
+  "description": "Společná pravidla pro kurátorovanou vrstvu content/ i syrové příspěvky v inbox/. Pole převzatá z data/README.md + schvalovací pole. Kontroluje python3 ingest/validate.py content|inbox (implementuje podmnožinu JSON Schema: required, type, enum, const, pattern, format date, minLength, items, anyOf, if/then). Data v YAML pište v uvozovkách: '2026-10-06'.",
+  "type": "object",
+  "required": ["zdroj", "nazev", "typ", "viditelnost", "stazeno", "stav"],
+  "properties": {
+    "zdroj": {"type": "string", "minLength": 1, "description": "URL nebo cesta ke zdroji (citace). U textu složeného z více zdrojů hlavní zdroj, ostatní v těle nebo v poli zdroje."},
+    "zdroje": {"type": "array", "items": {"type": "string", "minLength": 1}, "description": "Volitelně další zdroje (URL nebo cesty v repozitáři)."},
+    "nazev": {"type": "string", "minLength": 1},
+    "typ": {
+      "enum": [
+        "tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument", "predpis",
+        "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani", "materialy", "schuzka",
+        "prispevek-socialni-site", "navod", "clanek-media", "system",
+        "slovnik", "sablona", "vysledek", "material"
+      ],
+      "description": "Typy z data/README.md + typy kurátorované vrstvy: slovnik, sablona, vysledek (co jsme dokázali), material (syrový příspěvek bez jasného typu, jen inbox/)."
+    },
+    "viditelnost": {"enum": ["verejne", "clenske"]},
+    "stazeno": {"type": "string", "format": "date", "description": "Kdy byl text stažen ze zdroje nebo vložen do repozitáře (YYYY-MM-DD)."},
+    "datum": {"anyOf": [
+      {"type": "string", "format": "date"},
+      {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}(:\\d{2})?(\\.\\d+)?(Z|[+-]\\d{2}:?\\d{2})?$"}
+    ]},
+    "autorita": {"type": "string", "minLength": 1, "description": "Hodnoty z data/README.md; v content/ navíc `kurator` = text sestavený přispěvatelem nebo kurátorem z citovaných zdrojů, platí až po schválení."},
+    "autor": {"type": ["string", "null"]},
+    "stav": {"enum": ["navrh", "schvaleno"], "description": "navrh = čeká na kurátora (indexuje se s nižší vahou a označením neověřeno); schvaleno = kurátor ověřil."},
+    "schvalil": {"type": ["string", "null"], "description": "Kdo schválil: GitHub účet (@jmeno) nebo jméno kurátora. Povinné při stav: schvaleno."},
+    "schvaleno_dne": {"anyOf": [{"type": "string", "format": "date"}, {"type": "null"}]},
+    "reviewed_at": {"anyOf": [{"type": "string", "format": "date"}, {"type": "null"}], "description": "Kdy byl obsah naposledy porovnán se zdroji (autorem návrhu nebo kurátorem). Podle něj kurátor hledá stárnoucí dokumenty."},
+    "platnost_do": {"anyOf": [{"type": "string", "format": "date"}, {"type": "null"}], "description": "Volitelně: do kdy dokument platí. Datum v minulosti = dokument je neplatný (validate vypíše upozornění)."},
+    "nahrazeno": {"type": ["string", "null"], "description": "Volitelně u neplatného dokumentu: cesta nebo URL dokumentu, který ho nahrazuje."},
+    "poznamka": {"type": ["string", "null"]},
+    "generator": {"type": "string", "description": "Skript, který návrh vytvořil (jen automatické návrhy v inbox/)."}
+  },
+  "if": {"required": ["stav"], "properties": {"stav": {"const": "schvaleno"}}},
+  "then": {
+    "required": ["schvalil", "schvaleno_dne"],
+    "properties": {
+      "schvalil": {"type": "string", "minLength": 1},
+      "schvaleno_dne": {"type": "string", "format": "date"}
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/veritasderman-rgb/pirateKB/schemas/brand.schema.json",
+  "title": "content/brand/: vizuální identita a tón komunikace",
+  "allOf": [{"$ref": "content.schema.json"}],
+  "required": ["autorita", "reviewed_at"],
+  "properties": {
+    "typ": {"enum": ["brand", "navod"]},
+    "verze_styleguide": {"type": "string", "description": "Verze styleguide.pirati.cz, ze které jsou ověřené hodnoty."}
+  }
+}

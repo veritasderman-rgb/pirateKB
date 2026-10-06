@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/veritasderman-rgb/pirateKB/schemas/vysledek.schema.json",
+  "title": "content/vysledky/ a inbox/vysledky/: co jsme dokázali",
+  "description": "Jeden soubor = jeden výsledek (prosazený zákon, změna, spuštěná služba). Automatické návrhy generuje ingest/navrhy_vysledku.py do inbox/vysledky/.",
+  "allOf": [{"$ref": "content.schema.json"}],
+  "required": ["datum", "shrnuti"],
+  "properties": {
+    "typ": {"const": "vysledek"},
+    "shrnuti": {"type": "string", "minLength": 1, "description": "1–3 věty: co se změnilo a jaký byl podíl Pirátů."},
+    "souvisejici_hlasovani": {"type": "array", "items": {"type": "string", "pattern": "^https://www\\.psp\\.cz/"}, "description": "URL hlasování na psp.cz."},
+    "kdo": {"type": "array", "items": {"type": "string"}, "description": "Kdo za výsledkem stojí (jména politiků, týmy)."},
+    "uroven": {"enum": ["evropska", "celostatni", "krajska", "obecni", null]},
+    "jistota": {"enum": ["vysoka", "stredni", "nizka"], "description": "Jen automatické návrhy: jak silný byl signál úspěchu."}
+  }
+}

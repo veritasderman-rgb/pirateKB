@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/veritasderman-rgb/pirateKB/schemas/organizace.schema.json",
+  "title": "content/organizace/: kurátorované informace o fungování strany",
+  "allOf": [{"$ref": "content.schema.json"}],
+  "properties": {"typ": {"enum": ["organizacni-jednotka", "osoba", "navod", "rozcestnik", "predpis"]}}
+}

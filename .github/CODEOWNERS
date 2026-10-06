@@ -1,0 +1,18 @@
+# Vlastníci kódu a obsahu (GitHub CODEOWNERS).
+# Změny v těchto cestách vyžadují schválení vlastníka v pull requestu, pokud je v nastavení
+# větve main zapnuto „Require review from Code Owners“ (Settings -> Branches).
+# Model „hejno + kurátor“: docs/navrh-architektury.md sekce 2a, postup v docs/kurator.md.
+
+# Kurátorovaný brand, stanoviska a výsledky: finální slovo má kurátor.
+/content/brand/        @veritasderman-rgb
+/content/stanoviska/   @veritasderman-rgb
+/content/vysledky/     @veritasderman-rgb
+
+# Pravidla kurátorované vrstvy (schémata, postupy) mění jen kurátor.
+/schemas/              @veritasderman-rgb
+/.github/CODEOWNERS    @veritasderman-rgb
+/docs/kurator.md       @veritasderman-rgb
+
+# Ostatní složky content/ (slovnik, sablony, organizace) a inbox/ mohou schvalovat
+# i další pověření správci; doplňte je sem, až budou určeni, např.:
+# /content/slovnik/    @veritasderman-rgb @jmeno-spravce
