@@ -1,0 +1,221 @@
+# Aliasy a synonyma pro hledání ve znalostní bázi (server/kb).
+#
+# Ručně psaná část. Automatická část se generuje při buildu (server/kb/aliases.py)
+# a obojí se uloží do tabulky `aliasy` v indexu:
+#   - zkratka <-> název každé jednotky z data/lide/tymy a data/lide/regiony (pole `zkratka`),
+#   - „Resortní tým X“ <-> „RT X“, „Meziresortní tým X“ <-> „MRT X“, „KS X“ <-> „Krajské
+#     sdružení X“, „MS X“ <-> „Místní sdružení X“, „ZK X“ <-> „Zastupitelský klub X“,
+#     „Pracovní skupina X“ <-> „PS X“, „Místní tým X“ <-> „MT X“,
+#   - příjmení -> celé jméno u poslanců, europoslanců, senátorů a členů RP (jen pokud je
+#     příjmení v evidenci jednoznačné) a domácké tvary křestních jmen (Kuba Michálek).
+#
+# Shoda se počítá na kmenech (server/kb/stem.py), takže stačí základní tvar:
+# „Republikovým předsednictvem“ i „republikove predsednictvo“ najdou alias
+# „Republikové předsednictvo“. Velikost písmen nehraje roli, s jednou výjimkou:
+# zkratka, která je zároveň běžné české slovo (TO, PO, …), se rozvine jen když je
+# v dotazu napsaná velkými písmeny.
+#
+# Sekce:
+#   zkratky:  ZKRATKA: [význam, …]          oboustranně (RP <-> Republikové předsednictvo)
+#   lide:     Celé jméno: [varianta, …]       jen varianta -> celé jméno
+#   domacka_jmena: Křestní: [domácký tvar]  použije se automaticky na poslance a vedení
+#   temata:   hlavní pojem: [synonymum, …]    hlavní pojem <-> každé synonymum
+#             (synonyma se mezi sebou nerozvíjejí: „hypotéky“ najde „bydlení“, ne „nájmy“)
+
+zkratky:
+  # orgány strany
+  CF: [Celostátní fórum]
+  RV: [Republikový výbor]
+  RP: [Republikové předsednictvo]
+  KS: [Krajské sdružení]
+  PKS: [Předsednictvo krajského sdružení]
+  MS: [Místní sdružení]
+  PMS: [Předsednictvo místního sdružení]
+  KK: [Kontrolní komise]
+  RK: [Rozhodčí komise]
+  KaS: [Kancelář strany]
+  AO: [Administrativní oddělení, Administrativní odbor]
+  TO: [Technické oddělení, Technický odbor]
+  FT: [Finanční tým]
+  FO: [Finanční odbor]
+  PO: [Personální odbor]
+  MO: [Mediální odbor, Ministerstvo obrany]
+  RT: [Resortní tým]
+  MRT: [Meziresortní tým]
+  ReS: [Resortní sekce]
+  RRT: [Rada resortních týmů]
+  PS: [Pracovní skupina, Poslanecká sněmovna]
+  ZK: [Zastupitelský klub]
+  MT: [Místní tým]
+  KT: [Kampaňový tým]
+  CVS: [Centrální volební štáb]
+  MP: [Mladé Pirátstvo]
+  RMP: [Rada Mladého Pirátstva]
+  PEER: [Pirátská expertní ekonomická rada]
+  TZ: [tisková zpráva]
+  RegP: [registrovaný příznivec]
+  # parlament a instituce
+  PSP: [Poslanecká sněmovna Parlamentu, Poslanecký klub]
+  PČR: [Parlament České republiky, Policie České republiky]
+  EP: [Evropský parlament, Europoslanecký klub]
+  EK: [Evropská komise]
+  EU: [Evropská unie]
+  ČR: [Česká republika]
+  OSN: [Organizace spojených národů]
+  NATO: [Severoatlantická aliance]
+  ÚS: [Ústavní soud]
+  NSS: [Nejvyšší správní soud]
+  NKÚ: [Nejvyšší kontrolní úřad]
+  ÚOHS: [Úřad pro ochranu hospodářské soutěže]
+  ČNB: [Česká národní banka]
+  ČSÚ: [Český statistický úřad]
+  NÚKIB: [Národní úřad pro kybernetickou a informační bezpečnost]
+  ČT: [Česká televize]
+  ČRo: [Český rozhlas]
+  ČTK: [Česká tisková kancelář]
+  VZP: [Všeobecná zdravotní pojišťovna]
+  ŘSD: [Ředitelství silnic a dálnic]
+  SŽ: [Správa železnic]
+  # ministerstva
+  MV: [Ministerstvo vnitra]
+  MF: [Ministerstvo financí]
+  MPSV: [Ministerstvo práce a sociálních věcí]
+  MMR: [Ministerstvo pro místní rozvoj]
+  MŠMT: [Ministerstvo školství mládeže a tělovýchovy]
+  MZd: [Ministerstvo zdravotnictví]
+  MPO: [Ministerstvo průmyslu a obchodu]
+  MŽP: [Ministerstvo životního prostředí]
+  MZV: [Ministerstvo zahraničních věcí]
+  MD: [Ministerstvo dopravy, mateřská dovolená]
+  MK: [Ministerstvo kultury]
+  MZe: [Ministerstvo zemědělství]
+  MSp: [Ministerstvo spravedlnosti]
+  # pojmy
+  DPH: [daň z přidané hodnoty]
+  EET: [elektronická evidence tržeb]
+  OZE: [obnovitelné zdroje energie]
+  OSVČ: [osoba samostatně výdělečně činná, živnostníci]
+  MHD: [městská hromadná doprava]
+  SVJ: [společenství vlastníků jednotek]
+  GDPR: [ochrana osobních údajů]
+  RVP: [rámcový vzdělávací program]
+  HDP: [hrubý domácí produkt]
+
+lide:
+  Zdeněk Hřib: [Hřib, primátor Hřib, Zdenda Hřib]
+  Ivan Bartoš: [Bartoš, Ivan Bartos]
+  Jakub Michálek: [Michálek, Kuba Michálek]
+  Mikuláš Peksa: [Peksa]
+  Mikuláš Ferjenčík: [Ferjenčík]
+  Olga Richterová: [Richterová, Richterova]
+  Markéta Gregorová: [Gregorová]
+  Marcel Kolaja: [Kolaja]
+  Lukáš Kolářík: [Kolářík]
+  Lukáš Černohorský: [Černohorský]
+  Ondřej Profant: [Profant]
+  Ondřej Polanský: [Polanský]
+  Vojtěch Pikal: [Pikal, Vojta Pikal]
+  Radek Holomčík: [Holomčík]
+  František Kopřiva: [Kopřiva, Franta Kopřiva]
+  Jan Lipavský: [Lipavský]
+  Klára Kocmanová: [Kocmanová]
+  Dana Balcarová: [Balcarová]
+  Tomáš Vymazal: [Vymazal]
+  Martin Šmída: [Šmída]
+  Jiří Hlavenka: [Hlavenka]
+  Irena Ferčíková Konečná: [Ferčíková Konečná, Ferčíková, Konečná]
+  Lenka Martínková Španihelová: [Španihelová]
+
+domacka_jmena:
+  Jakub: [Kuba]
+  František: [Franta]
+  Ondřej: [Ondra]
+  Vojtěch: [Vojta]
+  Jiří: [Jirka]
+  Zdeněk: [Zdenda]
+  Tomáš: [Tom]
+  Mikuláš: [Míka]
+  Lukáš: [Luky]
+  Martin: [Marťa]
+  Kateřina: [Katka]
+  Markéta: [Markétka]
+  Barbora: [Bára]
+  Veronika: [Verča]
+  Michaela: [Míša]
+  Gabriela: [Gábina]
+
+temata:
+  bydlení: [byty, byt, bytová politika, bytová výstavba, výstavba bytů, nájmy, nájem, nájemné,
+            nájemní bydlení, hypotéky, hypotéka, dostupné bydlení, obecní byty, sociální bydlení,
+            startovací byty, družstevní bydlení]
+  digitalizace: [e-government, eGovernment, Portál občana, digitální stát, elektronizace,
+                 datové schránky, bankovní identita, eDoklady, digitální služby, online úřad]
+  školství: [vzdělávání, vzdělání, školy, škola, učitelé, žáci, MŠMT, maturita, přijímačky,
+             rámcový vzdělávací program]
+  zdravotnictví: [nemocnice, lékaři, lékař, zdravotní péče, zdravotní pojištění, pacienti,
+                  zdravotní sestry, léky, zdravotníci, pojišťovny]
+  doprava: [dálnice, železnice, vlaky, MHD, veřejná doprava, silnice, cyklostezky, ŘSD,
+            dopravní infrastruktura]
+  energetika: [energie, elektřina, ceny energií, obnovitelné zdroje, OZE, fotovoltaika,
+               solární elektrárny, jaderná energetika, teplárenství, plyn]
+  životní prostředí: [ochrana přírody, klimatická změna, klima, emise, Zelená dohoda,
+                      Green Deal, ekologie, znečištění]
+  korupce: [protikorupční, střet zájmů, registr smluv, klientelismus, lobbing, transparentnost]
+  transparentnost: [otevřená data, rozklikávací rozpočet, registr smluv, otevřenost]
+  daně: [DPH, daň z příjmu, zdanění, daňová reforma, EET, daňové přiznání, daňový systém]
+  veřejné finance: [státní rozpočet, rozpočet, schodek, deficit, státní dluh, zadlužení,
+                    konsolidace]
+  důchody: [penze, důchodová reforma, důchodový věk, penzijní spoření, důchodci]
+  sociální věci: [sociální dávky, dávky, chudoba, sociální služby, sociální péče,
+                  příspěvek na bydlení, superdávka]
+  exekuce: [exekutoři, dluhy, oddlužení, insolvence, dluhové pasti, milostivé léto]
+  zemědělství: [zemědělci, farmáři, potraviny, zemědělské dotace, společná zemědělská politika,
+                krajina]
+  obrana: [armáda, ozbrojené síly, vojáci, NATO, obranné výdaje, Ministerstvo obrany]
+  kybernetická bezpečnost: [kyberbezpečnost, kybernetické útoky, NÚKIB, hackerské útoky]
+  zahraniční politika: [diplomacie, MZV, zahraniční vztahy, Ministerstvo zahraničních věcí]
+  Evropská unie: [EU, Brusel, Evropská komise, Evropský parlament, evropská integrace]
+  euro: [eurozóna, přijetí eura, společná měna]
+  migrace: [migranti, uprchlíci, azyl, cizinci, imigrace, migrační pakt]
+  kultura: [umění, památky, divadla, knihovny, kulturní instituce, Ministerstvo kultury]
+  veřejnoprávní média: [Česká televize, Český rozhlas, ČT, ČRo, koncesionářské poplatky,
+                        mediální rady]
+  dezinformace: [hoaxy, propaganda, fake news, manipulace, informační válka]
+  justice: [soudy, soudci, státní zastupitelství, spravedlnost, trestní právo, vězeňství]
+  policie: [policisté, kriminalita, Policie České republiky]
+  návykové chování: [drogy, návykové látky, závislosti, adiktologie, alkohol, hazard]
+  konopí: [marihuana, léčebné konopí, legalizace konopí, regulace konopí]
+  rodina: [rodiče, rodičovský příspěvek, mateřská, rodičovská, náhradní výživné, alimenty,
+           školky]
+  zaměstnanost: [zaměstnanci, mzdy, minimální mzda, nezaměstnanost, trh práce,
+                 zkrácené úvazky, home office]
+  podnikání: [podnikatelé, živnostníci, OSVČ, firmy, malé a střední podniky, startupy]
+  byrokracie: [administrativní zátěž, papírování, regulace, zjednodušení]
+  veřejná správa: [úřady, státní správa, úředníci, služební zákon]
+  samospráva: [obce, města, kraje, starostové, komunální politika, zastupitelstva]
+  volby: [volební zákon, kandidátky, volební kampaň, hlasování voličů]
+  korespondenční volba: [volba poštou, hlasování ze zahraničí, elektronické volby]
+  referendum: [přímá demokracie, místní referendum, celostátní referendum]
+  lidská práva: [práva menšin, diskriminace, rovnost, LGBT]
+  manželství pro všechny: [stejnopohlavní manželství, registrované partnerství, LGBT]
+  věda a výzkum: [výzkum, věda, vědci, inovace, Akademie věd, vysoké školy]
+  internet: [vysokorychlostní internet, připojení k internetu, 5G, svoboda internetu,
+             digitální infrastruktura]
+  autorské právo: [copyright, autorský zákon, kolektivní správci, OSA]
+  ochrana soukromí: [soukromí, osobní údaje, GDPR, sledování, šmírování, data retention]
+  sport: [sportovci, tělovýchova, sportovní kluby, Národní sportovní agentura]
+  cestovní ruch: [turismus, turisté]
+  voda: [sucho, vodní zdroje, pitná voda, zadržování vody]
+  odpady: [recyklace, skládky, třídění odpadu, cirkulární ekonomika]
+  ochrana zvířat: [týrání zvířat, kožešinové farmy, útulky, zvířata]
+  Ukrajina: [válka na Ukrajině, ruská agrese, ukrajinští uprchlíci]
+  Rusko: [Ruská federace, Putin, Kreml, ruský vliv]
+  Čína: [ČLR, Huawei, Tchaj-wan, čínský vliv]
+  inflace: [drahota, zdražování, růst cen]
+  duševní zdraví: [psychické zdraví, psychologové, psychiatrie, deprese, psychoterapie]
+  senioři: [důchodci, stárnutí, péče o seniory]
+  mladí lidé: [mládež, mladí, mladé rodiny, studenti]
+  veřejné zakázky: [tendry, zadávací řízení, zakázky]
+  dotace: [granty, evropské fondy, eurofondy]
+  stavební řízení: [stavební zákon, povolování staveb, územní plánování, stavebnictví]
+  hazard: [hazardní hry, herny, automaty, loterie]

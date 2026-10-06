@@ -22,8 +22,10 @@ def tokens(text: str | None) -> list[str]:
 
 
 def fts_query(query: str, prefix_min_len: int = 4, joiner: str = " OR ") -> str:
-    """Převede volný dotaz na FTS5 výraz.
+    """Převede volný dotaz na FTS5 výraz (starší prefixová heuristika).
 
+    ``KB`` ji od schématu 3 nepoužívá (nahradil ji český stemmer ``stem.py`` a plán
+    dotazu ``query.py``); zůstává kvůli zpětné kompatibilitě a pro index bez kmenů.
     Tokeny bez diakritiky; tokeny s délkou >= ``prefix_min_len`` dostanou prefixovou
     hvězdičku (``bydlen*`` najde bydlení/bydlením/bydlením), kratší se hledají přesně.
     Výsledek je prázdný řetězec, pokud dotaz neobsahuje žádný použitelný token.
@@ -42,7 +44,9 @@ def fts_query(query: str, prefix_min_len: int = 4, joiner: str = " OR ") -> str:
 
 
 def query_stems(query: str, prefix_min_len: int = 4) -> list[str]:
-    """Stejné kmeny, jaké používá ``fts_query`` (pro bonus za shodu více tokenů)."""
+    """Stejné kmeny, jaké používá ``fts_query``: podřetězce textu bez diakritiky
+    (``"bydlen" in fold(text)``). Používá je ``server/mcp_server.py`` pro kontrolu úplné
+    shody; přesnější je pole ``shoda_vsech`` ve výsledcích ``KB.search``."""
     stems: list[str] = []
     for tok in tokens(query):
         if len(tok) < 2:

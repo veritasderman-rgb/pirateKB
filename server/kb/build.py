@@ -20,7 +20,13 @@ from pathlib import Path
 
 import yaml
 
+from . import aliases as aliases_mod
+from . import embeddings as emb_mod
+from .stem import stem_text
 from .text import chunk_markdown, fold, split_frontmatter
+
+SCHEMA_VERSION = "3"
+STEMMER = "cz-light-1"   # server/kb/stem.py; změna pravidel = nový název + rebuild
 
 # volební období PSP: id období v otevřených datech -> rok voleb
 PSP_OBDOBI = {"172": 2017, "173": 2021, "174": 2025}
@@ -53,11 +59,14 @@ CREATE TABLE chunks (
     nadpis  TEXT,           -- cesta nadpisů prvního odstavce ("H1 > H2")
     nadpisy TEXT,           -- všechny nadpisy v chunku (pro FTS)
     text    TEXT,
-    nazev   TEXT            -- název dokumentu (denormalizace pro FTS)
+    nazev   TEXT,           -- název dokumentu (denormalizace pro FTS)
+    nadpisy_stem TEXT,      -- kmeny (server/kb/stem.py) pro české skloňování
+    text_stem    TEXT,
+    nazev_stem   TEXT
 );
 CREATE INDEX chunks_doc ON chunks(doc_id);
 CREATE VIRTUAL TABLE chunks_fts USING fts5(
-    nadpisy, text, nazev,
+    nadpisy, text, nazev, nadpisy_stem, text_stem, nazev_stem,
     content='chunks', content_rowid='id',
     tokenize="unicode61 remove_diacritics 2"
 );
@@ -74,10 +83,12 @@ CREATE TABLE people (
     role_text   TEXT,       -- role a jednotky jako text pro FTS
     profil_web  TEXT,       -- URL profilu na pirati.cz (jen pokud existuje)
     telefon     TEXT,       -- jen pokud je ve veřejném profilu
-    meta        TEXT        -- JSON: další pole (funkce, web, socialni_site, psp ...)
+    meta        TEXT,       -- JSON: další pole (funkce, web, socialni_site, psp ...)
+    jmeno_stem TEXT, role_text_stem TEXT, zarazeni_stem TEXT, medailonek_stem TEXT
 );
 CREATE VIRTUAL TABLE people_fts USING fts5(
     jmeno, role_text, zarazeni, medailonek,
+    jmeno_stem, role_text_stem, zarazeni_stem, medailonek_stem,
     content='people', content_rowid='rowid',
     tokenize="unicode61 remove_diacritics 2"
 );
@@ -93,11 +104,12 @@ CREATE TABLE org_units (
     role        TEXT,       -- JSON list [{jmeno, role, sekce}]
     role_text   TEXT,
     pocet_clenu INTEGER,
-    body        TEXT
+    body        TEXT,
+    nazev_stem TEXT, role_text_stem TEXT, body_stem TEXT
 );
 CREATE INDEX org_units_nazev ON org_units(nazev);
 CREATE VIRTUAL TABLE org_units_fts USING fts5(
-    nazev, zkratka, role_text, body,
+    nazev, zkratka, role_text, body, nazev_stem, role_text_stem, body_stem,
     content='org_units', content_rowid='rowid',
     tokenize="unicode61 remove_diacritics 2"
 );
@@ -121,11 +133,12 @@ CREATE TABLE votes (
     nehlasoval    INTEGER,
     url           TEXT,
     pirati        TEXT,     -- JSON {jmeno: hlas}
-    pirati_souhrn TEXT      -- JSON {hlas: pocet}
+    pirati_souhrn TEXT,     -- JSON {hlas: pocet}
+    nazev_stem    TEXT
 );
 CREATE INDEX votes_datum ON votes(datum);
 CREATE VIRTUAL TABLE votes_fts USING fts5(
-    nazev,
+    nazev, nazev_stem,
     content='votes', content_rowid='id_hlasovani',
     tokenize="unicode61 remove_diacritics 2"
 );
@@ -153,14 +166,21 @@ CREATE TABLE social_posts (
     lajky       INTEGER,
     reposty     INTEGER,
     odpovedi    INTEGER,
+    text_stem   TEXT,
     UNIQUE (platforma, id)
 );
 CREATE INDEX social_posts_datum ON social_posts(datum);
 CREATE INDEX social_posts_jmeno ON social_posts(jmeno_fold, datum);
 CREATE VIRTUAL TABLE social_posts_fts USING fts5(
-    text, jmeno,
+    text, jmeno, text_stem,
     content='social_posts', content_rowid='pk',
     tokenize="unicode61 remove_diacritics 2"
+);
+
+-- volitelné embeddingy chunků (EMBEDDINGS_PROVIDER=voyage); jinak prázdná
+CREATE TABLE chunk_vec (
+    chunk_id INTEGER PRIMARY KEY REFERENCES chunks(id),
+    vec      BLOB NOT NULL      -- float32 little-endian
 );
 
 CREATE TABLE meta (
@@ -252,13 +272,16 @@ def _load_documents(data_dir: Path, con: sqlite3.Connection) -> dict:
             _s(fm.get("datum")), _s(fm.get("autor")), _j(tagy), _s(fm.get("autorita")),
             _s(fm.get("viditelnost")), kolekce, _j(fm), body, len(body),
         ))
+        nazev = _s(fm.get("nazev")) or path.stem
+        nazev_stem = stem_text(nazev)
         for i, ch in enumerate(chunk_markdown(body)):
-            chunks.append((doc_id, i, ch["nadpis"], ch["nadpisy"], ch["text"],
-                           _s(fm.get("nazev")) or path.stem))
+            chunks.append((doc_id, i, ch["nadpis"], ch["nadpisy"], ch["text"], nazev,
+                           stem_text(ch["nadpisy"]), stem_text(ch["text"]), nazev_stem))
         n_chunks += 1
     con.executemany("INSERT INTO documents VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", docs)
     con.executemany(
-        "INSERT INTO chunks(doc_id, poradi, nadpis, nadpisy, text, nazev) VALUES (?,?,?,?,?,?)",
+        "INSERT INTO chunks(doc_id, poradi, nadpis, nadpisy, text, nazev, nadpisy_stem, "
+        "text_stem, nazev_stem) VALUES (?,?,?,?,?,?,?,?,?)",
         chunks)
     con.execute("INSERT INTO chunks_fts(chunks_fts) VALUES ('rebuild')")
     return {"documents": len(docs), "chunks": len(chunks)}
@@ -375,12 +398,14 @@ def _load_people(data_dir: Path, con: sqlite3.Connection) -> dict:
                                                        r.get("jednotka")) if x))
             if r.get("obdobi"):
                 role_bits.append(" ".join(r["obdobi"]))
+        role_text = "; ".join(role_bits)
         rows.append((
             p["id"], p["jmeno"], p["url"], p["zarazeni"], p["email"], p["clenem_od"],
-            p["medailonek"], _j(p["role"]), "; ".join(role_bits), p["profil_web"],
-            p["telefon"], _j(p["meta"]),
+            p["medailonek"], _j(p["role"]), role_text, p["profil_web"],
+            p["telefon"], _j(p["meta"]), stem_text(p["jmeno"]), stem_text(role_text),
+            stem_text(p["zarazeni"]), stem_text(p["medailonek"]),
         ))
-    con.executemany("INSERT INTO people VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", rows)
+    con.executemany("INSERT INTO people VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
     con.execute("INSERT INTO people_fts(people_fts) VALUES ('rebuild')")
     return {"people": len(rows), "people_web_profiles": n_web, "people_web_new": n_web_new,
             "people_psp": n_psp, "people_psp_new": n_psp_new}
@@ -407,9 +432,10 @@ def _load_org_units(data_dir: Path, con: sqlite3.Connection) -> dict:
                 f"lide/{sub}/{path.stem}", _s(fm.get("nazev")), _s(fm.get("zkratka")),
                 _s(fm.get("druh")), _s(fm.get("nadrazeny")), _s(fm.get("zdroj")),
                 _j(fm.get("kontakty") or []), _j(roles), role_text,
-                fm.get("pocet_clenu"), body,
+                fm.get("pocet_clenu"), body, stem_text(_s(fm.get("nazev"))), stem_text(role_text),
+                stem_text(body),
             ))
-    con.executemany("INSERT INTO org_units VALUES (?,?,?,?,?,?,?,?,?,?,?)", rows)
+    con.executemany("INSERT INTO org_units VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
     con.execute("INSERT INTO org_units_fts(org_units_fts) VALUES ('rebuild')")
 
     edges = []
@@ -436,11 +462,11 @@ def _load_votes(data_dir: Path, con: sqlite3.Connection) -> dict:
                 r["id_hlasovani"], obdobi, r.get("datum"), r.get("cas"), r.get("nazev"),
                 r.get("vysledek"), r.get("pro"), r.get("proti"), r.get("zdrzel"),
                 r.get("nehlasoval"), r.get("url"), _j(r.get("pirati") or {}),
-                _j(r.get("pirati_souhrn") or {}),
+                _j(r.get("pirati_souhrn") or {}), stem_text(r.get("nazev")),
             ))
             for jmeno, hlas in (r.get("pirati") or {}).items():
                 members.append((r["id_hlasovani"], jmeno, fold(jmeno), hlas))
-        con.executemany("INSERT OR REPLACE INTO votes VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", votes)
+        con.executemany("INSERT OR REPLACE INTO votes VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", votes)
         con.executemany("INSERT INTO vote_members VALUES (?,?,?,?)", members)
         n_votes += len(votes)
         n_members += len(members)
@@ -484,15 +510,18 @@ def _load_social(data_dir: Path, con: sqlite3.Connection) -> dict:
                 pocty = {}
             ucet = str(rec.get("ucet") or path.stem).strip().lstrip("@")
             jmeno = _s(rec.get("jmeno")) or ucet
+            text = _s(rec.get("text")) or ""
             rows.append((
                 str(rec["id"]), platforma, ucet, jmeno, fold(jmeno), _s(rec.get("datum")),
-                _s(rec.get("text")) or "", _s(rec.get("url")),
+                text, _s(rec.get("url")),
                 1 if rec.get("je_odpoved") else 0, 1 if rec.get("je_repost") else 0,
                 _int(pocty.get("lajky")), _int(pocty.get("reposty")), _int(pocty.get("odpovedi")),
+                stem_text(text),
             ))
     con.executemany(
         "INSERT INTO social_posts(id, platforma, ucet, jmeno, jmeno_fold, datum, text, url, "
-        "je_odpoved, je_repost, lajky, reposty, odpovedi) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
+        "je_odpoved, je_repost, lajky, reposty, odpovedi, text_stem) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
     con.execute("INSERT INTO social_posts_fts(social_posts_fts) VALUES ('rebuild')")
     return {"social_posts": len(rows)}
 
@@ -538,6 +567,22 @@ def _load_brand(data_dir: Path) -> dict:
     return brand
 
 
+# ---------------------------------------------------------------- aliasy
+
+def _load_aliases(con: sqlite3.Connection, aliases_yaml: Path | None) -> dict:
+    """Ruční aliasy z ``aliasy.yaml`` + automatické ze jednotek a lidí -> tabulka ``aliasy``."""
+    con.executescript(aliases_mod.SCHEMA)
+    manual, domacka = aliases_mod.load_manual(aliases_yaml or aliases_mod.YAML_PATH)
+    units = [(n, z, "lide/" + i.split("/")[1]) for i, n, z in
+             con.execute("SELECT id, nazev, zkratka FROM org_units")]
+    auto_units = aliases_mod.auto_from_units(units)
+    people = con.execute("SELECT jmeno, role FROM people").fetchall()
+    auto_people = aliases_mod.auto_from_people(people, domacka)
+    n = aliases_mod.write_table(con, manual + auto_units + auto_people)
+    return {"aliasy": n, "aliasy_rucni": len(manual), "aliasy_jednotky": len(auto_units),
+            "aliasy_lide": len(auto_people)}
+
+
 # ---------------------------------------------------------------- hlavní build
 
 def _remove_db_files(path: Path) -> None:
@@ -548,20 +593,31 @@ def _remove_db_files(path: Path) -> None:
             p.unlink()
 
 
-def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False) -> dict:
+def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False,
+                embeddings_provider="env", aliases_yaml: Path | None = None) -> dict:
     """Vytvoří (znovu) SQLite index `db_path` z `data_dir` a vrátí statistiky.
 
     Builduje se do dočasného souboru vedle cíle a teprve po úspěšném dokončení se
     atomicky nahradí (`os.replace`). Při chybě zůstává původní index netknutý
     a dočasný soubor se smaže.
+
+    ``embeddings_provider``: ``"env"`` (výchozí) = podle ``EMBEDDINGS_PROVIDER`` a
+    ``VOYAGE_API_KEY``; ``None`` = bez embeddingů; jinak instance provideru (testy).
+    Cache embeddingů je ``EMBEDDINGS_CACHE`` nebo ``<složka indexu>/embeddings-cache.sqlite``.
     """
     data_dir = Path(data_dir)
     db_path = Path(db_path)
     db_path.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = db_path.with_suffix(".sqlite.tmp")
     _remove_db_files(tmp_path)  # zbytek po předchozím přerušeném buildu
+    provider = emb_mod.provider_from_env() if embeddings_provider == "env" else embeddings_provider
+    cache_path = None
+    if provider is not None:
+        cache_path = Path(os.environ.get("EMBEDDINGS_CACHE")
+                          or db_path.parent / "embeddings-cache.sqlite")
     try:
-        stats = _build_into(data_dir, tmp_path, verbose=verbose)
+        stats = _build_into(data_dir, tmp_path, verbose=verbose, provider=provider,
+                            cache_path=cache_path, aliases_yaml=aliases_yaml)
         os.replace(tmp_path, db_path)
     except BaseException:
         _remove_db_files(tmp_path)
@@ -570,18 +626,22 @@ def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False) -> dict
     return stats
 
 
-def _build_into(data_dir: Path, db_path: Path, *, verbose: bool = False) -> dict:
+def _build_into(data_dir: Path, db_path: Path, *, verbose: bool = False, provider=None,
+                cache_path: Path | None = None, aliases_yaml: Path | None = None) -> dict:
     """Sestaví index do `db_path` (který nesmí existovat) a vrátí statistiky."""
     t0 = time.perf_counter()
     con = sqlite3.connect(db_path)
     try:
-        return _build_with_connection(data_dir, db_path, con, t0, verbose)
+        return _build_with_connection(data_dir, db_path, con, t0, verbose, provider=provider,
+                                      cache_path=cache_path, aliases_yaml=aliases_yaml)
     finally:
         con.close()  # idempotentní; při výjimce uvolní soubor před smazáním
 
 
 def _build_with_connection(data_dir: Path, db_path: Path, con: sqlite3.Connection,
-                           t0: float, verbose: bool) -> dict:
+                           t0: float, verbose: bool, *, provider=None,
+                           cache_path: Path | None = None,
+                           aliases_yaml: Path | None = None) -> dict:
     con.execute("PRAGMA journal_mode=OFF")
     con.execute("PRAGMA synchronous=OFF")
     con.execute("PRAGMA temp_store=MEMORY")
@@ -594,7 +654,11 @@ def _build_with_connection(data_dir: Path, db_path: Path, con: sqlite3.Connectio
         ("org_units", lambda: _load_org_units(data_dir, con)),
         ("votes", lambda: _load_votes(data_dir, con)),
         ("social", lambda: _load_social(data_dir, con)),
+        ("aliasy", lambda: _load_aliases(con, aliases_yaml)),
     )
+    if provider is not None:
+        steps += (("embeddings", lambda: emb_mod.build_chunk_vectors(
+            con, provider, cache_path, verbose=verbose)),)
     for name, fn in steps:
         t = time.perf_counter()
         stats.update(fn())
@@ -616,11 +680,15 @@ def _build_with_connection(data_dir: Path, db_path: Path, con: sqlite3.Connectio
         "built_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         "data_dir": str(data_dir.resolve()),
         "data_commit": _git_commit(data_dir),
-        "schema_version": "2",
+        "schema_version": SCHEMA_VERSION,
+        "stemmer": STEMMER,
         "brand": _j(brand),
     }
     for k, v in stats.items():
         meta[f"count_{k}"] = _j(v) if isinstance(v, dict) else str(v)
+    if stats.get("chunk_vec"):
+        meta["embeddings_model"] = stats["embeddings_model"]
+        meta["embeddings_dim"] = str(stats["embeddings_dim"])
     con.executemany("INSERT INTO meta VALUES (?,?)",
                     [(k, v if isinstance(v, str) or v is None else str(v)) for k, v in meta.items()])
     con.commit()

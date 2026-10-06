@@ -212,7 +212,7 @@ otazky:
     otazka: Co jsme vydali k dostupnému bydlení?
     tool: search_press_releases
     argumenty: {query: dostupné bydlení, limit: 5}
-    ocekavane: [dostupnost bydlení, dostupného bydlení, dostupnosti bydlení]
+    ocekavane: [dostupnost bydlení, dostupného bydlení, dostupnosti bydlení, dostupnější bydlení, dostupne-bydleni]
     nesmi_obsahovat: [Žádná tisková zpráva]
     zdroj_musi_byt: pirati.cz
 

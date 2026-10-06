@@ -264,6 +264,11 @@ def _full_matches(results: list[dict], query: str) -> tuple[list[dict], bool]:
         return results, True
     if len(stems) < 2:
         return results, True
+    if results and all("shoda_vsech" in r for r in results):
+        # Index se stemmerem a aliasy už ví, zda se shodly všechny pojmy dotazu
+        # (i přes jiný tvar slova nebo synonymum); podřetězce by je mylně vyřadily.
+        full = [r for r in results if r["shoda_vsech"]]
+        return (full, True) if full else (results, False)
     full = []
     for r in results:
         hay = fold(" ".join(_s(r.get(k)) for k in ("nazev", "nadpis", "snippet")))
