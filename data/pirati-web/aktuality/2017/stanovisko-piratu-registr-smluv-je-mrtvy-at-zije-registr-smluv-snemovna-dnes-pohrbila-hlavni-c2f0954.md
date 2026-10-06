@@ -1,0 +1,32 @@
+---
+zdroj: https://www.pirati.cz/jak-pirati-pracuji/stanovisko-piratu-registr-smluv-je-mrtvy-at-zije-registr-smluv-snemovna-dnes-pohrbila-hlavni-protikorupcni-zakon/
+nazev: 'Stanovisko Pirátů: Registr smluv je mrtvý. Ať žije registr smluv! Sněmovna dnes pohřbila hlavní protikorupční zákon'
+typ: stanovisko
+datum: '2017-02-22'
+autor: Věra Marušiaková
+tagy:
+- Stanovisko
+viditelnost: verejne
+autorita: web
+stazeno: '2026-10-06'
+---
+
+# Stanovisko Pirátů: Registr smluv je mrtvý. Ať žije registr smluv! Sněmovna dnes pohřbila hlavní protikorupční zákon
+
+Dnešek lze bez nadsázky považovat za pohřeb tolik oslavovaného a politiky vzývaného registru smluv. Postarali se o něj svým dnešním hlasováním v poslanecké sněmovně volení zástupci občanů za ČSSD, KSČM, KDU-ČSL a ODS. Těsnou většinou tak padla povinnost nejen státních podniků, ale i městských firem zveřejňovat smlouvy. Určité úlevy dostaly také Česká televize a Český rozhlas i veřejné vysoké školy. Totálně vykostěný zákon ukládá povinnost zveřejňovat smlouvy snad už jen úřadům a základkám.
+
+Před parlamentními volbami v roce 2013 donutila nevládní občanská sdružení spojená v iniciativě Rekonstrukce státu k převzetí závazku, že prosadí zákon o registru smluv. Jeho návrh pak společně předložilo 70 poslanců a poté se k registru zavázala i sama vládní koalice. Zákon byl přijat v roce 2015. Už od svého samotného přijetí čelil snahám různých oklešťovačů a zatmívačů. Dnes se tedy sněmovnímu spojenectví ČSSD, KSČM, ODS a Lidovců podařil husarský kousek. Z veřejné kontroly bylo vyjmuto přibližně 300 miliard korun, se kterými hospodaří státní firmy. K přijetí tohoto ostudného návrhu jednoznačně přispěli také poslanci ANO, přestože pro něj ruku nezvedli. Svou omluvenou neúčastí (6 osob) a nepřihlášením se k hlasování (5 osob) snížili kvórum, tedy potřebný počet hlasů pro průchod novely.
+
+> „Je vidět, že žádná ze zaběhnutých politických stran systémovou korupci řešit nehodlá a nechce. Politici z ní totiž přímo nebo zprostředkovaně profitují. Korupce není nošení krabic s penězi, jak lidem může stále připadat. Jsou to především miliardové investice v zakázkách a smlouvách státních podniků, firem a úřadů, nad kterými chybí veřejná kontrola. Deklarovaný boj s korupcí tak opět končí fotečkou u podpisu Rekonstrukce státu a s odevzdáním voličova hlasu ve volbách. To chceme změnit. Proto se již osmým rokem angažujeme v Pirátské straně. Na rozdíl od „starých“ stran transparentně jednáme, nejen o tom hovoříme, jak nám dnes názorně předvedly parlamentní strany.“ Komentuje dnešní hlasování v poslanecké sněmovně předseda Pirátů Ivan Bartoš.
+> Zajímá vás, jak o dalším osudu hlavního protikorupčního zákona hlasoval váš poslanec? Prohlédněte si [rozhodující hlasování](http://www.psp.cz/sqw/hlasy.sqw?g=65423&l=cz) a všimněte si také 17 poslanců, kteří svým nepřihlášením se k hlasování snížili kvórum, tedy počet hlasů nutný pro přijetí návrhu. Figuruje mezi nimi například 5 poslanců za ČSSD, 5 poslanců za ANO nebo 3 poslanci za TOP09.
+
+<h3>Související odkazy</h3>
+
+- [Registr smluv](http://www.mvcr.cz/clanek/registr-smluv.aspx)
+- [Zákon č. 340/2015 Sb. - zákon o registru smluv](https://www.zakonyprolidi.cz/cs/2015-340)
+- [Hlasování v PS o novele zákona o registru smluv](http://www.psp.cz/sqw/hlasy.sqw?g=65423&l=cz)
+
+<h3>Kontakty</h3>
+
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#600916010e4e020112140f13201009120114094e031a), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#1e7377756b727f6d30787b6c747b707d77755e6e776c7f6a77307d64), vedoucí mediálního odboru Pirátů, 737 943 770
