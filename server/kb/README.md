@@ -21,7 +21,7 @@ Build je idempotentní (databázi smaže a vytvoří znovu). `index/` je v `.git
 
 | Tabulka | Obsah |
 |---|---|
-| `documents` | každý `data/**/*.md` s frontmatter: `id` (relativní cesta bez přípony, např. `pirati-web/aktuality/2019/slug`), `nazev`, `typ`, `zdroj` (URL pro citaci), `datum`, `autor`, `tagy` (JSON), `autorita`, `viditelnost`, `kolekce` (`pirati-web`/`lide`/`psp`/`brand`), `meta` (JSON celý frontmatter), `body` (Markdown bez frontmatter), `delka` |
+| `documents` | každý `data/**/*.md` s frontmatter: `id` (relativní cesta bez přípony, např. `pirati-web/aktuality/2019/slug`), `nazev`, `typ`, `zdroj` (URL pro citaci), `datum`, `autor`, `tagy` (JSON), `autorita`, `viditelnost`, `kolekce` (`pirati-web`/`lide`/`psp`/`brand`/`social`), `meta` (JSON celý frontmatter), `body` (Markdown bez frontmatter), `delka` |
 | `chunks` | `id`, `doc_id`, `poradi`, `nadpis` (cesta nadpisů `H1 > H2`), `nadpisy` (všechny nadpisy v chunku), `text`, `nazev` (název dokumentu) |
 | `chunks_fts` | FTS5 external-content nad `chunks(nadpisy, text, nazev)`, `tokenize="unicode61 remove_diacritics 2"` |
 | `people` | `id` (`lide:<id>`, `web:<slug>`, `psp:<id_osoba>`), `jmeno`, `url`, `zarazeni`, `email`, `clenem_od`, `medailonek`, `role` (JSON `[{role, sekce, jednotka, jednotka_url, obdobi?}]`), `role_text`, `profil_web`, `telefon` (jen z veřejného profilu), `meta` (JSON: `profil_web`, `psp`) |
@@ -32,7 +32,9 @@ Build je idempotentní (databázi smaže a vytvoří znovu). `index/` je v `.git
 | `votes` | `id_hlasovani` PK, `obdobi` (2017/2021/2025), `datum`, `cas`, `nazev`, `vysledek`, `pro`, `proti`, `zdrzel`, `nehlasoval`, `url` (psp.cz), `pirati` (JSON `{jméno: hlas}`), `pirati_souhrn` (JSON) |
 | `votes_fts` | FTS5 nad `votes(nazev)` |
 | `vote_members` | `id_hlasovani`, `jmeno`, `jmeno_fold` (bez diakritiky), `hlas` – pro dotazy per poslanec |
-| `meta` | `built_at`, `data_commit` (git), `schema_version`, `count_*`, `brand` (JSON: barvy, fonty, loga, materiály) |
+| `social_posts` | příspěvky poslanců na sociálních sítích z `data/social/<platforma>/<handle>.jsonl`: `pk` (rowid), `id` (id na platformě), `platforma` (`x`/`bluesky`), `ucet` (handle bez @), `jmeno`, `jmeno_fold`, `datum` (ISO 8601 s časem), `text`, `url`, `je_odpoved`, `je_repost` (0/1), `lajky`, `reposty`, `odpovedi`; unikátní `(platforma, id)`. Složka `data/social` nemusí existovat (tabulka je pak prázdná). Měsíční Markdown přehledy `data/social/<platforma>/<handle>/<RRRR-MM>.md` (typ `prispevek-socialni-site`, autorita `vyjadreni-politika`) se indexují jako běžné dokumenty v kolekci `social` |
+| `social_posts_fts` | FTS5 nad `social_posts(text, jmeno)`, `tokenize="unicode61 remove_diacritics 2"` |
+| `meta` | `built_at`, `data_commit` (git), `schema_version` (2), `count_*` (vč. `count_social_posts`), `brand` (JSON: barvy, fonty, loga, materiály) |
 
 Chunkování: Markdown po nadpisech a odstavcích, cílově 1 200–3 500 znaků, překryv
 200 znaků při dělení uvnitř sekce; malé sekce se slučují (jejich nadpisy zůstávají
@@ -52,10 +54,13 @@ v textu jako `## Nadpis`), krátký dokument = jeden chunk.
 | `search_votes(query=None, poslanec=None, od=None, do=None, obdobi=None, limit=20)` | hlasování podle názvu (FTS) s filtry; při `poslanec` (i bez diakritiky, i jen příjmení) přidá `poslanec` a `hlas` |
 | `get_vote(id_hlasovani)` | jedno hlasování |
 | `vote_summary(poslanec, od=None, do=None) -> dict` | `celkem`, `hlasy` (všechny kódy), `ano`, `ne`, `zdrzel`, `nehlasoval`, `nepritomen` (= nepřítomen + omluven), `obdobi`, `od`, `do` |
+| `search_social(query=None, osoba=None, platforma=None, od=None, do=None, limit=20, bez_odpovedi=True) -> list[dict]` | příspěvky poslanců na X/Bluesky: FTS přes `fts_query` (skloňování), `osoba` = všechna slova ve jménu bez diakritiky nebo přesný handle, `platforma` = `x`/`bluesky`, `bez_odpovedi` vynechá odpovědi v diskusích; řazení `-bm25` + bonus za shodu více slov + bonus za novost (max 1, mizí po 2 letech), při shodě podle data; bez `query` jen nejnovější. Položky: `id, platforma, ucet, jmeno, datum, text, url, je_odpoved, je_repost, lajky, reposty, odpovedi` (+ `score`, `matched_tokens` při `query`) |
+| `social_summary(osoba) -> dict` | `nalezen`, `jmeno`, `celkem`, `podle_platformy` (`{platforma: počet}`), `ucty` (`{platforma: handle}`), `odpovedi`, `reposty`, `od`, `do` (první a poslední datum) |
+| `find_expert(tema, limit=3) -> dict` | koho se zeptat: `jednotky` (z `org_units_fts`; resortní/meziresortní týmy, pracovní skupiny a odbory mají bonus, regiony malus; `nazev, zkratka, url, email` z `kontakty`, `vedeni` = vedoucí/garant/předseda/koordinátor se jmény), `lide` (vedení nalezených jednotek + FTS v `people` podle rolí/medailonku/zařazení; poslanci aktuálního období bonus; `jmeno, role, jednotka, url, profil_web, email, telefon` jen pokud je z veřejného profilu, `duvod`), `fallback` (Mediální odbor / Kancelář strany podle názvu, s `lide` z vedení) – vždy, i když téma nic nenajde |
 | `brand() -> dict` | `barvy` (seznam `{skupina, nazev, hex}`), `barvy_podle_skupiny`, `fonty`, `loga`, `materialy` (tabulka z `materialy.md`), `styleguide` (`url`, `verze`, `doc_id`) |
 | `program_documents() -> list[dict]` | programové dokumenty z `pirati-web/program/` (`doc_id, nazev, typ, zdroj, odkaz, poradi, delka, nadpisy`) |
 | `program_section(doc_id, heading_query=None)` | celý dokument, nebo `sekce: [{nadpis, text}]` jejichž nadpis odpovídá všem slovům dotazu (vč. podsekcí) |
-| `stats() -> dict` | počty, `built_at`, `data_commit`, rozsah dat |
+| `stats() -> dict` | počty (vč. `social_posts`, `social_posts_by_platforma`), `built_at`, `data_commit`, rozsah dat |
 
 Všechny textové dotazy jsou odolné na diakritiku: `kb.search("bydleni")` najde „bydlení“.
 

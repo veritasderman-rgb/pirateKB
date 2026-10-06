@@ -145,6 +145,122 @@ def test_votes(kb: KB):
     assert 0 < summ2["celkem"] < summ["celkem"]
 
 
+# ---------------------------------------------------------------- koho se zeptat
+
+def test_find_expert(kb: KB):
+    res = kb.find_expert("školství")
+    assert [u["nazev"] for u in res["jednotky"] if u["nazev"] == "Resortní tým Školství"]
+    rt = next(u for u in res["jednotky"] if u["nazev"] == "Resortní tým Školství")
+    assert rt["url"].startswith("https://lide.pirati.cz/") and rt["email"]
+    assert any(v["role"] == "vedoucí" for v in rt["vedeni"])
+    assert res["lide"] and all(p["jmeno"] and p["role"] and p["url"] for p in res["lide"])
+    assert any("Školství" in (p["jednotka"] or "") for p in res["lide"])
+    assert all("@pirati.cz" in (p["email"] or "") for p in res["lide"])
+    assert res["fallback"]["nazev"] == "Kancelář strany"
+    # bez diakritiky stejné jednotky
+    assert kb.find_expert("skolstvi")["jednotky"][0]["nazev"] == res["jednotky"][0]["nazev"]
+    # nesmyslné téma: nic, ale fallback zůstává
+    none = kb.find_expert("xyzzy quuxfoo")
+    assert none["jednotky"] == [] and none["lide"] == []
+    assert none["fallback"]["nazev"] and none["fallback"]["lide"]
+    assert all(p["email"] for p in none["fallback"]["lide"])
+
+
+# ---------------------------------------------------------------- sociální sítě
+
+SOCIAL_POSTS = [
+    {"id": "1", "platforma": "x", "ucet": "test", "jmeno": "Jan Testovský",
+     "datum": "2026-09-01T10:00:00+02:00",
+     "text": "Dostupné bydlení je priorita. Stát musí stavět obecní byty.",
+     "url": "https://x.com/test/status/1", "je_odpoved": False, "je_repost": False,
+     "pocty": {"lajky": 10, "reposty": 2, "odpovedi": 1}},
+    {"id": "2", "platforma": "x", "ucet": "test", "jmeno": "Jan Testovský",
+     "datum": "2026-09-02T11:00:00+02:00",
+     "text": "@nekdo Souhlasím, bydlením se musíme zabývat hned.",
+     "url": "https://x.com/test/status/2", "je_odpoved": True, "je_repost": False,
+     "pocty": {"lajky": 1, "reposty": 0, "odpovedi": 0}},
+    {"id": "3", "platforma": "x", "ucet": "test", "jmeno": "Jan Testovský",
+     "datum": "2026-09-03T12:00:00+02:00",
+     "text": "Digitalizace státu šetří čas i peníze.",
+     "url": "https://x.com/test/status/3", "je_odpoved": False, "je_repost": False,
+     "pocty": {"lajky": 5, "reposty": 1, "odpovedi": 0}, "jazyk": "cs"},
+]
+SOCIAL_MD = """---
+typ: prispevek-socialni-site
+autorita: vyjadreni-politika
+osoba: Jan Testovský
+platforma: x
+ucet: test
+datum: 2026-09
+pocet_prispevku: 3
+zdroj: https://x.com/test
+viditelnost: verejne
+stazeno: 2026-10-06
+---
+# Jan Testovský na X – 2026-09
+
+### 2026-09-03 12:00
+Digitalizace státu šetří čas i peníze.
+https://x.com/test/status/3
+"""
+
+
+def test_social_posts(tmp_path):
+    import json
+    d = tmp_path / "data" / "social" / "x"
+    (d / "test").mkdir(parents=True)
+    (d / "test.jsonl").write_text("\n".join(json.dumps(p, ensure_ascii=False) for p in SOCIAL_POSTS) + "\n",
+                                  encoding="utf-8")
+    (d / "test" / "2026-09.md").write_text(SOCIAL_MD, encoding="utf-8")
+    db = tmp_path / "kb.sqlite"
+    stats = build_index(tmp_path / "data", db)
+    assert stats["social_posts"] == 3
+    k = KB(db)
+    try:
+        # Markdown přehled je běžný dokument
+        docs = k.list_documents(typ=["prispevek-socialni-site"])
+        assert len(docs) == 1 and docs[0]["kolekce"] == "social" and docs[0]["autorita"] == "vyjadreni-politika"
+        # fulltext se skloňováním, bez odpovědí
+        res = k.search_social("bydlení")
+        assert [p["id"] for p in res] == ["1"]
+        assert res[0]["url"] == "https://x.com/test/status/1" and res[0]["lajky"] == 10
+        assert res[0]["je_odpoved"] is False and res[0]["platforma"] == "x"
+        assert {p["id"] for p in k.search_social("bydleni", bez_odpovedi=False)} == {"1", "2"}
+        # bez query jen nejnovější
+        assert [p["id"] for p in k.search_social()] == ["3", "1"]
+        assert [p["id"] for p in k.search_social(bez_odpovedi=False)] == ["3", "2", "1"]
+        # filtr osoba (jméno bez diakritiky, příjmení, handle), platforma, datum
+        assert len(k.search_social(osoba="testovsky")) == 2
+        assert len(k.search_social(osoba="Jan Testovský")) == 2
+        assert len(k.search_social(osoba="@test")) == 2
+        assert k.search_social(osoba="nikdo") == []
+        assert k.search_social(platforma="bluesky") == []
+        assert [p["id"] for p in k.search_social(od="2026-09-02", do="2026-09-03")] == ["3"]
+        assert [p["id"] for p in k.search_social(do="2026-09-01")] == ["1"]
+        assert k.search_social("!!!") == []
+        # souhrn
+        s = k.social_summary("Testovský")
+        assert s["nalezen"] and s["celkem"] == 3 and s["podle_platformy"] == {"x": 3}
+        assert s["jmeno"] == "Jan Testovský" and s["ucty"] == {"x": "test"} and s["odpovedi"] == 1
+        assert s["od"].startswith("2026-09-01") and s["do"].startswith("2026-09-03")
+        assert k.social_summary("nikdo")["nalezen"] is False
+        st = k.stats()
+        assert st["social_posts"] == 3 and st["social_posts_by_platforma"] == {"x": 3}
+    finally:
+        k.close()
+
+
+def test_social_posts_missing_dir(tmp_path):
+    empty = tmp_path / "data"
+    empty.mkdir()
+    db = tmp_path / "kb.sqlite"
+    assert build_index(empty, db)["social_posts"] == 0
+    k = KB(db)
+    assert k.search_social("bydlení") == [] and k.search_social() == []
+    assert k.social_summary("x")["nalezen"] is False
+    k.close()
+
+
 # ---------------------------------------------------------------- brand, program, statistiky
 
 def test_brand(kb: KB):

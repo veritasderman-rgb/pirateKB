@@ -50,6 +50,13 @@ class KB:
     def _rows(self, sql: str, params=()) -> list[dict]:
         return [dict(r) for r in self.con.execute(sql, params).fetchall()]
 
+    def _has_table(self, name: str) -> bool:
+        """Starší index nemusí mít novější tabulky (např. `social_posts`)."""
+        row = self.con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type IN ('table', 'view') AND name = ?", (name,)
+        ).fetchone()
+        return row is not None
+
     @staticmethod
     def _doc_row(r: dict, with_body: bool = False) -> dict:
         out = {
@@ -369,6 +376,165 @@ class KB:
         roots = sorted(set(children) - kids)
         return [node(r, 0) for r in roots]
 
+    # ------------------------------------------------------------ koho se zeptat
+
+    # prefixy názvů jednotek, které mají věcnou gesci (bonus), a vedoucí role
+    EXPERT_UNIT_PREFIXES = ("resortni tym", "meziresortni tym", "pracovni skupina",
+                            "programovy", "odbor", "oddeleni", "medialni", "kancelar")
+    LEAD_ROLES = ("vedouci", "garant", "predsed", "koordinator", "zastupce vedouciho",
+                  "zastupkyne vedouciho", "mistopredsed")
+    FALLBACK_UNITS = ("Mediální odbor", "Tiskový odbor", "Mediální tým", "Tým komunikace",
+                      "Kancelář strany")
+
+    @staticmethod
+    def _unit_email(kontakty: list) -> str | None:
+        for k in kontakty or []:
+            s = str(k)
+            if s.lower().startswith("email:"):
+                return s.split(":", 1)[1].strip()
+        return None
+
+    def _people_by_names(self, names: list[str]) -> dict[str, dict]:
+        """Lidé z `people` podle jména (bez diakritiky) – kvůli e-mailu/telefonu/URL."""
+        out: dict[str, dict] = {}
+        keys = {fold(n).strip(): n for n in names if n}
+        if not keys:
+            return out
+        rows = self._rows("SELECT * FROM people")
+        for r in rows:
+            k = fold(r["jmeno"]).strip()
+            if k in keys and k not in out:
+                out[k] = r
+        return out
+
+    def _expert_unit(self, r: dict, score: float) -> dict:
+        kontakty = _loads(r.get("kontakty"), [])
+        vedeni = [{"jmeno": x.get("jmeno"), "role": x.get("role")}
+                  for x in _loads(r.get("role"), []) if isinstance(x, dict)
+                  and any(l in fold(x.get("role")) for l in self.LEAD_ROLES)]
+        return {"id": r["id"], "nazev": r["nazev"], "zkratka": r["zkratka"], "druh": r["druh"],
+                "url": r["url"], "email": self._unit_email(kontakty), "kontakty": kontakty,
+                "vedeni": vedeni, "score": round(score, 3)}
+
+    @staticmethod
+    def _expert_person(r: dict, role: str | None, jednotka: str | None, score: float,
+                       duvod: str) -> dict:
+        out = {"id": r["id"], "jmeno": r["jmeno"], "role": role, "jednotka": jednotka,
+               "zarazeni": r["zarazeni"], "url": r["url"], "profil_web": r.get("profil_web"),
+               "email": r["email"], "score": round(score, 3), "duvod": duvod}
+        if r.get("telefon"):
+            out["telefon"] = r["telefon"]  # jen z veřejného profilu na pirati.cz
+        return out
+
+    @staticmethod
+    def _is_current_mp(roles: list) -> bool:
+        for ro in roles:
+            if isinstance(ro, dict) and fold(ro.get("role")).startswith("poslanec") \
+                    and any(str(o).endswith("–") for o in (ro.get("obdobi") or [])):
+                return True
+        return False
+
+    def find_expert(self, tema: str, limit: int = 3) -> dict:
+        """Koho se zeptat na téma: věcně příslušné jednotky, lidé s kontaktem a fallback.
+
+        ``jednotky``: z `org_units` (FTS přes název, zkratku, role a popis působnosti);
+        resortní/meziresortní týmy, pracovní skupiny a odbory mají přednost před regiony.
+        ``lide``: vedení nalezených jednotek + lidé, jejichž role/medailonek/zařazení
+        odpovídá tématu; poslanci aktuálního období mají bonus. ``fallback``: obecný
+        kontakt (Mediální odbor / Kancelář strany), vždy pokud v bázi existuje.
+        """
+        limit = max(1, int(limit))
+        expr = fts_query(tema) if tema else ""
+        stems = query_stems(tema or "")
+        jednotky: list[dict] = []
+        if expr:
+            rows = self._rows(
+                "SELECT u.*, bm25(org_units_fts, 10.0, 5.0, 2.0, 1.0) AS rank FROM org_units_fts "
+                "JOIN org_units u ON u.rowid = org_units_fts.rowid WHERE org_units_fts MATCH ? "
+                "ORDER BY rank LIMIT 40", (expr,))
+            scored = []
+            for r in rows:
+                nf = fold(r["nazev"])
+                score = -float(r["rank"])
+                in_name = sum(1 for s in stems if s in nf)
+                score += 3.0 * in_name
+                if stems and in_name == len(stems):
+                    score += 2.0
+                if nf.startswith(self.EXPERT_UNIT_PREFIXES):
+                    score += 3.0
+                if r["druh"] == "region":
+                    score -= 4.0
+                scored.append((score, r))
+            scored.sort(key=lambda x: (-x[0], x[1]["nazev"] or ""))
+            jednotky = [self._expert_unit(r, s) for s, r in scored[:limit]]
+
+        # lidé: vedení jednotek (s kontaktem z people) + FTS v people
+        candidates: dict[str, dict] = {}
+        lead_names = [v["jmeno"] for u in jednotky for v in u["vedeni"] if v.get("jmeno")]
+        by_name = self._people_by_names(lead_names)
+        for u in jednotky:
+            for v in u["vedeni"]:
+                r = by_name.get(fold(v.get("jmeno")).strip())
+                if r is None:
+                    continue
+                bonus = 6.0 if fold(v.get("role")).startswith(("vedouci", "garant", "predsed")) else 4.0
+                p = self._expert_person(r, v.get("role"), u["nazev"], u["score"] + bonus,
+                                        f"vedení jednotky {u['nazev']}")
+                if self._is_current_mp(_loads(r.get("role"), [])):
+                    p["score"] = round(p["score"] + 2.0, 3)
+                    p["poslanec"] = True
+                cur = candidates.get(r["id"])
+                if cur is None or cur["score"] < p["score"]:
+                    candidates[r["id"]] = p
+        if expr:
+            rows = self._rows(
+                "SELECT p.*, bm25(people_fts, 1.0, 4.0, 2.0, 1.5) AS rank FROM people_fts "
+                "JOIN people p ON p.rowid = people_fts.rowid WHERE people_fts MATCH ? "
+                "ORDER BY rank LIMIT 40", (expr,))
+            for r in rows:
+                roles = _loads(r.get("role"), [])
+                score = -float(r["rank"])
+                hay = fold(r["role_text"]) + " " + fold(r["medailonek"]) + " " + fold(r["zarazeni"])
+                matched = sum(1 for s in stems if s in hay)
+                score += 1.5 * matched
+                best_role, best_unit, best = None, None, -1.0
+                for ro in roles:
+                    if not isinstance(ro, dict):
+                        continue
+                    rt = fold(ro.get("role")) + " " + fold(ro.get("jednotka"))
+                    n = sum(1 for s in stems if s in rt)
+                    b = n + (0.5 if any(l in fold(ro.get("role")) for l in self.LEAD_ROLES) else 0)
+                    if b > best:
+                        best, best_role, best_unit = b, ro.get("role"), ro.get("jednotka")
+                if best > 0:
+                    score += 2.0 * best
+                is_mp = self._is_current_mp(roles)
+                if is_mp:
+                    score += 2.0
+                if best_role is None and roles:
+                    ro = roles[0]
+                    best_role, best_unit = ro.get("role"), ro.get("jednotka")
+                p = self._expert_person(r, best_role, best_unit, score, "role/medailonek odpovídá tématu")
+                if is_mp:
+                    p["poslanec"] = True
+                cur = candidates.get(r["id"])
+                if cur is None or cur["score"] < p["score"]:
+                    candidates[r["id"]] = p
+        lide = sorted(candidates.values(), key=lambda p: (-p["score"], p["jmeno"] or ""))[:limit]
+
+        fallback: dict = {}
+        for name in self.FALLBACK_UNITS:
+            rows = self._rows("SELECT * FROM org_units WHERE nazev = ?", (name,))
+            if rows:
+                fallback = self._expert_unit(rows[0], 0.0)
+                leads = self._people_by_names([v["jmeno"] for v in fallback["vedeni"]])
+                fallback["lide"] = [
+                    self._expert_person(leads[fold(v["jmeno"]).strip()], v["role"], name, 0.0,
+                                        "vedení obecného kontaktu")
+                    for v in fallback["vedeni"] if fold(v["jmeno"]).strip() in leads]
+                break
+        return {"tema": tema, "jednotky": jednotky, "lide": lide, "fallback": fallback}
+
     # ------------------------------------------------------------ hlasování
 
     @staticmethod
@@ -464,6 +630,128 @@ class KB:
             "do": max((r["do"] for r in rows), default=None),
         }
 
+    # ------------------------------------------------------------ sociální sítě
+
+    @staticmethod
+    def _social_row(r: dict) -> dict:
+        return {
+            "id": r["id"], "platforma": r["platforma"], "ucet": r["ucet"], "jmeno": r["jmeno"],
+            "datum": r["datum"], "text": r["text"], "url": r["url"],
+            "je_odpoved": bool(r["je_odpoved"]), "je_repost": bool(r["je_repost"]),
+            "lajky": r["lajky"], "reposty": r["reposty"], "odpovedi": r["odpovedi"],
+        }
+
+    @staticmethod
+    def _osoba_clause(osoba: str | None, params: list) -> str:
+        """Filtr na osobu: všechna slova ve jménu (bez diakritiky), nebo přesný handle."""
+        q = fold(osoba).strip().lstrip("@")
+        if not q:
+            return ""
+        toks = q.split()
+        sql = " AND (" + " AND ".join("s.jmeno_fold LIKE ?" for _ in toks)
+        params.extend(f"%{t}%" for t in toks)
+        sql += " OR lower(s.ucet) = ?)"
+        params.append(q)
+        return sql
+
+    def search_social(self, query: str | None = None, osoba: str | None = None,
+                      platforma: str | None = None, od: str | None = None,
+                      do: str | None = None, limit: int = 20,
+                      bez_odpovedi: bool = True) -> list[dict]:
+        """Příspěvky poslanců na X/Bluesky: fulltext (skloňování přes prefixy) + filtry.
+
+        Bez ``query`` vrací jen nejnovější příspěvky. ``osoba`` = jméno (i bez diakritiky,
+        i jen příjmení) nebo handle; ``platforma`` = x | bluesky; ``bez_odpovedi`` vynechá
+        odpovědi v diskusích (výchozí). Řazení: relevance (bm25 + bonus za shodu více slov
+        + mírný bonus za novost), při shodě skóre podle data sestupně.
+        """
+        if not self._has_table("social_posts"):
+            return []
+        params: list = []
+        joins, where = "", "1=1"
+        expr = fts_query(query) if query else ""
+        if query and not expr:
+            return []
+        if expr:
+            joins += " JOIN social_posts_fts f ON f.rowid = s.pk"
+            where += " AND social_posts_fts MATCH ?"
+            params.append(expr)
+        where += self._osoba_clause(osoba, params)
+        p = fold(platforma).strip()
+        if p:
+            where += " AND s.platforma = ?"
+            params.append(p)
+        if bez_odpovedi:
+            where += " AND s.je_odpoved = 0"
+        where += self._date_clause("s.datum", od, do, params)
+        limit = max(1, int(limit))
+        if not expr:
+            params.append(limit)
+            rows = self._rows(f"SELECT s.* FROM social_posts s{joins} WHERE {where} "
+                              f"ORDER BY s.datum DESC LIMIT ?", params)
+            return [self._social_row(r) for r in rows]
+
+        params.append(max(limit * 5, 100))
+        rows = self._rows(
+            f"SELECT s.*, bm25(social_posts_fts, 1.0, 0.2) AS rank FROM social_posts s{joins} "
+            f"WHERE {where} ORDER BY rank LIMIT ?", params)
+        stems = query_stems(query or "")
+        today = dt.date.today()
+        out = []
+        for r in rows:
+            score = -float(r["rank"])
+            hay = fold(r["text"])
+            matched = sum(1 for s in stems if s in hay)
+            if len(stems) > 1:
+                score += 2.0 * (matched - 1)
+                if matched == len(stems):
+                    score += 1.0
+            # čerstvé příspěvky mírně nahoru (max 1.0, mizí po 2 letech)
+            try:
+                d = dt.date.fromisoformat(str(r["datum"])[:10])
+                score += max(0.0, 1.0 - (today - d).days / 730)
+            except (TypeError, ValueError):
+                pass
+            item = self._social_row(r)
+            item["score"] = round(score, 3)
+            item["matched_tokens"] = matched
+            out.append(item)
+        # stabilní řazení: při stejném skóre novější první
+        out.sort(key=lambda x: x["datum"] or "", reverse=True)
+        out.sort(key=lambda x: x["score"], reverse=True)
+        return out[:limit]
+
+    def social_summary(self, osoba: str) -> dict:
+        """Počet příspěvků osoby po platformách a účtech, první a poslední datum."""
+        params: list = []
+        clause = self._osoba_clause(osoba, params)
+        if not clause or not self._has_table("social_posts"):
+            return {"osoba": osoba, "nalezen": False, "celkem": 0, "podle_platformy": {}}
+        rows = self._rows(
+            f"SELECT s.platforma, s.ucet, s.jmeno, COUNT(*) AS n, "
+            f"SUM(CASE WHEN s.je_odpoved THEN 1 ELSE 0 END) AS odpovedi, "
+            f"SUM(CASE WHEN s.je_repost THEN 1 ELSE 0 END) AS reposty, "
+            f"MIN(s.datum) AS od, MAX(s.datum) AS do "
+            f"FROM social_posts s WHERE 1=1{clause} GROUP BY s.platforma, s.ucet "
+            f"ORDER BY s.platforma", params)
+        if not rows:
+            return {"osoba": osoba, "nalezen": False, "celkem": 0, "podle_platformy": {}}
+        podle: dict[str, int] = {}
+        ucty: dict[str, str] = {}
+        for r in rows:
+            podle[r["platforma"]] = podle.get(r["platforma"], 0) + r["n"]
+            ucty.setdefault(r["platforma"], r["ucet"])
+        jmena = sorted({r["jmeno"] for r in rows if r["jmeno"]})
+        return {
+            "osoba": osoba, "nalezen": True,
+            "jmeno": jmena[0] if len(jmena) == 1 else jmena,
+            "celkem": sum(podle.values()), "podle_platformy": podle, "ucty": ucty,
+            "odpovedi": sum(r["odpovedi"] or 0 for r in rows),
+            "reposty": sum(r["reposty"] or 0 for r in rows),
+            "od": min((r["od"] for r in rows if r["od"]), default=None),
+            "do": max((r["do"] for r in rows if r["do"]), default=None),
+        }
+
     # ------------------------------------------------------------ brand, program, statistiky
 
     def brand(self) -> dict:
@@ -543,8 +831,15 @@ class KB:
         out: dict = {"built_at": meta.get("built_at"), "data_commit": meta.get("data_commit"),
                      "schema_version": meta.get("schema_version"), "db_path": str(self.db_path),
                      "db_bytes": self.db_path.stat().st_size}
-        for table in ("documents", "chunks", "people", "org_units", "votes", "vote_members"):
-            out[table] = self.con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+        for table in ("documents", "chunks", "people", "org_units", "votes", "vote_members",
+                      "social_posts"):
+            try:
+                out[table] = self.con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            except sqlite3.OperationalError:  # starší index bez tabulky
+                out[table] = 0
+        if out.get("social_posts"):
+            out["social_posts_by_platforma"] = dict(self.con.execute(
+                "SELECT platforma, COUNT(*) FROM social_posts GROUP BY platforma").fetchall())
         out["documents_by_typ"] = dict(self.con.execute(
             "SELECT typ, COUNT(*) FROM documents GROUP BY typ ORDER BY 2 DESC").fetchall())
         out["documents_by_kolekce"] = dict(self.con.execute(
