@@ -42,7 +42,7 @@ jsou čtecí odkazy.
 | resource | `kb://templates/{typ}` | šablona daného typu |
 | resource | `kb://program/seznam` | seznam programových dokumentů |
 | resource | `kb://stats` | statistika báze |
-| resource | `kb://gaps/posledni` | posledních 50 hlášení z `report_gap` (lokální soubor instance) |
+| resource | `kb://gaps/posledni` | posledních 50 hlášení z `report_gap` (čas, tool, stav; texty jen s `PIRATEKB_GAPS_TEXTY=1`) |
 
 Přesné parametry tooly popisují samy MCP klientovi (JSON schéma); AI je vidí, uživatel
 je zadávat nemusí.
@@ -349,7 +349,11 @@ Otázka se zkracuje na 500 znaků a `@zmínky` v issue nikoho nenotifikují. Lab
 v repozitáři založte předem (Issues → Labels → New label); GitHub label u nového issue
 tiše vynechá, pokud ho token nemá právo nastavit, a dedup přes GitHub pak issue nenajde.
 Hlášení obsahuje text otázky, jak ho AI předala: tool AI žádá, aby do něj nedávala osobní
-údaje, ale resource `kb://gaps/posledni` je čitelný pro každého, kdo se k serveru připojí.
+údaje, ale nedá se to vynutit. Proto resource `kb://gaps/posledni` ve výchozím stavu ukazuje
+jen čas, tool a stav hlášení, ne text otázek (server je veřejný). Texty kurátor čte v souboru
+`GAPS_FILE` nebo v GitHub issues; pozor, ve veřejném repozitáři jsou issues veřejné, takže
+`GITHUB_TOKEN` zapínejte jen pokud to tak chcete. Na neveřejné instanci (např. s
+`PIRATEKB_AUTH=keycloak`) lze texty v resource zapnout `PIRATEKB_GAPS_TEXTY=1`.
 
 ### Telemetrie
 

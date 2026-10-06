@@ -1602,7 +1602,8 @@ def report_gap(otazka: str, poznamka: str = "", tool: str = "") -> str:
 
 
 @mcp.resource("kb://gaps/posledni", name="gaps_posledni", title="Poslední hlášení „báze nemá odpověď“",
-              description="Posledních 50 hlášení z toolu report_gap (lokální evidence serveru).",
+              description="Posledních 50 hlášení z toolu report_gap (čas, tool, stav; texty otázek "
+                          "jen na neveřejné instanci s PIRATEKB_GAPS_TEXTY=1).",
               mime_type="text/markdown")
 def resource_gaps_posledni() -> str:
     try:

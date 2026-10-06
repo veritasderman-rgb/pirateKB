@@ -286,22 +286,44 @@ def report_gap(otazka: str, poznamka: str = "", tool: str = "", now: datetime | 
     }
 
 
-def format_recent(limit: int = 50) -> str:
-    """Markdown s posledními ``limit`` hlášeními z lokálního souboru (nejnovější první)."""
+def texty_verejne() -> bool:
+    """Zda resource smí ukázat text otázek. Výchozí NE: server je veřejný a otázky
+    mohou obsahovat osobní údaje jiných uživatelů. Kurátor čte texty v souboru
+    nebo v GitHub issues; zapnout lze jen pro neveřejnou instanci."""
+    return os.environ.get("PIRATEKB_GAPS_TEXTY", "").strip() == "1"
+
+
+def format_recent(limit: int = 50, *, s_texty: bool | None = None) -> str:
+    """Markdown s posledními ``limit`` hlášeními z lokálního souboru (nejnovější první).
+
+    Bez ``s_texty`` (výchozí podle ``PIRATEKB_GAPS_TEXTY``) jen čas, tool a stav, bez
+    textu otázky a poznámky."""
+    if s_texty is None:
+        s_texty = texty_verejne()
     rows = read_reports(limit=limit)
     out = [f"# Poslední hlášení „báze nemá odpověď“ ({len(rows)})", "",
-           f"Soubor: `{gaps_file()}` (na Vercelu dočasný; trvalá evidence jsou GitHub issues "
-           f"s labelem `{LABEL}` v {github_repo()})", ""]
+           f"Trvalá evidence jsou GitHub issues s labelem `{LABEL}` v {github_repo()}.", ""]
+    if not s_texty:
+        out += ["Texty otázek se tu nezobrazují: server je veřejný a otázky mohou obsahovat "
+                "osobní údaje jiných uživatelů. Kurátor je najde v souboru hlášení na serveru "
+                "nebo v GitHub issues.", ""]
     if not rows:
         out.append("Zatím žádné hlášení.")
         return "\n".join(out)
-    out.append("| čas | otázka | tool | poznámka | issue |")
-    out.append("|---|---|---|---|---|")
 
     def cell(v: Any) -> str:
         return " ".join(str(v or "").split()).replace("|", "\\|")
 
-    for r in reversed(rows):
-        out.append(f"| {cell(r.get('cas'))[:19]} | {cell(r.get('otazka'))[:120]} | {cell(r.get('tool'))} | "
-                   f"{cell(r.get('poznamka'))[:120]} | {cell(r.get('issue_url')) or ('duplicita' if r.get('duplikat') else '–')} |")
+    if s_texty:
+        out.append("| čas | otázka | tool | poznámka | issue |")
+        out.append("|---|---|---|---|---|")
+        for r in reversed(rows):
+            out.append(f"| {cell(r.get('cas'))[:19]} | {cell(r.get('otazka'))[:120]} | {cell(r.get('tool'))} | "
+                       f"{cell(r.get('poznamka'))[:120]} | {cell(r.get('issue_url')) or ('duplicita' if r.get('duplikat') else '–')} |")
+    else:
+        out.append("| čas | tool | stav |")
+        out.append("|---|---|---|")
+        for r in reversed(rows):
+            stav = "duplicita" if r.get("duplikat") else ("issue založeno" if r.get("issue_url") else "nové")
+            out.append(f"| {cell(r.get('cas'))[:19]} | {cell(r.get('tool')) or '–'} | {stav} |")
     return "\n".join(out)

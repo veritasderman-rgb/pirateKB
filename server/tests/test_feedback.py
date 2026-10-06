@@ -81,9 +81,17 @@ def test_report_gap_writes_file_without_token(gaps_file, monkeypatch, capsys):
     rows = _lines(gaps_file)
     assert len(rows) == 2 and rows[1]["duplikat"]
 
+    # veřejný resource neukazuje texty otázek jiných uživatelů
+    res = anyio.run(mcp_server.mcp.read_resource, "kb://gaps/posledni")
+    text = "\n".join(getattr(r, "content", "") for r in res)
+    assert "kroužek" not in text and "krouzek" not in text
+    assert "search_kb" in text and "duplicita" in text and "(2)" in text
+    # neveřejná instance je může zapnout
+    monkeypatch.setenv("PIRATEKB_GAPS_TEXTY", "1")
     res = anyio.run(mcp_server.mcp.read_resource, "kb://gaps/posledni")
     text = "\n".join(getattr(r, "content", "") for r in res)
     assert "Kdo vede pirátský kroužek vaření?" in text and "duplicita" in text
+    monkeypatch.delenv("PIRATEKB_GAPS_TEXTY")
 
     assert "Chybí otázka" in mcp_server.report_gap("   ")
     assert len(_lines(gaps_file)) == 2
