@@ -84,7 +84,7 @@ def _open_data() -> steno.OpenData:
     bod = {"100": {"cislo": "3", "nazev": "Vládní návrh zákona o České televizi", "kon": "/sněmovní tisk 263/",
                    "zkratka": "ČT"}}
     prijmeni = {"6473": "Richterová", "6435": "Baxa", "6477": "Michálek", "6537": "Lipavský"}
-    return steno.OpenData(turns, rec, bod, {}, prijmeni)
+    return steno.OpenData(turns, rec, bod, {}, prijmeni, {"173": {"6473", "6477", "6537"}})
 
 
 class _Pages:
@@ -181,6 +181,8 @@ def test_zapis_and_get_speeches(tmp_path, monkeypatch):
     try:
         assert kb.resolve_speaker("hrib") == ["Zdeněk Hřib"]
         assert kb.resolve_speaker("Hřiba") == ["Zdeněk Hřib"]          # skloňování
+        assert kb.resolve_speaker("Michálka") == ["Jakub Michálek"]     # vypadávající e
+        assert kb.resolve_speaker("Mich") == ["Jakub Michálek"]         # začátek příjmení
         assert kb.resolve_speaker("6477") == ["Jakub Michálek"]         # id_osoba
         assert kb.resolve_speaker("Nikdo") == []
         res = kb.search_speeches("nájemní byty", poslanec="Hřib")
@@ -210,3 +212,27 @@ def test_zapis_and_get_speeches(tmp_path, monkeypatch):
     finally:
         mcp_server._state["kb"] = None
         kb.close()
+
+
+# zip 2017: odkazy href="#" bez id; kotvu #rN dopočítá zpracování podle toho, kdo je poslanec
+PAGE_2017 = """<html><body><!-- eh -->
+<!-- sttm -->(10.00 hodin)<!-- ettm -->
+<p align="justify"><a href="#">Předseda PSP Radek Vondráček</a>: Slovo má pan ministr.</p>
+<p align="justify"><a href="#">Ministr kultury ČR Někdo Mimo</a>: Ministr, který není poslancem, nemá na online stránce kotvu.</p>
+<p align="justify"><a href="#">Poslanec Jakub Michálek</a>: Transparentní registr smluv šetří veřejné peníze a umožňuje občanům kontrolu veřejných zakázek, proto navrhujeme jeho rozšíření i na obce.</p>
+<!-- sf --></body></html>"""
+
+
+def test_anchor_2017_from_mp_list():
+    od = steno.OpenData({("172", 9): {1: steno.Turn("x1", 1, "2018-03-01", 600)}},
+                        {"x1": {1: ("5", "", "4"), 2: ("999", "", "5"), 3: ("6477", "", "5")}},
+                        {}, {}, {"5": "Vondráček", "999": "Mimo", "6477": "Michálek"},
+                        {"172": {"5", "6477"}})
+
+    class P(_Pages):
+        def url(self, t, kotva=None):
+            return f"https://www.psp.cz/eknih/2017ps/stenprot/009schuz/s009{t:03d}.htm" + (f"#r{kotva}" if kotva else "")
+
+    out = steno.zpracuj_schuzi(2017, 9, od, _pirati(), P({1: PAGE_2017}), Counter())
+    assert [v["url"][-14:] for v in out] == ["s009001.htm#r2"]      # Vondráček r1, ministr bez kotvy
+    assert out[0]["cas"] == "10:00" and out[0]["bod"] is None

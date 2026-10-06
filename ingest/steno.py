@@ -100,6 +100,7 @@ class OpenData:
     bod: dict[str, dict]                                    # id_bod -> {cislo, nazev, kon, zkratka}
     klub_obdobi: dict[str, str]                             # id_klub -> id_org období
     prijmeni: dict[str, str]                                # id_osoba -> příjmení (kontrola rec)
+    poslanci: dict[str, set[str]]                           # id_org období -> id_osoba poslanců
 
 
 def load_open_data() -> OpenData:
@@ -139,7 +140,12 @@ def load_open_data() -> OpenData:
     klub_obdobi = {r[0]: r[1] for r in unl(zp, "organy.unl") if len(r) > 2}
     # osoby: id_osoba|pred|prijmeni|jmeno|za|narozeni|...
     prijmeni = {r[0]: r[2].strip() for r in unl(zp, "osoby.unl") if len(r) > 3}
-    return OpenData(turns, rec, bod, klub_obdobi, prijmeni)
+    # poslanec: id_poslanec|id_osoba|id_kraj|id_kandidatka|id_obdobi (kotvy #rN mají jen poslanci)
+    poslanci: dict[str, set[str]] = defaultdict(set)
+    for r in unl(zp, "poslanec.unl"):
+        if len(r) > 4:
+            poslanci[r[4]].add(r[1])
+    return OpenData(turns, rec, bod, klub_obdobi, prijmeni, poslanci)
 
 
 @dataclass
@@ -431,6 +437,14 @@ def zpracuj_schuzi(rok: int, schuze: int, od: OpenData, pirati: dict[str, Pirat]
         datum = tr.datum if tr else None
         cas_stranky = f"{tr.od_t // 60:02d}:{tr.od_t % 60:02d}" if tr and tr.od_t is not None else None
         segs = parse_page(page)
+        if not any(x.kotva for x in segs) and recs:
+            # zipy 2017 nemají id="rN" ani odkazy na detail: online stránka čísluje kotvy jen
+            # u řečníků, kteří jsou poslanci (ministr mimo Sněmovnu odkazuje na vlada.cz bez id)
+            n = 0
+            for x in segs:
+                if x.poradi and recs.get(x.poradi, ("",))[0] in od.poslanci.get(org, ()):
+                    n += 1
+                    x.kotva = n
         if posledni_turn != t - 1:
             otevrene = None
         posledni_turn = t
@@ -661,7 +675,7 @@ def main(argv: list[str] | None = None) -> int:
                        "zpracovano": today()}
             log(f"{rok}/{s:03d} [{zdroj.druh}] vystoupení {len(vyst)}, předsedající vynecháno "
                 f"{stats['vynechano_predsedajici']}, krátké {stats['vynechano_kratke']}"
-                + (f", staženo stránek {zdroj.stazeno}" if zdroj.stazeno else ""))
+                + (f", načteno stránek {zdroj.stazeno}" if zdroj.stazeno else ""))
             save_stav(stav)
         else:
             continue

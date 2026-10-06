@@ -62,7 +62,7 @@ zdroje. Platí toto rozlišení:
 
 - program a usnesení jsou oficiální postoj strany;
 - tisková zpráva je oficiální výstup strany;
-- příspěvek politika je jeho názor;
+- příspěvek politika na sítích i projev poslance ve Sněmovně je jeho názor;
 - kurátorem schválený obsah má nejvyšší spolehlivost.
 
 Když báze odpověď nemá, AI to přizná, doporučí konkrétního člověka s kontaktem a mezeru
@@ -77,7 +77,7 @@ nahlásí.
 - **Přihlášení přes auth.pirati.cz:** kód je připravený (Keycloak, jen pro členy), čeká
   na klienta v Keycloaku. Viz [docs/auth-keycloak.md](docs/auth-keycloak.md).
 - **Telemetrie:** anonymní, bez textu dotazů.
-- **Evals:** 63 testovacích otázek běží v CI při každém pull requestu.
+- **Evals:** 66 testovacích otázek běží v CI při každém pull requestu.
 - **Skills pro Claude** ve složce [`skills/`](skills/README.md): tisková zpráva, brief a
   sociální sítě, včetně toho, kdy přibrat MCP Hlídače státu.
 
@@ -97,6 +97,7 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026.
 | [evidence.pirati.cz](https://evidence.pirati.cz) | zápisy ze schůzí orgánů a týmů | 7 260 | denně |
 | [psp.cz](https://www.psp.cz) | pirátští poslanci | 41 | denně |
 | psp.cz | hlasování ve Sněmovně (období 2017, 2021, 2025) | 21 541 | denně |
+| psp.cz | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (období 2017, 2021, 2025; bez řízení schůze) | 7 827 vystoupení (40 poslanců, 1 342 souborů) | týdně |
 | [senat.cz](https://www.senat.cz) | pirátští senátoři | 3 | měsíčně |
 | senat.cz | hlasování v Senátu (od 2012) | 6 794 | týdně |
 | [HowTheyVote.eu](https://howtheyvote.eu) | pirátští europoslanci | 3 | týdně |

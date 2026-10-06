@@ -1062,16 +1062,19 @@ class KB:
             return exact
         toks = [t for t in re.findall(r"\w+", q) if len(t) > 1]
 
-        def tok_ok(t: str, name: str) -> bool:
+        def tok_ok(t: str, name: str, fuzzy: bool) -> bool:
             for nt in re.findall(r"\w+", fold(name)):
-                if nt == t or nt.startswith(t):
+                if nt == t or (not fuzzy and len(t) >= 3 and nt.startswith(t)):
                     return True
-                k = max(4, len(nt) - 1)      # skloňování: „bartose“ ~ „bartos“, „hriba“ ~ „hrib“
-                if len(t) >= 4 and t[:k] == nt[:k] and abs(len(t) - len(nt)) <= 3:
+                # skloňování přes český stemmer: „Bartoše“ -> bartos = „Bartoš“, „Michálka“ ~ „Michálek“
+                if fuzzy and len(t) >= 4 and stem(t) in (stem(nt), nt):
                     return True
             return False
 
-        return [n for n in names if toks and all(tok_ok(t, n) for t in toks)]
+        if not toks:
+            return []
+        exact = [n for n in names if all(tok_ok(t, n, False) for t in toks)]
+        return exact or [n for n in names if all(tok_ok(t, n, True) for t in toks)]
 
     @staticmethod
     def _speech_sections(body: str) -> dict[str, str]:
