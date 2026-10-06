@@ -1138,28 +1138,41 @@ class KB:
                     od_sql = (dt.date.fromisoformat(od[:10]) - dt.timedelta(days=120)).isoformat()
                 except ValueError:
                     od_sql = od
+            plan = self._plan(query)
+            if not plan:
+                return []
+            # Dokument = všechna vystoupení poslance na schůzi; search() vrací nejvýš dva
+            # chunky na dokument a chunk může obsahovat víc vystoupení. Proto se odsud berou
+            # jen kandidátní dokumenty a shoda se vyhodnotí znovu po jednotlivých
+            # vystoupeních: odkaz a čas patří vždy tomu vystoupení, jehož text se shoduje.
             hits = self.search(query, typ=["projev"], autor=autori, od=od_sql, do=do,
-                               limit=limit * 4, preferuj_nove=False)
-            seen: set[tuple[str, str]] = set()
+                               limit=max(limit * 6, 40), preferuj_nove=False)
+            doc_score: dict[str, float] = {}
             for h in hits:
-                doc, meta, sections = load(h["doc_id"])
-                head = (h.get("nadpis") or "").split(" > ")[-1].strip()
-                vys = meta.get("vystoupeni") or []
-                v = next((x for x in vys if x.get("nadpis") == head), None)
-                if v is None and vys:
-                    v = vys[0]
-                if v is None or (v.get("nadpis"), h["doc_id"]) in seen:
-                    continue
-                if not self._in_range(v.get("datum"), od, do):
-                    continue
-                seen.add((v.get("nadpis"), h["doc_id"]))
-                item = self._speech_item(doc, meta, v, sections.get(v.get("nadpis") or ""))
-                item["snippet"] = h.get("snippet") or item["snippet"]
-                item["score"] = h.get("score")
-                item["shoda_vsech"] = h.get("shoda_vsech")
+                doc_score[h["doc_id"]] = max(doc_score.get(h["doc_id"], 0.0), h.get("score") or 0.0)
+            forms = plan.highlight_forms()
+            ranked = []
+            for doc_id, dscore in doc_score.items():
+                doc, meta, sections = load(doc_id)
+                for v in meta.get("vystoupeni") or []:
+                    if not self._in_range(v.get("datum"), od, do):
+                        continue
+                    text = sections.get(v.get("nadpis") or "") or ""
+                    stems = stem_text((v.get("bod") or "") + " " + text)
+                    m = plan.match(StemHay(stems))
+                    shod = sum(1 for x in m if x)
+                    if not shod:
+                        continue
+                    prim = sum(1 for x in m if x == 2)
+                    tf = min(10, sum(1 for w in stems.split() if w in forms))  # jak moc o tom mluví
+                    ranked.append(((shod, prim, tf, dscore), doc, meta, v, text, all(m)))
+            ranked.sort(key=lambda t: t[0], reverse=True)
+            for (shod, prim, _tf, dscore), doc, meta, v, text, vse in ranked[:limit]:
+                item = self._speech_item(doc, meta, v, text)
+                item["snippet"] = self._snippet(text, forms) if text else item["snippet"]
+                item["score"] = round(dscore + shod + 0.5 * prim, 3)
+                item["shoda_vsech"] = vse
                 out.append(item)
-                if len(out) >= limit:
-                    break
             return out
 
         params: list = []

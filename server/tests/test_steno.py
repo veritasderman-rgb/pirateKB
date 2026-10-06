@@ -214,6 +214,35 @@ def test_zapis_and_get_speeches(tmp_path, monkeypatch):
         kb.close()
 
 
+def test_search_speeches_attributes_hit_to_matching_speech(tmp_path, monkeypatch):
+    """Krátká vystoupení jedné schůze leží v jednom chunku: odkaz musí patřit tomu
+    vystoupení, jehož text se shoduje, a jeden dokument smí vrátit víc vystoupení."""
+    data = tmp_path / "data"
+    monkeypatch.setattr(steno, "DATA", data)
+    base = {"obdobi": 2025, "schuze": 20, "datum": "2026-06-10", "osoba_psp": "6552",
+            "jmeno": "Zdeněk Hřib", "role": "Poslanec", "popisek": "Poslanec Zdeněk Hřib",
+            "druh": "recnik", "id_bod": None, "bod": None}
+    texty = [
+        "Rozpočet na školství musí růst, učitelé potřebují jistotu platů i v příštím roce.",
+        "Rozpočet na dopravu zanedbává železnici a opravy silnic druhé a třetí třídy.",
+        "Jaderná elektrárna Dukovany je strategická investice a rozpočet ji musí unést.",
+    ]
+    rows = [{**base, "cas": f"1{i}:00", "turn": i + 1, "kotva": i + 1, "text": t, "znaku": len(t),
+             "url": f"https://www.psp.cz/eknih/2025ps/stenprot/020schuz/s020001.htm#r{i + 1}",
+             "stranky": [1]} for i, t in enumerate(texty)]
+    steno.zapis_schuzi(2025, 20, rows)
+    db = tmp_path / "kb.sqlite"
+    build_index(data, db, embeddings_provider=None)
+    kb = KB(db, embeddings_provider=None)
+    try:
+        res = kb.search_speeches("jaderná elektrárna", poslanec="Hřib")
+        assert [r["url"][-3:] for r in res] == ["#r3"] and "Dukovany" in res[0]["snippet"]
+        res = kb.search_speeches("rozpočet", poslanec="Hřib", limit=5)
+        assert sorted(r["url"][-3:] for r in res) == ["#r1", "#r2", "#r3"]
+    finally:
+        kb.close()
+
+
 # zip 2017: odkazy href="#" bez id; kotvu #rN dopočítá zpracování podle toho, kdo je poslanec
 PAGE_2017 = """<html><body><!-- eh -->
 <!-- sttm -->(10.00 hodin)<!-- ettm -->
