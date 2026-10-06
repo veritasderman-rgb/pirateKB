@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "piratekb": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "piratekb:latest", "python", "-m", "server"]
+    }
+  }
+}

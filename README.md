@@ -70,3 +70,6 @@ docs/      návrhy a dokumentace
 
 Plánováno: `content/` (kurátorovaný obsah), `schemas/` (JSON Schema), `evals/`
 (testovací otázky).
+
+
+Návod k připojení do Claude Desktop, claude.ai a Claude Code: [docs/pripojeni/README.md](docs/pripojeni/README.md).
