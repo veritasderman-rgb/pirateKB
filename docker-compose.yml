@@ -1,0 +1,43 @@
+# Spuštění: docker compose up --build
+# Server pak běží na http://localhost:8765/mcp
+#
+# Pozor: server nemá autentizaci. Vystavujte ho jen s veřejnými daty,
+# případně za VPN nebo s omezením přístupu na proxy.
+services:
+  piratekb:
+    build: .
+    image: piratekb:latest
+    restart: unless-stopped
+    ports:
+      # jen lokálně; při použití Caddy níže tento řádek smažte a použijte "expose"
+      - "127.0.0.1:8765:8765"
+    # expose:
+    #   - "8765"
+
+  # Volitelná reverzní proxy s automatickým HTTPS (pro claude.ai a ChatGPT).
+  # Odkomentujte, v Caddyfile změňte doménu (viz server/README.md) a
+  # smažte mapování portu 8765 výše.
+  #
+  # caddy:
+  #   image: caddy:2
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - piratekb
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile:ro
+  #     - caddy_data:/data
+  #     - caddy_config:/config
+  #
+  # Caddyfile pro tuto variantu:
+  #   kb.example.cz {
+  #       reverse_proxy piratekb:8765 {
+  #           flush_interval -1
+  #       }
+  #   }
+
+# volumes:
+#   caddy_data:
+#   caddy_config:
