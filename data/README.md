@@ -36,6 +36,20 @@ data/
   flickr/                fotoalba Pirátů na Flickru (jen metadata, ne fotky)
     alba.md              tabulka alb od nejnovějších s odkazy, počtem fotek a licencí
     alba.jsonl           jedno album na řádek (id, název, popis, počet fotek, url, náhled, data, licence)
+  dokumenty/             programové dokumenty převedené z PDF (dokumenty.py)
+    <slug>/00-cely-dokument.md   celý text dokumentu
+    <slug>/NN-<kapitola>.md      kapitoly podle hlavní osnovy; `strany` = rozsah stran v PDF
+  subweby/               menší pirátské weby v Majáku (subweby.py)
+    peer/                peer.pirati.cz: úvod a členové PEER, stránka strategie, články „Co si o tom myslíme“
+  majak/                 majak.pirati.cz, redakční systém pirátských webů (subweby.py)
+    seznam-webu.md       tabulka všech webů v Majáku (název, adresa, odvozený druh)
+    napoveda/<slug>.md   nápověda pro správce webů
+    zalozeni-webu.md     postup založení webu, uvod.md: přihlášení, statistiky, Uniweb
+  social/                veřejné příspěvky pirátských poslanců na sociálních sítích
+    x/<ucet>.jsonl       jeden příspěvek na řádek (id, datum, text, url, počty reakcí, repost/odpověď)
+    x/<ucet>/<RRRR-MM>.md  příspěvky účtu za měsíc od nejnovějších (typ prispevek-socialni-site)
+    bluesky/<ucet>.jsonl   totéž pro Bluesky
+    bluesky/<ucet>/<RRRR-MM>.md
   evidence/              Evidence kontaktů a schůzek (evidence.pirati.cz, Open Lobby): registr lobbistických schůzek
     <rok>/<id>-<slug>.md jedna schůzka = jeden soubor (popis, přijaté/poskytnuté výhody, účastníci)
     schuzky.jsonl        jedna schůzka na řádek (id, datum, název, popis, výhody, účastníci, autor, publikováno, url)
@@ -50,7 +64,7 @@ Každý `.md` soubor začíná blokem `---` … `---`. Povinná pole:
 |---|---|---|
 | `zdroj` | URL stránky nebo datové sady, ze které text pochází; slouží jako citace | URL |
 | `nazev` | název dokumentu (titulek článku, název orgánu, osoby…) | text |
-| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka` |
+| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka`, `prispevek-socialni-site`, `navod` |
 | `viditelnost` | vrstva přístupu v MCP serveru | `verejne` (bez přihlášení), `clenske` (jen přihlášení piráti); v `data/` je dnes vše `verejne` |
 | `stazeno` | kdy skript dokument stáhl (stáří dat) | `YYYY-MM-DD` |
 
@@ -59,11 +73,11 @@ Volitelná pole:
 | Pole | Význam | Hodnoty |
 |---|---|---|
 | `datum` | datum vydání dokumentu (článku, usnesení); chybí, pokud ho zdroj neuvádí | `YYYY-MM-DD`, u exportů i ISO 8601 |
-| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, později `nazor-jednotlivce` |
+| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, `vyjadreni-politika` (vlastní příspěvek poslance na sociální síti, ne stanovisko strany), později `nazor-jednotlivce` |
 
 Skripty přidávají další pole podle zdroje: `autor`, `tagy` (články), `telefon`,
 `socialni_site` (profily na webu), `druh`, `zkratka`, `nadrazeny`, `kontakty`, `role`
-(organizační jednotky), `poradi` (program), `verze_styleguide` (brand). Tělo souboru je
+(organizační jednotky), `poradi` (program), `verze_styleguide` (brand), `osoba`, `platforma`, `ucet`, `pocet_prispevku`, `overit` (příspěvky na sociálních sítích; `overit: true` = účet nebyl spolehlivě ověřen). Tělo souboru je
 Markdown převedený z HTML, obvykle začíná nadpisem `# <nazev>`.
 
 JSONL soubory mají jeden JSON objekt na řádek (UTF-8, bez BOM); popis polí je v docstringu
@@ -77,6 +91,8 @@ příslušného skriptu a u PSP v `data/psp/README.md`.
 | styleguide.pirati.cz | licence na stránce neuvedena; provozuje stejný technický odbor jako pirati.cz | barvy a názvy písem nejsou autorské dílo, samotné fonty (soubory) ale ano, viz jejich licence |
 | psp.cz otevřená data | otevřená data Poslanecké sněmovny, volně k dalšímu užití s uvedením zdroje | <https://www.psp.cz/sqw/hp.sqw?k=1300> |
 | lide.pirati.cz | veřejná evidence České pirátské strany (organizační struktura a funkcionáři) | vytěžujeme jen veřejnou část bez přihlášení |
+| peer.pirati.cz, majak.pirati.cz | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) podle patičky webů (stejná šablona jako pirati.cz) | PDF hospodářské strategie na majak.pirati.cz licenci neuvádí; před dalším šířením ověřit u PEER |
+| X/Twitter, Bluesky | veřejné příspěvky politiků; autorská práva k textu má autor, X podmínky dovolují zobrazení veřejného obsahu s odkazem na původní příspěvek | ukládáme jen text, datum, odkaz a počty reakcí; žádné obrázky ani videa, žádné odpovědi třetích osob; u citace vždy odkaz na původní příspěvek |
 | evidence.pirati.cz | veřejný registr schůzek (Open Lobby, AGPL software); licence dat na stránce neuvedena, strana ho zveřejňuje záměrně kvůli transparentnosti lobbingu | jména protistran jsou údaje třetích osob, viz GDPR níže; `evidence.py --bez-tretich-osob` je neuloží |
 
 Před zařazením čehokoli do `content/` nebo do veřejné vrstvy serveru zkontrolujte,
@@ -95,6 +111,7 @@ Před zařazením čehokoli do `content/` nebo do veřejné vrstvy serveru zkont
   z profilů lidí s funkcí bere jen zařazení (kraj/MS), e-mail `@pirati.cz`, „členem od“ a
   krátký medailonek; občanské jméno, uživatelské jméno ani telefon z evidence neukládá.
   Telefon se ukládá jen z profilů na pirati.cz, kde ho člověk sám zveřejnil.
+- Ze sociálních sítí jen **veřejné účty poslanců** vedené v `ingest/socialni_site_ucty.yaml` (odkaz z jejich profilu na pirati.cz nebo ověřený profil); jen jejich vlastní příspěvky a reposty, ne odpovědi a komentáře jiných lidí.
 - Žádné údaje třetích osob (občané, kteří straně psali, protistrany ve sporech apod.).
   Pokud se takový údaj v textu článku objeví, jde o citaci veřejného zdroje; při kurátorství
   do `content/` se posoudí, zda ho ponechat.
