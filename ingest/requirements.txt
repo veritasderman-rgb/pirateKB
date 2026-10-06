@@ -1,0 +1,5 @@
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=5
+pyyaml>=6
+markdownify>=0.12

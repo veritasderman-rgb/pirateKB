@@ -1,0 +1,72 @@
+zdroj: https://styleguide.pirati.cz/2.22.0/
+verze_styleguide: 2.22.0
+stazeno: '2026-10-06'
+viditelnost: verejne
+autorita: oficialni-styleguide
+fonty:
+- role: Primary font
+  pismo: Roboto
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Primary font italic
+  pismo: Roboto
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Primary font light
+  pismo: Roboto
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Primary font medium
+  pismo: Roboto
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Primary font bold
+  pismo: Roboto
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Condensed font
+  pismo: Roboto Condensed
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Condensed font italic
+  pismo: Roboto
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Condensed font light
+  pismo: Roboto
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Condensed font bold
+  pismo: Roboto
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Alternate font
+  pismo: Bebas Neue
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
+- role: Alternate font bold
+  pismo: Bebas Neue
+  zaloha:
+  - Helvetica
+  - Arial
+  - sans-serif
