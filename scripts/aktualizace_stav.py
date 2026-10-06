@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 ZDROJE = [
     ("styleguide", "styleguide.pirati.cz (barvy, písma)", "brand"),
     ("psp", "psp.cz otevřená data (poslanci, hlasování)", "psp"),
+    ("steno", "psp.cz stenozáznamy (vystoupení pirátských poslanců)", "psp/steno"),
     ("lide_pirati", "lide.pirati.cz (struktura, lidé s funkcí)", "lide"),
     ("pirati_web", "pirati.cz (aktuality, program, profily)", "pirati-web"),
     ("flickr", "Flickr Pirátů (metadata alb)", "flickr"),

@@ -52,6 +52,7 @@ ALLOWED_TYP = (
     "navod",  # nápověda a postupy pro správce webů (majak.pirati.cz, subweby.py)
     "system",  # audit systémů *.pirati.cz (systemy.py; používá i `navod` pro kam-s-problemem.md)
     "prepis-videa",  # přepisy videí z YouTube z titulků (youtube.py)
+    "projev",  # vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (steno.py)
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$")

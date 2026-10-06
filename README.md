@@ -34,7 +34,7 @@ Podrobný návod, včetně lokálního běhu přes Docker, je v
 
 ## Co server umí
 
-**15 toolů:**
+**16 toolů:**
 
 | Tool | K čemu |
 |---|---|
@@ -46,6 +46,7 @@ Podrobný návod, včetně lokálního běhu přes Docker, je v
 | `search_press_releases` | tiskové zprávy a aktuality |
 | `get_voting_record` | hlasování pirátských poslanců, senátorů a europoslanců (`komora`: psp, senat, ep) |
 | `get_social_posts` | příspěvky politiků na X a Bluesky |
+| `get_speeches` | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (2017–dnes), s odkazem na stenozáznam |
 | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec s kontaktem |
 | `get_brand`, `get_template` | barvy, písma, loga, šablony tiskové zprávy, postu, reels, briefu a projevu |
 | `kb_stats` | co báze obsahuje, kdy se aktualizovala, souhrn použití |

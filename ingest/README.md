@@ -12,6 +12,7 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 |---|---|---|---|---|
 | [styleguide.pirati.cz](https://styleguide.pirati.cz) (Pattern Lab) | `styleguide.py` | `data/brand/barvy.yaml`, `fonty.yaml`, `styleguide.md` | značkové, neutrální a cizí barvy (hex), rodiny písem, shrnutí s odkazem na verzi styleguide | při vydání nové verze styleguide, jinak cca měsíčně |
 | [psp.cz otevřená data](https://www.psp.cz/sqw/hp.sqw?k=1300) | `psp.py` | `data/psp/poslanci.jsonl`, `hlasovani-2017.jsonl`, `hlasovani-2021.jsonl`, `hlasovani-2025.jsonl`, `README.md` | pirátští poslanci (členství v klubu, funkce) a každé sněmovní hlasování s tím, jak hlasovali Piráti | týdně (po jednacích týdnech), před volbami zkontrolovat seznam období v `TERMS` |
+| [psp.cz stenoprotokoly](https://www.psp.cz/eknih/2021ps/stenprot/zip/index.htm) (zipy schůzí, online stránky `sNNNTTT.htm`, otevřená data `steno.zip`/`schuze.zip`) | `steno.py` | `data/psp/steno/<obdobi>/<schuze>-<poslanec>.md`, `vystoupeni.jsonl`, `stav.json` | všechna vystoupení pirátských poslanců ve Sněmovně (období 2017, 2021, 2025, i v roli člena vlády): text, datum a čas, schůze, bod jednání, odkaz na stenozáznam s kotvou `#rN`; typ `projev`, autorita `vyjadreni-politika`; bez řízení schůze (předsedající) a procedurálních vět pod 120 znaků | týdně `--obdobi 2025 --max-stranek 600` (nové schůze + poslední 2 znovu); celé naplnění jednorázově bez parametrů (~1–2 h, ~300 zipů) |
 | [senat.cz](https://www.senat.cz/senatori/) (RSS „Jak jsem hlasoval/a“ `hlasovani_rss.php?pid=<id>`, seznamy a profily senátorů) | `senat.py` | `data/senat/senatori.jsonl`, `hlasovani-<rok>.jsonl` (rok začátku funkčního období), `README.md` | pirátští senátoři (příslušnost Piráti nebo zvoleni za Piráty) s mandáty a obvody; každé hlasování, kde hlasoval pirátský senátor, ve schématu `data/psp` + `komora: senat`; celkové počty hlasů chybí (detail hlasování na senat.cz je za WAF, otevřená data hlasování Senát nevydává) | týdně `--jen-rss` (jen RSS známých senátorů); první týden v měsíci `--aktualni` (kontrola nových mandátů v aktuálním funkčním období, sloučí se s uloženým seznamem); bez parametru projde všechna období od 2012 |
 | [HowTheyVote.eu API](https://howtheyvote.eu/api/) (jmenovitá hlasování EP, ODbL) | `ep.py` | `data/ep/europoslanci.jsonl`, `hlasovani-2019.jsonl`, `hlasovani-2024.jsonl`, `README.md` | pirátští europoslanci (Gregorová, Peksa, Kolaja; další se najdou podle národní strany) a každé hlavní hlasování EP od 7/2019 s jejich hlasy a celkovými počty, ve schématu `data/psp` + `komora: ep`; názvy anglicky | týdně; interval ≥ 1 s, první běh ~45 min (countries.csv pro každé hlasování), další běhy jen nová hlasování (`--bez-souctu` bez celkových počtů za ~1 min) |
 | [pirati.cz](https://www.pirati.cz) | `pirati_web.py` | `data/pirati-web/aktuality/<rok>/*.md`, `program/*.md`, `lide/*.md`, `materialy.md`, `index.jsonl` | tiskové zprávy a články, programové dokumenty, stanoviska a kodexy, profily lidí na webu, odkazy na loga a soubory ke stažení | aktuality denně (`--only aktuality`), celý web měsíčně |
@@ -37,6 +38,21 @@ data vytvoření a úprav) nastavte zdarma získaný klíč
 (<https://www.flickr.com/services/apps/create/noncommercial/>) v proměnné prostředí
 `FLICKR_API_KEY`; skript pak použije `flickr.photosets.getList`. Klíč nepatří do
 repozitáře. Bez klíče skript upozorní na stderr.
+
+**Stenozáznamy PSP (`steno.py`).** Text vystoupení je ze zipů stenoprotokolů po schůzích
+(`.cache/steno/<rok>/NNNschuz.zip`, cp1250). Kdo mluví, určuje tabulka `rec` z otevřených dat
+(`steno.zip`): `aname` je **pořadí řečníka na stránce** (ne číslo z `id="rN"`; ministr s odkazem
+na vlada.cz kotvu nemá, ale v pořadí se počítá), a kontroluje se příjmením z `osoby.unl`. Pirát =
+`id_osoba` z `data/psp/poslanci.jsonl` s členstvím v pirátském klubu v daném období (vystoupení
+Ivana Bartoše jako ministra se počítají; Jan Lipavský v období 2021 byl ministrem, ale ne
+poslancem pirátského klubu, a v období 2025 sedí v jiném klubu, takže jeho vystoupení se nepočítají). Vystoupení v roli předsedajícího (`rec.druh` 2/4: řízení schůze,
+omluvenky, hlasování) a kratší než 120 znaků se vynechávají, počty jsou ve `stav.json`. Zip nové
+schůze vydává psp.cz se zpožděním ~3 měsíce; do té doby skript stahuje přes `polite_get` jen
+online stránky, kde podle `rec` mluví Pirát, plus navazující stránky s pokračováním (u stránek bez
+záznamu v `rec` celé schůze a řečníka určí odkaz `detail.sqw?id=`). Bod jednání je z
+`bod_schuze.unl` (otevřená data `schuze.zip`), u bodů mimo číselník (sloučená rozprava) z nadpisu
+na stránce; bez známého bodu nadpis vystoupení bod neuvádí. Volby: `--obdobi`, `--schuze`,
+`--znovu`, `--bez-zipu` (jen online stránky, kontrola), `--max-stranek N`.
 
 **Sociální sítě (X/Twitter, Bluesky).** `socialni_site.py` čte seznam účtů z
 `socialni_site_ucty.yaml` (jméno poslance, handle na X a Bluesky, příznak `overit`, odkud odkaz
@@ -163,6 +179,7 @@ pořadí je od nejrychlejšího k nejpomalejšímu, aby byla brzy vidět přípa
 cd ingest
 python3 styleguide.py          # sekundy
 python3 psp.py                 # desítky sekund, stahuje ~20 MB zipů
+python3 steno.py               # 1–2 hodiny poprvé (~300 zipů stenoprotokolů); pak týdně --obdobi 2025
 python3 lide_pirati.py         # minuty (stovky stránek)
 python3 pirati_web.py          # desítky minut (tisíce článků, 4 vlákna)
 python3 subweby.py             # sekundy (peer.pirati.cz, majak.pirati.cz)

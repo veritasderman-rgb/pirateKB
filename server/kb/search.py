@@ -151,7 +151,7 @@ class KB:
     def search(self, query: str, typ: list[str] | None = None,
                kolekce: list[str] | None = None, od: str | None = None,
                do: str | None = None, limit: int = 10,
-               preferuj_nove: bool = True) -> list[dict]:
+               preferuj_nove: bool = True, autor: list[str] | None = None) -> list[dict]:
         """Plnotextové hledání v chuncích; vrací max. 2 chunky z jednoho dokumentu.
 
         Dotaz -> pojmy (kmeny + přesné tvary + aliasy, viz ``server/kb/query.py``) -> FTS5
@@ -160,6 +160,7 @@ class KB:
         ``RECENT_TYPES``) + oficiální pozice. U programu/stanovisek zůstane jen nejnovější
         verze dokumentu se stejným názvem. Se zapnutými embeddingy se pořadí BM25 a
         kosinové podobnosti spojí přes reciprocal rank fusion (pole ``rrf``, ``podobnost``).
+        ``autor`` = přesná jména v poli ``autor`` (např. z ``resolve_speaker``).
         """
         plan = self._plan(query)
         if not plan:
@@ -168,6 +169,7 @@ class KB:
         where = ""
         where += self._in_clause("d.typ", typ, params)
         where += self._in_clause("d.kolekce", kolekce, params)
+        where += self._in_clause("d.autor", autor, params)
         where += self._date_clause("d.datum", od, do, params)
         candidates = max(limit * 12, 150)
         params.append(candidates)
@@ -190,7 +192,7 @@ class KB:
         vec = self._vector_index()
         if vec is not None:
             fused = self._fuse_vectors(vec, query, scored, plan, today, preferuj_nove,
-                                       typ, kolekce, od, do, candidates)
+                                       typ, kolekce, od, do, candidates, autor)
             if fused is not None:
                 scored, hybrid = fused, True
 
@@ -372,13 +374,14 @@ class KB:
 
     def _fuse_vectors(self, vec: emb_mod.VectorIndex, query: str, scored: list[dict],
                       plan: QueryPlan, today: dt.date, preferuj_nove: bool, typ, kolekce,
-                      od, do, candidates: int) -> list[dict] | None:
+                      od, do, candidates: int, autor=None) -> list[dict] | None:
         allowed = None
-        if typ or kolekce or od or do:
+        if typ or kolekce or od or do or autor:
             params: list = []
             where = ""
             where += self._in_clause("d.typ", typ, params)
             where += self._in_clause("d.kolekce", kolekce, params)
+            where += self._in_clause("d.autor", autor, params)
             where += self._date_clause("d.datum", od, do, params)
             allowed = {r[0] for r in self.con.execute(
                 f"SELECT c.id FROM chunks c JOIN documents d ON d.id = c.doc_id WHERE 1=1{where}",
@@ -1038,6 +1041,159 @@ class KB:
             "od": min((r["od"] for r in rows if r["od"]), default=None),
             "do": max((r["do"] for r in rows if r["do"]), default=None),
         }
+
+    # ------------------------------------------------------------ projevy ve Sněmovně
+
+    def resolve_speaker(self, poslanec: str) -> list[str]:
+        """Jména autorů projevů (typ ``projev``) odpovídající dotazu: celé jméno nebo jen
+        příjmení, bez diakritiky, i v jiném pádě („Bartoše“), nebo id_osoba z psp.cz."""
+        q = fold(poslanec).strip()
+        if not q:
+            return []
+        if q.isdigit():
+            return [r["autor"] for r in self._rows(
+                "SELECT DISTINCT autor FROM documents WHERE typ = 'projev' "
+                "AND json_extract(meta, '$.osoba_psp') = ?", (q,)) if r["autor"]]
+        names = [r["autor"] for r in self._rows(
+            "SELECT DISTINCT autor FROM documents WHERE typ = 'projev' AND autor IS NOT NULL "
+            "ORDER BY autor")]
+        exact = [n for n in names if fold(n) == q]
+        if exact:
+            return exact
+        toks = [t for t in re.findall(r"\w+", q) if len(t) > 1]
+
+        def tok_ok(t: str, name: str) -> bool:
+            for nt in re.findall(r"\w+", fold(name)):
+                if nt == t or nt.startswith(t):
+                    return True
+                k = max(4, len(nt) - 1)      # skloňování: „bartose“ ~ „bartos“, „hriba“ ~ „hrib“
+                if len(t) >= 4 and t[:k] == nt[:k] and abs(len(t) - len(nt)) <= 3:
+                    return True
+            return False
+
+        return [n for n in names if toks and all(tok_ok(t, n) for t in toks)]
+
+    @staticmethod
+    def _speech_sections(body: str) -> dict[str, str]:
+        """Text vystoupení podle nadpisu ``## …`` (bez řádku s popiskem a odkazem)."""
+        out: dict[str, str] = {}
+        for part in re.split(r"(?m)^## ", body or "")[1:]:
+            head, _, text = part.partition("\n")
+            text = re.sub(r"(?m)^\*[^\n]*· stenozáznam: \S+\s*$", "", text).strip()
+            out[head.strip()] = text
+        return out
+
+    def _speech_item(self, doc: dict, meta: dict, v: dict, text: str | None) -> dict:
+        return {
+            "doc_id": doc["id"], "nazev": doc["nazev"], "jmeno": doc["autor"],
+            "osoba_psp": meta.get("osoba_psp"), "obdobi": meta.get("obdobi"),
+            "schuze": meta.get("schuze"), "datum": v.get("datum"), "cas": v.get("cas"),
+            "bod": v.get("bod"), "role": v.get("role"), "url": v.get("url") or doc["zdroj"],
+            "nadpis": v.get("nadpis"), "znaku": v.get("znaku"), "autorita": doc["autorita"],
+            "snippet": (text or "")[:600],
+        }
+
+    @staticmethod
+    def _in_range(datum: str | None, od: str | None, do: str | None) -> bool:
+        d = str(datum or "")[:10]
+        if od and (not d or d < od[:10]):
+            return False
+        if do and (not d or d > do[:10]):
+            return False
+        return True
+
+    def search_speeches(self, query: str | None = None, poslanec: str | None = None,
+                        od: str | None = None, do: str | None = None,
+                        limit: int = 10) -> list[dict]:
+        """Vystoupení pirátských poslanců ve Sněmovně (typ ``projev``).
+
+        S ``query`` fulltext v textu vystoupení (stejné skóre jako ``search``), bez něj
+        nejnovější vystoupení. ``poslanec`` = jméno, příjmení (i bez diakritiky, i skloněné)
+        nebo id_osoba; nenalezený poslanec -> prázdný seznam. ``od``/``do`` filtrují datum
+        vystoupení. Každá položka má datum, čas, schůzi, bod, URL na stenozáznam a úryvek."""
+        limit = max(1, int(limit))
+        autori = None
+        if poslanec and fold(poslanec).strip():
+            autori = self.resolve_speaker(poslanec)
+            if not autori:
+                return []
+        docs_cache: dict[str, tuple[dict, dict, dict[str, str]]] = {}
+
+        def load(doc_id: str):
+            if doc_id not in docs_cache:
+                r = self._rows("SELECT id, nazev, autor, zdroj, autorita, meta, body FROM documents "
+                               "WHERE id = ?", (doc_id,))[0]
+                docs_cache[doc_id] = (r, _loads(r["meta"], {}), self._speech_sections(r["body"]))
+            return docs_cache[doc_id]
+
+        out: list[dict] = []
+        if query and fold(query).strip():
+            # datum dokumentu = první den schůze; schůze trvá i týdny -> širší SQL filtr
+            od_sql = None
+            if od:
+                try:
+                    od_sql = (dt.date.fromisoformat(od[:10]) - dt.timedelta(days=120)).isoformat()
+                except ValueError:
+                    od_sql = od
+            hits = self.search(query, typ=["projev"], autor=autori, od=od_sql, do=do,
+                               limit=limit * 4, preferuj_nove=False)
+            seen: set[tuple[str, str]] = set()
+            for h in hits:
+                doc, meta, sections = load(h["doc_id"])
+                head = (h.get("nadpis") or "").split(" > ")[-1].strip()
+                vys = meta.get("vystoupeni") or []
+                v = next((x for x in vys if x.get("nadpis") == head), None)
+                if v is None and vys:
+                    v = vys[0]
+                if v is None or (v.get("nadpis"), h["doc_id"]) in seen:
+                    continue
+                if not self._in_range(v.get("datum"), od, do):
+                    continue
+                seen.add((v.get("nadpis"), h["doc_id"]))
+                item = self._speech_item(doc, meta, v, sections.get(v.get("nadpis") or ""))
+                item["snippet"] = h.get("snippet") or item["snippet"]
+                item["score"] = h.get("score")
+                item["shoda_vsech"] = h.get("shoda_vsech")
+                out.append(item)
+                if len(out) >= limit:
+                    break
+            return out
+
+        params: list = []
+        where = "typ = 'projev'" + self._in_clause("autor", autori, params)
+        if do:
+            where += " AND datum <= ?"
+            params.append(do[:10] + "~")
+        rows = self._rows(f"SELECT id FROM documents WHERE {where} ORDER BY datum DESC, id "
+                          f"LIMIT ?", params + [max(limit * 3, 30)])
+        for r in rows:
+            doc, meta, sections = load(r["id"])
+            for v in meta.get("vystoupeni") or []:
+                if self._in_range(v.get("datum"), od, do):
+                    out.append(self._speech_item(doc, meta, v, sections.get(v.get("nadpis") or "")))
+        out.sort(key=lambda x: (str(x["datum"] or ""), str(x["cas"] or "")), reverse=True)
+        return out[:limit]
+
+    def speeches_summary(self, poslanec: str) -> dict:
+        """Počty vystoupení poslance ve Sněmovně: celkem, po obdobích, počet schůzí, od–do."""
+        autori = self.resolve_speaker(poslanec)
+        if not autori:
+            return {"poslanec": poslanec, "nalezen": False, "celkem": 0}
+        params: list = []
+        rows = self._rows("SELECT autor, datum, meta FROM documents WHERE typ = 'projev'"
+                          + self._in_clause("autor", autori, params), params)
+        po_obdobi: dict[str, int] = {}
+        celkem, datumy = 0, []
+        for r in rows:
+            meta = _loads(r["meta"], {})
+            n = int(meta.get("pocet_vystoupeni") or len(meta.get("vystoupeni") or []))
+            celkem += n
+            k = str(meta.get("obdobi") or "?")
+            po_obdobi[k] = po_obdobi.get(k, 0) + n
+            datumy += [str(v.get("datum")) for v in meta.get("vystoupeni") or [] if v.get("datum")]
+        return {"poslanec": autori[0] if len(autori) == 1 else autori, "nalezen": True,
+                "celkem": celkem, "schuzi": len(rows), "podle_obdobi": dict(sorted(po_obdobi.items())),
+                "od": min(datumy, default=None), "do": max(datumy, default=None)}
 
     # ------------------------------------------------------------ brand, program, statistiky
 
