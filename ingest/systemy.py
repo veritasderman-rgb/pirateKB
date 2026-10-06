@@ -854,16 +854,14 @@ def main() -> int:
         (neaktivni if rec["stav"].startswith("nefunguje") or rec["stav"].startswith("neurčeno") else rows).append(rec)
 
     if bez_sondy:
-        pred = 0
-        if (OUT / "systemy.jsonl").exists():
-            pred = sum(1 for ln in (OUT / "systemy.jsonl").read_text(encoding="utf-8").splitlines() if ln.strip())
+        existuje_vystup = any((OUT / n).exists() for n in ("systemy.jsonl", "neaktivni.jsonl", "systemy.md"))
+        if existuje_vystup:
+            print(f"CHYBA: {len(bez_sondy)} kandidátů nemá v cache sondu a existující výstupy v {OUT} by se "
+                  "přepsaly neúplnými daty; nic nepřepisuji. Cache sond (.cache/systemy/) je neúplná, "
+                  "je potřeba běh bez --jen-vystup.", file=sys.stderr)
+            return 2
         print(f"Varování: {len(bez_sondy)} kandidátů nemá v cache sondu (půjdou do neproverene.jsonl s důvodem bez_sondy).",
               file=sys.stderr)
-        if pred and len(rows) * 2 < pred:
-            print(f"CHYBA: z cache vychází {len(rows)} řádků, existující systemy.jsonl jich má {pred} (méně než polovina); "
-                  "nic nepřepisuji. Cache sond (.cache/systemy/) je neúplná, je potřeba běh bez --jen-vystup.",
-                  file=sys.stderr)
-            return 2
     pocty["sondovano"] = len(sonda) - len(bez_sondy)
 
     OUT.mkdir(parents=True, exist_ok=True)
