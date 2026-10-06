@@ -1,0 +1,36 @@
+# Kontrola dat a testů serveru na každém pull requestu a pushi do main.
+# Poznámka: push z workflow "Aktualizace dat" tímto GITHUB_TOKENem další workflow nespouští;
+# data si ten workflow hlídá sám (validate + build v update_data.sh).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            ingest/requirements.txt
+            server/requirements.txt
+
+      - name: Instalace závislostí
+        run: pip install -r ingest/requirements.txt -r server/requirements.txt pytest
+
+      - name: Kontrola dat (validate)
+        run: python3 ingest/validate.py
+
+      - name: Testy serveru
+        run: python3 -m pytest server/tests -q

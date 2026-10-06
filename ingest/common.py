@@ -87,10 +87,26 @@ def frontmatter(meta: dict) -> str:
                                width=1000) + "---\n"
 
 
-def write_markdown(path: Path, meta: dict, body: str) -> None:
+def _strip_stazeno(text: str) -> str:
+    """Odstraní řádek `stazeno:` z frontmatteru, aby šel obsah porovnat."""
+    return re.sub(r"^stazeno:.*$", "", text, count=1, flags=re.M)
+
+
+def write_markdown(path: Path, meta: dict, body: str) -> bool:
+    """Zapíše Markdown s frontmatterem. Pokud se liší jen pole `stazeno`,
+    soubor nepřepisuje (aby automatické běhy neměnily tisíce souborů).
+    Vrací True, když se soubor skutečně zapsal."""
     path.parent.mkdir(parents=True, exist_ok=True)
     body = re.sub(r"\n{3,}", "\n\n", body).strip() + "\n"
-    path.write_text(frontmatter(meta) + "\n" + body, encoding="utf-8")
+    content = frontmatter(meta) + "\n" + body
+    if path.exists():
+        try:
+            if _strip_stazeno(path.read_text(encoding="utf-8")) == _strip_stazeno(content):
+                return False
+        except OSError:
+            pass
+    path.write_text(content, encoding="utf-8")
+    return True
 
 
 def write_jsonl(path: Path, rows) -> int:
