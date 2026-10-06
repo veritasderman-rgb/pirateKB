@@ -1,0 +1,60 @@
+---
+zdroj: https://stredocesky.pirati.cz/aktuality/vpluli-jsme-do-horke-faze-eurokampane-predstavili-program-priority-pro-mlade-a-ve-specialni-pinkare-vyrazime-na-kontaktni-tour/
+nazev: 'Vpluli jsme do horké fáze eurokampaně: představili program, priority pro mladé a ve speciální Pinkáře vyrážíme na kontaktní tour'
+typ: aktualita
+datum: '2024-04-30'
+web: KS Středočeský kraj
+web_url: https://stredocesky.pirati.cz
+druh_webu: KS
+region: Středočeský kraj
+tagy:
+- Zuzana Klusová
+- Mikuláš Peksa
+- Evropa
+- Marcel Kolaja
+- Markéta Gregorová
+- Volby do eu
+viditelnost: verejne
+autorita: web
+stazeno: '2026-10-06'
+---
+
+# Vpluli jsme do horké fáze eurokampaně: představili program, priority pro mladé a ve speciální Pinkáře vyrážíme na kontaktní tour
+
+*S heslem „Odvaha pro Evropu, Evropa pro tebe“ cílíme na silnou konkurenceschopnou Evropu a prosperující Česko bez korupce i nesmyslných dotací oligarchům, kde se dbá na kvalitu života každého člověka bez rozdílu. Nabízíme garanci bezpečí a zahraniční politiky s rovnou páteří. Představujeme také priority pro mladé: usilujeme o špičkové vzdělávání, podporu talentů i větší dostupnost zahraničního studia. Klademe důraz na udržitelnou budoucnost, tedy snižování dopadů klimatické krize. Rovněž na zlepšení péče o duševní zdraví, rovné podmínky pro ženy a muže, ochranu zranitelných skupin a boj proti sexualizovanému a domácímu násilí. Proto spouštíme petici za přijetí Úmluvy o prevenci a potírání násilí. Dneškem také zahajujeme kontaktní tour „S Piráty se bavíš“, na kterou vyjedeme mimo jiné speciální Pinkárou.*
+
+> „*Naše země i celá Evropa prochází náročným obdobím. O to víc je třeba kompetentních a odvážných politiků a političek, kteří dokáží výzvám úspěšně čelit. Takové politiky a političky za Piráty máme. Jako houby po dešti se objevují nejrůznější pábitelé a obchodníci se strachem, kteří se snaží rozeštvat společnost a postrčit nás na šikmou plochu směr Východ. To za Piráty odmítáme dovolit. Je ale i na demokratických politicích, aby se k prázdným slibům těchto rádoby mesiášů lidé upínat nepotřebovali*,“ uvedl předseda Pirátů Ivan Bartoš.
+
+> „*Cílíme tak na silnou konkurenceschopnou Evropu a prosperující Česko. Piráti jsou jediní, kdo jde s dobou. Máme odvahu řešit nové ekonomické výzvy a umíme využít moderní technologie a trendy ve prospěch lidí. Neopakujeme už 30 let ty stejné přežité vize, nebrečíme nad problémy jako jiní politici. Naopak přinášíme reálná řešení. Zároveň jsme a budeme hlavními tahouny boje proti korupci a nesmyslným dotacím typu toastové linky. Máme hmatatelné výsledky a 15 let čistý štít. Chráníme peníze občanů, aby šly místo k oligarchům do škol a školek, zdravotnictví, bydlení*,“ nastínil Bartoš s tím, že Piráti jsou zárukou bezpečí a zahraniční politiky s rovnou páteří.
+
+> „*Jsme hlavním nárazníkem proti všem extremistům, obchodníkům se strachem a populistům. Nás si nelze koupit a nejde nás ani zastrašit. Proto Andrej Babiš označil Piráty za hlavního nepřítele, což od oligarchy bereme jako pochvalu. Zároveň platí, že chceme férovou Evropu a kvalitní život pro všechny bez ohledu na to, kde žijí či z jakého pocházejí prostředí. Postaráme se, aby evropské miliardy pomohly řešit skutečné problémy skutečných lidí v regionech,“*popsal Bartoš priority.
+
+> *„Dnes stojíme na rozcestí,“*řekl europoslanec a lídr kandidátky Marcel Kolaja. Poukázal na to, že zatímco v posledních pěti letech byl Evropský parlament zárukou solidarity, vzájemné spolupráce a hájení lidských práv, dnes hrozí, že po volbách nastane opak.*„Poprvé hrozí, že Evropský parlament nebude naše práva bránit, ale bude nám je brát. Ani čeští konzervativci se již nestydí paktovat na evropské úrovni s extremisty. Naopak se tím chlubí. Získávají od nich hlasy pro své zpátečnické návrhy, o kterých eufemisticky hovoří jako o racionálních. A pak mlčí, když jejich noví přátelé v evropských zemích zakazují potraty, diskriminují menšiny nebo do ulic instalují špehovací kamery,“*dodal*.*
+
+> Piráti podle něj chtějí jinou budoucnost. *„My chceme Evropu, která je spravedlivá, která spolupracuje a kde se nikdo nebojí být sám sebou. Chceme moderní Evropu. Takovou, která chrání životní prostředí a přechod na udržitelnější ekonomiku vidí jako příležitost, ne jako hrozbu,“* představil Kolaja svou vizi. K té podle něj vede cesta přes investice do inovací a chytré využívání moderních technologií.*„Potřebujeme funkční jednotný evropský trh bez zbytečných překážek. Na kterém spolu férově soutěží firmy o to, kdo nabídne lepší výrobek. A na kterém může uspět každý, bez ohledu na velikost. Aby se z dobrých nápadů mohly stávat dobré produkty. To je klíč ke kvalitnímu, pohodlnému životu. A to nejen pro nás. Ale také pro další generace,“*dodal.
+
+> Klíčovým tématem pro Piráty je i bezpečnost. „*Pokud dnes mluvíme o bezpečnosti, musíme mluvit o dezinformacích. Sociální sítě fungují na netransparentních algoritmech, téma dezinformací je přehazováno mezi ministerstvy jako horká brambora, a ve výsledku proti nim zatím nejvíce udělal Ivan Bartoš, když zakázal státní reklamu na dezinformačních webech. Hrozba dezinformací přitom nebyla nikdy větší než teď – před prvními evropskými volbami od začátku Putinovy agrese. Česká republika ale nemůžeme nechat dezinformátorům napospas. Proto chci k řešení pro Česko přispět i z evropské úrovně,”*uvedla europoslankyně a dvojka kandidátky do EP Markéta Gregorová, jejíž velkou prioritou jsou vedle problematiky dezinformací a bezpečnosti také lidská práva. „*Piráti jsou nejspolehlivější zárukou toho, že se Česko nevydá cestou konzervativního tmářství a autoritářství. V tomto boji nepřestaneme, dokud nezmizí všechny bariéry z minulého století. Evropa potřebuje Piráty a my ji nezklameme*,*“*zdůraznila.
+
+> *„S Piráty chceme být v Evropě hlasem těch, kteří za sebou nemají mocné lobbisty, kmotry a nevlastní vlivná média. Hlasem těch, které není slyšet, ale kteří potřebují největší pomoc. Hlasem dětí ze sociálně slabých rodin a milionů lidí, kteří se pohybují na hraně chudoby a sotva vyjdou. Ať už se narodíte v Karviné, Karlíně nebo Berlíně měli byste mít stejnou šanci uspět a dobře žít. Aktuálně ale v Karviné umíráme o 5 let dříve než v Praze, v Dolní Lutyni mají třetí nejhorší vzduch v Evropě a k tomu máme nízké mzdy a horší vzdělání. Uhlí nám tedy zjevně prosperitu nepřináší, naopak,“*navázala trojka evropské kandidátky Zuzana Klusová, která by se ráda v evropském Výboru pro regionální rozvoj věnovala politice koheze, tedy politice soudržnosti, která má právě tyto nerovnosti stírat a zajistit, aby sociálně a hospodářské ohrožené regiony prosperovaly.
+
+> *„Není pravda, že si musíme vybrat mezi bohatstvím a zdravým životním prostředím. Je to falešné dilema. Můžeme mít obojí. Dokazuje to třeba Kalifornie, Dánsko, Švédsko, které jsou lídry v obnovitelných zdrojích i elektromobilitě, mají silnou prosperující ekonomiku i vysokou kvalitu života. Cesta k čisté ekonomice ale musí být cestou spravedlivou pro všechny. A já jsem tu, abych se postarala o to, aby se tak stalo. Chci bojovat za svobodnou, udržitelnou a sociálně spravedlivou Evropu, kde má každý člověk stejnou šanci na úspěch, bez ohledu na svůj původ či společenský status,“* popsala Klusová.
+
+> *„Stojíme před vámi s vizí, která je odvážná, ale nezbytná pro budoucnost naší společné Evropy. Jedním z klíčových kroků pirátského plánu pro Evropu je oprava Green Dealu. Musí totiž fungovat tak, aby skutečně odpovídal potřebám a realitám všech Evropanů. Chceme zabezpečit, aby ekonomické oživení nebylo jen slovní proklamací, ale skutečnou změnou, která přinese pracovní příležitosti a udržitelný růst. Máme odvahu zajistit, že dotace budou využívány opravdu pouze tam, kde je to třeba. A to transparentně a účelně*,*“*zdůraznil europoslanec a čtyřka kandidátky Mikuláš Peksa.
+
+> Piráti také představili priority pro mladé. „*Vším, co za Piráty děláme, se prolíná jedna hlavní motivace - mladí lidé a jejich budoucnost. Právě mladí jsou hnací silou zlepšení, nápadů a inovací, které nás mohou posunout dál. K tomu jim ale musíme utvářet dostatečně dobré podmínky. A hlavně musíme být ochotni je takříkajíc pustit ke kormidlu*,“ uvedla poslankyně a členka Mladého Pirátstva Klára Kocmanová.
+
+> „*Místo toho bohužel mladí leckdy slýchají, že ničemu nerozumí, mají držet pusu a krok a tiše sledovat, jak se rozhoduje o nich bez nich. Takovýhle přístup za Piráty jednoznačně odmítáme. U nás mají mladí lidé skutečně možnost rozhodovat a věci zlepšovat. Na prvních deseti místech na kandidátce do Evropského parlamentu tak máme za Piráty nejmladší věkový průměr ze všech relevantních stran - 34 let. Pro porovnání u SPOLU to je 49 let, u ANO 48, u STAN 41. Díky tomu také víme z první ruky, co mladé opravdu trápí a pracujeme na zlepšení napříč všemi úrovněmi*,” nastínila Kocmanová.
+
+> „*Celý náš program klade velký důraz na modernizaci a investice do oblastí, které mohou životy mladých lidí zlepšit. Jednou z nich je i vzdělávání, ať už jde o zlepšení dostupnosti zahraniční zkušenosti skrze program Erasmus+, zajištění dobrých podmínek pro práci špičkovým vědeckým talentům, nebo podporu celoživotního vzdělávání. Druhým zásadním tématem je zlepšení péče o duševní zdraví. To zvedáme za Piráty dlouhodobě, pořád jde ale bohužel ve společnosti tak trochu o tabu. My ale před tímto problémem narozdíl od ostatních nezavíráme oči. Chceme řešit nejen podporu osob s duševním onemocněním, ale také sociální a další problémy, které s tím mohou souviset. Aby péče byla opravdu efektivní a komplexní. Investice do vzdělávání i psychického zdraví Česko nutně potřebuje, mnohonásobně se nám vrátí*,*“*navázala Kateřina Stojanová, předsedkyně Mladého pirátstva.
+
+> „*Pirátům na mladých lidech a budoucnosti záleží. Usilujeme o ochranu životního prostředí a naší planety, kterou máme opravdu jen jednu. Zároveň usilujeme a vždy budeme usilovat o rovné postavení žen a mužů ve společnosti, o zrovnoprávnění všech osob bez ohledu na to, koho milují, a obecně se zasazovat o lidskoprávní témata a hájení naší svobody,”*doplnila vizi pro mladé Markéta Gregorová s tím, že Piráti také chtějí, aby Česká republika konečně přijala Úmluvu o prevenci a potírání násilí. Proto spouští [petici](https://gov.cz/e-petice/702-petice-za-prijeti-umluvy-o-potirani-a-prevenci-nasili), kde mohou občané výzvu podpořit. Bude ji možné podepsat jak online, tak na petičních stáncích v rámci pirátské kontaktní tour.
+
+> „*Na tu mimochodem vyrážíme ve dvou vozech. Jedním z nich je naše Pinkára, speciální elektroauto, které symbolizuje naše přesvědčení, že mají mít všichni bez výjimky rovná práva, nárok na důstojné zacházení a respekt. Za to každý den už 15 let bojujeme a budeme bojovat i nadále. Máme totiž odvahu dělat, co je správné,”*řekla Gregorová.
+
+> Na zahájení horké fáze kampaně vystoupili také ministr zahraničí Jan Lipavský, místopředsedkyně Sněmovny Olga Richterová či předseda poslaneckého klubu Jakub Michálek. Odprezentovali zlepšení, kterých se na české úrovni podařilo dosáhnout, ať už v posílení naši bezpečnosti, kvalitě života či boji proti korupci. „*Neexistuje žádné my versus oni, jak lžou populisté. Dění v České republice je úzce provázané s děním v Evropě. Jsou to spojené nádoby a my spolupracujeme napříč všemi úrovněmi na tom, abychom zvládli současné výzvy a lidem se co nejlépe žilo. Aby mladí měli perspektivní budoucnost*,*”*uzavřel Bartoš.
+
+**Celý pirátský program najdete zde:**[**https://eurovolby.pirati.cz/**](https://eurovolby.pirati.cz/)
+
+**Petici za přijetí Úmluvy o potírání a prevenci násilí lze podepsat**[**ZDE**](https://gov.cz/e-petice/702-petice-za-prijeti-umluvy-o-potirani-a-prevenci-nasili)
+
+**Hlavní výjezdy kontaktní tour naleznete v** [**příloze**](https://stredocesky.pirati.cz/documents/378/Hlavn%C3%AD_v%C3%BDjezdy_kontaktn%C3%AD_tour.pdf)

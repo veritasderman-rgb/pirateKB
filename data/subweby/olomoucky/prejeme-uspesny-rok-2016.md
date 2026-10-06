@@ -1,0 +1,24 @@
+---
+zdroj: https://olomoucky.pirati.cz/aktuality/prejeme-uspesny-rok-2016/
+nazev: Přejeme úspěšný rok 2016
+typ: aktualita
+datum: '2016-01-26'
+autor: Martin Šmída
+web: KS Olomoucký kraj
+web_url: https://olomoucky.pirati.cz
+druh_webu: KS
+region: Olomoucký kraj
+tagy:
+- Pirátská tvrz
+viditelnost: verejne
+autorita: web
+stazeno: '2026-10-06'
+---
+
+# Přejeme úspěšný rok 2016
+
+Členové a příznivci Pirátské tvrze přejí všem občanům bez rozdílu věku, pohlaví, rasy i vyznání úspěšný rok 2016!
+
+V něm nás čeká podobný program jako letos - uskutečníme několik kulturních akcí v Majetíně a okolí, zorganizujeme dobrovolnický úklid černých skládek a v obecních zastupitelstvech a komisích, kde máme své zastoupení, budeme dál usilovat o naplnění našeho programu a našich idejí. Konec roku je dobrý čas na bilancování, přestože víme, že nás čeká ještě spousta práce. Avšak něco se již daří - slíbili jsme, že budeme naslouchat občanům (rozšíření otevírací doby dětského hřiště), že rozvíříme diskuzi nad poplatky za odpady (dotazník), podpoříme spolky a dobrovolníky a podpoříme vyrovnaný rozpočet, a to se víceméně podařilo. O některé vychytávky zabojujeme v budoucnu, např. zavedení transparentního účtu, architektonické soutěže pro veřejné budovy, atd. Jiné za nás pořešili zákonodárci, jako např. veřejný registr smluv. Chceme touto cestou poděkovat zastupitelům, že nám naslouchají. Bez jejich souhlasu by se nám podařilo prosadit pramálo. Chceme také poděkovat všem, kdo naše snahy sdílejí a pomáhají nám. Jsme rádi, že se (nejen) mladí lidé zajímají o veřejný prostor a zlepšení života v obci. S optimismem vstříc novému roku!
+
+Martin Šmída MS Pirátská Tvrz
