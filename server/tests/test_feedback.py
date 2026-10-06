@@ -278,7 +278,7 @@ def test_evals_runner_three_questions(mini_kb, tmp_path, monkeypatch):
 def test_evals_questions_file_is_valid():
     runner = _load_runner()
     qs = runner.load_questions()
-    assert len(qs) == 60
+    assert len(qs) >= 60
     cats = {q["kategorie"] for q in qs}
     assert len(cats) >= 10
     tools = {t.name for t in mcp_server.mcp._tool_manager.list_tools()}

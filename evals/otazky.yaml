@@ -500,3 +500,29 @@ otazky:
     tool: get_social_posts
     argumenty: {osoba: Nikdo Neexistuje}
     ocekavane: [nemá v bázi žádné příspěvky]
+
+  - id: hlasovani-ep-01
+    kategorie: hlasovani
+    otazka: Jak hlasovala Markéta Gregorová v Evropském parlamentu?
+    tool: get_voting_record
+    argumenty: {poslanec: Gregorová, komora: ep, limit: 3}
+    ocekavane: [Výsledek v EP]
+    nesmi_obsahovat: [nenalezen]
+    zdroj_musi_byt: howtheyvote.eu
+
+  - id: hlasovani-senat-01
+    kategorie: hlasovani
+    otazka: Jak hlasovala senátorka Adéla Šípová?
+    tool: get_voting_record
+    argumenty: {poslanec: Šípová, komora: senat, limit: 3}
+    ocekavane: [Výsledek v Senátu]
+    nesmi_obsahovat: [nenalezen]
+    zdroj_musi_byt: senat.cz
+
+  - id: brand-kurator-01
+    kategorie: brand
+    otazka: Jaká je ochranná zóna loga?
+    tool: search_kb
+    argumenty: {query: ochranná zóna loga, limit: 3}
+    ocekavane: [kurátorovaný obsah]
+    zdroj_musi_byt: styleguide.pirati.cz

@@ -21,7 +21,7 @@ Build je idempotentní (databázi smaže a vytvoří znovu). `index/` je v `.git
 
 | Tabulka | Obsah |
 |---|---|
-| `documents` | každý `data/**/*.md` s frontmatter: `id` (relativní cesta bez přípony, např. `pirati-web/aktuality/2019/slug`), `nazev`, `typ`, `zdroj` (URL pro citaci), `datum`, `autor`, `tagy` (JSON), `autorita`, `viditelnost`, `kolekce` (`pirati-web`/`lide`/`psp`/`brand`/`social`), `meta` (JSON celý frontmatter), `body` (Markdown bez frontmatter), `delka` |
+| `documents` | každý `data/**/*.md` a `content/**/*.md` (kromě README; doc_id `content/...`, autorita `kurator-navrh`/`kurator-schvaleno` podle pole `stav`) s frontmatter: `id` (relativní cesta bez přípony, např. `pirati-web/aktuality/2019/slug`), `nazev`, `typ`, `zdroj` (URL pro citaci), `datum`, `autor`, `tagy` (JSON), `autorita`, `viditelnost`, `kolekce` (`pirati-web`/`lide`/`psp`/`brand`/`social`), `meta` (JSON celý frontmatter), `body` (Markdown bez frontmatter), `delka` |
 | `chunks` | `id`, `doc_id`, `poradi`, `nadpis` (cesta nadpisů `H1 > H2`), `nadpisy` (všechny nadpisy v chunku), `text`, `nazev` (název dokumentu), `nadpisy_stem`, `text_stem`, `nazev_stem` (kmeny slov, viz *České stemování*) |
 | `chunks_fts` | FTS5 external-content nad `chunks(nadpisy, text, nazev, nadpisy_stem, text_stem, nazev_stem)`, `tokenize="unicode61 remove_diacritics 2"`; originální sloupce slouží přesné shodě a snippetům, `*_stem` skloňování |
 | `chunk_vec` | `chunk_id`, `vec` (float32 little-endian) – embeddingy chunků; prázdná, pokud build běžel bez `EMBEDDINGS_PROVIDER` |
@@ -31,7 +31,7 @@ Build je idempotentní (databázi smaže a vytvoří znovu). `index/` je v `.git
 | `org_units` | `id` (= doc id, `lide/tymy/...`), `nazev`, `zkratka`, `druh`, `nadrazeny`, `url`, `kontakty` (JSON), `role` (JSON), `role_text`, `pocet_clenu`, `body` |
 | `org_units_fts` | FTS5 nad `org_units(nazev, zkratka, role_text, body)` + `nazev_stem`, `role_text_stem`, `body_stem` |
 | `org_struktura` | hrany `dite -> rodic` ze `struktura.jsonl` (`dite`, `dite_url`, `dite_druh`, `rodic`, `rodic_url`, `rodic_druh`) |
-| `votes` | `id_hlasovani` PK, `obdobi` (2017/2021/2025), `datum`, `cas`, `nazev`, `vysledek`, `pro`, `proti`, `zdrzel`, `nehlasoval`, `url` (psp.cz), `pirati` (JSON `{jméno: hlas}`), `pirati_souhrn` (JSON) |
+| `votes` | hlasování z `data/psp`, `data/senat` a `data/ep`: `id_hlasovani` PK (Senát 1e9+, EP 2e9+), `komora` (`psp`/`senat`/`ep`), `obdobi` (rok z názvu souboru), `datum`, `cas`, `nazev`, `vysledek`, `pro`, `proti`, `zdrzel`, `nehlasoval`, `url` (psp.cz / senat.cz / howtheyvote.eu), `pirati` (JSON `{jméno: hlas}`), `pirati_souhrn` (JSON) |
 | `votes_fts` | FTS5 nad `votes(nazev, nazev_stem)` |
 | `vote_members` | `id_hlasovani`, `jmeno`, `jmeno_fold` (bez diakritiky), `hlas` – pro dotazy per poslanec |
 | `social_posts` | příspěvky poslanců na sociálních sítích z `data/social/<platforma>/<handle>.jsonl`: `pk` (rowid), `id` (id na platformě), `platforma` (`x`/`bluesky`), `ucet` (handle bez @), `jmeno`, `jmeno_fold`, `datum` (ISO 8601 s časem), `text`, `url`, `je_odpoved`, `je_repost` (0/1), `lajky`, `reposty`, `odpovedi`; unikátní `(platforma, id)`. Složka `data/social` nemusí existovat (tabulka je pak prázdná). Měsíční Markdown přehledy `data/social/<platforma>/<handle>/<RRRR-MM>.md` (typ `prispevek-socialni-site`, autorita `vyjadreni-politika`) se indexují jako běžné dokumenty v kolekci `social` |

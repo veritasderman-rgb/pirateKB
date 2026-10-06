@@ -25,7 +25,7 @@ jsou čtecí odkazy.
 | tool | `get_program` | programové dokumenty a jejich obsah podle tématu |
 | tool | `get_position` | stanovisko strany k tématu (program, usnesení, stanoviska) s uvedením autority zdroje |
 | tool | `search_press_releases` | hledání v tiskových zprávách a aktualitách, filtr podle data a tématu |
-| tool | `get_voting_record` | hlasování pirátských poslanců ve Sněmovně (podle poslance, tématu, období) |
+| tool | `get_voting_record` | hlasování pirátských poslanců, senátorů a europoslanců (PSP, Senát, EP; podle jména, tématu, období, komory `psp`/`senat`/`ep`) |
 | tool | `get_social_posts` | příspěvky pirátských poslanců na X a Bluesky (podle osoby, tématu, platformy, data); vyjádření jednotlivce, ne stanovisko strany, vždy s URL příspěvku |
 | tool | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec k tématu s veřejným kontaktem (e-mail, telefon jen pokud je na pirati.cz); ostatní tooly ho nabídnou samy, když báze přesnou odpověď nemá |
 | tool | `get_brand` | barvy a písma z grafického manuálu |
@@ -418,6 +418,7 @@ slova z argumentů.
   Cloudflare a mrak.pirati.cz vyžaduje přihlášení; skripty pro ně nejsou. Odpovědi
   o interních postupech proto báze zatím neumí.
 - **Data jsou nekurátorovaná.** Vznikla automaticky a nikdo je neprošel; mohou být
-  zastaralá, duplicitní nebo mít špatně určený typ. Kurátorovaná vrstva `content/` zatím neexistuje.
+  zastaralá, duplicitní nebo mít špatně určený typ. Kurátorovaná vrstva `content/` se indexuje s autoritou
+  `kurator-navrh` nebo `kurator-schvaleno` (viz `docs/kurator.md`); zatím je v ní hlavně návrh.
 - Autentizace je volitelná a členská vrstva dat zatím neexistuje (viz výše), index se po aktualizaci dat načte až
   po restartu serveru a data se nestahují průběžně, jen při spuštění ingestu.

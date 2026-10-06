@@ -85,12 +85,12 @@ class FakeKB:
     def org_tree(self, root=None, depth=2):
         return [{"nazev": "Centrála", "zkratka": None, "deti": [{"nazev": "RP", "deti": []}]}]
 
-    def search_votes(self, query=None, poslanec=None, od=None, do=None, obdobi=None, limit=20):
+    def search_votes(self, query=None, poslanec=None, od=None, do=None, obdobi=None, limit=20, komora=None):
         return [{"id_hlasovani": 1, "datum": "2026-03-11", "nazev": "Rozpočet**", "vysledek": "prijato",
                  "pro": 1, "proti": 0, "zdrzel": 0, "url": "https://www.psp.cz/sqw/hlasy.sqw?g=1",
                  "pirati": {}, "pirati_souhrn": {"ano": 1}, "poslanec": "Zdeněk Hřib", "hlas": "ano"}]
 
-    def vote_summary(self, poslanec, od=None, do=None):
+    def vote_summary(self, poslanec, od=None, do=None, komora=None):
         return {"poslanec": "Zdeněk Hřib", "nalezen": True, "celkem": 1, "hlasy": {"ano": 1}, "ano": 1,
                 "ne": 0, "zdrzel": 0, "nehlasoval": 0, "nepritomen": 0, "obdobi": [2025]}
 

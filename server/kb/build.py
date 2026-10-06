@@ -134,8 +134,10 @@ CREATE TABLE votes (
     url           TEXT,
     pirati        TEXT,     -- JSON {jmeno: hlas}
     pirati_souhrn TEXT,     -- JSON {hlas: pocet}
-    nazev_stem    TEXT
+    nazev_stem    TEXT,
+    komora        TEXT      -- psp | senat | ep
 );
+CREATE INDEX votes_komora ON votes(komora);
 CREATE INDEX votes_datum ON votes(datum);
 CREATE VIRTUAL TABLE votes_fts USING fts5(
     nazev, nazev_stem,
@@ -251,17 +253,31 @@ def _person_key(name: str) -> str:
 
 # ---------------------------------------------------------------- dokumenty + chunky
 
-def _load_documents(data_dir: Path, con: sqlite3.Connection) -> dict:
+def _load_documents(data_dir: Path, con: sqlite3.Connection,
+                    content_dir: Path | None = None) -> dict:
+    """Markdown z `data/` a kurátorované vrstvy `content/` (doc_id `content/...`).
+
+    U `content/` se autorita odvodí ze stavu schválení (`kurator-navrh` /
+    `kurator-schvaleno`) a vynechají se README.md složek."""
     docs, chunks = [], []
     n_chunks = 0
-    for path in sorted(data_dir.rglob("*.md")):
-        if path.name == "README.md" and path.parent == data_dir:
+    sources = [(data_dir, None)]
+    if content_dir is not None and content_dir.is_dir():
+        sources.append((content_dir, "content"))
+    paths = [(root, prefix, p) for root, prefix in sources for p in sorted(root.rglob("*.md"))]
+    for root, prefix, path in paths:
+        if path.name == "README.md" and (path.parent == root or prefix == "content"):
             continue
         parsed = _read_md(path)
         if parsed is None:
             continue
         fm, body = parsed
-        rel = path.relative_to(data_dir).with_suffix("")
+        rel = path.relative_to(root).with_suffix("")
+        if prefix:
+            rel = Path(prefix) / rel
+            stav = _s(fm.get("stav"))
+            if stav in ("navrh", "schvaleno"):
+                fm = {**fm, "autorita": f"kurator-{stav}"}
         doc_id = rel.as_posix()
         kolekce = rel.parts[0]
         tagy = fm.get("tagy") or []
@@ -451,27 +467,37 @@ def _load_org_units(data_dir: Path, con: sqlite3.Connection) -> dict:
 # ---------------------------------------------------------------- hlasování
 
 def _load_votes(data_dir: Path, con: sqlite3.Connection) -> dict:
+    """Hlasování z PSP (`data/psp`), Senátu (`data/senat`) a EP (`data/ep`).
+
+    Všechny tři složky mají stejné schéma `hlasovani-<rok>.jsonl`; Senát a EP mají
+    syntetická `id_hlasovani` (1e9+ resp. 2e9+), takže s PSP nekolidují."""
     n_votes = n_members = 0
-    psp = data_dir / "psp"
-    for path in sorted(psp.glob("hlasovani-*.jsonl")) if psp.is_dir() else []:
-        m = re.search(r"(\d{4})", path.name)
-        obdobi = int(m.group(1)) if m else None
-        votes, members = [], []
-        for r in _read_jsonl(path):
-            votes.append((
-                r["id_hlasovani"], obdobi, r.get("datum"), r.get("cas"), r.get("nazev"),
-                r.get("vysledek"), r.get("pro"), r.get("proti"), r.get("zdrzel"),
-                r.get("nehlasoval"), r.get("url"), _j(r.get("pirati") or {}),
-                _j(r.get("pirati_souhrn") or {}), stem_text(r.get("nazev")),
-            ))
-            for jmeno, hlas in (r.get("pirati") or {}).items():
-                members.append((r["id_hlasovani"], jmeno, fold(jmeno), hlas))
-        con.executemany("INSERT OR REPLACE INTO votes VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", votes)
-        con.executemany("INSERT INTO vote_members VALUES (?,?,?,?)", members)
-        n_votes += len(votes)
-        n_members += len(members)
+    by_komora: dict[str, int] = {}
+    for komora in ("psp", "senat", "ep"):
+        folder = data_dir / komora
+        for path in sorted(folder.glob("hlasovani-*.jsonl")) if folder.is_dir() else []:
+            m = re.search(r"(\d{4})", path.name)
+            obdobi = int(m.group(1)) if m else None
+            votes, members = [], []
+            for r in _read_jsonl(path):
+                k = r.get("komora") or komora
+                votes.append((
+                    r["id_hlasovani"], obdobi, r.get("datum"), r.get("cas"), r.get("nazev"),
+                    r.get("vysledek"), r.get("pro"), r.get("proti"), r.get("zdrzel"),
+                    r.get("nehlasoval"), r.get("url"), _j(r.get("pirati") or {}),
+                    _j(r.get("pirati_souhrn") or {}), stem_text(r.get("nazev")), k,
+                ))
+                for jmeno, hlas in (r.get("pirati") or {}).items():
+                    members.append((r["id_hlasovani"], jmeno, fold(jmeno), hlas))
+            con.executemany(
+                "INSERT OR REPLACE INTO votes VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", votes)
+            con.executemany("INSERT INTO vote_members VALUES (?,?,?,?)", members)
+            n_votes += len(votes)
+            n_members += len(members)
+            by_komora[komora] = by_komora.get(komora, 0) + len(votes)
     con.execute("INSERT INTO votes_fts(votes_fts) VALUES ('rebuild')")
-    return {"votes": n_votes, "vote_members": n_members}
+    return {"votes": n_votes, "vote_members": n_members,
+            **{f"votes_{k}": n for k, n in by_komora.items()}}
 
 
 # ---------------------------------------------------------------- sociální sítě
@@ -594,7 +620,8 @@ def _remove_db_files(path: Path) -> None:
 
 
 def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False,
-                embeddings_provider="env", aliases_yaml: Path | None = None) -> dict:
+                embeddings_provider="env", aliases_yaml: Path | None = None,
+                content_dir: Path | str | None = "auto") -> dict:
     """Vytvoří (znovu) SQLite index `db_path` z `data_dir` a vrátí statistiky.
 
     Builduje se do dočasného souboru vedle cíle a teprve po úspěšném dokončení se
@@ -607,6 +634,9 @@ def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False,
     """
     data_dir = Path(data_dir)
     db_path = Path(db_path)
+    if content_dir == "auto":
+        content_dir = data_dir.parent / "content"   # kurátorovaná vrstva vedle data/
+    content_dir = Path(content_dir) if content_dir is not None else None
     db_path.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = db_path.with_suffix(".sqlite.tmp")
     _remove_db_files(tmp_path)  # zbytek po předchozím přerušeném buildu
@@ -617,7 +647,8 @@ def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False,
                           or db_path.parent / "embeddings-cache.sqlite")
     try:
         stats = _build_into(data_dir, tmp_path, verbose=verbose, provider=provider,
-                            cache_path=cache_path, aliases_yaml=aliases_yaml)
+                            cache_path=cache_path, aliases_yaml=aliases_yaml,
+                            content_dir=content_dir)
         os.replace(tmp_path, db_path)
     except BaseException:
         _remove_db_files(tmp_path)
@@ -627,13 +658,15 @@ def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False,
 
 
 def _build_into(data_dir: Path, db_path: Path, *, verbose: bool = False, provider=None,
-                cache_path: Path | None = None, aliases_yaml: Path | None = None) -> dict:
+                cache_path: Path | None = None, aliases_yaml: Path | None = None,
+                content_dir: Path | None = None) -> dict:
     """Sestaví index do `db_path` (který nesmí existovat) a vrátí statistiky."""
     t0 = time.perf_counter()
     con = sqlite3.connect(db_path)
     try:
         return _build_with_connection(data_dir, db_path, con, t0, verbose, provider=provider,
-                                      cache_path=cache_path, aliases_yaml=aliases_yaml)
+                                      cache_path=cache_path, aliases_yaml=aliases_yaml,
+                                      content_dir=content_dir)
     finally:
         con.close()  # idempotentní; při výjimce uvolní soubor před smazáním
 
@@ -641,7 +674,8 @@ def _build_into(data_dir: Path, db_path: Path, *, verbose: bool = False, provide
 def _build_with_connection(data_dir: Path, db_path: Path, con: sqlite3.Connection,
                            t0: float, verbose: bool, *, provider=None,
                            cache_path: Path | None = None,
-                           aliases_yaml: Path | None = None) -> dict:
+                           aliases_yaml: Path | None = None,
+                           content_dir: Path | None = None) -> dict:
     con.execute("PRAGMA journal_mode=OFF")
     con.execute("PRAGMA synchronous=OFF")
     con.execute("PRAGMA temp_store=MEMORY")
@@ -649,7 +683,7 @@ def _build_with_connection(data_dir: Path, db_path: Path, con: sqlite3.Connectio
 
     stats: dict = {}
     steps = (
-        ("documents", lambda: _load_documents(data_dir, con)),
+        ("documents", lambda: _load_documents(data_dir, con, content_dir)),
         ("people", lambda: _load_people(data_dir, con)),
         ("org_units", lambda: _load_org_units(data_dir, con)),
         ("votes", lambda: _load_votes(data_dir, con)),

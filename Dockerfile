@@ -1,5 +1,5 @@
 # MCP server Pirátské znalostní báze (Streamable HTTP na /mcp, port z env PORT, výchozí 8765)
-# Stejný obsah má Dockerfile.vercel (Vercel buildí image z něj); při změně upravte oba.
+# Vercel buildí image z tohoto souboru (vercel.json → services).
 FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1 \
@@ -16,6 +16,7 @@ RUN pip install -r server/requirements.txt -r ingest/requirements.txt
 COPY ingest/ ingest/
 COPY server/ server/
 COPY data/ data/
+COPY content/ content/
 
 # Index se staví při buildu image, start kontejneru je pak okamžitý.
 RUN python -m server.kb.build

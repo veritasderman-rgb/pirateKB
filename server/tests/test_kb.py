@@ -647,3 +647,53 @@ def test_embeddings_build_and_hybrid_search(tmp_path, monkeypatch):
         assert [r["doc_id"].rsplit("/", 1)[1] for r in res] == ["bydleni"]
     finally:
         k.close()
+
+
+def test_votes_from_three_chambers_and_content_layer(tmp_path):
+    """Senát a EP se načítají vedle PSP s rozlišením komory; content/ jde do indexu
+    s autoritou podle stavu schválení."""
+    import json
+    data = tmp_path / "data"
+    rows = {
+        "psp": {"id_hlasovani": 81000, "datum": "2024-05-01", "nazev": "Zákon o podpoře bydlení",
+                "vysledek": "prijato", "pro": 120, "proti": 30, "zdrzel": 5, "nehlasoval": 0,
+                "url": "https://www.psp.cz/x", "pirati": {"Jan Novák": "ano"},
+                "pirati_souhrn": {"ano": 1}},
+        "senat": {"id_hlasovani": 1150010001, "komora": "senat", "datum": "2024-10-30",
+                  "nazev": "Zákon o podpoře bydlení (Senát)", "vysledek": "prijato",
+                  "pro": None, "proti": None, "zdrzel": None, "nehlasoval": None,
+                  "url": "https://www.senat.cz/x", "pirati": {"Adéla Šípová": "ano"},
+                  "pirati_souhrn": {"ano": 1}},
+        "ep": {"id_hlasovani": 2000169362, "komora": "ep", "datum": "2024-07-17",
+               "nazev": "Housing support in the EU", "vysledek": "prijato", "pro": 495,
+               "proti": 137, "zdrzel": 47, "nehlasoval": 40, "url": "https://howtheyvote.eu/votes/1",
+               "pirati": {"Markéta Gregorová": "ano"}, "pirati_souhrn": {"ano": 1}},
+    }
+    for komora, row in rows.items():
+        (data / komora).mkdir(parents=True)
+        (data / komora / "hlasovani-2024.jsonl").write_text(
+            json.dumps(row, ensure_ascii=False) + "\n", encoding="utf-8")
+    content = tmp_path / "content" / "brand"
+    content.mkdir(parents=True)
+    (content / "README.md").write_text("# jen popis složky\n", encoding="utf-8")
+    (content / "pravidla.md").write_text(
+        "---\nnazev: Brand pravidla\ntyp: brand\nzdroj: https://styleguide.pirati.cz\n"
+        "stav: schvaleno\nschvalil: kurator\nschvaleno_dne: 2026-10-01\n---\n"
+        "# Barvy\nPirátská žlutá #fec934 je akcentová barva.\n", encoding="utf-8")
+    db = tmp_path / "kb.sqlite"
+    stats = build_index(data, db, embeddings_provider=None)
+    assert stats["votes"] == 3
+    assert (stats["votes_psp"], stats["votes_senat"], stats["votes_ep"]) == (1, 1, 1)
+    k = KB(db)
+    try:
+        assert {v["komora"] for v in k.search_votes(query="bydlení")} == {"psp", "senat"}
+        assert [v["komora"] for v in k.search_votes(query="bydlení", komora="senat")] == ["senat"]
+        ep = k.search_votes(poslanec="Gregorová", komora="ep")
+        assert len(ep) == 1 and ep[0]["hlas"] == "ano"
+        assert k.search_votes(poslanec="Gregorová", komora="psp") == []
+        assert k.vote_summary("Šípová", komora="senat")["celkem"] == 1
+        docs = k.list_documents(typ=["brand"])
+        assert [d["doc_id"] for d in docs] == ["content/brand/pravidla"]
+        assert docs[0]["autorita"] == "kurator-schvaleno" and docs[0]["kolekce"] == "content"
+    finally:
+        k.close()

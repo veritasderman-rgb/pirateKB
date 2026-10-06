@@ -804,6 +804,7 @@ class KB:
             "proti": r["proti"], "zdrzel": r["zdrzel"], "nehlasoval": r["nehlasoval"],
             "url": r["url"], "pirati": _loads(r.get("pirati"), {}),
             "pirati_souhrn": _loads(r.get("pirati_souhrn"), {}),
+            "komora": r.get("komora") or "psp",
         }
 
     def _resolve_poslanec(self, poslanec: str) -> list[str]:
@@ -820,8 +821,10 @@ class KB:
 
     def search_votes(self, query: str | None = None, poslanec: str | None = None,
                      od: str | None = None, do: str | None = None,
-                     obdobi: int | None = None, limit: int = 20) -> list[dict]:
-        """Hlasování podle názvu, s filtrem na poslance (vrátí i jeho hlas), období a datum."""
+                     obdobi: int | None = None, limit: int = 20,
+                     komora: str | None = None) -> list[dict]:
+        """Hlasování podle názvu, s filtrem na poslance (vrátí i jeho hlas), období, datum
+        a komoru (psp | senat | ep)."""
         params: list = []
         joins, where = "", "1=1"
         names: list[str] = []
@@ -842,6 +845,7 @@ class KB:
         if obdobi:
             where += " AND v.obdobi = ?"
             params.append(int(obdobi))
+        where += self._komora_clause(komora, params)
         where += self._date_clause("v.datum", od, do, params)
         select_extra = ", m.jmeno AS poslanec, m.hlas AS hlas" if poslanec else ""
         weights = "1.0, 0.8" if self.stemmed else "1.0"
@@ -872,14 +876,24 @@ class KB:
         rows = self._rows("SELECT * FROM votes WHERE id_hlasovani = ?", (int(id_hlasovani),))
         return self._vote_row(rows[0]) if rows else None
 
+    def _komora_clause(self, komora: str | None, params: list) -> str:
+        if not komora:
+            return ""
+        cols = {r["name"] for r in self._rows("PRAGMA table_info(votes)")}
+        if "komora" not in cols:          # starší index: jen PSP
+            return "" if komora == "psp" else " AND 0"
+        params.append(komora)
+        return " AND v.komora = ?"
+
     def vote_summary(self, poslanec: str, od: str | None = None,
-                     do: str | None = None) -> dict:
+                     do: str | None = None, komora: str | None = None) -> dict:
         """Počty hlasů (ano/ne/zdrzel/nehlasoval/nepritomen/omluven) pro poslance."""
         names = self._resolve_poslanec(poslanec)
         if not names:
             return {"poslanec": poslanec, "nalezen": False, "celkem": 0, "hlasy": {}}
         params: list = list(names)
         where = f"m.jmeno IN ({','.join('?' * len(names))})"
+        where += self._komora_clause(komora, params)
         where += self._date_clause("v.datum", od, do, params)
         rows = self._rows(
             f"SELECT m.hlas, COUNT(*) AS n, MIN(v.datum) AS od, MAX(v.datum) AS do "

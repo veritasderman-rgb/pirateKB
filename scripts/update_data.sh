@@ -108,6 +108,11 @@ case "$MODE" in
     run_src evidence      evidence --plne
     run_src socialni_site social
     run_src subweby       subweby
+    # Regionální a tematické weby z Majáku: po dávkách (stav v data/subweby/stav.json),
+    # aby se týdenní běh vešel do limitu jobu; hotové weby se jen obnovují.
+    run_src subweby       subweby --z-majaku --limit-webu 15 --max-pozadavku 2500
+    run_src senat         senat --jen-rss
+    run_src ep            ep
     run_src dokumenty     dokumenty
     run_src systemy       systemy
     ;;
@@ -120,6 +125,9 @@ case "$MODE" in
     run_src socialni_site social
     run_src psp           psp
     run_src pirati_web    pirati-web --only aktuality
+    # Titulky z YouTube: malé dávky, YouTube z cloudu po desítkách videí blokuje
+    # (skript pak skončí kódem 3 a další běh pokračuje ze stav.json).
+    run_src youtube       youtube --limit 30
     ;;
 esac
 
