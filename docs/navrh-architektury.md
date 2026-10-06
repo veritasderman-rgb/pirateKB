@@ -37,20 +37,50 @@ Hlavní zásady, které z toho plynou:
 
 | Doména | Obsah | Primární zdroj dnes | Vlastník (návrh) |
 |---|---|---|---|
-| **Who is who** | poslanci, senátoři, europoslanci, zastupitelé, RP, RV, předsedové KS/MS, garanti odborných týmů, vedoucí odborů (mediální, technický, personální, administrativní, finanční, zahraniční), komise | pirati.cz/lide, wiki, interní systémy | personální odbor + KS |
+| **Who is who** | poslanci, senátoři, europoslanci, zastupitelé, RP, RV, předsedové KS/MS, garanti odborných týmů, vedoucí odborů (mediální, technický, personální, administrativní, finanční, zahraniční), komise | lide.pirati.cz (primární), pirati.cz/lide | personální odbor + KS |
 | **Organizace** | struktura orgánů (CF, RV, RP, KS, MS, odbory, komise, Pirátský institut), kompetence, jak se rozhoduje | stanovy, předpisy na wiki | administrativní odbor |
 | **Předpisy** | stanovy, jednací řády, pravidla pro komunikaci, kodexy | wiki.pirati.cz | administrativní odbor |
 | **Program** | dlouhodobý program, volební programy (PSP, Senát, kraje, obce, EP), programové body po tématech, hodnoty | pirati.cz/program, program.pirati.cz | programový tým / garanti |
 | **Politické výstupy** | tiskové zprávy, stanoviska, pozice k zákonům, interpelace, hlasování, projevy | pirati.cz/tiskove-zpravy, PSP (psp.cz data), Senát | mediální odbor + kluby |
 | **Co jsme dokázali** | kurátorovaný seznam výsledků (zákony, opatření, úspěchy v obcích/krajích) s důkazy | ručně kurátorováno z TZ a legislativy | mediální odbor + garanti |
-| **Brand & identita** | logo (varianty, pravidla), barvy, fonty, grafický manuál, šablony (TZ, prezentace, leták, plakát, sociální sítě, reels, newsletter), tone of voice, fotobanka | styleguide / grafický manuál, interní úložiště | mediální odbor |
-| **Mapa materiálů** | kde jsou jaké materiály (cloud, wiki, git, fotobanka, video), kdo má přístup | roztříštěné | technický + mediální odbor |
+| **Brand & identita** | logo (varianty, pravidla), barvy, fonty, grafický manuál, šablony (TZ, prezentace, leták, plakát, sociální sítě, reels, newsletter), tone of voice, fotobanka | mrak.pirati.cz, Google Drive kurátora, grafický manuál | kurátor (finální slovo) + mediální odbor |
+| **Mapa materiálů** | kde jsou jaké materiály (cloud, wiki, git, fotobanka, video), kdo má přístup | mrak.pirati.cz, Google Drive, wiki | kurátor + technický odbor |
 | **Jak se co dělá** | onboarding („nalodění“), jak podat návrh na CF, jak schválit TZ, jak založit MS, jak používat interní nástroje | wiki, nalodění, helpdesk | personální + administrativní odbor |
 | **Slovník** | zkratky a pirátský žargon | wiki | kdokoli, review admin odbor |
 | **Kalendář** | CF, zasedání RV, kampaňové milníky, volby | interní kalendáře | administrativní odbor |
 
 Poznámka: přesné názvy interních nástrojů a úložišť je potřeba ověřit při inventuře
 (fáze 0). Tabulka je hypotéza, ne zjištěný stav.
+
+## 2a. Dohodnutý model: hejno + kurátor
+
+Projekt je domluven s vedením strany v tomto režimu:
+
+- **Teorie hejna.** Kdokoli z pirátů může do gitu přidat své materiály, texty, šablony
+  nebo opravy. Přispívá se přes merge request (pull request) do obsahového repozitáře;
+  bariéra musí být nízká (šablona issue, návod v `CONTRIBUTING.md`, možnost poslat
+  materiál i mimo git a kurátor ho zařadí).
+- **Kurátor s finálním slovem.** Jeden kurátor (vlastník projektu) má dohled nad
+  kurátorovaným brandem a schvaluje, co se dostane do `content/`. Technicky:
+  `CODEOWNERS` na `content/brand/`, `content/stanoviska/` a `content/vysledky/`
+  vyžaduje jeho schválení; ostatní složky mohou schvalovat i další pověření lidé.
+- **Dvě úrovně obsahu.** `content/` je kurátorované (prošlo review, indexuje se jako
+  důvěryhodné); `inbox/` je odkladiště pro syrové příspěvky z hejna, které se
+  indexuje s nižší vahou a označením „neověřeno“, dokud je kurátor nepřesune.
+
+### Zdroje pro první naplnění
+
+| Zdroj | Co z něj vytěžit | Jak |
+|---|---|---|
+| **mrak.pirati.cz** (pirátský cloud) | grafický manuál, loga, fonty, šablony, fotky, prezentace, dokumenty odborů | kurátor má přístup; scraping přes WebDAV/API cloudu, výběr „důležitých“ složek podle whitelistu, metadata (cesta, autor, datum) jako citace |
+| **Google Drive kurátora** | osobní archiv materiálů (texty, grafika, šablony) | export přes Drive API/konektor, ruční roztřídění do `content/` nebo `inbox/` |
+| **pirati.cz** | program, tiskové zprávy, články, stanoviska, texty o straně | web je generován ze zdrojového repozitáře, ideálně číst přímo Markdown; záloha: crawler + RSS tiskových zpráv |
+| **lide.pirati.cz** | who is who: lidé, role, orgány, regiony, kontakty | pokud existuje API/export, použít ho; jinak strukturovaný scraping profilů; výsledek do `content/lide/*.yaml` |
+| wiki.pirati.cz | předpisy, návody, slovník | export jmenných prostorů (fáze 2) |
+| psp.cz otevřená data | hlasování | konektor (fáze 2) |
+
+Pro každý zdroj se zaznamená: licence/práva (zejména fotky a fonty), zda je veřejný
+nebo interní (určuje vrstvu viditelnosti), a kdo je kontaktní osoba.
 
 ## 3. Architektura
 
@@ -89,7 +119,7 @@ vlastnictví po složkách (CODEOWNERS), CI kontroly, nic neskončí v hlavě je
 Navrhovaná struktura repozitáře:
 
 ```
-content/
+content/              # kurátorovaný obsah (schvaluje kurátor)
   lide/               # jeden soubor na osobu (YAML)
   organizace/         # orgány, odbory, KS/MS, kompetence
   predpisy/           # stanovy, řády (nebo odkazy + souhrny)
@@ -108,6 +138,7 @@ content/
   materialy/          # mapa úložišť
   navody/             # jak se co dělá
   slovnik.yaml
+inbox/                # syrové příspěvky z hejna, čekají na kurátora
 schemas/              # JSON Schema pro lide, stanoviska, vysledky, brand
 ingest/               # konektory a chunkování
 server/               # MCP server
@@ -246,7 +277,7 @@ takže fungují i bez připojeného serveru, jen s horší aktuálností dat.
 ## 4. Co se musí udělat – fáze
 
 ### Fáze 0 – rozhodnutí a inventura (2 týdny)
-- Mandát: kdo projekt vlastní (návrh: mediální + technický odbor), kdo schvaluje obsah.
+- Mandát je dohodnut s vedením: kurátor má finální slovo, přispívá hejno (viz 2a).
 - Inventura zdrojů: kde co je, v jakém formátu, kdo to spravuje, co je veřejné.
 - Rozsah MVP a pilotní skupina (10–20 pirátů z různých rolí: poslanecký asistent,
   krajský zastupitel, PR člověk z MS, nováček).
@@ -254,9 +285,9 @@ takže fungují i bez připojeného serveru, jen s horší aktuálností dat.
 
 ### Fáze 1 – MVP (4–6 týdnů)
 - Založit obsahový repozitář se strukturou a schématy (viz 3.1).
-- Ručně naplnit: brand (logo, barvy, fonty, tón), 5 šablon (TZ, social, reels,
-  prezentace, leták), who is who pro celostátní úroveň a jeden pilotní kraj, aktuální
-  program po tématech, 20–30 nejčastějších stanovisek, slovník, mapa materiálů.
+- První naplnění: brand a šablony z mrak.pirati.cz a Google Drive kurátora,
+  who is who z lide.pirati.cz, program a stanoviska z pirati.cz, slovník, mapa materiálů.
+  Scrapery pro mrak a lide.pirati.cz vznikají už v MVP, protože jde o hlavní zdroje.
 - MCP server s tooly `search_kb`, `find_people`, `get_program`, `get_position`,
   `get_brand`, `get_template`, `lookup_term` a prompty `tiskova_zprava`, `reels_scenar`.
 - Jednoduchý index (SQLite + sqlite-vec nebo Postgres), hybridní hledání.
@@ -299,8 +330,8 @@ takže fungují i bez připojeného serveru, jen s horší aktuálností dat.
 
 ## 6. Otevřené otázky k rozhodnutí
 
-1. Kdo je vlastníkem projektu a kdo schvaluje, co je „oficiální stanovisko“?
-2. Existuje centrální pirátské SSO, na které lze napojit OAuth?
-3. Má být server veřejný i pro novináře a veřejnost (jen veřejná vrstva), nebo jen pro členy?
-4. Hostovat na vlastní infrastruktuře technického odboru, nebo v cloudu?
-5. Má se do báze zahrnout i obsah fóra (vysoký šum, riziko injection), nebo ne?
+1. Existuje centrální pirátské SSO, na které lze napojit OAuth?
+2. Má být server veřejný i pro novináře a veřejnost (jen veřejná vrstva), nebo jen pro členy?
+3. Hostovat na vlastní infrastruktuře technického odboru, nebo v cloudu?
+4. Má se do báze zahrnout i obsah fóra (vysoký šum, riziko injection), nebo ne?
+5. Má mrak.pirati.cz API nebo jen WebDAV? Má lide.pirati.cz export dat?
