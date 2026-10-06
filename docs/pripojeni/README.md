@@ -7,8 +7,7 @@ Tři cesty podle toho, kdo jste. Všechny vedou k témuž: vaše AI dostane tool
 ## A. Nejjednodušší: připojit hostovaný server (pro běžné piráty)
 
 Platí, jakmile kurátor server nasadí na veřejnou HTTPS adresu, viz část C.
-Níže je zástupná adresa `https://piratekb-veritasderman-3065s-projects.vercel.app/mcp`; skutečnou adresu doplní kurátor
-(při nasazení na Vercel je to `https://<název-projektu>.vercel.app/mcp`).
+Server běží na Vercelu na adrese `https://piratekb-veritasderman-3065s-projects.vercel.app/mcp` (kontrola: `https://piratekb-veritasderman-3065s-projects.vercel.app/health`).
 
 1. Otevřete claude.ai → **Settings → Connectors → Add custom connector**
    (názvy položek se v aplikaci občas mění).
