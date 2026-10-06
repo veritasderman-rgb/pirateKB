@@ -1,5 +1,0 @@
-# Kořenový soubor závislostí pro Vercel (Python funkce v api/index.py).
-# Serverové závislosti jsou v server/requirements.txt; mcp si nese starlette a uvicorn.
--r server/requirements.txt
-starlette>=0.40
-uvicorn>=0.30

@@ -1,13 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "python -m server.kb.build",
-  "functions": {
-    "api/index.py": {
-      "maxDuration": 120,
-      "excludeFiles": "{.cache/**,ingest/**,server/tests/**,docs/**,**/__pycache__/**}"
+  "services": {
+    "piratekb": {
+      "runtime": "container",
+      "root": ".",
+      "entrypoint": "Dockerfile"
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
+    { "source": "/(.*)", "destination": { "service": "piratekb" } }
   ]
 }

@@ -105,43 +105,15 @@ Podrobnosti jsou v [`Dockerfile`](../Dockerfile) a [`docker-compose.yml`](../doc
 
 ### Nasazení na Vercel
 
-Cíl je veřejná adresa `https://<projekt>.vercel.app/mcp`, kterou si lidé přidají v claude.ai
-jako custom connector (server nemá autentizaci, obsahuje jen veřejná data). Dvě varianty:
-
-- **Kontejner (primární):** Vercel postaví OCI image z [`deploy/Dockerfile.vercel` (pro kontejnerové nasazení zkopírujte do kořene jako `Dockerfile.vercel`)](../Dockerfile.vercel)
-  (stejný obsah jako `Dockerfile`, index se staví při buildu). Server čte port z env `PORT`
-  a naslouchá na `0.0.0.0`; `GET /` a `/health` vrací `{"status":"ok",...}`.
-- **Python funkce (záložní):** [`api/index.py`](../api/index.py) vystavuje ASGI `app`,
-  [`vercel.json`](../vercel.json) přesměruje všechny cesty na ni a `buildCommand` vybuduje
-  index; pokud by při běhu chyběl, vybuduje se do `/tmp/kb.sqlite`.
-
-HTTP běží stateless (bez session ID, JSON odpovědi), takže funguje za load balancerem i při
-více instancích. Ověření: `curl https://<projekt>.vercel.app/health`.
-
-## Aktualizace dat
-
-Data se obnovují skripty z [`ingest/`](../ingest/README.md). Vše najednou, včetně
-validace a přestavění indexu:
-
-```sh
-pip install -r ingest/requirements.txt     # jednou
-scripts/update_data.sh
-```
-
-Skript spustí postupně `styleguide`, `psp`, `lide_pirati`, `pirati_web`, `validate` a
-nakonec `python -m server.kb.build`. Celý běh trvá desítky minut, hlavně kvůli
-`pirati_web.py`; při opakování se hotové stránky berou z cache. Doporučené frekvence
-jednotlivých zdrojů jsou v [`ingest/README.md`](../ingest/README.md). Běžící server
-načte nový index až po restartu.
-
-## Připojení klientů
-
-V příkladech níže nahraďte `/ABSOLUTNI/CESTA/K/pirateKB` skutečnou cestou k repozitáři
-a `python` cestou k interpretu s nainstalovanými závislostmi (při použití `.venv` je to
-například `/ABSOLUTNI/CESTA/K/pirateKB/.venv/bin/python`, na Windows
-`C:\\cesta\\pirateKB\\.venv\\Scripts\\python.exe`). Claude Desktop nezdědí prostředí
-vašeho terminálu, takže holé `python` nemusí najít správné balíčky.
-
+Vercel sestaví kořenový `Dockerfile` jako kontejner (index se postaví uvnitř
+image při buildu, cca 10 s) a spustí ho s proměnnou `PORT`, kterou `CMD`
+respektuje. Postup: ve Vercelu Add New → Project → Import repozitáře, preset
+„Other“, nic dalšího nenastavovat. Po nasazení je server na
+`https://<projekt>.vercel.app/mcp` (kontrola `https://<projekt>.vercel.app/health`).
+V Settings → Deployment Protection vypněte Vercel Authentication, jinak se
+klienti MCP k adrese nedostanou. Server nemá vlastní autentizaci, hostujte jen
+veřejná data. Streamable HTTP běží stateless s JSON odpověďmi, takže funguje i za
+load balancerem s více instancemi.
 ### Claude Desktop
 
 Soubor `claude_desktop_config.json` otevřete v Claude Desktopu přes Settings →
