@@ -21,7 +21,7 @@ Výstup (data/systemy/):
   neaktivni.jsonl      sondované adresy bez použitelné odpovědi (DNS neexistuje, timeout, 5xx, 404)
   neproverene.jsonl    kandidáti nad limit --max (hlavně místní weby na Majáku, testovací a
                        aliasové domény z crt.sh): host, duvod, zdroj_objeveni
-  systemy.md           tabulky po kategoriích (typ `system`, autorita `oficialni-evidence`)
+  systemy.md           tabulky po kategoriích (typ `system`, autorita `audit`)
   kam-s-problemem.md   průvodce „Mám problém / potřebuji…“ -> kam jít (typ `navod`, autorita
                        `web`, poznámka „Návrh ke schválení kurátorem“); situace, jejichž systém
                        sonda nepotvrdila, jsou označené „ověřit“
@@ -689,42 +689,47 @@ def popis_systemu(k: dict, p: dict, tech: str) -> dict:
 
 # --------------------------------------------------------------------------- výstupy
 SITUACE = [
-    # (situace, host nebo url, poznámka)
-    ("Chci se zapojit, stát se příznivcem nebo členem", "nalodeni.pirati.cz", "Nalodění: co členství obnáší, přihláška; členství schvaluje krajské sdružení"),
-    ("Mám technický problém (web, účet, přístup, nástroj nefunguje)", "redmine.pirati.cz", "tiket v projektu TO: https://redmine.pirati.cz/projects/to/issues/new (helpdesk technického odboru)"),
-    ("Zapomněl/a jsem heslo, nejde mi přihlášení", "auth.pirati.cz", "jednotné přihlášení (SSO); obnova hesla tam, když nepomůže, tiket na helpdesk TO"),
-    ("Chci diskutovat, podat návrh orgánu, hlasovat na fóru", "forum.pirati.cz", "oficiální jednání orgánů a podatelna; psaní vyžaduje účet"),
-    ("Potřebuji rychle něco vyřídit s týmem (chat)", "zulip.pirati.cz", "interní chat, vyžaduje účet"),
-    ("Online schůzka / videohovor", "jitsi.pirati.cz", "videokonference bez instalace"),
-    ("Hledám předpis, stanovy, jednací řád", "sbirka.pirati.cz", "Sbírka předpisů; totéž (a slovník zkratek, návody) na wiki: https://wiki.pirati.cz/rules/start"),
-    ("Hledám návod, slovník zkratek, stránku odboru na wiki", "wiki.pirati.cz", "wiki je za ochranou Cloudflare, v prohlížeči funguje; předpisy v /rules/"),
-    ("Chci účet do pirátských systémů (Zulip, mrak, Redmine…)", "nalodeni.pirati.cz", "https://nalodeni.pirati.cz/systemy/ (odkazuje na to přihlašovací stránka Zulipu)", "https://nalodeni.pirati.cz/systemy/"),
-    ("Potřebuji logo, grafický manuál, šablonu, fotku", "mrak.pirati.cz", "mrak (Nextcloud, vyžaduje účet); veřejná loga na https://www.pirati.cz/download/, barvy a fonty na styleguide.pirati.cz, fotky na Flickru"),
-    ("Chci barvy, fonty, komponenty pro web", "styleguide.pirati.cz", "Pattern Lab s vizuální identitou"),
-    ("Chci zveřejnit schůzku s lobbistou / zájmovou skupinou", "evidence.pirati.cz", "Evidence kontaktů a schůzek (Open Lobby); zápis po přihlášení"),
-    ("Chci darovat, potřebuji darovací smlouvu nebo potvrzení", "dary.pirati.cz", "darovací portál"),
-    ("Mám fakturu nebo výdaj k proplacení, hospodaření", "piroplaceni.pirati.cz", "Piroplácení (vyžaduje účet); v patičce webu jako „Hospodaření“"),
-    ("Uzavírám smlouvu za stranu / hledám smlouvu", "smlouvy.pirati.cz", "registr smluv"),
-    ("Kdo je kdo, kdo je v jakém orgánu, oficiální kontakt", "lide.pirati.cz", "veřejná evidence lidí a orgánů; členská část po přihlášení"),
-    ("Chci založit nebo upravit web kraje, MS nebo kampaně", "majak.pirati.cz", "Maják: nápověda, seznam webů, žádost o založení (pak tiket TO)"),
-    ("Hledám web kraje, místního sdružení, kandidáta, Pirátské centrum", "rozcestnik.pirati.cz", "rozcestník webů; seznam webů i na https://majak.pirati.cz/seznam-webu/"),
-    ("Kdo kandiduje, volební program, aktuální volby", "volby.pirati.cz", "kandidatura se řeší v krajském sdružení a na fóru (primárky)"),
-    ("Jak odvolit, voličský průkaz, volby ze zahraničí", "howtovote.pirati.cz", "návod pro voliče"),
-    ("Mám hlasovat v tajné volbě / primárkách", "helios.pirati.cz", "Helios Voting; odkaz na hlasování chodí e-mailem"),
-    ("Chci být v okrskové volební komisi", "ovk.pirati.cz", "nábor do OVK (ověřit)"),
-    ("Chci pomoct v kampani jako dobrovolník", "dobrovolnik.pirati.cz", "web pro dobrovolníky"),
-    ("Chci podepsat nebo založit petici", "petice.pirati.cz", "petiční web"),
-    ("Chyba na webu www.pirati.cz, oprava článku", "majak.pirati.cz", "web běží v Majáku: obsah řeší mediální odbor (kontakt na www.pirati.cz/kontakt/), technické chyby tiket TO v Redmine; starý Jekyll zdroj github.com/pirati-web (ověřit)"),
-    ("Chci se podívat na statistiky návštěvnosti webu", "matomo.pirati.cz", "přístup přes technický odbor"),
-    ("Chci absolvovat kurz nebo školení", "moodle.pirati.cz", "vzdělávací portál Moodle; komunální politici také SAKO (sako.pirati.cz)"),
-    ("Potřebuji číst e-mail @pirati.cz v prohlížeči", "webmail.pirati.cz", "webmail (Roundcube); zřízení schránky řeší technický odbor"),
-    ("Chci vidět transparentní účet strany", "ucet.pirati.cz", "přesměrování do Fio banky (ověřit, že jde o veřejný náhled); hospodaření také na piroplaceni.pirati.cz"),
-    ("Společné psaní poznámek ze schůzky", "pad.pirati.cz", "sdílený textový editor"),
-    ("Kdy je CF, RV, veřejná akce", "calendar.google.com", "veřejný kalendář vložený na www.pirati.cz; interní kalendáře jsou v mraku (ověřit)"),
-    ("Chci merch (trička, placky)", "piratskyobchod.cz", "e-shop"),
-    ("Chci veřejně sdílet / sledovat Piráty na sociálních sítích", "www.facebook.com", "Facebook, Instagram, X, Bluesky, YouTube, Mastodon (viz systemy.md, kategorie komunikace)"),
-    ("Chci pochopit, jak Piráti fungují jako hejno", "swarmwise.pirati.cz", "kniha Swarmwise česky"),
+    # (situace, host, prihlaseni, poznámka[, adresa]); prihlaseni = zda je k samotné činnosti potřeba účet:
+    # ano | ne | overit (nezávisí na tom, zda je úvodní stránka veřejná)
+    ("Chci se zapojit, stát se příznivcem nebo členem", "nalodeni.pirati.cz", "ne", "Nalodění: co členství obnáší, přihláška; členství schvaluje krajské sdružení"),
+    ("Mám technický problém (web, účet, přístup, nástroj nefunguje)", "redmine.pirati.cz", "ano", "tiket v projektu TO: https://redmine.pirati.cz/projects/to/issues/new (helpdesk technického odboru)"),
+    ("Zapomněl/a jsem heslo, nejde mi přihlášení", "auth.pirati.cz", "ne", "jednotné přihlášení (SSO); obnova hesla tam, když nepomůže, tiket na helpdesk TO"),
+    ("Chci diskutovat, podat návrh orgánu, hlasovat na fóru", "forum.pirati.cz", "ano", "oficiální jednání orgánů a podatelna; psaní vyžaduje účet"),
+    ("Potřebuji rychle něco vyřídit s týmem (chat)", "zulip.pirati.cz", "ano", "interní chat, vyžaduje účet"),
+    ("Online schůzka / videohovor", "jitsi.pirati.cz", "ne", "videokonference bez instalace"),
+    ("Hledám předpis, stanovy, jednací řád", "sbirka.pirati.cz", "ne", "Sbírka předpisů; totéž (a slovník zkratek, návody) na wiki: https://wiki.pirati.cz/rules/start"),
+    ("Hledám návod, slovník zkratek, stránku odboru na wiki", "wiki.pirati.cz", "ne", "wiki je za ochranou Cloudflare, v prohlížeči funguje; předpisy v /rules/"),
+    ("Chci účet do pirátských systémů (Zulip, mrak, Redmine…)", "nalodeni.pirati.cz", "ne", "https://nalodeni.pirati.cz/systemy/ (odkazuje na to přihlašovací stránka Zulipu)", "https://nalodeni.pirati.cz/systemy/"),
+    ("Potřebuji logo, grafický manuál, šablonu, fotku", "mrak.pirati.cz", "ano", "mrak (Nextcloud, vyžaduje účet); veřejná loga na https://www.pirati.cz/download/, barvy a fonty na styleguide.pirati.cz, fotky na Flickru"),
+    ("Chci stáhnout veřejné logo", "www.pirati.cz", "ne", "veřejná loga ke stažení bez účtu; grafický manuál a šablony jsou v mraku", "https://www.pirati.cz/download/"),
+    ("Chci barvy, fonty, komponenty pro web", "styleguide.pirati.cz", "ne", "Pattern Lab s vizuální identitou"),
+    ("Chci zveřejnit schůzku s lobbistou / zájmovou skupinou", "evidence.pirati.cz", "ano", "Evidence kontaktů a schůzek (Open Lobby); zápis po přihlášení"),
+    ("Chci darovat, potřebuji darovací smlouvu nebo potvrzení", "dary.pirati.cz", "ne", "darovací portál"),
+    ("Mám fakturu nebo výdaj k proplacení, hospodaření", "piroplaceni.pirati.cz", "ano", "Piroplácení (vyžaduje účet); v patičce webu jako „Hospodaření“"),
+    ("Uzavírám smlouvu za stranu / hledám smlouvu", "smlouvy.pirati.cz", "overit", "registr smluv"),
+    ("Kdo je kdo, kdo je v jakém orgánu, oficiální kontakt", "lide.pirati.cz", "ne", "veřejná evidence lidí a orgánů; členská část po přihlášení"),
+    ("Chci založit nebo upravit web kraje, MS nebo kampaně", "majak.pirati.cz", "ano", "Maják: nápověda, seznam webů, žádost o založení (pak tiket TO)"),
+    ("Hledám web kraje, místního sdružení, kandidáta, Pirátské centrum", "rozcestnik.pirati.cz", "ne", "rozcestník webů; seznam webů i na https://majak.pirati.cz/seznam-webu/"),
+    ("Kdo kandiduje, volební program, aktuální volby", "volby.pirati.cz", "ne", "kandidatura se řeší v krajském sdružení a na fóru (primárky)"),
+    ("Jak odvolit, voličský průkaz, volby ze zahraničí", "howtovote.pirati.cz", "ne", "návod pro voliče"),
+    ("Mám hlasovat v tajné volbě / primárkách", "helios.pirati.cz", "ano", "Helios Voting; odkaz na hlasování chodí e-mailem"),
+    ("Chci být v okrskové volební komisi", "ovk.pirati.cz", "overit", "nábor do OVK (ověřit)"),
+    ("Chci pomoct v kampani jako dobrovolník", "dobrovolnik.pirati.cz", "overit", "web pro dobrovolníky"),
+    ("Chci podepsat nebo založit petici", "petice.pirati.cz", "overit", "petiční web"),
+    ("Chyba na webu www.pirati.cz, oprava článku", "majak.pirati.cz", "ano", "web běží v Majáku: obsah řeší mediální odbor (kontakt na www.pirati.cz/kontakt/), technické chyby tiket TO v Redmine; starý Jekyll zdroj github.com/pirati-web (ověřit)"),
+    ("Chci se podívat na statistiky návštěvnosti webu", "matomo.pirati.cz", "ano", "přístup přes technický odbor"),
+    ("Chci absolvovat kurz nebo školení", "moodle.pirati.cz", "ano", "vzdělávací portál Moodle; komunální politici také SAKO (sako.pirati.cz)"),
+    ("Potřebuji číst e-mail @pirati.cz v prohlížeči", "webmail.pirati.cz", "ano", "webmail (Roundcube); zřízení schránky řeší technický odbor"),
+    ("Chci vidět transparentní účet strany", "ucet.pirati.cz", "overit", "přesměrování do Fio banky (ověřit, že jde o veřejný náhled); hospodaření také na piroplaceni.pirati.cz"),
+    ("Společné psaní poznámek ze schůzky", "pad.pirati.cz", "overit", "sdílený textový editor"),
+    ("Kdy je CF, RV, veřejná akce", "calendar.google.com", "ne", "veřejný kalendář vložený na www.pirati.cz; interní kalendáře jsou v mraku (ověřit)"),
+    ("Chci merch (trička, placky)", "piratskyobchod.cz", "ne", "e-shop"),
+    ("Chci veřejně sdílet / sledovat Piráty na sociálních sítích", "www.facebook.com", "ne", "Facebook, Instagram, X, Bluesky, YouTube, Mastodon (viz systemy.md, kategorie komunikace)"),
+    ("Chci pochopit, jak Piráti fungují jako hejno", "swarmwise.pirati.cz", "ne", "kniha Swarmwise česky"),
 ]
+
+
+ZDROJE_OBJEVENI = ["crt.sh", "odkazy v datech", "majak.pirati.cz/seznam-webu"]
 
 
 def md_escape(s: str) -> str:
@@ -738,7 +743,8 @@ def write_systemy_md(rows: list[dict], neaktivni: int, neproverene: int, pocty: 
     lines = ["# Systémy a adresy Pirátů", "",
              "Automatický audit domén `*.pirati.cz` a známých externích služeb strany: co na adrese běží, "
              "jestli odpovídá, zda vyžaduje přihlášení a k čemu slouží. Sonda je jeden HTTP GET bez přihlášení; "
-             "odhad technologie je heuristika. Popisy označené „(ověřit)“ jsou odhad, ne potvrzený stav.", "",
+             "odhad technologie je heuristika. Popisy označené „(ověřit)“ jsou odhad, ne potvrzený stav. "
+             "Popisy jsou heuristické (title, meta, markery technologií) a k ověření; citujte adresu samotného systému v řádku tabulky.", "",
              f"Kandidátů celkem {pocty['kandidatu']} (crt.sh {pocty['crt']}, odkazy v datech {pocty['data']}, "
              f"patičky a seznam webů {pocty['paticky']}, ruční seznam {pocty['seznam']}); sondováno {pocty['sondovano']}, "
              f"z toho odpovídá {len(rows)}, vyžaduje přihlášení {sum(1 for r in rows if r['vyzaduje_prihlaseni'])}, "
@@ -756,9 +762,10 @@ def write_systemy_md(rows: list[dict], neaktivni: int, neproverene: int, pocty: 
             lines.append(f"| {md_escape(r['nazev'])} | <{r['url']}> | {md_escape(r['stav'])} | {pr} | "
                          f"{md_escape(r['technologie']) or '–'} | {md_escape(r['popis'])} | {md_escape(r['kam'])} |")
         lines.append("")
-    meta = {"zdroj": "https://crt.sh/?q=%25.pirati.cz", "nazev": "Systémy a adresy Pirátů", "typ": "system",
-            "autorita": "oficialni-evidence", "viditelnost": "verejne", "stazeno": STAZENO,
-            "poznamka": "audit *.pirati.cz: sonda HTTP bez přihlášení, technologie odhadnuta heuristicky"}
+    meta = {"zdroj": "https://github.com/veritasderman-rgb/pirateKB/blob/main/data/systemy/systemy.jsonl",
+            "zdroje_objeveni": ZDROJE_OBJEVENI, "nazev": "Systémy a adresy Pirátů", "typ": "system",
+            "autorita": "audit", "viditelnost": "verejne", "stazeno": STAZENO,
+            "poznamka": "audit *.pirati.cz: sonda HTTP bez přihlášení, technologie odhadnuta heuristicky; k ověření kurátorem"}
     write_markdown(OUT / "systemy.md", meta, "\n".join(lines))
 
 
@@ -766,30 +773,36 @@ def write_kam_md(rows: list[dict]) -> None:
     by_host = {urlparse(r["url"]).netloc.lower(): r for r in rows}
     by_host.update({urlparse(r["url"]).netloc.lower() + urlparse(r["url"]).path.rstrip("/"): r for r in rows})
     lines = ["# Mám problém / potřebuji… → kam jít", "",
-             "Návrh rozcestníku pro členy a příznivce: typická situace, systém, adresa a jestli je potřeba účet. "
+             "Návrh rozcestníku pro členy a příznivce: typická situace, systém, adresa a jestli je k dané činnosti potřeba účet (sloupec Přihlášení je kurátorský odhad podle činnosti, ne podle úvodní stránky). "
              "Vychází z automatického auditu adres (`systemy.md`); u řádků označených **ověřit** sonda systém "
              "nepotvrdila (nefunguje, je za ochranou, nebo není jisté, k čemu slouží). Před zařazením do "
              "kurátorovaného obsahu musí tabulku projít kurátor nebo technický odbor.", "",
-             "| Situace | Kam | Adresa | Přihlášení | Stav sondy | Poznámka |", "|---|---|---|---|---|---|"]
-    for sit, host, pozn, *extra in SITUACE:
+             "| Situace | Kam | Adresa | Přihlášení (pro činnost) | Stav sondy | Poznámka |", "|---|---|---|---|---|---|"]
+    prihl_txt = {"ano": "ano", "ne": "ne", "overit": "ověřit"}
+    for sit, host, prihl, pozn, *extra in SITUACE:
         r = by_host.get(host)
+        pr = prihl_txt[prihl]
         if r is None:
-            lines.append(f"| {md_escape(sit)} | {host} | <https://{host}/> | ověřit | **ověřit** (sonda nepotvrdila) | {md_escape(pozn)} |")
+            url = extra[0] if extra else f"https://{host}/"
+            lines.append(f"| {md_escape(sit)} | {host} | <{url}> | {pr} | **ověřit** (sonda nepotvrdila) | {md_escape(pozn)} |")
             continue
-        pr = {True: "ano", False: "ne", None: "ověřit"}[r["vyzaduje_prihlaseni"]]
         stav = r["stav"]
         if not (stav == "funguje" or stav == "vyžaduje přihlášení" or stav.startswith(("přesměrování", "externí služba"))):
             stav = f"**ověřit** ({stav})"
         url = extra[0] if extra else r["url"]
-        lines.append(f"| {md_escape(sit)} | {md_escape(r['nazev'])} | <{url}> | {pr} | {md_escape(stav)} | {md_escape(pozn)} |")
+        pozn_out = pozn
+        if prihl != "ano" and r["vyzaduje_prihlaseni"] is True:
+            pozn_out += "; sonda: stránka vyžaduje přihlášení už při vstupu"
+        lines.append(f"| {md_escape(sit)} | {md_escape(r['nazev'])} | <{url}> | {pr} | {md_escape(stav)} | {md_escape(pozn_out)} |")
     lines += ["", "## Obecná pravidla", "",
               "- Většina interních nástrojů (Zulip, mrak, Redmine, Piroplácení, Maják, Helios) používá jednotné přihlášení (SSO). "
               "Účet vzniká při nalodění; problémy s účtem řeší helpdesk technického odboru (tiket v Redmine, projekt TO).",
               "- Fórum, wiki, evidence schůzek, registr smluv a Lidé mají veřejnou část bez přihlášení; psát a upravovat lze až s účtem.",
               "- Když nevíte, kam s tím: zeptejte se na fóru nebo v Zulipu, případně koordinátora svého krajského sdružení (kontakty na lide.pirati.cz).", ""]
-    meta = {"zdroj": "https://majak.pirati.cz/seznam-webu/", "nazev": "Kam s problémem: rozcestník systémů Pirátů",
+    meta = {"zdroj": "https://github.com/veritasderman-rgb/pirateKB/blob/main/data/systemy/kam-s-problemem.md",
+            "zdroje_objeveni": ZDROJE_OBJEVENI, "nazev": "Kam s problémem: rozcestník systémů Pirátů",
             "typ": "navod", "autorita": "web", "viditelnost": "verejne", "stazeno": STAZENO,
-            "poznamka": "Návrh ke schválení kurátorem"}
+            "poznamka": "Návrh ke schválení kurátorem; situace a sloupec Přihlášení jsou kurátorský odhad, adresy ověřuje sonda"}
     write_markdown(OUT / "kam-s-problemem.md", meta, "\n".join(lines))
 
 
@@ -813,12 +826,13 @@ def main() -> int:
     print(f"Kandidátů {len(kand)}: crt.sh {pocty['crt']}, data {pocty['data']}, patičky {pocty['paticky']}, "
           f"seznam {pocty['seznam']}; sonduji {len(sonda)}, odkládám {len(zbytek)}", file=sys.stderr)
 
-    rows, neaktivni = [], []
+    rows, neaktivni, bez_sondy = [], [], []
     for i, k in enumerate(sonda, 1):
         if args.jen_vystup:
             key = hashlib.sha256(k["url"].encode()).hexdigest()[:24]
             cp = CACHE / f"{key}.json"
             if not cp.exists():
+                bez_sondy.append(k)
                 continue
             p = json.loads(cp.read_text(encoding="utf-8"))
         else:
@@ -839,17 +853,32 @@ def main() -> int:
         print(f"  [{i}/{len(sonda)}] {k['host']:<40} {rec['stav']:<32} {tech}", file=sys.stderr)
         (neaktivni if rec["stav"].startswith("nefunguje") or rec["stav"].startswith("neurčeno") else rows).append(rec)
 
+    if bez_sondy:
+        pred = 0
+        if (OUT / "systemy.jsonl").exists():
+            pred = sum(1 for ln in (OUT / "systemy.jsonl").read_text(encoding="utf-8").splitlines() if ln.strip())
+        print(f"Varování: {len(bez_sondy)} kandidátů nemá v cache sondu (půjdou do neproverene.jsonl s důvodem bez_sondy).",
+              file=sys.stderr)
+        if pred and len(rows) * 2 < pred:
+            print(f"CHYBA: z cache vychází {len(rows)} řádků, existující systemy.jsonl jich má {pred} (méně než polovina); "
+                  "nic nepřepisuji. Cache sond (.cache/systemy/) je neúplná, je potřeba běh bez --jen-vystup.",
+                  file=sys.stderr)
+            return 2
+    pocty["sondovano"] = len(sonda) - len(bez_sondy)
+
     OUT.mkdir(parents=True, exist_ok=True)
     write_jsonl(OUT / "systemy.jsonl", rows)
     write_jsonl(OUT / "neaktivni.jsonl", neaktivni)
     write_jsonl(OUT / "neproverene.jsonl", [{"host": k["host"], "url": k["url"], "zdroj_objeveni": k["zdroje"],
                                              "duvod": {4: "alias, neznámý účel nebo kampaň mimo pirati.cz (nad limit --max)", 5: "testovací/aliasová doména", 6: "místní web na Majáku nebo cizí doména (viz data/subweby)"}.get(k["priorita"], "nad limit --max"),
-                                             "stazeno": STAZENO} for k in zbytek])
-    write_systemy_md(rows, len(neaktivni), len(zbytek), pocty)
+                                             "stazeno": STAZENO} for k in zbytek]
+                + [{"host": k["host"], "url": k["url"], "zdroj_objeveni": k["zdroje"], "duvod": "bez_sondy",
+                    "stazeno": STAZENO} for k in bez_sondy])
+    write_systemy_md(rows, len(neaktivni), len(zbytek) + len(bez_sondy), pocty)
     write_kam_md(rows)
     kat = Counter(r["kategorie"] for r in rows)
     print(f"Hotovo: odpovídá {len(rows)} (přihlášení {sum(1 for r in rows if r['vyzaduje_prihlaseni'])}), "
-          f"neaktivní {len(neaktivni)}, neprověřeno {len(zbytek)}", file=sys.stderr)
+          f"neaktivní {len(neaktivni)}, neprověřeno {len(zbytek) + len(bez_sondy)} (z toho bez sondy {len(bez_sondy)})", file=sys.stderr)
     print("Kategorie: " + ", ".join(f"{c}: {n}" for c, n in kat.most_common()), file=sys.stderr)
     return 0
 

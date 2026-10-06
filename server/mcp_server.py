@@ -59,6 +59,7 @@ AUTORITA_POPIS = {
     "stanovisko": "oficiální stanovisko / usnesení",
     "tz": "tisková zpráva (oficiální výstup, ne usnesení)",
     "web": "text na webu pirati.cz (informativní)",
+    "audit": "automatický audit, heuristika, k ověření kurátorem",
     "oficialni-evidence": "oficiální evidence lide.pirati.cz",
     "oficialni-styleguide": "oficiální styleguide.pirati.cz",
     "oficialni-data-psp": "otevřená data Poslanecké sněmovny",
@@ -70,7 +71,7 @@ AUTORITA_PODLE_TYPU = {
     "predpis": "usneseni", "tiskova-zprava": "tz", "aktualita": "web", "rozcestnik": "web",
     "osoba": "oficialni-evidence", "organizacni-jednotka": "oficialni-evidence",
     "brand": "oficialni-styleguide", "hlasovani": "oficialni-data-psp", "materialy": "web",
-    "prispevek-socialni-site": "vyjadreni-politika",
+    "prispevek-socialni-site": "vyjadreni-politika", "system": "audit",
 }
 
 SERVER_INSTRUCTIONS = """Znalostní báze České pirátské strany (lidé, organizace, program,
