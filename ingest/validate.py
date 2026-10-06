@@ -31,6 +31,12 @@ DATA = ROOT / "data"
 REQUIRED = ("zdroj", "nazev", "typ", "viditelnost", "stazeno")
 OPTIONAL = ("datum", "autorita")
 VIDITELNOST = ("verejne", "clenske")
+# Povolené hodnoty pole `typ`. MUSÍ odpovídat výčtu v data/README.md (tabulka povinných polí).
+ALLOWED_TYP = (
+    "tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument",
+    "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
+    "materialy",
+)
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$")
 SKIP = {"README.md"}  # jen v kořeni data/
@@ -64,17 +70,35 @@ def folder_of(path: Path, data: Path) -> str:
 
 
 def is_date(value) -> bool:
-    if isinstance(value, dt.datetime):
+    if isinstance(value, (dt.datetime, dt.date)):
         return True
-    if isinstance(value, dt.date):
-        return True
-    return isinstance(value, str) and bool(DATE_RE.match(value))
+    if not (isinstance(value, str) and DATE_RE.match(value)):
+        return False
+    try:
+        dt.date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
 
 
 def is_date_or_datetime(value) -> bool:
     if isinstance(value, (dt.date, dt.datetime)):
         return True
-    return isinstance(value, str) and bool(DATETIME_RE.match(value))
+    if not (isinstance(value, str) and DATETIME_RE.match(value)):
+        return False
+    try:
+        if DATE_RE.match(value):
+            dt.date.fromisoformat(value)
+        else:
+            # fromisoformat před Pythonem 3.11 neumí "Z" ani offset bez dvojtečky
+            v = value
+            if v.endswith("Z"):
+                v = v[:-1] + "+00:00"
+            v = re.sub(r"([+-]\d{2})(\d{2})$", r"\1:\2", v) if re.search(r"[+-]\d{4}$", v) else v
+            dt.datetime.fromisoformat(v)
+    except ValueError:
+        return False
+    return True
 
 
 def split_frontmatter(text: str) -> tuple[str | None, str]:
@@ -106,6 +130,10 @@ def check_markdown(path: Path, rep: Report, data: Path) -> None:
     except yaml.YAMLError as e:
         rep.error(path, f"neplatný YAML ve frontmatter: {str(e).splitlines()[0]}", folder)
         return
+    except ValueError as e:
+        # PyYAML při nevalidním nezakvotovaném datu (2026-02-31) vyhodí ValueError, ne YAMLError
+        rep.error(path, f"neplatná hodnota ve frontmatter (např. neexistující datum): {e}", folder)
+        return
     if not isinstance(meta, dict):
         rep.error(path, "frontmatter není mapa klíč: hodnota", folder)
         return
@@ -118,6 +146,9 @@ def check_markdown(path: Path, rep: Report, data: Path) -> None:
     vid = meta.get("viditelnost")
     if vid is not None and vid not in VIDITELNOST:
         problems.append(f"`viditelnost` má hodnotu {vid!r}, povoleno: {'|'.join(VIDITELNOST)}")
+    typ_val = meta.get("typ")
+    if typ_val is not None and not (isinstance(typ_val, str) and not typ_val.strip()) and typ_val not in ALLOWED_TYP:
+        problems.append(f"`typ` má neznámou hodnotu {typ_val!r}, povoleno: {'|'.join(ALLOWED_TYP)}")
     stazeno = meta.get("stazeno")
     if stazeno is not None and not is_date(stazeno):
         problems.append(f"`stazeno` není datum YYYY-MM-DD: {stazeno!r}")
@@ -153,12 +184,18 @@ def check_jsonl(path: Path, rep: Report, data: Path) -> None:
                         rep.error(path, f"řádek {n}: prázdný řádek", folder)
                     continue
                 try:
-                    json.loads(line)
-                    rows += 1
+                    obj = json.loads(line)
                 except json.JSONDecodeError as e:
                     bad += 1
                     if bad <= 3:
                         rep.error(path, f"řádek {n}: neplatný JSON ({e.msg} na pozici {e.pos})", folder)
+                    continue
+                if not isinstance(obj, dict):
+                    bad += 1
+                    if bad <= 3:
+                        rep.error(path, f"řádek {n}: JSON není objekt (je {type(obj).__name__})", folder)
+                    continue
+                rows += 1
     except UnicodeDecodeError as e:
         rep.error(path, f"není platné UTF-8: {e}", folder)
         return
