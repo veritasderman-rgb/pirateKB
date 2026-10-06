@@ -92,6 +92,8 @@ python -m server --http --host 0.0.0.0 --port 8765
 Server pak odpovídá na `http://<host>:8765/mcp`. Pro lokální zkoušku použijte
 `--host 127.0.0.1`. Do světa ho nevystavujte bez reverzní proxy s HTTPS, viz níže.
 
+Stručný návod pro koncové uživatele včetně hotových konfiguračních souborů: [docs/pripojeni/README.md](../docs/pripojeni/README.md).
+
 ### Docker
 
 ```sh

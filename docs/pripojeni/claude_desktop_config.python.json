@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "piratekb": {
+      "command": "python3",
+      "args": ["-m", "server"],
+      "cwd": "/ABSOLUTNI/CESTA/K/pirateKB",
+      "env": {
+        "PYTHONPATH": "/ABSOLUTNI/CESTA/K/pirateKB",
+        "PIRATEKB_DB": "/ABSOLUTNI/CESTA/K/pirateKB/index/kb.sqlite"
+      }
+    }
+  }
+}

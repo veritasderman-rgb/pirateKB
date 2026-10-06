@@ -1,0 +1,7 @@
+.git
+.cache
+index
+__pycache__
+*.pyc
+.pytest_cache
+raw
