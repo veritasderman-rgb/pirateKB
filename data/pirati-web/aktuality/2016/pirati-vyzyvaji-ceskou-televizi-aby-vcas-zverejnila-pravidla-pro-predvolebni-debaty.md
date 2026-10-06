@@ -1,0 +1,31 @@
+---
+zdroj: https://www.pirati.cz/jak-pirati-pracuji/pirati-vyzyvaji-ceskou-televizi-aby-vcas-zverejnila-pravidla-pro-predvolebni-debaty/
+nazev: Piráti vyzývají Českou televizi, aby včas zveřejnila pravidla pro předvolební debaty.
+typ: aktualita
+datum: '2016-09-30'
+autor: Věra Marušiaková
+tagy:
+- Média
+viditelnost: verejne
+autorita: web
+stazeno: '2026-10-06'
+---
+
+# Piráti vyzývají Českou televizi, aby včas zveřejnila pravidla pro předvolební debaty.
+
+Piráti vyzvali Českou televizi, aby s dostatečným předstihem zveřejnila pravidla pro předvolební vysílání k parlamentním volbám v roce 2017. Česká televize dosud tyto informace zveřejňovala přibližně měsíc před volbami. V této době ale již naplno běžel průzkum veřejného mínění, který o účasti v debatě rozhodoval.
+
+Transparentní pravidla ČT by přitom měla být jasně dána předem, nikoliv až během sběru klíčových dat. Tak, aby se vyloučila i hypotetická možnost dodatečného zvýhodnění či znevýhodnění jakýchkoliv politických stran. Výzva se může jevit jako předčasná. Pravidla pro předvolební debaty by ale měla být jasně stanovena ještě před zahájením rozhodujícího volebního výzkumu a ideálně už v době, kdy politické strany zahajují svou předvolební kampaň.
+
+Ve své výzvě Piráti také navrhují, aby prostor dostaly všechny politické subjekty, které v průzkumu překročí hranici 4% volebního potenciálu. Ty by měla televize pozvat k relevantním tématům. Pirátům nepřipadá fér, že je Česká televize opakovaně zve například do pořadu Politické spektrum, aby se vyjádřili k působení prezidenta republiky, ale nedostanou žádnou příležitost prezentovat svá vlastní témata, například otevřenost veřejné správy, svobodu informací nebo efektivní využití technologií na úrovni státní správy a samosprávy.
+
+> „Debaty ve veřejnoprávní televizi mají i v době Internetu velký vliv obzvláště na nerozhodnuté voliče. Během posledních voleb závěrečnou debatu sledoval téměř milion diváků. Je zásadní, aby podmínky byly rovné pro všechny strany, a to jak kvůli vyváženosti a objektivitě vysílání, tak dodržování zásad demokracie,“ vysvětlil vznik výzvy její autor a předseda zastupitelského klubu pražských Pirátů Jakub Michálek.
+
+<h3>Související odkazy</h3>
+
+- [Výzva Pirátů pro Českou televizi](https://github.com/pirati-byro/spisy-parl-2016/blob/master/4017-vcasna-pravidla-ct/01-zadost/main_signed.pdf)
+
+<h3>Kontakt</h3>
+
+- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e48e858f9186ca898d878c8588818fa4948d9685908dca879e), 775 978 550, pražský zastupitel a předseda pražských Pirátů
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#610c080a140d00124f0704130b040f02080a211108130015084f021b), 737 943 770, vedoucí mediálního odboru

@@ -1,0 +1,23 @@
+---
+zdroj: https://www.pirati.cz/jak-pirati-pracuji/nove-zvoleni-poslanci-ceske-piratske-strany-se-poprve-sesli-na-setkani-klubu/
+nazev: Nově zvolení poslanci České pirátské strany se poprvé sešli na setkání klubu
+typ: tiskova-zprava
+datum: '2017-10-22'
+autor: Karolína Sadílková
+tagy:
+- Sněmovna
+viditelnost: verejne
+autorita: tz
+stazeno: '2026-10-06'
+---
+
+# Nově zvolení poslanci České pirátské strany se poprvé sešli na setkání klubu
+
+Praha, 22. října 2017 – Všech dvaadvacet nově zvolených poslanců České pirátské strany se dnes sešlo na prvním společném setkání nově vzniklého klubu. Poslanci si odhlasovali složení vyjednávacího povolebního týmu, jednání povede předseda strany Ivan Bartoš a místopředseda Jakub Michálek, ad hoc je budou doplňovat Dana Balcarová, Lenka Kozlová, Mikuláš Peksa, Lukáš Bartoň a Mikuláš Ferjenčík.
+
+Úkolem vyjednávacího týmu Pirátů je především seznámit ostatní politické strany s dvaceti programovými body, které chtějí prioritně prosadit:
+<https://www.pirati.cz/program/psp2017/20-nejdulezitejsich-bodu-programu/>
+
+Dále byl na setkání klubu zvolen jeho nový předseda. „Protože já jako předseda strany mám dle jednacího řádu Sněmovny právo na přednostní vyjádření, chtěli jsme tuto možnost dát ještě dalšímu poslanci, předsedou nově vzniklého pirátského poslaneckého klubu jsme tak zvolili Jakuba Michálka, který měl jako lídr pražské kandidátky nejlepší pirátský volební výsledek v republice,“ vysvětlil předseda strany Ivan Bartoš.
+
+Poslanecký klub Pirátů se také jednomyslně shodl, že ve Sněmovně bude hlasovat pro vydání Andreje Babiše a Jaroslava Faltýnka k trestnímu stíhání.
