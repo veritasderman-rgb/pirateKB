@@ -1,0 +1,327 @@
+# Klíčová slova pro mediální monitoring (ingest/media.py).
+#
+# Vygenerováno 2026-10-06 z data/psp/poslanci.jsonl (všichni pirátští poslanci, `aktualni: true`
+# = člen klubu Piráti v aktuálním období, id klubu 1745) a z data/lide/osoby.jsonl (členové
+# Republikového předsednictva), doplněno ručně (europoslankyně, radní). Kurátor může soubor
+# upravovat ručně: skript ho nepřepisuje.
+#
+# Jak doplnit osobu: přidejte položku do `osoby` s poli
+#   jmeno      celé jméno (Google News a GDELT hledají přesnou frázi "Jméno Příjmení")
+#   prijmeni   příjmení (jen pro čitelnost)
+#   kmen       kmen příjmení BEZ diakritiky a malými písmeny jako regulární výraz, tolerantní
+#              ke skloňování: "bartos" najde Bartoš, Bartoše, Bartošovi; "richterov" najde
+#              Richterová, Richterové, Richterovou; "michale?k" najde Michálek i Michálka;
+#              u dvojitých příjmení části oddělte svislítkem ("fercikov|konecn")
+#   aktualni   true = současný poslanec / funkcionář (jen informativní pole pro kurátora)
+#   role       popis role (jen informativní)
+#   jen_s_textem  true u běžných jmen (Martínek, Svobodová, Hoffmannová…): článek se uloží, jen když je
+#              jméno nebo strana v titulku/perexu; samotný dotaz na jméno nestačí (jinak se chytají jmenovci)
+# Shoda podle samotného příjmení se započítá jen tehdy, když je v titulku nebo perexu zároveň
+# zmíněna strana (jinak by "Svobodová" nebo "Hřib" chytaly cizí lidi a houby); shoda celého
+# jména platí vždy. U dotazů na jméno (Google News, GDELT) se jméno započítá i bez shody v
+# titulku, protože vyhledávač prohledal celý text (pole `shoda: dotaz` v clanky.jsonl).
+#
+# Jak doplnit klíčové slovo strany: `strana.dotazy` jsou fráze pro vyhledávače (Google News,
+# GDELT), `strana.vzory` regulární výrazy pro filtr titulku+perexu (text bez diakritiky, malá
+# písmena), `strana.vylouceni` kontexty, ve kterých slovo "piráti" NEZNAMENÁ stranu (sport,
+# Somálsko, film, silniční piráti…). Vyloučení ruší jen shodu strany, ne shodu celého jména osoby.
+
+strana:
+  dotazy:
+  - Piráti
+  - Pirátská strana
+  - Česká pirátská strana
+  - pirátský poslanec
+  - pirátská poslankyně
+  vzory:
+  - \bpirat(i|u|um|ech|y|a|e|ek|ka|ky|ku|kou|kam|kach)\b
+  - \bpiratsk\w*
+  - \bpiratstrana\b
+  vylouceni:
+  - somal\w* pirat
+  - pirat\w* z karibiku
+  - pirati? karibiku
+  - pirat\w* silnic
+  - silnicn\w* pirat
+  - piratstvi
+  - pirat\w*\s+(kopi|verz|stahov|software|vysilan|radi|rozhlas|lod|utok|utoc|zaliv|unes)
+  - (hokej|extralig|chance lig|florbal|basketbal|fotbal|rugby|ragby|baseball|hazen|play.?off|utkani|zapas\w* sezon|stadion)
+  - pirati chomutov
+  - chomutovsk\w* pirat
+  - pirates
+  - piratsk\w* (lod|vlajk\w* nad lod|poklad|hra|kostym|party)
+
+# Osoby: nejdřív současní, pak bývalí poslanci (abecedně podle příjmení)
+osoby:
+- jmeno: Hana Ančincová
+  prijmeni: Ančincová
+  kmen: ancincov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '6986'
+- jmeno: Ivan Bartoš
+  prijmeni: Bartoš
+  kmen: bartos
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '6433'
+- jmeno: Katerina Demetrashvili
+  prijmeni: Demetrashvili
+  kmen: demetrashvili
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '6999'
+- jmeno: Irena Ferčíková Konečná
+  prijmeni: Ferčíková Konečná
+  kmen: fercikov|konecn
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7003'
+- jmeno: Markéta Gregorová
+  prijmeni: Gregorová
+  kmen: gregorov
+  aktualni: true
+  role: europoslankyně
+- jmeno: Jiří Hlavenka
+  prijmeni: Hlavenka
+  kmen: hlavenka
+  aktualni: true
+  role: 3. místopředseda/kyně Republikového předsednictva
+- jmeno: Andrea Hoffmannová
+  jen_s_textem: true
+  prijmeni: Hoffmannová
+  kmen: hoffmannov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '6905'
+- jmeno: Zdeněk Hřib
+  prijmeni: Hřib
+  kmen: hrib
+  aktualni: true
+  role: poslanec/poslankyně PSP; předseda RP
+  psp_id_osoba: '6552'
+- jmeno: Veronika Kovářová
+  jen_s_textem: true
+  prijmeni: Kovářová
+  kmen: kovarov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7013'
+- jmeno: Šárka Kučerová
+  jen_s_textem: true
+  prijmeni: Kučerová
+  kmen: kucerov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7020'
+- jmeno: Lenka Martínková Španihelová
+  prijmeni: Martínková Španihelová
+  kmen: martinkov|spanihelov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7023'
+- jmeno: Michaela Moricová
+  jen_s_textem: true
+  prijmeni: Moricová
+  kmen: moricov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7024'
+- jmeno: Jana Patková
+  jen_s_textem: true
+  prijmeni: Patková
+  kmen: patkov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7032'
+- jmeno: Barbora Pipášová
+  prijmeni: Pipášová
+  kmen: pipasov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7035'
+- jmeno: Olga Richterová
+  prijmeni: Richterová
+  kmen: richterov
+  aktualni: true
+  role: poslanec/poslankyně PSP; 4. místopředsedkyně RP
+  psp_id_osoba: '6473'
+- jmeno: Martin Šmída
+  prijmeni: Šmída
+  kmen: smida
+  aktualni: true
+  role: poslanec/poslankyně PSP; 1. místopředseda/kyně RP
+  psp_id_osoba: '7065'
+- jmeno: Eva Šrámková
+  jen_s_textem: true
+  prijmeni: Šrámková
+  kmen: sramkov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7046'
+- jmeno: Kateřina Stojanová
+  jen_s_textem: true
+  prijmeni: Stojanová
+  kmen: stojanov
+  aktualni: true
+  role: poslanec/poslankyně PSP; 2. místopředsedkyně RP
+  psp_id_osoba: '7048'
+- jmeno: Gabriela Svárovská
+  prijmeni: Svárovská
+  kmen: svarovsk
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7049'
+- jmeno: Vendula Svobodová
+  jen_s_textem: true
+  prijmeni: Svobodová
+  kmen: svobodov
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7051'
+- jmeno: Samuel Volpe
+  prijmeni: Volpe
+  kmen: volpe
+  aktualni: true
+  role: poslanec/poslankyně PSP
+  psp_id_osoba: '7057'
+- jmeno: Adam Zábranský
+  prijmeni: Zábranský
+  kmen: zabransky
+  aktualni: true
+  role: radní Prahy
+- jmeno: Dana Balcarová
+  prijmeni: Balcarová
+  kmen: balcarov
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6429'
+- jmeno: Lukáš Bartoň
+  prijmeni: Bartoň
+  kmen: barton
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6432'
+- jmeno: Lukáš Černohorský
+  prijmeni: Černohorský
+  kmen: cernohorsky
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6442'
+- jmeno: František Elfmark
+  prijmeni: Elfmark
+  kmen: elfmark
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6446'
+- jmeno: Mikuláš Ferjenčík
+  prijmeni: Ferjenčík
+  kmen: ferjencik
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6450'
+- jmeno: Radek Holomčík
+  prijmeni: Holomčík
+  kmen: holomcik
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6454'
+- jmeno: Martin Jiránek
+  jen_s_textem: true
+  prijmeni: Jiránek
+  kmen: jirane?k
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6462'
+- jmeno: Klára Kocmanová
+  prijmeni: Kocmanová
+  kmen: kocmanov
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6776'
+- jmeno: Lukáš Kolářík
+  prijmeni: Kolářík
+  kmen: kolarik
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6507'
+- jmeno: František Kopřiva
+  prijmeni: Kopřiva
+  kmen: kopriva
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6499'
+- jmeno: Lenka Kozlová
+  jen_s_textem: true
+  prijmeni: Kozlová
+  kmen: kozlov
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6465'
+- jmeno: Jan Lipavský
+  prijmeni: Lipavský
+  kmen: lipavsky
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6537'
+- jmeno: Tomáš Martínek
+  jen_s_textem: true
+  prijmeni: Martínek
+  kmen: martine?k
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6535'
+- jmeno: Jakub Michálek
+  prijmeni: Michálek
+  kmen: michale?k
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6477'
+- jmeno: František Navrkal
+  prijmeni: Navrkal
+  kmen: navrkal
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6624'
+- jmeno: Mikuláš Peksa
+  prijmeni: Peksa
+  kmen: peksa
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6488'
+- jmeno: Vojtěch Pikal
+  prijmeni: Pikal
+  kmen: pikal
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6531'
+- jmeno: Ondřej Polanský
+  prijmeni: Polanský
+  kmen: polansky
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6529'
+- jmeno: Jan Pošvář
+  prijmeni: Pošvář
+  kmen: posvar
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6528'
+- jmeno: Ondřej Profant
+  prijmeni: Profant
+  kmen: profant
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6526'
+- jmeno: Petr Třešňák
+  prijmeni: Třešňák
+  kmen: tresnak
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6483'
+- jmeno: Tomáš Vymazal
+  prijmeni: Vymazal
+  kmen: vymazal
+  aktualni: false
+  role: poslanec/poslankyně PSP (bývalý/á)
+  psp_id_osoba: '6489'

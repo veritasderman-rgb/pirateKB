@@ -1,0 +1,16 @@
+{
+ "historie": {
+  "2026-09": {
+   "google_novych": 166,
+   "google_polozek": 354,
+   "hotovo": true,
+   "stazeno": "2026-10-06"
+  },
+  "2026-10": {
+   "google_novych": 65,
+   "google_polozek": 155,
+   "hotovo": true,
+   "stazeno": "2026-10-06"
+  }
+ }
+}

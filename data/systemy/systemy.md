@@ -1,16 +1,20 @@
 ---
-zdroj: https://crt.sh/?q=%25.pirati.cz
+zdroj: https://github.com/veritasderman-rgb/pirateKB/blob/main/data/systemy/systemy.jsonl
+zdroje_objeveni:
+- crt.sh
+- odkazy v datech
+- majak.pirati.cz/seznam-webu
 nazev: Systémy a adresy Pirátů
 typ: system
-autorita: oficialni-evidence
+autorita: audit
 viditelnost: verejne
 stazeno: '2026-10-06'
-poznamka: 'audit *.pirati.cz: sonda HTTP bez přihlášení, technologie odhadnuta heuristicky'
+poznamka: 'audit *.pirati.cz: sonda HTTP bez přihlášení, technologie odhadnuta heuristicky; k ověření kurátorem'
 ---
 
 # Systémy a adresy Pirátů
 
-Automatický audit domén `*.pirati.cz` a známých externích služeb strany: co na adrese běží, jestli odpovídá, zda vyžaduje přihlášení a k čemu slouží. Sonda je jeden HTTP GET bez přihlášení; odhad technologie je heuristika. Popisy označené „(ověřit)“ jsou odhad, ne potvrzený stav.
+Automatický audit domén `*.pirati.cz` a známých externích služeb strany: co na adrese běží, jestli odpovídá, zda vyžaduje přihlášení a k čemu slouží. Sonda je jeden HTTP GET bez přihlášení; odhad technologie je heuristika. Popisy označené „(ověřit)“ jsou odhad, ne potvrzený stav. Popisy jsou heuristické (title, meta, markery technologií) a k ověření; citujte adresu samotného systému v řádku tabulky.
 
 Kandidátů celkem 359 (crt.sh 241, odkazy v datech 171, patičky a seznam webů 157, ruční seznam 201); sondováno 150, z toho odpovídá 122, vyžaduje přihlášení 7, bez odpovědi 28 (`neaktivni.jsonl`), nesondováno 209 (`neproverene.jsonl`, hlavně místní weby na Majáku, které pokrývá `data/subweby/`).
 
