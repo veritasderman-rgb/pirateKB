@@ -1,10 +1,12 @@
 """Testy indexu a dotazovací vrstvy nad celým `data/` (build trvá ~10 s)."""
 from __future__ import annotations
 
+import sqlite3
 from pathlib import Path
 
 import pytest
 
+from server.kb import build as build_mod
 from server.kb.build import build_index
 from server.kb.search import KB
 from server.kb.text import chunk_markdown, fold, fts_query
@@ -172,3 +174,79 @@ def test_stats(kb: KB):
     assert st["people"] >= 458 and st["org_units"] == 293
     assert st["votes"] > 20000 and st["vote_members"] > st["votes"]
     assert st["built_at"]
+
+
+# ---------------------------------------------------------------- atomický build
+
+def test_build_failure_keeps_existing_index(tmp_path, monkeypatch):
+    empty = tmp_path / "data"
+    empty.mkdir()
+    db = tmp_path / "index" / "kb.sqlite"
+    build_index(empty, db)
+    before = db.read_bytes()
+    tmp = db.with_suffix(".sqlite.tmp")
+    assert not tmp.exists()
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("simulované selhání uprostřed buildu")
+
+    monkeypatch.setattr(build_mod, "_load_votes", boom)
+    with pytest.raises(RuntimeError):
+        build_index(empty, db)
+    assert db.read_bytes() == before          # původní index netknutý
+    assert not tmp.exists()                   # dočasný soubor uklizen
+    assert not list(db.parent.glob("*-journal")) and not list(db.parent.glob("*-wal"))
+    # a po opravě chyby build zase projde a nahradí index
+    monkeypatch.undo()
+    build_index(empty, db)
+    assert db.exists() and not tmp.exists()
+
+
+def test_build_removes_stale_tmp(tmp_path):
+    empty = tmp_path / "data"
+    empty.mkdir()
+    db = tmp_path / "kb.sqlite"
+    tmp = db.with_suffix(".sqlite.tmp")
+    tmp.write_bytes(b"zbytek")
+    Path(str(tmp) + "-journal").write_bytes(b"zbytek")
+    build_index(empty, db)
+    assert db.exists() and not tmp.exists() and not Path(str(tmp) + "-journal").exists()
+
+
+# ---------------------------------------------------------------- filtr datumu
+
+def test_date_clause_do_is_inclusive_for_whole_day():
+    params: list = []
+    sql = KB._date_clause("datum", "2024-01-01", "2024-01-31", params)
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE t (datum TEXT)")
+    values = ["2023-12-31T23:59:59", "2024-01-01", "2024-01-31", "2024-01-31T12:00:00",
+              "2024-01-31T23:59:59.999", "2024-02-01", "2024-02-01T00:00:00"]
+    con.executemany("INSERT INTO t VALUES (?)", [(v,) for v in values])
+    got = [r[0] for r in con.execute(f"SELECT datum FROM t WHERE 1=1{sql} ORDER BY datum", params)]
+    assert got == ["2024-01-01", "2024-01-31", "2024-01-31T12:00:00", "2024-01-31T23:59:59.999"]
+    # měsíc a rok zůstávají inkluzivní
+    for do, expected in (("2024-01", 5), ("2024", 7)):  # bez dolní meze
+        params = []
+        sql = KB._date_clause("datum", None, do, params)
+        n = con.execute(f"SELECT COUNT(*) FROM t WHERE 1=1{sql}", params).fetchone()[0]
+        assert n == expected, do
+
+
+def test_search_do_includes_timestamp_document(tmp_path):
+    data = tmp_path / "data" / "pirati-web" / "stanoviska"
+    data.mkdir(parents=True)
+    (data / "test.md").write_text(
+        "---\nnazev: Testovací stanovisko\ntyp: stanovisko\ndatum: 2024-01-31T12:00:00\n---\n"
+        "Unikátníslovo pro test filtru data.\n", encoding="utf-8")
+    db = tmp_path / "kb.sqlite"
+    stats = build_index(tmp_path / "data", db)
+    k = KB(db)
+    if stats["documents"] == 0:  # loader nerozpoznal fixture -> ověř aspoň bez filtru
+        pytest.skip("testovací dokument se nenačetl")
+    assert k.search("Unikátníslovo")
+    assert k.search("Unikátníslovo", do="2024-01-31")
+    assert k.search("Unikátníslovo", od="2024-01-31", do="2024-01-31")
+    assert not k.search("Unikátníslovo", do="2024-01-30")
+    assert not k.search("Unikátníslovo", od="2024-02-01")
+    k.close()

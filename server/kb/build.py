@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import re
 import sqlite3
 import subprocess
@@ -462,18 +463,48 @@ def _load_brand(data_dir: Path) -> dict:
 
 # ---------------------------------------------------------------- hlavní build
 
-def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False) -> dict:
-    """Vytvoří (znovu) SQLite index `db_path` z `data_dir` a vrátí statistiky."""
-    data_dir = Path(data_dir)
-    db_path = Path(db_path)
-    t0 = time.perf_counter()
-    db_path.parent.mkdir(parents=True, exist_ok=True)
+def _remove_db_files(path: Path) -> None:
+    """Smaže SQLite soubor včetně případných `-journal`/`-wal`/`-shm` souborů."""
     for suffix in ("", "-journal", "-wal", "-shm"):
-        p = db_path.with_name(db_path.name + suffix)
+        p = path.with_name(path.name + suffix)
         if p.exists():
             p.unlink()
 
+
+def build_index(data_dir: Path, db_path: Path, *, verbose: bool = False) -> dict:
+    """Vytvoří (znovu) SQLite index `db_path` z `data_dir` a vrátí statistiky.
+
+    Builduje se do dočasného souboru vedle cíle a teprve po úspěšném dokončení se
+    atomicky nahradí (`os.replace`). Při chybě zůstává původní index netknutý
+    a dočasný soubor se smaže.
+    """
+    data_dir = Path(data_dir)
+    db_path = Path(db_path)
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = db_path.with_suffix(".sqlite.tmp")
+    _remove_db_files(tmp_path)  # zbytek po předchozím přerušeném buildu
+    try:
+        stats = _build_into(data_dir, tmp_path, verbose=verbose)
+        os.replace(tmp_path, db_path)
+    except BaseException:
+        _remove_db_files(tmp_path)
+        raise
+    stats["db_bytes"] = db_path.stat().st_size
+    return stats
+
+
+def _build_into(data_dir: Path, db_path: Path, *, verbose: bool = False) -> dict:
+    """Sestaví index do `db_path` (který nesmí existovat) a vrátí statistiky."""
+    t0 = time.perf_counter()
     con = sqlite3.connect(db_path)
+    try:
+        return _build_with_connection(data_dir, db_path, con, t0, verbose)
+    finally:
+        con.close()  # idempotentní; při výjimce uvolní soubor před smazáním
+
+
+def _build_with_connection(data_dir: Path, db_path: Path, con: sqlite3.Connection,
+                           t0: float, verbose: bool) -> dict:
     con.execute("PRAGMA journal_mode=OFF")
     con.execute("PRAGMA synchronous=OFF")
     con.execute("PRAGMA temp_store=MEMORY")

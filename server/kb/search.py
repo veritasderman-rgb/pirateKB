@@ -78,7 +78,9 @@ class KB:
             params.append(od)
         if do:
             sql += f" AND {column} <= ?"
-            params.append(do + ("~" if len(do) < 10 else ""))  # 'do' včetně celého dne/měsíce
+            # 'do' je inkluzivní pro celý den/měsíc/rok: '~' řadí za cifry i za 'T' v ISO timestampu,
+            # takže '2024-01-31' pokryje i '2024-01-31T12:00:00'
+            params.append(do + ("~" if len(do) <= 10 else ""))
         return sql
 
     # ------------------------------------------------------------ fulltext
