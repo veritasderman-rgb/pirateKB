@@ -1,0 +1,240 @@
+# Zdroje mediálního monitoringu (ingest/media.py). URL kanálů ověřeny 2026-10-06.
+#
+# rss:               veřejné RSS kanály českých médií. `aktivni: false` = kanál v době ověření
+#                    neexistoval nebo vracel prázdný výstup; skript ho přeskočí (po nalezení
+#                    funkční URL ji opravte a nastavte true). `domena` slouží k pojmenování média
+#                    i u článků z Google News a GDELT. Kanály dávají jen posledních 20 až 150
+#                    položek (Respekt 2000), takže RSS pokrývá jen poslední dny.
+# nazvy_medii:       doména -> název média pro zdroje bez vlastního RSS (hledá se i podle
+#                    nadřazené domény: ct24.ceskatelevize.cz -> ceskatelevize.cz)
+# vyloucene_domeny:  nikdy neukládat (vlastní weby strany pokrývají jiné konektory; agregátory)
+# vyloucene_url:     regulární výrazy na URL, které nejsou články (profilové stránky, diskuze pod článkem)
+# google_news:       šablona dotazu; GDELT viz gdelt.
+rss:
+  - nazev: iROZHLAS
+    domena: irozhlas.cz
+    url: https://www.irozhlas.cz/rss/irozhlas
+    aktivni: true
+  - nazev: iROZHLAS
+    domena: irozhlas.cz
+    url: https://www.irozhlas.cz/rss/irozhlas/section/zpravy-domov
+    aktivni: true
+    poznamka: rubrika Zprávy z domova
+  - nazev: ČT24
+    domena: ceskatelevize.cz
+    url: https://ct24.ceskatelevize.cz/rss/hlavni-zpravy
+    aktivni: true
+  - nazev: ČT24
+    domena: ceskatelevize.cz
+    url: https://ct24.ceskatelevize.cz/rss/domaci
+    aktivni: true
+    poznamka: rubrika Domácí
+  - nazev: Seznam Zprávy
+    domena: seznamzpravy.cz
+    url: https://www.seznamzpravy.cz/rss
+    aktivni: true
+  - nazev: Seznam Zprávy
+    domena: seznamzpravy.cz
+    url: https://www.seznamzpravy.cz/rss/politika
+    aktivni: true
+    poznamka: rubrika Politika
+  - nazev: Novinky.cz
+    domena: novinky.cz
+    url: https://www.novinky.cz/rss
+    aktivni: true
+  - nazev: Novinky.cz
+    domena: novinky.cz
+    url: https://www.novinky.cz/rss/domaci
+    aktivni: true
+    poznamka: rubrika Domácí
+  - nazev: Aktuálně.cz
+    domena: aktualne.cz
+    url: https://www.aktualne.cz/rss/
+    aktivni: true
+  - nazev: Aktuálně.cz
+    domena: aktualne.cz
+    url: https://www.aktualne.cz/rss/domaci/
+    aktivni: true
+    poznamka: rubrika Domácí
+  - nazev: iDNES.cz
+    domena: idnes.cz
+    url: https://servis.idnes.cz/rss.aspx?c=zpravodaj
+    aktivni: true
+  - nazev: iDNES.cz
+    domena: idnes.cz
+    url: https://servis.idnes.cz/rss.aspx?c=domaci
+    aktivni: true
+    poznamka: rubrika Domácí
+  - nazev: Deník N
+    domena: denikn.cz
+    url: https://denikn.cz/feed/
+    aktivni: true
+  - nazev: Deník N
+    domena: denikn.cz
+    url: https://denikn.cz/minuta/feed/
+    aktivni: true
+    poznamka: Minuta N (krátké zprávy)
+  - nazev: Lidovky.cz
+    domena: lidovky.cz
+    url: https://servis.lidovky.cz/rss.aspx?c=ln_domov
+    aktivni: true
+  - nazev: Hospodářské noviny
+    domena: hn.cz
+    url: https://ihned.cz/?m=rss
+    aktivni: true
+    poznamka: 150 položek; články za paywallem, v RSS je jen perex
+  - nazev: Hospodářské noviny
+    domena: hn.cz
+    url: https://domaci.hn.cz/?m=rss
+    aktivni: true
+    poznamka: rubrika Domácí
+  - nazev: Echo24
+    domena: echo24.cz
+    url: https://www.echo24.cz/rss/s
+    aktivni: true
+    poznamka: echo24.cz/rss vrací 404, funkční kanál je uveden v hlavičce webu
+  - nazev: Forum24
+    domena: forum24.cz
+    url: https://www.forum24.cz/feed
+    aktivni: true
+  - nazev: Deník
+    domena: denik.cz
+    url: https://www.denik.cz/rss/vse.xml
+    aktivni: true
+    poznamka: celostátní kanál (rss/zpravy.html na něj přesměrovává)
+  - nazev: Blesk
+    domena: blesk.cz
+    url: https://www.blesk.cz/rss
+    aktivni: true
+  - nazev: Blesk
+    domena: blesk.cz
+    url: https://www.blesk.cz/rss/zpravy-politika
+    aktivni: true
+    poznamka: rubrika Politika
+  - nazev: Reflex
+    domena: reflex.cz
+    url: https://www.reflex.cz/rss
+    aktivni: true
+  - nazev: Respekt
+    domena: respekt.cz
+    url: https://www.respekt.cz/api/rss
+    aktivni: true
+    poznamka: 2000 položek (cca 1,7 MB na stažení), proto cache 1 h; pokrývá i několik měsíců zpět
+  - nazev: ČTK (České noviny)
+    domena: ceskenoviny.cz
+    url: https://www.ceskenoviny.cz/sluzby/rss/zpravy.php
+    aktivni: true
+  - nazev: ČTK (České noviny)
+    domena: ceskenoviny.cz
+    url: https://www.ceskenoviny.cz/sluzby/rss/domov.php
+    aktivni: true
+    poznamka: rubrika Domov
+  - nazev: ParlamentníListy.cz
+    domena: parlamentnilisty.cz
+    url: https://www.parlamentnilisty.cz/export/rss.aspx
+    aktivni: true
+    poznamka: 100 položek; hodně politických zmínek, nízký redakční standard (přebírá tiskové zprávy a výroky bez ověření)
+  - nazev: TN.cz
+    domena: tn.nova.cz
+    url: https://tn.nova.cz/rss
+    aktivni: true
+  - nazev: CNN Prima News
+    domena: cnn.iprima.cz
+    url: https://cnn.iprima.cz/rss
+    aktivni: true
+  - nazev: Info.cz
+    domena: info.cz
+    url: https://www.info.cz/rss
+    aktivni: true
+  - nazev: Hlídací pes
+    domena: hlidacipes.org
+    url: https://hlidacipes.org/feed/
+    aktivni: true
+  - nazev: Alarm
+    domena: a2larm.cz
+    url: https://a2larm.cz/feed/
+    aktivni: true
+  - nazev: Deník Referendum
+    domena: denikreferendum.cz
+    url: https://denikreferendum.cz/rss
+    aktivni: false
+    poznamka: 2026-10-06 /rss i /feed vrací 404, web neinzeruje žádný kanál
+  - nazev: EuroZprávy.cz
+    domena: eurozpravy.cz
+    url: https://eurozpravy.cz/rss/
+    aktivni: false
+    poznamka: 2026-10-06 vrací 404, web neinzeruje žádný kanál
+
+nazvy_medii:
+  irozhlas.cz: iROZHLAS
+  rozhlas.cz: Český rozhlas
+  ceskatelevize.cz: ČT24
+  seznamzpravy.cz: Seznam Zprávy
+  novinky.cz: Novinky.cz
+  aktualne.cz: Aktuálně.cz
+  idnes.cz: iDNES.cz
+  denikn.cz: Deník N
+  lidovky.cz: Lidovky.cz
+  hn.cz: Hospodářské noviny
+  ihned.cz: Hospodářské noviny
+  echo24.cz: Echo24
+  forum24.cz: Forum24
+  denik.cz: Deník
+  blesk.cz: Blesk
+  reflex.cz: Reflex
+  respekt.cz: Respekt
+  ceskenoviny.cz: ČTK (České noviny)
+  parlamentnilisty.cz: ParlamentníListy.cz
+  tn.nova.cz: TN.cz
+  nova.cz: TV Nova
+  cnn.iprima.cz: CNN Prima News
+  iprima.cz: Prima
+  info.cz: Info.cz
+  hlidacipes.org: Hlídací pes
+  a2larm.cz: Alarm
+  e15.cz: E15
+  euro.cz: Euro
+  tyden.cz: Týden
+  expres.cz: Expres.cz
+  extra.cz: Extra.cz
+  eurozpravy.cz: EuroZprávy.cz
+  denikreferendum.cz: Deník Referendum
+  prazsky.denik.cz: Pražský deník
+  ctidoma.cz: ČtiDoma
+  zpravy.aktualne.cz: Aktuálně.cz
+  ekonom.cz: Ekonom
+  lupa.cz: Lupa.cz
+  root.cz: Root.cz
+  radiozurnal.rozhlas.cz: Radiožurnál
+  plus.rozhlas.cz: Český rozhlas Plus
+  denikalarm.cz: Alarm
+  mediar.cz: Médiář
+  neovlivni.cz: Neovlivní.cz
+  investigace.cz: investigace.cz
+  romea.cz: Romea.cz
+  halonoviny.cz: Haló noviny
+  pravdive.eu: pravdive.eu
+  prvnizpravy.cz: Prvnizpravy.cz
+  nasregion.cz: Náš region
+  drbna.cz: Drbna
+
+vyloucene_domeny:
+  - pirati.cz
+  - news.google.com
+
+vyloucene_url:
+  - parlamentnilisty\.cz/profily/
+  - forum24\.cz/.*diskuze
+  - /diskuze(/|$|\?)
+  - /komentare/\d+$
+
+google_news:
+  url: https://news.google.com/rss/search
+  parametry: {hl: cs, gl: CZ, ceid: "CZ:cs"}
+  poznamka: "cca 100 nejnovějších položek na dotaz; s operátory after:/before: jen vzorek 20 až 40 na měsíc"
+
+gdelt:
+  url: https://api.gdeltproject.org/api/v2/doc/doc
+  poznamka: >-
+    ArtList, max 250 záznamů na dotaz, dotaz omezen na sourcelang:czech. Limit 1 požadavek za 5 s
+    na IP adresu; při překročení vrací 429 (textově). Indexuje jen část českých médií a nedává perex.
