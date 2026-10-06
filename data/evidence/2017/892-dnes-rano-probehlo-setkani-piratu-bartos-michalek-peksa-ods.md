@@ -1,0 +1,42 @@
+---
+zdroj: https://evidence.pirati.cz/report/892/
+nazev: Dnes rano probehlo setkani Piratu (Bartos, Michalek, Peksa), ODS (Fiala…
+typ: schuzka
+autorita: oficialni-evidence
+datum: '2017-11-08'
+autor: Mikulas Peksa
+autor_url: https://evidence.pirati.cz/author/28/
+ucastnici_nasi: []
+ucastnici_ostatni: []
+publikovano: '2017-11-08T15:20:00+01:00'
+upraveno: '2017-11-08T15:20:00+01:00'
+odkaz_forum: https://forum.pirati.cz/viewtopic.php?p=527102#p527102
+viditelnost: verejne
+stazeno: '2026-10-06'
+---
+
+# Dnes rano probehlo setkani Piratu (Bartos, Michalek, Peksa), ODS (Fiala…
+
+Schůzka 8. 11. 2017. Zapsal/a: Mikulas Peksa (zveřejněno 2017-11-08 v Evidenci kontaktů a schůzek).
+
+Dnes rano probehlo setkani Piratu (Bartos, Michalek, Peksa), ODS (Fiala, Stanjura), TOP 09 (Kalousek, Adamova) a STAN (Rakusan, Farsky). Ze setkani obratem vznikla tiskova zprava:
+
+Na setkání u kulatého stolu iniciovaném Piráty se opoziční strany shodly, že Mandátový a imunitní výbor nelze ponechat v řízení hnutí ANO. „Všichni zúčastnění souhlasili, že tento výbor nesmí řídit zástupce ANO, jelikož se jedná o orgán, který bude hlasovat o vydání poslanců Andreje Babiše a Jaroslava Faltýnka,“ uvedl předseda poslaneckého klubu Pirátů Jakub Michálek. Tématem setkání dále byla koordinace požadavků opozičních stran k obsazení funkcí předsedů výborů a komisí a také řešení rizik vyplývajících z možných scénářů vlády bez důvěry nebo menšinové vlády ANO s podporou SPD a KSČM.
+
+„Bilaterální vyjednáváni, kdy se každý zvlášť setkává s ANO, nepřináší dle našeho názoru výraznější posun v prosazování programové priority do účasti na výborech ve Sněmovně. Chtěli jsme nabídnout otevřenou platformu, kde si navzájem tyto priority vyjasníme, a to se podařilo. Osobně mě mrzí, že se schůzky neúčastnili zástupci ČSSD a lidovců, každopádně je budeme informovat a na tuto společnou diskuzní “palubu” mohou kdykoliv přistoupit. Zejména kontrolní role v kritických komisích a výborech je jistě i v jejich zájmu,” uvedl předseda Pirátů Ivan Bartoš.
+
+Předseda klubu Michálek k tomu doplňuje: „Shodli jsme se, že zástupci všech parlamentních stran musí mít své zastoupení v Bezpečnostním výboru, Volební komisi a Mandátovém a imunitním výboru. Stejně tak jsme se shodli, že předsedové kontrolních komisí Sněmovny například pro BIS či GIBS by měli být z opozice a tyto komise musí být sestaveny paritním způsobem. Probírali jsme rizika menšinové vlády ANO s případnou podporou SPD a KSČM, Piráti apelovali na to, abychom si přesně identifikovali rizika a navrhli i možné scénáře jejich řešení“.
+
+## Přijaté výhody
+
+informace
+
+## Poskytnuté výhody
+
+informace, nejaky mineralky, kafe a takovy veci z rozpoctu klubu
+
+## Účastníci
+
+Naši účastníci: neuvedeno
+
+Ostatní účastníci: neuvedeno

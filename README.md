@@ -27,7 +27,7 @@ přihlášení zatím chybí. Architektura a plán realizace jsou v
 | styleguide.pirati.cz | písma | 11 |
 
 **Ingest** ([`ingest/`](ingest/README.md)): skripty `styleguide`, `psp`, `lide_pirati`,
-`pirati_web` a kontrola `validate`; aktualizace jedním příkazem `scripts/update_data.sh`.
+`pirati_web` a kontrola `validate`; aktualizace jedním příkazem `scripts/update_data.sh denni|tydenni`.
 
 **MCP server** ([`server/`](server/README.md)): SQLite index s plnotextovým hledáním,
 12 toolů (hledání, dokumenty, lidé, organizační struktura, program, stanoviska,
@@ -37,6 +37,16 @@ HTTP, je připravený Docker image.
 
 **Zatím chybí:** wiki.pirati.cz a mrak.pirati.cz, kurátorovaný obsah (`content/`),
 členská vrstva a přihlášení (OAuth), vyhledávání podle významu (embeddingy).
+
+## Automatické aktualizace
+
+[![Aktualizace dat](https://github.com/veritasderman-rgb/pirateKB/actions/workflows/update-data.yml/badge.svg)](https://github.com/veritasderman-rgb/pirateKB/actions/workflows/update-data.yml)
+
+Data se obnovují sama v GitHub Actions: denně rychlé inkrementy (nové schůzky, příspěvky,
+aktuality) a v neděli všechny zdroje. Změny se commitnou do `main`, což spustí nový build
+na Vercelu. Kdy a jak dopadl který zdroj, je v [`data/AKTUALIZACE.md`](data/AKTUALIZACE.md)
+(dostupné i přes MCP server). Jak to spustit ručně, přidat zdroj a nastavit klíče:
+[`docs/rutiny.md`](docs/rutiny.md).
 
 ## Rychlý start
 

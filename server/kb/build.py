@@ -37,7 +37,7 @@ CREATE TABLE documents (
     tagy        TEXT,       -- JSON list
     autorita    TEXT,
     viditelnost TEXT,
-    kolekce     TEXT,       -- pirati-web | lide | psp | brand
+    kolekce     TEXT,       -- pirati-web | lide | psp | brand | social
     meta        TEXT,       -- JSON celý frontmatter
     body        TEXT,
     delka       INTEGER
@@ -138,6 +138,31 @@ CREATE TABLE vote_members (
 CREATE INDEX vote_members_jmeno ON vote_members(jmeno_fold, id_hlasovani);
 CREATE INDEX vote_members_vote ON vote_members(id_hlasovani);
 
+CREATE TABLE social_posts (
+    pk          INTEGER PRIMARY KEY,   -- stabilní rowid pro FTS (přežije VACUUM)
+    id          TEXT NOT NULL,         -- id příspěvku na platformě
+    platforma   TEXT NOT NULL,         -- x | bluesky
+    ucet        TEXT,                  -- handle bez @
+    jmeno       TEXT,
+    jmeno_fold  TEXT,                  -- jméno bez diakritiky (filtr na osobu)
+    datum       TEXT,                  -- ISO 8601 s časem
+    text        TEXT,
+    url         TEXT,
+    je_odpoved  INTEGER NOT NULL DEFAULT 0,
+    je_repost   INTEGER NOT NULL DEFAULT 0,
+    lajky       INTEGER,
+    reposty     INTEGER,
+    odpovedi    INTEGER,
+    UNIQUE (platforma, id)
+);
+CREATE INDEX social_posts_datum ON social_posts(datum);
+CREATE INDEX social_posts_jmeno ON social_posts(jmeno_fold, datum);
+CREATE VIRTUAL TABLE social_posts_fts USING fts5(
+    text, jmeno,
+    content='social_posts', content_rowid='pk',
+    tokenize="unicode61 remove_diacritics 2"
+);
+
 CREATE TABLE meta (
     klic    TEXT PRIMARY KEY,
     hodnota TEXT
@@ -163,7 +188,10 @@ def _s(value) -> str | None:
 
 
 def _read_md(path: Path) -> tuple[dict, str] | None:
-    raw = path.read_text(encoding="utf-8")
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except FileNotFoundError:  # soubor zmizel mezi výčtem a čtením (souběžný ingest)
+        return None
     fm_text, body = split_frontmatter(raw)
     if fm_text is None:
         return None
@@ -420,6 +448,55 @@ def _load_votes(data_dir: Path, con: sqlite3.Connection) -> dict:
     return {"votes": n_votes, "vote_members": n_members}
 
 
+# ---------------------------------------------------------------- sociální sítě
+
+def _int(value) -> int | None:
+    try:
+        return int(value) if value is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _load_social(data_dir: Path, con: sqlite3.Connection) -> dict:
+    """Příspěvky poslanců na sociálních sítích z `data/social/<platforma>/<handle>.jsonl`.
+
+    Složka nemusí existovat (konektor ještě neběžel) – pak je tabulka prázdná. Markdown
+    měsíční přehledy ve stejné složce se indexují jako běžné dokumenty (typ
+    `prispevek-socialni-site`), tady se zpracují jen JSONL záznamy.
+    """
+    social = data_dir / "social"
+    if not social.is_dir():
+        return {"social_posts": 0}
+    rows = []
+    seen: set[tuple[str, str]] = set()
+    for path in sorted(social.rglob("*.jsonl")):
+        platforma_dir = path.relative_to(social).parts[0] if len(path.relative_to(social).parts) > 1 else None
+        for rec in _read_jsonl(path):
+            if not isinstance(rec, dict) or rec.get("id") is None:
+                continue
+            platforma = str(rec.get("platforma") or platforma_dir or "").strip().lower()
+            key = (platforma, str(rec["id"]))
+            if key in seen:
+                continue
+            seen.add(key)
+            pocty = rec.get("pocty") or {}
+            if not isinstance(pocty, dict):
+                pocty = {}
+            ucet = str(rec.get("ucet") or path.stem).strip().lstrip("@")
+            jmeno = _s(rec.get("jmeno")) or ucet
+            rows.append((
+                str(rec["id"]), platforma, ucet, jmeno, fold(jmeno), _s(rec.get("datum")),
+                _s(rec.get("text")) or "", _s(rec.get("url")),
+                1 if rec.get("je_odpoved") else 0, 1 if rec.get("je_repost") else 0,
+                _int(pocty.get("lajky")), _int(pocty.get("reposty")), _int(pocty.get("odpovedi")),
+            ))
+    con.executemany(
+        "INSERT INTO social_posts(id, platforma, ucet, jmeno, jmeno_fold, datum, text, url, "
+        "je_odpoved, je_repost, lajky, reposty, odpovedi) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
+    con.execute("INSERT INTO social_posts_fts(social_posts_fts) VALUES ('rebuild')")
+    return {"social_posts": len(rows)}
+
+
 # ---------------------------------------------------------------- brand
 
 _MATERIAL_ROW_RE = re.compile(r"^\|\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(\S+?)\s*\|\s*$")
@@ -516,6 +593,7 @@ def _build_with_connection(data_dir: Path, db_path: Path, con: sqlite3.Connectio
         ("people", lambda: _load_people(data_dir, con)),
         ("org_units", lambda: _load_org_units(data_dir, con)),
         ("votes", lambda: _load_votes(data_dir, con)),
+        ("social", lambda: _load_social(data_dir, con)),
     )
     for name, fn in steps:
         t = time.perf_counter()
@@ -538,7 +616,7 @@ def _build_with_connection(data_dir: Path, db_path: Path, con: sqlite3.Connectio
         "built_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         "data_dir": str(data_dir.resolve()),
         "data_commit": _git_commit(data_dir),
-        "schema_version": "1",
+        "schema_version": "2",
         "brand": _j(brand),
     }
     for k, v in stats.items():

@@ -2,7 +2,7 @@
 
 Server zpřístupňuje [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 znalostní bázi České pirátské strany: lidi a organizační strukturu, program, tiskové
-zprávy, hlasování poslanců, brand a šablony. AI asistent (Claude, ChatGPT, Cursor…) se
+zprávy, hlasování poslanců, příspěvky poslanců na X a Bluesky, brand a šablony. AI asistent (Claude, ChatGPT, Cursor…) se
 pak místo hádání ptá přímo do báze a u odpovědí uvádí zdroj.
 
 Data pocházejí z [`data/`](../data/README.md) (automaticky vytěžená, zatím
@@ -11,8 +11,9 @@ nekurátorovaná). Architektura je v [`docs/navrh-architektury.md`](../docs/navr
 ## Co server umí
 
 Server při startu otevře SQLite index (`index/kb.sqlite`) postavený z `data/` a
-nabízí AI čtyři druhy věcí. Tooly volá AI sama podle potřeby, prompty si vybírá
-uživatel (v Claude Desktopu v nabídce „+“), resources jsou čtecí odkazy.
+nabízí AI čtyři druhy věcí (14 toolů, 5 promptů, 5 resources). Tooly volá AI sama
+podle potřeby, prompty si vybírá uživatel (v Claude Desktopu v nabídce „+“), resources
+jsou čtecí odkazy.
 
 | Typ | Název | K čemu slouží |
 |---|---|---|
@@ -25,6 +26,8 @@ uživatel (v Claude Desktopu v nabídce „+“), resources jsou čtecí odkazy.
 | tool | `get_position` | stanovisko strany k tématu (program, usnesení, stanoviska) s uvedením autority zdroje |
 | tool | `search_press_releases` | hledání v tiskových zprávách a aktualitách, filtr podle data a tématu |
 | tool | `get_voting_record` | hlasování pirátských poslanců ve Sněmovně (podle poslance, tématu, období) |
+| tool | `get_social_posts` | příspěvky pirátských poslanců na X a Bluesky (podle osoby, tématu, platformy, data); vyjádření jednotlivce, ne stanovisko strany, vždy s URL příspěvku |
+| tool | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec k tématu s veřejným kontaktem (e-mail, telefon jen pokud je na pirati.cz); ostatní tooly ho nabídnou samy, když báze přesnou odpověď nemá |
 | tool | `get_brand` | barvy a písma z grafického manuálu |
 | tool | `get_template` | šablona podle typu (např. tisková zpráva) |
 | tool | `kb_stats` | co je v bázi: počty dokumentů podle typu, stáří dat |
@@ -261,6 +264,12 @@ můžete dodat „použij znalostní bázi Pirátů“.
 8. „Shrň, co jsme za poslední měsíc vydali v tiskových zprávách.“
 9. „Připrav scénář 30sekundového reelsu o transparentnosti veřejných zakázek.“
 10. „Občan se ptá, proč Piráti podporují digitalizaci státní správy a jestli to neohrozí jeho soukromí. Navrhni slušnou odpověď.“
+
+11. „Co psal Ivan Bartoš na X k bydlení za poslední měsíc?“ (tool `get_social_posts`; odpověď
+    musí označit příspěvky jako názor jednotlivce, ne stanovisko strany)
+12. „Kdo mi odpoví na otázku k reformě školství?“ (tool `find_expert`; když báze přesnou
+    odpověď nemá, AI řekne „Přesnou odpověď jsem nenašel, ale nejlepší osobou k zodpovězení
+    je …“ s e-mailem, telefon jen pokud je na pirati.cz)
 
 Další nápady: „Kolik poslanců dnes Piráti mají?“, „Které programové dokumenty
 existují?“, „Co všechno v bázi je a jak je stará?“ (tool `kb_stats`).

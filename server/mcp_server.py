@@ -46,7 +46,8 @@ DOC_PAGE_CHARS = 7000     # velikost stránky pro get_document
 
 DOC_TYPES = ["tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument",
              "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
-             "materialy"]
+             "materialy", "prispevek-socialni-site"]
+SOCIAL_PLATFORMS = ["x", "bluesky"]
 TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev"]
 BRAND_PARTS = ["vse", "barvy", "fonty", "loga", "pravidla"]
 
@@ -60,24 +61,29 @@ AUTORITA_POPIS = {
     "oficialni-styleguide": "oficiální styleguide.pirati.cz",
     "oficialni-data-psp": "otevřená data Poslanecké sněmovny",
     "nazor-jednotlivce": "názor jednotlivce (NENÍ stanovisko strany)",
+    "vyjadreni-politika": "vyjádření politika na sociální síti (názor jednotlivce, NENÍ stanovisko strany)",
 }
 AUTORITA_PODLE_TYPU = {
     "program": "program", "programovy-dokument": "program", "stanovisko": "stanovisko",
     "predpis": "usneseni", "tiskova-zprava": "tz", "aktualita": "web", "rozcestnik": "web",
     "osoba": "oficialni-evidence", "organizacni-jednotka": "oficialni-evidence",
     "brand": "oficialni-styleguide", "hlasovani": "oficialni-data-psp", "materialy": "web",
+    "prispevek-socialni-site": "vyjadreni-politika",
 }
 
 SERVER_INSTRUCTIONS = """Znalostní báze České pirátské strany (lidé, organizace, program,
-stanoviska, tiskové zprávy, hlasování v PSP, brand, šablony). Data jsou automaticky
-vytěžená z veřejných zdrojů (pirati.cz, lide.pirati.cz, psp.cz, styleguide.pirati.cz)
-a nejsou kurátorovaná. Pravidla pro odpovědi:
+stanoviska, tiskové zprávy, hlasování v PSP, příspěvky poslanců na X a Bluesky, brand,
+šablony). Data jsou automaticky vytěžená z veřejných zdrojů (pirati.cz, lide.pirati.cz,
+psp.cz, styleguide.pirati.cz, X, Bluesky) a nejsou kurátorovaná. Pravidla pro odpovědi:
 1. U každého tvrzení cituj URL ze pole „Zdroj“.
 2. Rozlišuj autoritu: program a usnesení = oficiální postoj strany; tisková zpráva =
-   oficiální výstup, ale ne usnesení; článek na webu, profil, názor jednotlivce ≠ stanovisko strany.
+   oficiální výstup, ale ne usnesení; článek na webu, profil, názor jednotlivce nebo
+   příspěvek poslance na sociální síti ≠ stanovisko strany.
 3. Nikdy nevymýšlej stanoviska. Pokud báze nic nemá, řekni to a navrhni, u koho to ověřit.
 4. Začni toolem search_kb nebo get_position; pro lidi find_people, pro brand get_brand,
-   pro šablony get_template."""
+   pro šablony get_template, pro vyjádření poslanců na sítích get_social_posts.
+5. Když báze nemá přesnou odpověď, řekni to a doporuč konkrétní osobu s kontaktem
+   (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu."""
 
 
 # =============================================================================
@@ -174,16 +180,24 @@ def _blank(value: Any) -> bool:
     return value is None or not str(value).strip()
 
 
-def _cap(text: str, hint: str = "") -> str:
-    """Ořízne výstup na MAX_CHARS a připojí nápovědu, jak získat zbytek."""
-    if len(text) <= MAX_CHARS:
+def _cap(text: str, hint: str = "", limit: int | None = None) -> str:
+    """Ořízne výstup na ``limit`` (výchozí MAX_CHARS) a připojí nápovědu, jak získat zbytek."""
+    limit = MAX_CHARS if limit is None else max(2000, int(limit))
+    if len(text) <= limit:
         return text
-    cut = text[:MAX_CHARS]
+    cut = text[:limit]
     nl = cut.rfind("\n")
-    if nl > MAX_CHARS * 0.7:
+    if nl > limit * 0.7:
         cut = cut[:nl]
     note = hint or "Zúž dotaz (filtr typ/od/do, menší limit) nebo použij get_document(doc_id)."
-    return cut + f"\n\n… *(výstup zkrácen na {MAX_CHARS} znaků z {len(text)}. {note})*"
+    return cut + f"\n\n… *(výstup zkrácen na {limit} znaků z {len(text)}. {note})*"
+
+
+def _cap_with_tail(main: str, tail: str, hint: str = "") -> str:
+    """Ořízne ``main`` tak, aby se za něj vešel krátký ``tail`` (citace, kontakt) do MAX_CHARS."""
+    if not tail:
+        return _cap(main, hint)
+    return _cap(main, hint, limit=MAX_CHARS - len(tail) - 2) + "\n\n" + tail
 
 
 def _autorita(item: dict) -> str:
@@ -252,6 +266,85 @@ def _full_matches(results: list[dict], query: str) -> tuple[list[dict], bool]:
         if all(s in hay for s in stems):
             full.append(r)
     return (full, True) if full else (results, False)
+
+
+LOW_SCORE = 6.0   # pod touto hodnotou nejlepšího výsledku nabídneme kontakt na experta
+NENASEL = "Přesnou odpověď jsem nenašel"
+
+
+def _fmt_expert_person(p: dict) -> str:
+    role = " – ".join(x for x in (_clean(p.get("role")), _clean(p.get("jednotka"))) if x)
+    line = f"**{_clean(p.get('jmeno'))}**" + (f", {role}" if role else "")
+    if p.get("poslanec"):
+        line += " (poslanec/poslankyně PSP)"
+    kontakt = []
+    if not _blank(p.get("email")):
+        kontakt.append(f"e-mail {p.get('email')}")
+    if not _blank(p.get("telefon")):
+        kontakt.append(f"tel. {p.get('telefon')} (z veřejného profilu na pirati.cz)")
+    line += "; kontakt: " + (", ".join(kontakt) if kontakt else "e-mail v bázi není, viz profil")
+    src = [u for u in (p.get("url"), p.get("profil_web")) if not _blank(u)]
+    if src:
+        line += f"; profil: {' | '.join(map(str, src))}"
+    return line
+
+
+def _fmt_expert_unit(u: dict) -> str:
+    line = f"**{_clean(u.get('nazev'))}**" + (f" ({_clean(u.get('zkratka'))})" if not _blank(u.get("zkratka")) else "")
+    vedeni = [f"{_clean(v.get('jmeno'))} ({_clean(v.get('role'))})" for v in u.get("vedeni") or [] if v.get("jmeno")]
+    if vedeni:
+        line += "; vedení: " + ", ".join(vedeni)
+    if not _blank(u.get("email")):
+        line += f"; e-mail {u.get('email')}"
+    if not _blank(u.get("url")):
+        line += f"; {u.get('url')}"
+    return line
+
+
+def _expert_section(tema: str, max_people: int = 3, max_units: int = 1,
+                    intro: str | None = None) -> str:
+    """Sekce „Přesnou odpověď jsem nenašel. Nejlepší osoba k dotazu:“ z find_expert.
+
+    Vrací prázdný řetězec, když KB find_expert nemá nebo selže (starší index)."""
+    try:
+        kb = get_kb()
+        fn = getattr(kb, "find_expert", None)
+        if fn is None:
+            return ""
+        res = fn(_clean(tema), limit=max(max_people, max_units)) or {}
+    except Exception as exc:  # noqa: BLE001
+        log.warning("find_expert selhal: %s", exc)
+        return ""
+    lide = (res.get("lide") or [])[:max_people]
+    jednotky = (res.get("jednotky") or [])[:max_units]
+    fb = res.get("fallback") or {}
+    if not (lide or jednotky or fb):
+        return ""
+    out = [intro or f"## {NENASEL}. Nejlepší osoba k dotazu:"]
+    out.extend(f"- {_fmt_expert_person(p)}" for p in lide)
+    out.extend(f"- Jednotka: {_fmt_expert_unit(u)}" for u in jednotky)
+    if fb and not lide and not jednotky:
+        out.append(f"- Obecný kontakt: {_fmt_expert_unit(fb)}")
+        out.extend(f"- {_fmt_expert_person(p)}" for p in (fb.get("lide") or [])[:2])
+    elif fb:
+        out.append(f"- Obecný kontakt: {_fmt_expert_unit(fb)}")
+    out.append(f"Odpověz uživateli: „{NENASEL}, ale nejlepší osobou k zodpovězení je <jméno>, "
+               "<role/jednotka>, kontakt: <e-mail, telefon jen pokud je v bázi>.“ "
+               "Autorita kontaktů: oficiální evidence lide.pirati.cz (stav k datu stažení dat).")
+    return "\n".join(out)
+
+
+def _weak(results: list[dict], query: str, full: bool = True) -> bool:
+    """Prázdný výsledek, nebo víceslovný dotaz bez úplné shody, nebo nízké skóre."""
+    if not results:
+        return True
+    if not full:
+        return True
+    try:
+        best = max(float(r.get("score") or 0.0) for r in results)
+    except (TypeError, ValueError):
+        return False
+    return best < LOW_SCORE
 
 
 def _kb_error(exc: Exception) -> str:
@@ -474,9 +567,16 @@ def search_kb(query: str, typ: list[str] | None = None, od: str | None = None,
     if not results:
         return (f"K dotazu „{q}“ báze nic nenašla"
                 + (f" (filtr typ={typy}" + (f", od={od}" if od else "") + (f", do={do}" if do else "") + ")" if typy or od or do else "")
-                + ". Zkus jiná slova, bez filtrů, nebo řekni uživateli, že KB k tématu nic nemá a co ověřit.")
+                + ". Zkus jiná slova, bez filtrů, nebo řekni uživateli, že KB k tématu nic nemá a co ověřit."
+                + "\n\n" + _expert_section(q))
+    _, full = _full_matches(results, q)
     head = f"Výsledky hledání „{q}“ ({len(results)}):\n\n"
-    return _cap(head + _fmt_results(results) + "\n\n" + _citace_veta(results))
+    # citační věta a kontakt mimo oříznutou část, aby je u dlouhého výstupu neuřízl limit délky
+    tail = _citace_veta(results)
+    if _weak(results, q, full):
+        tail += ("\n\n*(Výsledky jsou jen částečná shoda nebo slabá relevance; posuď je kriticky.)*\n\n"
+                 + _expert_section(q))
+    return _cap_with_tail(head + _fmt_results(results), tail)
 
 
 @mcp.tool(structured_output=False)
@@ -743,6 +843,11 @@ def get_program(tema: str, dokument: str | None = None) -> str:
                     parts.append(f"*(dalších {len(sekce) - 4} sekcí; použij get_document(\"{d['doc_id']}\"))*")
                 parts.append(f"Zdroj: {_s(sec.get('zdroj'))} | doc_id: `{d['doc_id']}`")
     results = kb.search(t, typ=["program", "programovy-dokument"], limit=10)
+    _, pr_full = _full_matches(results, t)
+    expert = ""
+    if _weak(results, t, pr_full):
+        expert = _expert_section(t, intro=f"## {NENASEL} v programu (nic, nebo jen částečná "
+                                          "shoda). Nejlepší osoba k dotazu:")
     if results:
         lines = [f"## Programové body k „{t}“ napříč dokumenty ({len(results)})"]
         for i, r in enumerate(results, 1):
@@ -752,17 +857,36 @@ def get_program(tema: str, dokument: str | None = None) -> str:
         parts.append("\n".join(lines))
     elif not parts:
         return (f"Program k tématu „{t}“ v bázi nenalezen. Zkus jiná slova nebo search_kb bez filtru; "
-                "pokud nic není, řekni uživateli, že program k tomu nic neříká, a nabídni ověření u garanta.")
-    parts.append("Cituj zdroj URL a vždy uveď název dokumentu a rok. Autorita: program = oficiální "
-                 "programový dokument strany (platí pro dané volby/období).")
-    return _cap("\n\n".join(parts), "Zadej `dokument` pro konkrétní program nebo get_document(doc_id).")
+                "pokud nic není, řekni uživateli, že program k tomu nic neříká, a nabídni ověření u garanta."
+                + (f"\n\n{expert}" if expert else ""))
+    tail = ("Cituj zdroj URL a vždy uveď název dokumentu a rok. Autorita: program = oficiální "
+            "programový dokument strany (platí pro dané volby/období).")
+    if expert:
+        tail = expert + "\n\n" + tail
+    return _cap_with_tail("\n\n".join(parts), tail,
+                          "Zadej `dokument` pro konkrétní program nebo get_document(doc_id).")
+
+
+def _social_for_topic(kb: Any, tema: str, limit: int = 5) -> list[dict]:
+    """Nejrelevantnější příspěvky poslanců k tématu; prázdný seznam, když KB zdroj nemá."""
+    fn = getattr(kb, "search_social", None)
+    if fn is None:
+        return []
+    try:
+        posts = fn(query=tema, limit=limit, bez_odpovedi=True) or []
+    except Exception as exc:  # noqa: BLE001
+        log.warning("search_social selhal: %s", exc)
+        return []
+    full, _ = _full_matches([{**p, "snippet": p.get("text")} for p in posts], tema)
+    return full[:limit]
 
 
 @mcp.tool(structured_output=False)
 @_guard
 def get_position(tema: str) -> str:
     """Oficiální postoj Pirátů k tématu, seřazený podle autority: 1) stanoviska a
-    usnesení/předpisy, 2) program, 3) pět nejnovějších tiskových zpráv k tématu.
+    usnesení/předpisy, 2) program, 3) pět nejnovějších tiskových zpráv k tématu
+    (+ podsekce s vyjádřeními poslanců na X/Bluesky, jen názory jednotlivců).
     Každá část uvádí úroveň autority a datum. Použij vždy, když se ptají „co si
     Piráti myslí o…“, před psaním TZ, postu nebo odpovědi občanovi.
     Pokud báze nemá stanovisko ani program, řekni to – nic nedomýšlej."""
@@ -815,10 +939,27 @@ def get_position(tema: str) -> str:
     out.append("")
     if not (stanoviska or program or tz_latest):
         out.append("**Báze k tématu nic nemá.** Řekni to uživateli a nabídni, co ověřit: program "
-                   "(get_program), garant tématu (find_people role=garant), mediální odbor.")
-    out.append("Cituj zdroj URL u každého tvrzení a uveď úroveň autority a datum. Pokud se TZ a "
-               "program liší, má přednost program/usnesení; novější TZ může upřesňovat situaci.")
-    return _cap("\n".join(out), "Pro detail použij get_document(doc_id).")
+                   "(get_program), garant tématu (find_expert), mediální odbor.")
+        out.append("")
+    # krátké závěrečné bloky (sítě, kontakt, citace) jdou mimo oříznutou část, aby nezmizely
+    tail: list[str] = []
+    social = _social_for_topic(kb, t, limit=5)
+    if social:
+        tail.append("### Vyjádření poslanců na sítích (X, Bluesky)")
+        tail.append("*Autorita: názory jednotlivých poslanců, NE stanovisko strany; nepoužívej jako "
+                    "oficiální postoj, jen jako ilustraci, s citací URL příspěvku.*")
+        tail.append("\n\n".join(_fmt_social_post(i, p, 300) for i, p in enumerate(social, 1)))
+        tail.append("")
+    if not (stanoviska or program or tz_latest):
+        tail.append(_expert_section(t))
+        tail.append("")
+    elif not (stanoviska and st_full) and not (program and pr_full):
+        tail.append(_expert_section(t, intro=f"## {NENASEL} (žádné stanovisko ani program s úplnou "
+                                             "shodou). Nejlepší osoba k dotazu:"))
+        tail.append("")
+    tail.append("Cituj zdroj URL u každého tvrzení a uveď úroveň autority a datum. Pokud se TZ a "
+                "program liší, má přednost program/usnesení; novější TZ může upřesňovat situaci.")
+    return _cap_with_tail("\n".join(out), "\n".join(tail), "Pro detail použij get_document(doc_id).")
 
 
 @mcp.tool(structured_output=False)
@@ -835,9 +976,13 @@ def search_press_releases(query: str, od: str | None = None, do: str | None = No
     results = get_kb().search(q, typ=["tiskova-zprava"], od=od or None, do=do or None, limit=limit)
     if not results:
         return f"Žádná tisková zpráva k „{q}“" + (f" v rozmezí {od or '…'}–{do or '…'}" if od or do else "") + \
-            ". Zkus jiná slova nebo search_kb (typ aktualita) – starší texty na webu mohou být označeny jako článek."
-    return _cap(f"Tiskové zprávy k „{q}“ ({len(results)}):\n\n" + _fmt_results(results) +
-                "\n\nCituj zdroj URL. Autorita: tz = tisková zpráva (oficiální výstup k datu vydání, ne usnesení).")
+            ". Zkus jiná slova nebo search_kb (typ aktualita) – starší texty na webu mohou být označeny jako článek." + \
+            "\n\n" + _expert_section(q)
+    _, full = _full_matches(results, q)
+    tail = "Cituj zdroj URL. Autorita: tz = tisková zpráva (oficiální výstup k datu vydání, ne usnesení)."
+    if _weak(results, q, full):
+        tail += "\n\n*(Jen částečná shoda nebo slabá relevance.)*\n\n" + _expert_section(q)
+    return _cap_with_tail(f"Tiskové zprávy k „{q}“ ({len(results)}):\n\n" + _fmt_results(results), tail)
 
 
 def _fmt_vote(i: int, v: dict) -> str:
@@ -856,6 +1001,48 @@ def _fmt_vote(i: int, v: dict) -> str:
     lines.append(f"   Zdroj: {_s(v.get('url')) or 'psp.cz'} | id_hlasovani: {_s(v.get('id_hlasovani'))}"
                  + (f" | období: {_s(v.get('obdobi'))}" if not _blank(v.get("obdobi")) else ""))
     return "\n".join(lines)
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def find_expert(tema: str) -> str:
+    """Koho se zeptat: najde garanta, resortní tým nebo poslance k tématu s veřejným
+    kontaktem (e-mail, telefon pokud je zveřejněn na pirati.cz). Použij vždy, když báze
+    nemá přesnou odpověď, aby šlo uživateli doporučit konkrétní osobu. Vrací lidi
+    (jméno, role, jednotka, e-mail, profil), věcně příslušné jednotky (resortní tým,
+    pracovní skupina, odbor) a obecný kontakt (Kancelář strany / mediální odbor)."""
+    t = _clean(tema)
+    if not t:
+        return "Zadej téma, např. `find_expert(\"školství\")`."
+    kb = get_kb()
+    fn = getattr(kb, "find_expert", None)
+    if fn is None:
+        return "Index neobsahuje data pro find_expert; spusť `python -m server.kb.build`."
+    res = fn(t, limit=5) or {}
+    lide, jednotky, fb = res.get("lide") or [], res.get("jednotky") or [], res.get("fallback") or {}
+    out = [f"# Koho se zeptat: „{t}“", ""]
+    out.append("## Lidé")
+    if lide:
+        out.extend(f"{i}. {_fmt_expert_person(p)}" for i, p in enumerate(lide, 1))
+    else:
+        out.append("Nikdo s rolí nebo medailonkem odpovídajícím tématu v bázi není.")
+    out.append("")
+    out.append("## Věcně příslušné jednotky")
+    if jednotky:
+        out.extend(f"{i}. {_fmt_expert_unit(u)}" for i, u in enumerate(jednotky, 1))
+    else:
+        out.append("Žádný resortní tým, pracovní skupina ani odbor k tématu v bázi není.")
+    out.append("")
+    if fb:
+        out.append("## Obecný kontakt")
+        out.append(f"- {_fmt_expert_unit(fb)}")
+        out.extend(f"- {_fmt_expert_person(p)}" for p in (fb.get("lide") or [])[:2])
+        out.append("")
+    out.append(f"Pokud báze přesnou odpověď nemá, odpověz: „{NENASEL}, ale nejlepší osobou k zodpovězení "
+               "je <jméno>, <role/jednotka>, kontakt: <e-mail, telefon jen pokud je v bázi>.“ Telefon uváděj "
+               "jen pokud ho báze má z veřejného profilu na pirati.cz. Autorita: oficiální evidence "
+               "lide.pirati.cz / profil na pirati.cz (funkce k datu stažení dat).")
+    return _cap("\n".join(out))
 
 
 @mcp.tool(structured_output=False)
@@ -902,6 +1089,94 @@ def get_voting_record(poslanec: str | None = None, query: str | None = None,
     out.append("\nZdroj dat: https://www.psp.cz/sqw/hp.sqw?k=1300 (otevřená data PSP); u každého hlasování "
                "cituj jeho URL na psp.cz. Autorita: oficiální data PSP (hlas poslance, ne stanovisko strany).")
     return _cap("\n".join(out), "Sniž limit nebo zúž query/od/do.")
+
+
+SOCIAL_DISCLAIMER = ("Jde o vyjádření jednotlivce (poslance), ne stanovisko strany; vždy cituj URL "
+                     "příspěvku a uveď autora, platformu a datum.")
+
+
+def _platforma_label(p: Any) -> str:
+    return {"x": "X", "bluesky": "Bluesky"}.get(_s(p).lower(), _s(p) or "síť")
+
+
+def _fmt_social_post(i: int, p: dict, text_len: int = 500) -> str:
+    datum = _s(p.get("datum")).replace("T", " ")[:16]
+    head = f"{i}. **{_clean(p.get('jmeno')) or _clean(p.get('ucet'))}** – {_platforma_label(p.get('platforma'))}"
+    if not _blank(p.get("ucet")):
+        head += f" (@{_clean(p.get('ucet')).lstrip('@')})"
+    head += f", {datum}" if datum else ""
+    flags = [n for n, k in (("odpověď", "je_odpoved"), ("repost", "je_repost")) if p.get(k)]
+    if flags:
+        head += f" [{', '.join(flags)}]"
+    lines = [head, f"   > {_snippet(p.get('text'), text_len)}"]
+    counts = [f"{label} {p.get(k)}" for label, k in (("lajky", "lajky"), ("reposty", "reposty"),
+                                                      ("odpovědi", "odpovedi")) if p.get(k) is not None]
+    if counts:
+        lines.append("   " + ", ".join(counts))
+    lines.append(f"   Zdroj: {_s(p.get('url')) or 'neuveden'}")
+    return "\n".join(lines)
+
+
+def _fmt_social_summary(summary: dict) -> str:
+    jm = summary.get("jmeno")
+    jm = ", ".join(jm) if isinstance(jm, list) else _s(jm)
+    podle = summary.get("podle_platformy") or {}
+    ucty = summary.get("ucty") or {}
+    parts = [f"{_platforma_label(p)} {n}" + (f" (@{ucty[p]})" if ucty.get(p) else "")
+             for p, n in podle.items()]
+    out = [f"## Souhrn: {jm or _s(summary.get('osoba'))}",
+           f"Celkem {summary.get('celkem', 0)} příspěvků v bázi"
+           + (f" ({', '.join(parts)})" if parts else "")
+           + (f", z toho odpovědí {summary.get('odpovedi')}" if summary.get("odpovedi") else "")
+           + (f"; období {_s(summary.get('od'))[:10]} – {_s(summary.get('do'))[:10]}" if summary.get("od") else "")
+           + "."]
+    return "\n".join(out)
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_social_posts(osoba: str | None = None, query: str | None = None,
+                     platforma: str | None = None, od: str | None = None,
+                     do: str | None = None, limit: int = 20) -> str:
+    """Příspěvky pirátských poslanců na X a Bluesky. Jde o vyjádření jednotlivce, ne
+    stanovisko strany; vždy cituj URL příspěvku.
+
+    Argumenty (všechny volitelné, lze kombinovat): osoba = jméno poslance (i bez
+    diakritiky, i jen příjmení) nebo handle účtu; query = hledaná slova v textu
+    příspěvku (diakritika a skloňování nevadí); platforma = x | bluesky; od/do =
+    rozmezí data YYYY-MM-DD; limit = počet (výchozí 20, max 50). Bez query vrací
+    nejnovější příspěvky. Odpovědi v diskusích se vynechávají. Při zadání osoby
+    vrátí nejdřív souhrn (počty po platformách, období)."""
+    kb = get_kb()
+    limit = max(1, min(int(limit or 20), 50))
+    p = _clean(platforma).lower() or None
+    if p and p not in SOCIAL_PLATFORMS:
+        return f"Neznámá platforma „{platforma}“. Povolené: {', '.join(SOCIAL_PLATFORMS)}."
+    o, q = _clean(osoba) or None, _clean(query) or None
+    out: list[str] = []
+    if o:
+        summary = kb.social_summary(o) or {}
+        if summary.get("nalezen"):
+            out.append(_fmt_social_summary(summary))
+            out.append("")
+        else:
+            return (f"Osoba „{o}“ nemá v bázi žádné příspěvky ze sociálních sítí. Zkus jen příjmení "
+                    "nebo handle účtu; seznam poslanců dá find_people(role=\"poslanec\").")
+    posts = kb.search_social(query=q, osoba=o, platforma=p, od=od or None, do=do or None,
+                             limit=limit, bez_odpovedi=True)
+    if not posts:
+        filt = ", ".join(f"{k}={v}" for k, v in (("osoba", o), ("query", q), ("platforma", p),
+                                                 ("od", od), ("do", do)) if v)
+        return "\n".join(out) + (f"Žádný příspěvek neodpovídá filtrům ({filt}). " if filt else
+                                 "V bázi zatím nejsou žádné příspěvky ze sociálních sítí. ") + \
+            "Zkus jiná slova, širší období nebo bez filtru; pro oficiální postoj použij get_position."
+    head = f"## Příspěvky ({len(posts)}" + (f", k „{q}“" if q else ", nejnovější") + ")"
+    out.append(head)
+    out.append("\n\n".join(_fmt_social_post(i, x) for i, x in enumerate(posts, 1)))
+    out.append("")
+    out.append(f"Autorita: {AUTORITA_POPIS['vyjadreni-politika']}. {SOCIAL_DISCLAIMER} "
+               "Oficiální postoj strany ověř přes get_position.")
+    return _cap("\n".join(out), "Sniž limit nebo zúž query/osoba/od/do.")
 
 
 @mcp.tool(structured_output=False)
@@ -961,27 +1236,30 @@ def kb_stats() -> str:
     if st.get("db_bytes"):
         out.append(f"- Velikost: {int(st['db_bytes']) / 1e6:.1f} MB")
     for label, key in (("Dokumentů", "documents"), ("Chunků", "chunks"), ("Lidí", "people"),
-                       ("Organizačních jednotek", "org_units"), ("Hlasování", "votes")):
+                       ("Organizačních jednotek", "org_units"), ("Hlasování", "votes"),
+                       ("Příspěvků na sítích (X, Bluesky)", "social_posts")):
         if key in st:
             out.append(f"- {label}: {st[key]}")
     if st.get("documents_datum_od") or st.get("documents_datum_do"):
         out.append(f"- Dokumenty datované: {_s(st.get('documents_datum_od'))} – {_s(st.get('documents_datum_do'))}")
     for label, key in (("Dokumenty podle typu", "documents_by_typ"),
                        ("Dokumenty podle kolekce", "documents_by_kolekce"),
-                       ("Hlasování podle období", "votes_by_obdobi")):
+                       ("Hlasování podle období", "votes_by_obdobi"),
+                       ("Příspěvky na sítích podle platformy", "social_posts_by_platforma")):
         d = st.get(key)
         if isinstance(d, dict) and d:
             out.append(f"\n## {label}")
             out.extend(f"- {k}: {v}" for k, v in d.items())
     known = {"built_at", "data_commit", "schema_version", "db_path", "db_bytes", "documents", "chunks",
-             "people", "org_units", "votes", "vote_members", "documents_datum_od", "documents_datum_do",
-             "documents_by_typ", "documents_by_kolekce", "votes_by_obdobi"}
+             "people", "org_units", "votes", "vote_members", "social_posts", "documents_datum_od",
+             "documents_datum_do", "documents_by_typ", "documents_by_kolekce", "votes_by_obdobi",
+             "social_posts_by_platforma"}
     rest = {k: v for k, v in st.items() if k not in known}
     if rest:
         out.append("\n## Další")
         out.extend(f"- {k}: {v}" for k, v in rest.items())
     out.append("\nData jsou automaticky vytěžená a nekurátorovaná (viz data/README.md); zdroje: pirati.cz, "
-               "lide.pirati.cz, psp.cz, styleguide.pirati.cz.")
+               "lide.pirati.cz, psp.cz, styleguide.pirati.cz, X a Bluesky (příspěvky poslanců).")
     return _cap("\n".join(out))
 
 
@@ -1004,7 +1282,9 @@ def tiskova_zprava(tema: str, mluvci: str | None = None) -> str:
     m = _clean(mluvci)
     kroky = [
         f"1. Zavolej `get_position(\"{tema}\")` a zjisti oficiální postoj a jeho autoritu.",
-        f"2. Zavolej `search_press_releases(\"{tema}\", limit=5)` pro nedávné výstupy, čísla a tón.",
+        f"2. Zavolej `search_press_releases(\"{tema}\", limit=5)` pro nedávné výstupy, čísla a tón; "
+        f"`get_social_posts(query=\"{tema}\", limit=5)` ukáže, co k tomu poslanci psali na X/Bluesky "
+        "(jen inspirace pro tón a citace – jsou to názory jednotlivců, ne stanovisko strany).",
         (f"3. Zavolej `find_people(query=\"{m}\")` a ověř přesnou funkci mluvčího." if m else
          "3. Zavolej `find_people(role=...)` a navrhni vhodného mluvčího podle gesce (poslanec, europoslankyně, "
          "předseda, garant); funkci cituj z profilu."),
@@ -1061,10 +1341,12 @@ def brief_k_tematu(tema: str) -> str:
         f"2. `get_program(\"{tema}\")` – konkrétní programové body s názvem dokumentu a rokem.",
         f"3. `search_press_releases(\"{tema}\", limit=10)` – co jsme k tomu řekli a udělali (s daty).",
         f"4. `get_voting_record(query=\"{tema}\", limit=10)` – relevantní hlasování v PSP, pokud existují.",
-        "5. `find_people(...)` – garant/mluvčí tématu (role=garant, poslanec, europoslanec…).",
-        "6. `get_template(\"brief\")` – vyplň všechny sekce; tabulku faktů se zdrojem a datem; "
+        f"5. `get_social_posts(query=\"{tema}\", limit=5)` – co k tématu psali poslanci na X/Bluesky "
+        "(označ jako názory jednotlivců, ne stanovisko strany; cituj URL příspěvku).",
+        f"6. `find_expert(\"{tema}\")` a `find_people(...)` – garant/resortní tým/mluvčí tématu s kontaktem.",
+        "7. `get_template(\"brief\")` – vyplň všechny sekce; tabulku faktů se zdrojem a datem; "
         "protiargumenty označ, kdo je říká, a odpověz věcně.",
-        "7. Sekce „Co ověřit / co v KB chybí“ je povinná.",
+        "8. Sekce „Co ověřit / co v KB chybí“ je povinná; uveď, koho se zeptat (z find_expert).",
     ]
     return (f"Připrav interní brief k tématu: {tema}.\n\nPostup:\n" + "\n".join(kroky) +
             "\n\n" + _PRAVIDLA_PROMPTU)
@@ -1081,8 +1363,9 @@ def odpoved_obcanovi(dotaz: str) -> str:
         "`find_people(region=..., role=...)` a doporuč oficiální kontakt (jen @pirati.cz e-maily z báze).",
         "3. Napiš odpověď (150–300 slov): poděkování, věcná odpověď s odkazy na program/stanovisko (URL), "
         "co Piráti udělali, kam se může obrátit. Zdvořile, bez politického útoku, bez slibů, které nejsou v programu.",
-        "4. Pokud báze postoj nemá, napiš to v odpovědi upřímně („k tomuto bodu zatím nemáme oficiální "
-        "stanovisko, předám garantovi“) a pod odpověď přidej poznámku pro odesílatele, koho se zeptat.",
+        "4. Pokud báze postoj nemá, zavolej `find_expert(<téma>)` a napiš to v odpovědi upřímně („přesnou "
+        "odpověď jsem nenašel, nejlepší osobou k zodpovězení je <jméno>, <role>, kontakt <e-mail>“); "
+        "pod odpověď přidej poznámku pro odesílatele, koho se zeptat (telefon jen pokud je v bázi).",
         "5. Pod odpověď: zdroje s autoritou a poznámka „návrh, před odesláním zkontrolovat“.",
     ]
     return (f"Odpověz občanovi na tento dotaz/stížnost:\n\n„{dotaz}“\n\nPostup:\n" + "\n".join(kroky) +

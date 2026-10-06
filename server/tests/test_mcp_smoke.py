@@ -26,7 +26,7 @@ DB_PATH = Path(os.environ.get("PIRATEKB_DB") or REPO_ROOT / "index" / "kb.sqlite
 EXPECTED_TOOLS = {
     "search_kb", "get_document", "find_people", "get_org_unit", "get_org_tree", "get_program",
     "get_position", "search_press_releases", "get_voting_record", "get_brand", "get_template",
-    "kb_stats",
+    "kb_stats", "get_social_posts", "find_expert",
 }
 EXPECTED_PROMPTS = {"tiskova_zprava", "reels_scenar", "social_post", "brief_k_tematu", "odpoved_obcanovi"}
 EXPECTED_RESOURCES = {"kb://brand/barvy", "kb://brand/fonty", "kb://program/seznam", "kb://stats"}
@@ -94,6 +94,45 @@ class FakeKB:
         return {"poslanec": "Zdeněk Hřib", "nalezen": True, "celkem": 1, "hlasy": {"ano": 1}, "ano": 1,
                 "ne": 0, "zdrzel": 0, "nehlasoval": 0, "nepritomen": 0, "obdobi": [2025]}
 
+    POST = {"id": "1", "platforma": "x", "ucet": "hrib", "jmeno": "Zdeněk Hřib",
+            "datum": "2026-09-01T10:00:00+02:00", "text": "Dostupné bydlení je priorita.",
+            "url": "https://x.com/hrib/status/1", "je_odpoved": False, "je_repost": False,
+            "lajky": 10, "reposty": 2, "odpovedi": 1, "score": 3.1}
+
+    def search_social(self, query=None, osoba=None, platforma=None, od=None, do=None, limit=20,
+                      bez_odpovedi=True):
+        if query and "bydlen" not in query.lower():
+            return []
+        if osoba and "hrib" not in osoba.lower() and "hřib" not in osoba.lower():
+            return []
+        if platforma and platforma != "x":
+            return []
+        return [dict(self.POST)]
+
+    def social_summary(self, osoba):
+        if "hrib" not in osoba.lower() and "hřib" not in osoba.lower():
+            return {"osoba": osoba, "nalezen": False, "celkem": 0, "podle_platformy": {}}
+        return {"osoba": osoba, "nalezen": True, "jmeno": "Zdeněk Hřib", "celkem": 1,
+                "podle_platformy": {"x": 1}, "ucty": {"x": "hrib"}, "odpovedi": 0, "reposty": 0,
+                "od": "2026-09-01T10:00:00+02:00", "do": "2026-09-01T10:00:00+02:00"}
+
+    def find_expert(self, tema, limit=3):
+        osoba = {"id": "1", "jmeno": "Zdeněk Hřib", "role": "předseda", "jednotka": "Republikové předsednictvo",
+                 "url": "https://lide.pirati.cz/osoba/1/", "profil_web": None,
+                 "email": "zdenek.hrib@pirati.cz", "score": 9.0, "duvod": "vedení jednotky"}
+        unit = {"id": "lide/tymy/1", "nazev": "Resortní tým Bydlení", "zkratka": "RT-Byd", "druh": "tym",
+                "url": "https://lide.pirati.cz/tym/1/", "email": "bydleni@pirati.cz", "kontakty": [],
+                "vedeni": [{"jmeno": "Zdeněk Hřib", "role": "vedoucí"}], "score": 9.0}
+        fallback = {"id": "lide/tymy/8", "nazev": "Kancelář strany", "zkratka": "KaS", "druh": "tym",
+                    "url": "https://lide.pirati.cz/tym/8/", "email": None, "kontakty": [],
+                    "vedeni": [{"jmeno": "Jiří Kárský", "role": "vedoucí"}], "score": 0.0,
+                    "lide": [{"id": "2", "jmeno": "Jiří Kárský", "role": "vedoucí", "jednotka": "Kancelář strany",
+                              "url": "https://lide.pirati.cz/osoba/8019/", "email": "jiri.karsky@pirati.cz",
+                              "score": 0.0, "duvod": "vedení obecného kontaktu"}]}
+        if "bydlen" in tema.lower():
+            return {"tema": tema, "jednotky": [unit], "lide": [osoba], "fallback": fallback}
+        return {"tema": tema, "jednotky": [], "lide": [], "fallback": fallback}
+
     def brand(self):
         return {"barvy": [{"skupina": "znackove", "nazev": "Pirati Yellow", "hex": "#fec934"}],
                 "fonty": [{"role": "Primary font", "pismo": "Roboto", "zaloha": ["Arial"]}],
@@ -148,6 +187,9 @@ def test_mock_tools_do_not_crash(fake_kb):
     assert "Sněmovní volby 2025 (2025)" in mcp_server.get_program("bydlení", dokument="sněmovní")
     pos = mcp_server.get_position("bydlení")
     assert "Oficiální stanovisko" in pos and "Program" in pos and "Nedávné výstupy" in pos
+    assert "Vyjádření poslanců na sítích" in pos and "https://x.com/hrib/status/1" in pos
+    assert "NE stanovisko strany" in pos
+    assert "Vyjádření poslanců na sítích" not in mcp_server.get_position("digitalizace")
     assert "psp.cz" in mcp_server.get_voting_record(poslanec="Hřib")
     assert "**Rozpočet**" in mcp_server.get_voting_record(poslanec="Hřib")  # hvězdičky z dat odstraněny
     assert "Zadej aspoň jeden filtr" in mcp_server.get_voting_record()
@@ -157,6 +199,41 @@ def test_mock_tools_do_not_crash(fake_kb):
     assert "Město" in mcp_server.get_template("tiskova-zprava")
     assert "neexistuje" in mcp_server.get_template("letak")
     assert "Dokumentů: 1" in mcp_server.kb_stats()
+
+
+def test_mock_social_posts(fake_kb):
+    out = mcp_server.get_social_posts(osoba="Hřib", query="bydlení")
+    assert "Souhrn: Zdeněk Hřib" in out and "Celkem 1 příspěvků" in out and "X 1 (@hrib)" in out
+    assert "**Zdeněk Hřib** – X (@hrib), 2026-09-01 10:00" in out
+    assert "Dostupné bydlení je priorita." in out and "https://x.com/hrib/status/1" in out
+    assert "lajky 10" in out and "vyjádření jednotlivce" in out and "NENÍ stanovisko strany" in out
+    assert "get_position" in out
+    # bez osoby jen seznam, bez souhrnu
+    out = mcp_server.get_social_posts(query="bydlení")
+    assert "Souhrn" not in out and "nejnovější" not in out and "k „bydlení“" in out
+    assert "nejnovější" in mcp_server.get_social_posts()
+    assert "nemá v bázi žádné příspěvky" in mcp_server.get_social_posts(osoba="Nikdo")
+    assert "Žádný příspěvek neodpovídá" in mcp_server.get_social_posts(query="jaderná energetika")
+    assert "Neznámá platforma" in mcp_server.get_social_posts(platforma="facebook")
+
+
+def test_mock_find_expert(fake_kb):
+    out = mcp_server.find_expert("bydlení")
+    assert "Koho se zeptat" in out and "**Zdeněk Hřib**, předseda – Republikové předsednictvo" in out
+    assert "zdenek.hrib@pirati.cz" in out and "Resortní tým Bydlení" in out and "bydleni@pirati.cz" in out
+    assert "Kancelář strany" in out and "jiri.karsky@pirati.cz" in out
+    assert "Přesnou odpověď jsem nenašel, ale nejlepší osobou" in out
+    assert "tel." not in out  # telefon není v datech -> neuvádí se
+    assert "Zadej téma" in mcp_server.find_expert("  ")
+    # prázdný výsledek hledání nabídne kontakt
+    out = mcp_server.search_kb("xyzzy-nesmysl")
+    assert "nic nenašla" in out and "Přesnou odpověď jsem nenašel" in out and "Kancelář strany" in out
+    assert "Přesnou odpověď jsem nenašel" in mcp_server.search_press_releases("xyzzy-nesmysl")
+    assert "Přesnou odpověď jsem nenašel" in mcp_server.get_program("xyzzy-nesmysl")
+    pos = mcp_server.get_position("xyzzy-nesmysl")
+    assert "Báze k tématu nic nemá" in pos and "Přesnou odpověď jsem nenašel" in pos
+    # při dobrém výsledku se sekce nepřidává
+    assert "Přesnou odpověď jsem nenašel" not in mcp_server.search_kb("dostupné bydlení")
 
 
 def test_mock_prompts_mention_tools():
@@ -170,6 +247,10 @@ def test_mock_prompts_mention_tools():
         assert "get_position" in text, name
         assert "get_template" in text or name == "odpoved_obcanovi", name
         assert "Nevymýšlej" in text and "autorit" in text, name
+        if name in ("tiskova_zprava", "brief_k_tematu"):
+            assert "get_social_posts" in text, name
+        if name in ("brief_k_tematu", "odpoved_obcanovi"):
+            assert "find_expert" in text, name
 
 
 def test_missing_index_reports_error(tmp_path, monkeypatch):
@@ -217,6 +298,8 @@ def test_stdio_smoke():
                 res["votes"] = _text(await session.call_tool(
                     "get_voting_record", {"poslanec": "Hřib", "query": "rozpočet", "limit": 3}))
                 res["stats"] = _text(await session.call_tool("kb_stats", {}))
+                res["expert"] = _text(await session.call_tool("find_expert", {"tema": "školství"}))
+                res["social"] = _text(await session.call_tool("get_social_posts", {"limit": 3}))
                 res["prompt"] = _text(await session.get_prompt("tiskova_zprava", {"tema": "dostupné bydlení"}))
                 res["res_barvy"] = _text(await session.read_resource("kb://brand/barvy"))
                 res["res_tpl"] = _text(await session.read_resource("kb://templates/reels"))
@@ -234,6 +317,9 @@ def test_stdio_smoke():
     assert "## 1. Oficiální stanovisko" in res["position"] and "## 2. Program" in res["position"]
     assert "psp.cz" in res["votes"] and "Souhrn hlasování" in res["votes"]
     assert "Dokumentů:" in res["stats"]
+    assert "Resortní tým Školství" in res["expert"] and "@pirati.cz" in res["expert"]
+    assert "Kancelář strany" in res["expert"]
+    assert "nejnovější" in res["social"] or "nejsou žádné příspěvky" in res["social"]
     assert "get_position" in res["prompt"] and "dostupné bydlení" in res["prompt"]
     assert "#fec934" in res["res_barvy"]
     assert "Hook" in res["res_tpl"]
