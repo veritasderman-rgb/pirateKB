@@ -7,3 +7,6 @@ node_modules/
 raw/
 .cache/
 __pycache__/
+
+# Vybudovaný SQLite index (python -m server.kb.build)
+index/

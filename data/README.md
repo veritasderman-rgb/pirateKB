@@ -33,6 +33,9 @@ data/
     regiony/             krajská a místní sdružení: předsednictvo, koordinátoři
     osoby.jsonl          lidé s funkcí (role, jednotka, oficiální e-mail, medailonek)
     struktura.jsonl      hrany tým -> nadřazený tým
+  flickr/                fotoalba Pirátů na Flickru (jen metadata, ne fotky)
+    alba.md              tabulka alb od nejnovějších s odkazy, počtem fotek a licencí
+    alba.jsonl           jedno album na řádek (id, název, popis, počet fotek, url, náhled, data, licence)
 ```
 
 ## Formát: Markdown s YAML frontmatter
