@@ -1,0 +1,35 @@
+# YouTube kanály pro ingest/youtube.py (přepisy videí z automatických nebo ručních titulků).
+#
+# Soubor je kurátorovaný ručně: skript ho jen čte. Vytvořeno 2026-10-06. Kanál strany je
+# povinný; osobní kanály politiků se berou jen tehdy, když na ně odkazuje jejich vlastní
+# profil na pirati.cz (data/pirati-web/lide/*.md, pole `socialni_site`) nebo
+# ingest/socialni_site_ucty.yaml. K 2026-10-06 odkazuje na YouTube jen profil Markéty
+# Gregorové; socialni_site_ucty.yaml YouTube neuvádí. Další kanál doplňte sem.
+#
+# Pole:
+#   nazev         lidský název kanálu (do frontmatteru jako `autor`, pokud yt-dlp nevrátí jiný)
+#   url           adresa kanálu (https://www.youtube.com/@handle nebo /channel/UC…)
+#   druh          strana  -> autorita `web` (oficiální kanál strany)
+#                 osobni  -> autorita `vyjadreni-politika` (vlastní video politika, ne stanovisko strany)
+#   osoba         jméno politika u osobního kanálu (do frontmatteru `osoba`)
+#   zalozky       které záložky kanálu procházet: videos, streams (přenosy), shorts; výchozí videos+streams
+#   aktivni       false = kanál se přeskočí
+#   zdroj_odkazu  odkud odkaz pochází
+#   poznamka      volný text pro kurátora
+
+kanaly:
+  - nazev: Piráti
+    url: https://www.youtube.com/@CeskaPiratskaStrana
+    druh: strana
+    zalozky: [videos, streams]
+    aktivni: true
+    zdroj_odkazu: zadání (oficiální kanál České pirátské strany)
+
+  - nazev: Markéta Gregorová
+    url: https://www.youtube.com/channel/UCcf12G_5igxOSZBFSt4eEAQ
+    druh: osobni
+    osoba: Markéta Gregorová
+    zalozky: [videos, streams]
+    aktivni: true
+    zdroj_odkazu: https://www.pirati.cz/lide/marketa-gregorova/
+    poznamka: europoslankyně; jediný YouTube odkaz v profilech na pirati.cz (2026-10-06)

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/veritasderman-rgb/pirateKB/schemas/slovnik.schema.json",
+  "title": "content/slovnik/: zkratky a pirátské pojmy",
+  "allOf": [{"$ref": "content.schema.json"}],
+  "required": ["reviewed_at"],
+  "properties": {"typ": {"const": "slovnik"}}
+}

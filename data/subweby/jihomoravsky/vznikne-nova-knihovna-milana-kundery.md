@@ -1,0 +1,36 @@
+---
+zdroj: https://jihomoravsky.pirati.cz/aktuality/vznikne-nova-knihovna-milana-kundery/
+nazev: Vznikne nová Knihovna Milana Kundery
+typ: aktualita
+datum: '2021-05-25'
+autor: Krajský MO
+web: KS Jihomoravský kraj
+web_url: https://jihomoravsky.pirati.cz
+druh_webu: KS
+region: Jihomoravský kraj
+tagy:
+- Brno
+- Zastupitelstvo
+- Kundera
+- Knihovna
+- Tomáš Koláčny
+- Marek Fišer
+- Kultura
+viditelnost: verejne
+autorita: web
+stazeno: '2026-10-06'
+---
+
+# Vznikne nová Knihovna Milana Kundery
+
+**Milan Kundera se vrací do Brna! Tedy alespoň částečně – se svojí manželkou chtějí Moravské zemské knihovně věnovat rozsáhlý archiv jeho prací, který se kromě knih pyšní i jeho kresbami. Tato neocenitelná sbírka byla předmětem i dnešního jednání brněnského zastupitelstva, na němž bylo odhlasováno uzavření memoranda s Moravskou zemskou knihovnou.**
+
+Brno je rodiště nespočetného množství významných osobností, ať už vědců, sportovců, architektů nebo třeba literátů. Jedním z nich je právě Milan Kundera, spisovatel, který se proslavil klasikami, jakými jsou například knihy Žert či Nesnesitelná lehkost bytí. Kundera je známý nejen v České republice, ale i ve světě, proto je pro nás velkou ctí, že se svůj rozsáhlý archiv rozhodl věnovat rodnému městu, Brnu.
+
+Archiv jeho celé spisovatelské kariéry daruje Moravské zemské knihovně, která se v Memorandu zavázala, že vyčlení v rámci svého objektu prostory pro tuto sbírku. MZK se rozhodla sbírce věnovat jednu celou studovnu, která ponese název Knihovna Milana Kundery. Byli jsme jedním z hlasů, kteří se zasazovali o finanční a odbornou podporu pro nově vzniklý projekt.
+
+> „Brno je rodištěm jednoho z nejslavnějších a nejúspěšnějších spisovatelů českého původu. Město si jeho přínosu velice váží, a proto mu v roce 2009 udělilo i čestné občanství. Nyní budeme usilovat o to, aby se Knihovna Milana Kundery stala základem pro kulturní značku, pod níž se budou pořádat autorská čtení, debaty se spisovateli nebo odborné diskuse o české i světové literatuře. Chceme světu ukázat, že jsme Kunderovo město a že jsme na to náležitě hrdí,“ řekl náš náměstek [Tomáš Koláčny](https://jihomoravsky.pirati.cz/lide/tomas-kolacny/){:target="\_blank"}.
+
+Pokud jste příznivci autora, který s humorem a kritikou nahlíží na minulý režim, tak se máte na co těšit. V prostorách MZK se uskuteční série autorských čtení a debaty věnované jeho knihám, ale i literatuře jako takové.
+
+> „Velice si vážíme kroku Kunderových věnovat archiv Moravské zemské knihovně. Jako město chceme být samozřejmě u toho a plně se podílet na realizaci návrhu. Proto jsme ani na chvíli neváhali a nabídli jsme naši plnou spolupráci i finanční účast na tomto unikátním projektu. Kundera nepochybně patří k nejvýznamnějším a nejoblíbenějším moderním českým autorům. Za svůj přínos světové literatuře obdržel mnoho ocenění, jeho knihy se dočkaly mnoha překladů a my chceme zajistit, aby si jej pamatovaly i příští generace. Zřízení speciální knihovny pomůže dále pochopit jeho pohled na svět, myšlení a problematiku zachycenou v jeho dílech,“ komentuje pirátský radní pro kulturu [Marek Fišer](https://jihomoravsky.pirati.cz/lide/marek-fiser/){:target="\_blank"}.

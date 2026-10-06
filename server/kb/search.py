@@ -8,17 +8,46 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import logging
 import re
 import sqlite3
 from pathlib import Path
 
-from .text import fold, fts_query, iter_sections, query_stems
+from . import embeddings as emb_mod
+from .aliases import AliasIndex, alias_key
+from .query import QueryPlan, StemHay, build_plan
+from .stem import STOPWORDS, stem, stem_text, stem_tokens
+from .text import fold, iter_sections
 
-RECENT_TYPES = {"tiskova-zprava", "aktualita"}
-# oficiální pozice strany: mírný bonus, aby je nepřebily čerstvé články
-AUTHORITY_BONUS = {"program": 1.5, "stanovisko": 1.5, "programovy-dokument": 1.5,
-                   "predpis": 1.0}
+log = logging.getLogger("piratekb.kb")
+
+# typy, u kterých novost zvyšuje skóre (preferuj_nove=True): max RECENCY_MAX pro čerstvé,
+# poločas RECENCY_HALF_LIFE let (2 roky -> 1,5; 4 roky -> 0,75; 8 let -> 0,19)
+RECENT_TYPES = {"tiskova-zprava", "aktualita", "clanek-media", "prispevek-socialni-site",
+                "schuzka"}
+RECENCY_MAX = 3.0
+RECENCY_HALF_LIFE = 2.0
+# oficiální pozice strany: bonus ve výši max. bonusu za novost, aby je nepřebily čerstvé články
+AUTHORITY_BONUS = {"program": RECENCY_MAX, "stanovisko": RECENCY_MAX,
+                   "programovy-dokument": RECENCY_MAX, "predpis": 2.0}
+# dokumenty s verzemi: ve výsledcích zůstane jen nejnovější verze se stejným názvem
+VERSIONED_TYPES = {"program", "stanovisko", "programovy-dokument", "predpis"}
+_TITLE_NOISE = frozenset(stem_tokens(
+    "Piráti Pirátů Pirátská Pirátské Pirátský Česká České pirátské strany strana "
+    "stanovisko stanoviska problematice problematika otázce"))
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$", re.M)
+_WORD_SPAN_RE = re.compile(r"\w+")
+
+# sloupce FTS tabulek: (originální, kmeny); bm25 váhy ve stejném pořadí
+FTS_COLS = {
+    "chunks_fts": (["nadpisy", "text", "nazev"], ["nadpisy_stem", "text_stem", "nazev_stem"]),
+    "people_fts": (["jmeno", "role_text", "zarazeni", "medailonek"],
+                   ["jmeno_stem", "role_text_stem", "zarazeni_stem", "medailonek_stem"]),
+    "org_units_fts": (["nazev", "zkratka", "role_text", "body"],
+                      ["nazev_stem", "role_text_stem", "body_stem"]),
+    "votes_fts": (["nazev"], ["nazev_stem"]),
+    "social_posts_fts": (["text", "jmeno"], ["text_stem"]),
+}
 
 
 def _loads(value, default):
@@ -33,7 +62,9 @@ def _loads(value, default):
 class KB:
     """Čtecí přístup k indexu. Instance je bezpečná pro opakované volání z jednoho vlákna."""
 
-    def __init__(self, db_path: str | Path):
+    def __init__(self, db_path: str | Path, embeddings_provider="env"):
+        """``embeddings_provider``: ``"env"`` = podle ``EMBEDDINGS_PROVIDER``/``VOYAGE_API_KEY``
+        (bez nich čistě BM25), ``None`` = vypnuto, jinak instance provideru (testy)."""
         self.db_path = Path(db_path)
         if not self.db_path.exists():
             raise FileNotFoundError(f"index neexistuje: {self.db_path} (spusť server.kb.build)")
@@ -41,6 +72,12 @@ class KB:
                                    check_same_thread=False)
         self.con.row_factory = sqlite3.Row
         self._brand: dict | None = None
+        # starší index (schema 2) nemá kmeny ani aliasy -> prefixové hledání jako dřív
+        self.stemmed = self._has_column("chunks", "text_stem")
+        self.aliases = AliasIndex.from_db(self.con)
+        self._embeddings_provider = embeddings_provider
+        self._vectors: emb_mod.VectorIndex | None = None
+        self._vectors_checked = False
 
     def close(self) -> None:
         self.con.close()
@@ -49,6 +86,25 @@ class KB:
 
     def _rows(self, sql: str, params=()) -> list[dict]:
         return [dict(r) for r in self.con.execute(sql, params).fetchall()]
+
+    def _has_column(self, table: str, column: str) -> bool:
+        try:
+            return any(r[1] == column for r in self.con.execute(f"PRAGMA table_info({table})"))
+        except sqlite3.DatabaseError:
+            return False
+
+    def _plan(self, query: str | None, druhy: set[str] | None = None) -> QueryPlan:
+        return build_plan(query, self.aliases, druhy)
+
+    def _fts(self, plan: QueryPlan, table: str) -> str:
+        orig, stems = FTS_COLS[table]
+        return plan.fts(orig, stems if self.stemmed else None)
+
+    @staticmethod
+    def _stems(r: dict, *pairs: tuple[str, str]) -> StemHay:
+        """Kmeny řádku: sloupec ``*_stem`` z indexu, u starého indexu spočítané z originálu."""
+        return StemHay(*(r[sc] if r.get(sc) is not None else stem_text(r.get(oc))
+                         for sc, oc in pairs))
 
     def _has_table(self, name: str) -> bool:
         """Starší index nemusí mít novější tabulky (např. `social_posts`)."""
@@ -94,24 +150,30 @@ class KB:
 
     def search(self, query: str, typ: list[str] | None = None,
                kolekce: list[str] | None = None, od: str | None = None,
-               do: str | None = None, limit: int = 10) -> list[dict]:
-        """Plnotextové hledání v chuncích; vrací max. 2 chunky z jednoho dokumentu."""
-        expr = fts_query(query)
-        if not expr:
+               do: str | None = None, limit: int = 10,
+               preferuj_nove: bool = True) -> list[dict]:
+        """Plnotextové hledání v chuncích; vrací max. 2 chunky z jednoho dokumentu.
+
+        Dotaz -> pojmy (kmeny + přesné tvary + aliasy, viz ``server/kb/query.py``) -> FTS5
+        (BM25) -> skóre: BM25 + bonus za počet shodných pojmů (přímá shoda víc než přes
+        alias) + bonus za celou frázi + novost (``preferuj_nove``; jen typy v
+        ``RECENT_TYPES``) + oficiální pozice. U programu/stanovisek zůstane jen nejnovější
+        verze dokumentu se stejným názvem. Se zapnutými embeddingy se pořadí BM25 a
+        kosinové podobnosti spojí přes reciprocal rank fusion (pole ``rrf``, ``podobnost``).
+        """
+        plan = self._plan(query)
+        if not plan:
             return []
-        stems = query_stems(query)
-        params: list = [expr]
+        params: list = [self._fts(plan, "chunks_fts")]
         where = ""
         where += self._in_clause("d.typ", typ, params)
         where += self._in_clause("d.kolekce", kolekce, params)
         where += self._date_clause("d.datum", od, do, params)
         candidates = max(limit * 12, 150)
         params.append(candidates)
+        weights = "3.0, 1.0, 4.0, 2.4, 0.8, 3.2" if self.stemmed else "3.0, 1.0, 4.0"
         sql = f"""
-            SELECT c.id AS chunk_id, c.doc_id, c.nadpis, c.nadpisy, c.poradi, c.text,
-                   snippet(chunks_fts, 1, '[', ']', ' … ', 48) AS snippet,
-                   bm25(chunks_fts, 3.0, 1.0, 4.0) AS rank,
-                   d.nazev, d.typ, d.datum, d.zdroj, d.autorita, d.kolekce
+            SELECT {self._chunk_select()}, bm25(chunks_fts, {weights}) AS rank
             FROM chunks_fts
             JOIN chunks c ON c.id = chunks_fts.rowid
             JOIN documents d ON d.id = c.doc_id
@@ -121,56 +183,89 @@ class KB:
         """
         rows = self._rows(sql, params)
         today = dt.date.today()
-        scored = []
-        for r in rows:
-            hay = fold(r["nazev"]) + " " + fold(r["nadpisy"]) + " " + fold(r["text"])
-            matched = sum(1 for s in stems if s in hay)
-            score = -float(r["rank"])
-            if len(stems) > 1:
-                score += 2.5 * (matched - 1)  # bonus za shodu více tokenů
-                if matched == len(stems):
-                    score += 1.5
-            score += self._recency_bonus(r["typ"], r["datum"], today)
-            score += AUTHORITY_BONUS.get(r["typ"] or "", 0.0)
-            r["score"] = round(score, 3)
-            r["matched_tokens"] = matched
-            r["nadpis"] = self._best_heading(r["nadpis"], r["nadpisy"], stems)
-            scored.append(r)
-        scored.sort(key=lambda x: x["score"], reverse=True)
+        scored = [self._score_chunk(r, plan, today, preferuj_nove) for r in rows]
+        scored.sort(key=lambda x: (x["score"], x["datum"] or ""), reverse=True)
 
+        hybrid = False
+        vec = self._vector_index()
+        if vec is not None:
+            fused = self._fuse_vectors(vec, query, scored, plan, today, preferuj_nove,
+                                       typ, kolekce, od, do, candidates)
+            if fused is not None:
+                scored, hybrid = fused, True
+
+        scored = self._dedup_versions(scored)
+        forms = plan.highlight_forms()
         out, per_doc = [], {}
         for r in scored:
             n = per_doc.get(r["doc_id"], 0)
             if n >= 2:
                 continue
             per_doc[r["doc_id"]] = n + 1
-            snippet = r["snippet"] or ""
-            if not snippet.strip() or "[" not in snippet:
-                snippet = self._fallback_snippet(r["text"], stems)
-            out.append({
+            item = {
                 "doc_id": r["doc_id"], "nazev": r["nazev"], "typ": r["typ"],
                 "datum": r["datum"], "zdroj": r["zdroj"], "autorita": r["autorita"],
                 "kolekce": r["kolekce"], "nadpis": r["nadpis"], "chunk_id": r["chunk_id"],
-                "poradi": r["poradi"], "snippet": snippet, "score": r["score"],
-            })
+                "poradi": r["poradi"], "snippet": self._snippet(r["text"], forms),
+                "score": r["score"], "matched_tokens": r["matched_tokens"],
+                "shoda_vsech": r["shoda_vsech"],
+            }
+            if r.get("starsi_verze"):
+                item["starsi_verze"] = r["starsi_verze"]
+            if hybrid:
+                item["rrf"] = r["rrf"]
+                item["podobnost"] = r.get("podobnost")
+            out.append(item)
             if len(out) >= limit:
                 break
         return out
 
+    def _chunk_select(self) -> str:
+        stems = ", c.nadpisy_stem, c.text_stem, c.nazev_stem" if self.stemmed else ""
+        return ("c.id AS chunk_id, c.doc_id, c.nadpis, c.nadpisy, c.poradi, c.text" + stems +
+                ", d.nazev, d.typ, d.datum, d.zdroj, d.autorita, d.kolekce")
+
+    def _score_chunk(self, r: dict, plan: QueryPlan, today: dt.date,
+                     preferuj_nove: bool) -> dict:
+        hay = self._stems(r, ("nazev_stem", "nazev"), ("nadpisy_stem", "nadpisy"),
+                          ("text_stem", "text"))
+        m = plan.match(hay)
+        # přímá shoda (kmen/tvar z dotazu) = 1, jen přes alias/synonymum = 0,6
+        matched = sum(1.0 if x == 2 else 0.6 if x == 1 else 0.0 for x in m)
+        score = -float(r.get("rank") or 0.0)
+        if len(m) > 1:
+            score += 2.5 * (matched - 1)
+            if all(m):
+                score += 1.5
+            phrase = plan.phrase()
+            if phrase and hay.has(phrase):
+                score += 2.0          # celý víceslovný dotaz jako fráze
+        elif m and m[0] == 2:
+            score += 1.0
+        if preferuj_nove:
+            score += self._recency_bonus(r["typ"], r["datum"], today)
+        score += AUTHORITY_BONUS.get(r["typ"] or "", 0.0)
+        r["score"] = round(score, 3)
+        r["matched_tokens"] = sum(1 for x in m if x)
+        r["shoda_vsech"] = bool(m) and all(m)
+        r["nadpis"] = self._best_heading(r["nadpis"], r["nadpisy"], plan)
+        return r
+
     @staticmethod
-    def _best_heading(first: str | None, all_headings: str | None, stems: list[str]) -> str:
+    def _best_heading(first: str | None, all_headings: str | None, plan: QueryPlan) -> str:
         """Z nadpisů sloučených v chunku vybere ten, který nejlépe odpovídá dotazu."""
         if not all_headings or " | " not in all_headings:
             return first or ""
-        best, best_n = first or "", -1
+        best, best_n = first or "", 0
         for h in all_headings.split(" | "):
-            n = sum(1 for s in stems if s in fold(h))
+            n = sum(1 for x in plan.match(StemHay(stem_text(h))) if x)
             if n > best_n:
                 best, best_n = h, n
-        return best if best_n > 0 else (first or "")
+        return best
 
     @staticmethod
     def _recency_bonus(typ: str | None, datum: str | None, today: dt.date) -> float:
+        """Bonus za novost pro ``RECENT_TYPES``: 3,0 pro dnešek, poločas 2 roky."""
         if typ not in RECENT_TYPES or not datum:
             return 0.0
         try:
@@ -178,17 +273,140 @@ class KB:
         except ValueError:
             return 0.0
         years = max(0.0, (today - d).days / 365.25)
-        return max(0.0, 1.5 - 0.25 * years)  # 1.5 pro čerstvé, 0 po 6 letech
+        return RECENCY_MAX * 0.5 ** (years / RECENCY_HALF_LIFE)
 
     @staticmethod
-    def _fallback_snippet(text: str, stems: list[str], width: int = 500) -> str:
-        folded = fold(text)
-        pos = min((folded.find(s) for s in stems if s in folded), default=-1)
-        start = max(0, pos - width // 3) if pos >= 0 else 0
-        piece = text[start:start + width]
-        for s in stems:
-            piece = re.sub(rf"(?i)\b({re.escape(s)}\w*)", r"[\1]", piece, count=1)
-        return ("…" if start else "") + piece + ("…" if start + width < len(text) else "")
+    def _snippet(text: str, forms: set[str], width: int = 40) -> str:
+        """Úryvek ~``width`` slov s nejvíce shodami; shodná slova (podle kmene nebo
+        přesného tvaru) v ``[hranatých závorkách]``."""
+        text = text or ""
+        words = list(_WORD_SPAN_RE.finditer(text))
+        if not words:
+            return text[:300]
+        hits = [i for i, w in enumerate(words)
+                if stem(w.group()) in forms or fold(w.group()) in forms]
+        start = 0
+        if hits:
+            best = -1
+            for h in hits:
+                s0 = max(0, h - 6)
+                distinct = {stem(words[i].group()) for i in hits if s0 <= i < s0 + width}
+                if len(distinct) > best:
+                    best, start = len(distinct), s0
+        end = min(len(words), start + width)
+        hit_set = set(hits)
+        parts, pos = [], words[start].start()
+        for i in range(start, end):
+            w = words[i]
+            parts.append(text[pos:w.start()])
+            parts.append(f"[{w.group()}]" if i in hit_set else w.group())
+            pos = w.end()
+        piece = " ".join("".join(parts).split())
+        return ("… " if start > 0 else "") + piece + (" …" if end < len(words) else "")
+
+    def _dedup_versions(self, rows: list[dict]) -> list[dict]:
+        """Program/stanoviska: ze dokumentů se stejným názvem (bez „Pirátů“, „stanovisko“ …)
+        zůstane nejnovější verze (``datum``, u nedatovaných stránek programu datum stažení).
+        Vítěz převezme nejlepší skóre skupiny a dostane ``starsi_verze`` (doc_id)."""
+        vers = {r["doc_id"]: r for r in rows if r["typ"] in VERSIONED_TYPES}
+        if len(vers) < 2:
+            return rows
+        ids = list(vers)
+        eff: dict[str, str] = {}
+        for d in self._rows(f"SELECT id, datum, meta FROM documents WHERE id IN "
+                            f"({','.join('?' * len(ids))})", ids):
+            m = _loads(d["meta"], {})
+            eff[d["id"]] = str(d["datum"] or m.get("aktualizovano") or m.get("platnost_od")
+                               or m.get("stazeno") or "")[:10]
+        groups: dict[str, list[str]] = {}
+        for doc_id, r in vers.items():
+            key = " ".join(w for w in stem_tokens(r["nazev"])
+                           if w not in _TITLE_NOISE and w not in STOPWORDS)
+            if key:
+                groups.setdefault(key, []).append(doc_id)
+        losers: set[str] = set()
+        best_score: dict[str, float] = {}
+        for members in groups.values():
+            if len(members) < 2:
+                continue
+            members.sort(key=lambda i: (eff.get(i, ""), i), reverse=True)
+            winner = members[0]
+            losers.update(members[1:])
+            best_score[winner] = max(r["score"] for r in rows if r["doc_id"] in members)
+            older = members[1:]
+            for r in rows:
+                if r["doc_id"] == winner:
+                    r["starsi_verze"] = older
+        if not losers:
+            return rows
+        out = [r for r in rows if r["doc_id"] not in losers]
+        for r in out:
+            if r["doc_id"] in best_score:
+                r["score"] = max(r["score"], best_score[r["doc_id"]])
+        out.sort(key=lambda x: (x.get("rrf", 0.0), x["score"], x["datum"] or ""), reverse=True)
+        return out
+
+    # ------------------------------------------------------------ embeddingy (volitelné)
+
+    def _vector_index(self) -> emb_mod.VectorIndex | None:
+        """Vektorový index, jen pokud je provider nastaven a index má vektory stejného modelu."""
+        if self._vectors_checked:
+            return self._vectors
+        self._vectors_checked = True
+        prov = self._embeddings_provider
+        if prov == "env":
+            prov = emb_mod.provider_from_env()
+        if prov is None or not self._has_table("chunk_vec"):
+            return None
+        if not self.con.execute("SELECT 1 FROM chunk_vec LIMIT 1").fetchone():
+            log.warning("embeddingy zapnuté, ale index nemá vektory (build bez klíče?)")
+            return None
+        row = self.con.execute("SELECT hodnota FROM meta WHERE klic = 'embeddings_model'").fetchone()
+        model = row[0] if row else None
+        if model and model != prov.model:
+            log.warning("index má vektory modelu %s, provider %s – hybridní hledání vypnuto",
+                        model, prov.model)
+            return None
+        self._vectors = emb_mod.VectorIndex(self.con, prov, model)
+        return self._vectors
+
+    def _fuse_vectors(self, vec: emb_mod.VectorIndex, query: str, scored: list[dict],
+                      plan: QueryPlan, today: dt.date, preferuj_nove: bool, typ, kolekce,
+                      od, do, candidates: int) -> list[dict] | None:
+        allowed = None
+        if typ or kolekce or od or do:
+            params: list = []
+            where = ""
+            where += self._in_clause("d.typ", typ, params)
+            where += self._in_clause("d.kolekce", kolekce, params)
+            where += self._date_clause("d.datum", od, do, params)
+            allowed = {r[0] for r in self.con.execute(
+                f"SELECT c.id FROM chunks c JOIN documents d ON d.id = c.doc_id WHERE 1=1{where}",
+                params)}
+        try:
+            hits = vec.search(query, candidates, allowed)
+        except Exception as e:  # noqa: BLE001 - síť/API: zpět na čisté BM25
+            log.warning("embedding dotazu selhal (%s) – jen BM25", e)
+            return None
+        if not hits:
+            return None
+        sims = dict(hits)
+        by_id = {r["chunk_id"]: r for r in scored}
+        missing = [cid for cid in sims if cid not in by_id]
+        if missing:
+            for r in self._rows(
+                    f"SELECT {self._chunk_select()}, 0.0 AS rank FROM chunks c "
+                    f"JOIN documents d ON d.id = c.doc_id WHERE c.id IN "
+                    f"({','.join('?' * len(missing))})", missing):
+                by_id[r["chunk_id"]] = self._score_chunk(r, plan, today, preferuj_nove)
+        fused = emb_mod.rrf([r["chunk_id"] for r in scored], [cid for cid, _ in hits])
+        out = []
+        for cid, r in by_id.items():
+            r["rrf"] = round(fused.get(cid, 0.0), 6)
+            r["podobnost"] = round(sims[cid], 4) if cid in sims else None
+            out.append(r)
+        out.sort(key=lambda x: (x["rrf"], x["score"], x["datum"] or ""), reverse=True)
+        return out
 
     # ------------------------------------------------------------ dokumenty
 
@@ -237,12 +455,21 @@ class KB:
     def find_people(self, query: str | None = None, role: str | None = None,
                     jednotka: str | None = None, region: str | None = None,
                     limit: int = 20) -> list[dict]:
-        """Hledání lidí: FTS podle jména/role/medailonku + podřetězcové filtry (bez diakritiky)."""
-        if query and fts_query(query):
+        """Hledání lidí: FTS podle jména/role/medailonku + podřetězcové filtry (bez diakritiky).
+
+        Jméno se hledá i v jiném pádě a bez přechýlení (kmeny), varianty z aliasů
+        (``Hřib`` -> ``Zdeněk Hřib``, ``Kuba Michálek``) dávají danému člověku přednost.
+        """
+        plan = self._plan(query) if query else None
+        alias_names: set[str] = set()
+        q_fold = " ".join(fold(query).split()) if query else ""
+        if plan:
+            weights = "5.0, 2.0, 1.0, 1.0, 4.0, 1.6, 0.8, 0.8" if self.stemmed else "5.0, 2.0, 1.0, 1.0"
             rows = self._rows(
-                "SELECT p.*, bm25(people_fts, 5.0, 2.0, 1.0, 1.0) AS rank FROM people_fts "
+                f"SELECT p.*, bm25(people_fts, {weights}) AS rank FROM people_fts "
                 "JOIN people p ON p.rowid = people_fts.rowid WHERE people_fts MATCH ? "
-                "ORDER BY rank LIMIT 500", (fts_query(query),))
+                "ORDER BY rank LIMIT 500", (self._fts(plan, "people_fts"),))
+            alias_names = {fold(t) for t in plan.alias_targets("osoba")}
         else:
             rows = self._rows("SELECT p.*, 0 AS rank FROM people p ORDER BY jmeno")
         f_role, f_unit, f_region = fold(role).strip(), fold(jednotka).strip(), fold(region).strip()
@@ -269,6 +496,11 @@ class KB:
                 if best is None:
                     continue
                 rank_bonus = best
+            jf = fold(r["jmeno"])
+            if jf in alias_names:
+                rank_bonus += 4.0            # varianta jména z aliasů
+            if q_fold and jf == q_fold:
+                rank_bonus += 3.0            # přesně celé jméno
             p = self._person_row(r)
             p["score"] = round(-float(r["rank"]) + rank_bonus, 3)
             out.append(p)
@@ -303,12 +535,16 @@ class KB:
         if hit is None:
             hit = next((r for r in rows if fold(r["nazev"]) == q), None)
         if hit is None:
-            expr = fts_query(query)
-            if expr:
+            hit = self._unit_by_alias(query, rows)
+        if hit is None:
+            plan = self._plan(query, {"zkratka", "jednotka"})
+            if plan:
+                weights = "10.0, 10.0, 1.0, 0.5, 8.0, 0.8, 0.4" if self.stemmed else "10.0, 10.0, 1.0, 0.5"
                 found = self._rows(
-                    "SELECT u.*, bm25(org_units_fts, 10.0, 10.0, 1.0, 0.5) AS rank "
+                    f"SELECT u.*, bm25(org_units_fts, {weights}) AS rank "
                     "FROM org_units_fts JOIN org_units u ON u.rowid = org_units_fts.rowid "
-                    "WHERE org_units_fts MATCH ? ORDER BY rank LIMIT 1", (expr,))
+                    "WHERE org_units_fts MATCH ? ORDER BY rank LIMIT 1",
+                    (self._fts(plan, "org_units_fts"),))
                 hit = found[0] if found else None
         if hit is None:
             return None
@@ -316,6 +552,24 @@ class KB:
         unit["podrizene"] = self._children(unit["nazev"])
         unit["nadrizene"] = self._ancestors(unit["nazev"])
         return unit
+
+    def _unit_by_alias(self, query: str, rows: list[dict]) -> dict | None:
+        """Jednotka podle tvaru názvu (``Republikovým předsednictvem``) nebo aliasu
+        (``RT Školství``, ``MRT Byd``, ``Kancelář``…)."""
+        key = alias_key(query)
+        if not key:
+            return None
+        by_key = {}
+        for r in rows:
+            for k in (alias_key(r["nazev"]), alias_key(r["zkratka"])):
+                if k:
+                    by_key.setdefault(k, r)
+        if key in by_key:
+            return by_key[key]
+        for e in self.aliases.lookup(key, query.strip(), {"zkratka", "jednotka"}):
+            if e.key in by_key:
+                return by_key[e.key]
+        return None
 
     def _unit_ref(self, nazev: str, url: str | None = None, druh: str | None = None) -> dict:
         r = self._rows("SELECT id, nazev, zkratka, druh, url FROM org_units WHERE nazev = ?",
@@ -444,21 +698,23 @@ class KB:
         kontakt (Mediální odbor / Kancelář strany), vždy pokud v bázi existuje.
         """
         limit = max(1, int(limit))
-        expr = fts_query(tema) if tema else ""
-        stems = query_stems(tema or "")
+        plan = self._plan(tema) if tema else None
         jednotky: list[dict] = []
-        if expr:
+        if plan:
+            weights = ("10.0, 5.0, 2.0, 1.0, 8.0, 1.6, 0.8" if self.stemmed
+                       else "10.0, 5.0, 2.0, 1.0")
             rows = self._rows(
-                "SELECT u.*, bm25(org_units_fts, 10.0, 5.0, 2.0, 1.0) AS rank FROM org_units_fts "
+                f"SELECT u.*, bm25(org_units_fts, {weights}) AS rank FROM org_units_fts "
                 "JOIN org_units u ON u.rowid = org_units_fts.rowid WHERE org_units_fts MATCH ? "
-                "ORDER BY rank LIMIT 40", (expr,))
+                "ORDER BY rank LIMIT 40", (self._fts(plan, "org_units_fts"),))
             scored = []
             for r in rows:
                 nf = fold(r["nazev"])
                 score = -float(r["rank"])
-                in_name = sum(1 for s in stems if s in nf)
+                m = plan.match(self._stems(r, ("nazev_stem", "nazev")))
+                in_name = sum(1.0 if x == 2 else 0.6 if x == 1 else 0.0 for x in m)
                 score += 3.0 * in_name
-                if stems and in_name == len(stems):
+                if all(m):
                     score += 2.0
                 if nf.startswith(self.EXPERT_UNIT_PREFIXES):
                     score += 3.0
@@ -486,23 +742,26 @@ class KB:
                 cur = candidates.get(r["id"])
                 if cur is None or cur["score"] < p["score"]:
                     candidates[r["id"]] = p
-        if expr:
+        if plan:
+            weights = ("1.0, 4.0, 2.0, 1.5, 0.8, 3.2, 1.6, 1.2" if self.stemmed
+                       else "1.0, 4.0, 2.0, 1.5")
             rows = self._rows(
-                "SELECT p.*, bm25(people_fts, 1.0, 4.0, 2.0, 1.5) AS rank FROM people_fts "
+                f"SELECT p.*, bm25(people_fts, {weights}) AS rank FROM people_fts "
                 "JOIN people p ON p.rowid = people_fts.rowid WHERE people_fts MATCH ? "
-                "ORDER BY rank LIMIT 40", (expr,))
+                "ORDER BY rank LIMIT 40", (self._fts(plan, "people_fts"),))
             for r in rows:
                 roles = _loads(r.get("role"), [])
                 score = -float(r["rank"])
-                hay = fold(r["role_text"]) + " " + fold(r["medailonek"]) + " " + fold(r["zarazeni"])
-                matched = sum(1 for s in stems if s in hay)
+                hay = self._stems(r, ("role_text_stem", "role_text"),
+                                  ("medailonek_stem", "medailonek"), ("zarazeni_stem", "zarazeni"))
+                matched = sum(1 for x in plan.match(hay) if x)
                 score += 1.5 * matched
                 best_role, best_unit, best = None, None, -1.0
                 for ro in roles:
                     if not isinstance(ro, dict):
                         continue
-                    rt = fold(ro.get("role")) + " " + fold(ro.get("jednotka"))
-                    n = sum(1 for s in stems if s in rt)
+                    rt = StemHay(stem_text(f"{ro.get('role') or ''} {ro.get('jednotka') or ''}"))
+                    n = sum(1 for x in plan.match(rt) if x)
                     b = n + (0.5 if any(l in fold(ro.get("role")) for l in self.LEAD_ROLES) else 0)
                     if b > best:
                         best, best_role, best_unit = b, ro.get("role"), ro.get("jednotka")
@@ -545,6 +804,7 @@ class KB:
             "proti": r["proti"], "zdrzel": r["zdrzel"], "nehlasoval": r["nehlasoval"],
             "url": r["url"], "pirati": _loads(r.get("pirati"), {}),
             "pirati_souhrn": _loads(r.get("pirati_souhrn"), {}),
+            "komora": r.get("komora") or "psp",
         }
 
     def _resolve_poslanec(self, poslanec: str) -> list[str]:
@@ -561,8 +821,10 @@ class KB:
 
     def search_votes(self, query: str | None = None, poslanec: str | None = None,
                      od: str | None = None, do: str | None = None,
-                     obdobi: int | None = None, limit: int = 20) -> list[dict]:
-        """Hlasování podle názvu, s filtrem na poslance (vrátí i jeho hlas), období a datum."""
+                     obdobi: int | None = None, limit: int = 20,
+                     komora: str | None = None) -> list[dict]:
+        """Hlasování podle názvu, s filtrem na poslance (vrátí i jeho hlas), období, datum
+        a komoru (psp | senat | ep)."""
         params: list = []
         joins, where = "", "1=1"
         names: list[str] = []
@@ -573,21 +835,34 @@ class KB:
             joins += " JOIN vote_members m ON m.id_hlasovani = v.id_hlasovani"
             where += f" AND m.jmeno IN ({','.join('?' * len(names))})"
             params.extend(names)
-        expr = fts_query(query) if query else ""
-        if expr:
+        plan = self._plan(query) if query else None
+        if query and not plan:
+            return []
+        if plan:
             joins += " JOIN votes_fts f ON f.rowid = v.id_hlasovani"
             where += " AND votes_fts MATCH ?"
-            params.append(expr)
+            params.append(self._fts(plan, "votes_fts"))
         if obdobi:
             where += " AND v.obdobi = ?"
             params.append(int(obdobi))
+        where += self._komora_clause(komora, params)
         where += self._date_clause("v.datum", od, do, params)
         select_extra = ", m.jmeno AS poslanec, m.hlas AS hlas" if poslanec else ""
-        order = "bm25(votes_fts), v.datum DESC" if expr else "v.datum DESC, v.cas DESC"
-        params.append(limit)
+        weights = "1.0, 0.8" if self.stemmed else "1.0"
+        select_rank = f", bm25(votes_fts, {weights}) AS rank" if plan else ""
+        order = "rank, v.datum DESC" if plan else "v.datum DESC, v.cas DESC"
+        params.append(max(limit * 5, 100) if plan else limit)
         rows = self._rows(
-            f"SELECT v.*{select_extra} FROM votes v{joins} WHERE {where} "
+            f"SELECT v.*{select_extra}{select_rank} FROM votes v{joins} WHERE {where} "
             f"ORDER BY {order} LIMIT ?", params)
+        if plan:
+            # přímé shody (slovo z dotazu) před shodami jen přes synonymum, pak BM25
+            for r in rows:
+                m = plan.match(self._stems(r, ("nazev_stem", "nazev")))
+                r["_prim"] = sum(1 for x in m if x == 2)
+                r["_any"] = sum(1 for x in m if x)
+            rows.sort(key=lambda r: (-r["_any"], -r["_prim"], r["rank"]))
+            rows = rows[:limit]
         out = []
         for r in rows:
             v = self._vote_row(r)
@@ -601,14 +876,24 @@ class KB:
         rows = self._rows("SELECT * FROM votes WHERE id_hlasovani = ?", (int(id_hlasovani),))
         return self._vote_row(rows[0]) if rows else None
 
+    def _komora_clause(self, komora: str | None, params: list) -> str:
+        if not komora:
+            return ""
+        cols = {r["name"] for r in self._rows("PRAGMA table_info(votes)")}
+        if "komora" not in cols:          # starší index: jen PSP
+            return "" if komora == "psp" else " AND 0"
+        params.append(komora)
+        return " AND v.komora = ?"
+
     def vote_summary(self, poslanec: str, od: str | None = None,
-                     do: str | None = None) -> dict:
+                     do: str | None = None, komora: str | None = None) -> dict:
         """Počty hlasů (ano/ne/zdrzel/nehlasoval/nepritomen/omluven) pro poslance."""
         names = self._resolve_poslanec(poslanec)
         if not names:
             return {"poslanec": poslanec, "nalezen": False, "celkem": 0, "hlasy": {}}
         params: list = list(names)
         where = f"m.jmeno IN ({','.join('?' * len(names))})"
+        where += self._komora_clause(komora, params)
         where += self._date_clause("v.datum", od, do, params)
         rows = self._rows(
             f"SELECT m.hlas, COUNT(*) AS n, MIN(v.datum) AS od, MAX(v.datum) AS do "
@@ -657,21 +942,23 @@ class KB:
     def search_social(self, query: str | None = None, osoba: str | None = None,
                       platforma: str | None = None, od: str | None = None,
                       do: str | None = None, limit: int = 20,
-                      bez_odpovedi: bool = True) -> list[dict]:
+                      bez_odpovedi: bool = True, preferuj_nove: bool = True) -> list[dict]:
         """Příspěvky poslanců na X/Bluesky: fulltext (skloňování přes prefixy) + filtry.
 
         Bez ``query`` vrací jen nejnovější příspěvky. ``osoba`` = jméno (i bez diakritiky,
         i jen příjmení) nebo handle; ``platforma`` = x | bluesky; ``bez_odpovedi`` vynechá
         odpovědi v diskusích (výchozí). Řazení: relevance (bm25 + bonus za shodu více slov
-        + mírný bonus za novost), při shodě skóre podle data sestupně.
+        + bonus za novost: max 2,0, poločas 1 rok; ``preferuj_nove=False`` ho vypne), při
+        shodě skóre podle data sestupně.
         """
         if not self._has_table("social_posts"):
             return []
         params: list = []
         joins, where = "", "1=1"
-        expr = fts_query(query) if query else ""
-        if query and not expr:
+        plan = self._plan(query) if query else None
+        if query and not plan:
             return []
+        expr = self._fts(plan, "social_posts_fts") if plan else ""
         if expr:
             joins += " JOIN social_posts_fts f ON f.rowid = s.pk"
             where += " AND social_posts_fts MATCH ?"
@@ -692,29 +979,29 @@ class KB:
             return [self._social_row(r) for r in rows]
 
         params.append(max(limit * 5, 100))
+        weights = "1.0, 0.2, 0.8" if self.stemmed else "1.0, 0.2"
         rows = self._rows(
-            f"SELECT s.*, bm25(social_posts_fts, 1.0, 0.2) AS rank FROM social_posts s{joins} "
+            f"SELECT s.*, bm25(social_posts_fts, {weights}) AS rank FROM social_posts s{joins} "
             f"WHERE {where} ORDER BY rank LIMIT ?", params)
-        stems = query_stems(query or "")
         today = dt.date.today()
         out = []
         for r in rows:
             score = -float(r["rank"])
-            hay = fold(r["text"])
-            matched = sum(1 for s in stems if s in hay)
-            if len(stems) > 1:
+            m = plan.match(self._stems(r, ("text_stem", "text")))
+            matched = sum(1.0 if x == 2 else 0.6 if x == 1 else 0.0 for x in m)
+            if len(m) > 1:
                 score += 2.0 * (matched - 1)
-                if matched == len(stems):
+                if all(m):
                     score += 1.0
-            # čerstvé příspěvky mírně nahoru (max 1.0, mizí po 2 letech)
-            try:
-                d = dt.date.fromisoformat(str(r["datum"])[:10])
-                score += max(0.0, 1.0 - (today - d).days / 730)
-            except (TypeError, ValueError):
-                pass
+            if preferuj_nove:   # čerstvé příspěvky nahoru (max 2,0, poločas 1 rok)
+                try:
+                    d = dt.date.fromisoformat(str(r["datum"])[:10])
+                    score += 2.0 * 0.5 ** (max(0, (today - d).days) / 365.25)
+                except (TypeError, ValueError):
+                    pass
             item = self._social_row(r)
             item["score"] = round(score, 3)
-            item["matched_tokens"] = matched
+            item["matched_tokens"] = sum(1 for x in m if x)
             out.append(item)
         # stabilní řazení: při stejném skóre novější první
         out.sort(key=lambda x: x["datum"] or "", reverse=True)

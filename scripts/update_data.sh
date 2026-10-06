@@ -8,8 +8,9 @@
 # --dry-run (-n) jen vypíše, co by se spustilo; nic nestahuje ani nezapisuje.
 #
 # Selhání jednoho zdroje nezastaví ostatní: zapíše se řádek "CHYBA: <zdroj>" a běh pokračuje.
-# Na konci se spustí ingest/validate.py, zapíše se data/AKTUALIZACE.md (stav po zdrojích) a
-# přestaví se index (python -m server.kb.build -q).
+# Na konci se spustí ingest/validate.py, zapíše se data/AKTUALIZACE.md (stav po zdrojích),
+# přestaví se index (python -m server.kb.build -q) a informativně proběhnou evals
+# (evals/run.py; výsledek neovlivní návratový kód ani commit dat).
 #
 # Návratový kód: 0 = vše v pořádku, 1 = některý zdroj selhal (ostatní data i stav jsou zapsané),
 #                2 = selhala kontrola dat (validate) nebo stavba indexu, 64 = chybné použití.
@@ -107,6 +108,17 @@ case "$MODE" in
     run_src evidence      evidence --plne
     run_src socialni_site social
     run_src subweby       subweby
+    # Regionální a tematické weby z Majáku: po dávkách (stav v data/subweby/stav.json),
+    # aby se týdenní běh vešel do limitu jobu; hotové weby se jen obnovují.
+    run_src subweby       subweby --z-majaku --limit-webu 15 --max-pozadavku 2500
+    # Seznam pirátských senátorů se první týdenní běh v měsíci zkontroluje v aktuálním
+    # funkčním období (volby, rezignace, nové mandáty; ~80 profilů); jinak jen RSS hlasování.
+    if [ "$(date -u +%d)" -le 7 ]; then
+      run_src senat       senat --aktualni
+    else
+      run_src senat       senat --jen-rss
+    fi
+    run_src ep            ep
     run_src dokumenty     dokumenty
     run_src systemy       systemy
     ;;
@@ -119,11 +131,14 @@ case "$MODE" in
     run_src socialni_site social
     run_src psp           psp
     run_src pirati_web    pirati-web --only aktuality
+    # Titulky z YouTube: malé dávky, YouTube z cloudu po desítkách videí blokuje
+    # (skript pak skončí kódem 3 a další běh pokračuje ze stav.json).
+    run_src youtube       youtube --limit 30
     ;;
 esac
 
 if [ "$DRY" = 1 ]; then
-  echo "==> [dry-run] by následovalo: validate, zápis data/AKTUALIZACE.md, python -m server.kb.build -q"
+  echo "==> [dry-run] by následovalo: validate, zápis data/AKTUALIZACE.md, python -m server.kb.build -q, evals (informativně)"
   exit 0
 fi
 
@@ -153,6 +168,14 @@ BUILD_RC=0
 "$PYTHON" -m server.kb.build -q || BUILD_RC=$?
 if [ "$BUILD_RC" -ne 0 ]; then
   echo "CHYBA: server.kb.build (kód $BUILD_RC)" >>"$LOG"
+fi
+
+# Evals jen informativně: skóre se vypíše do logu, ale návratový kód ani commit dat neblokuje
+# (CI je na pull requestech pouští s prahem). Zapisují jen evals/vysledky.json, nic do data/.
+if [ "$BUILD_RC" -eq 0 ] && [ -f evals/run.py ]; then
+  echo "==> evals (informativně)"
+  "$PYTHON" evals/run.py --prah 0.85 \
+    || echo "varování: evals pod prahem nebo selhaly (neblokuje aktualizaci dat)" >&2
 fi
 
 if [ -s "$LOG" ]; then

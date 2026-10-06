@@ -1,0 +1,36 @@
+---
+zdroj: https://moravskoslezsky.pirati.cz/aktuality/pirati-nastartovali-revoluci-v-parkovani-zmena-zakona-mestum-umozni-pruzne-nastavit-pravidla/
+nazev: Piráti nastartovali revoluci v parkování, změna zákona městům umožní pružně nastavit pravidla
+typ: tiskova-zprava
+datum: '2020-01-22'
+autor: Mediální odbor
+web: KS Moravskoslezský kraj
+web_url: https://moravskoslezsky.pirati.cz
+druh_webu: KS
+region: Moravskoslezský kraj
+tagy:
+- Sněmovna
+- Doprava
+- Ondřej Polanský
+- David Witosz
+viditelnost: verejne
+autorita: tz
+stazeno: '2026-10-06'
+---
+
+# Piráti nastartovali revoluci v parkování, změna zákona městům umožní pružně nastavit pravidla
+
+Praha, 22. ledna 2020 - **Co s parkováním v centru města, to je otázka, která pálí každou radnici. Sněmovna dnes schválila pozměňovací návrh pirátského poslance Ondřeje Polanského a poslankyně Zuzany Ožanové za hnutí ANO, který samosprávám umožní pružně nastavovat pravidla v parkovacích zónách. To dosud zákon neumožňoval a de facto tak bránil zavádění chytrých řešení v oblasti parkovacích zón.**
+
+<hr />
+> „Pozměňovací návrh mění pravidla užívání městských parkovacích zón. Abych byl přesnější, tak těm městským radám, které se rozhodnou toho využít, dává možnost převzít odpovědnost za pravidla parkování v tzv. parkovacích zónách. Otevírá se tak prostor pro chytrá řešení, která mohou přinést bez jediného kopnutí do země více parkovacích míst, umožní je sdílet a taky snadno najít díky mobilní aplikaci. Parkovací místo tak může například po část dne sloužit veřejnosti a odpoledne již jen rezidentům,”
+
+vysvětluje spoluautor pozměňovacího návrhu Ondřej Polanský, který na návrhu spolupracoval s ostravským radním za Piráty Davidem Witoszem. Ten na problém v zákoně narazil, když chtěl řešit parkování v centru Ostravy.
+
+Dosud možnosti parkování v parkovacích zónách vymezoval § 23 zákona 13/1997 o pozemních komunikacích. Právě jeho novelizaci dnes Sněmovna hladce schválila. Možnosti využití parkovacích zón byly zákonem poměrně omezené. Buď časové stání na maximálně 24 hodin, nebo musel mít majitel vozidla v dané zóně buď bydliště, nebo provozovnu.
+
+> „Pokud má člověk vozidlo na operativní leasing, podle původní úpravy neměl právo zaparkovat ve své domácí zóně. Situace se komplikovala také například ve chvíli, kdy si domů lidé potřebovali pozvat řemeslníka nebo jim přijela na víkend rodina. Neřešitelná byla i situace, kdy se rezidentům pokazilo vozidlo a servis jim vydal náhradní. To vše teď mohou samosprávy změnit a vymyslet řešení šitá na míru. Novela městům umožní specifikovat dodatečné možnosti a podmínky parkování městskou vyhláškou,”
+
+dodává Polanský.
+
+<hr />

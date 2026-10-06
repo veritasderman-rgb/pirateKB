@@ -1,0 +1,528 @@
+# Evals znalostní báze Pirátů: typické otázky uživatelů a co musí odpověď obsahovat.
+#
+# Spuštění: python3 evals/run.py  (viz evals/run.py a server/README.md, sekce „Zpětná vazba a evals“)
+#
+# Každá otázka:
+#   id               jedinečný identifikátor (prefix = kategorie)
+#   kategorie        lide | organy | program | stanoviska | tiskove-zpravy | hlasovani | brand |
+#                    sablony | schuzky | systemy | media | socialni-site
+#   otazka           jak by se zeptal člověk (pro čtenáře a reporty)
+#   tool, argumenty  který tool MCP serveru má AI zavolat a s čím
+#   ocekavane        aspoň jeden z řetězců musí být ve výstupu (bez ohledu na diakritiku a velikost)
+#   nesmi_obsahovat  (volitelně) žádný z řetězců nesmí být ve výstupu
+#   zdroj_musi_byt   (volitelně) doména (nebo seznam domén), z níž musí být ve výstupu aspoň jedna URL
+#
+# Pozor: tool v odpovědi často opakuje dotaz („Výsledky hledání „X““, „Žádná tisková zpráva k „X““),
+# proto `ocekavane` nesmí být jen slova z argumentů; použij text, který je jen ve správné odpovědi
+# (název dokumentu, jméno, e-mail, URL), případně přidej `nesmi_obsahovat` s hláškou „nic nenalezeno“.
+#
+# Otázky stojí nad skutečnými daty v data/ (stav 2026-10). Když se data změní (nový předseda,
+# jiné vedení jednotky), uprav očekávání tady, ne práh v CI.
+
+verze: 1
+otazky:
+
+  # ------------------------------------------------------------------ lidé
+  - id: lide-01
+    kategorie: lide
+    otazka: Kdo je předsedou České pirátské strany?
+    tool: find_people
+    argumenty: {role: předseda, jednotka: Republikové předsednictvo}
+    ocekavane: [Zdeněk Hřib]
+    zdroj_musi_byt: lide.pirati.cz
+
+  - id: lide-02
+    kategorie: lide
+    otazka: Kdo jsou místopředsedové Pirátů?
+    tool: find_people
+    argumenty: {role: místopředseda, jednotka: Republikové předsednictvo}
+    ocekavane: [Jiří Hlavenka, Martin Šmída]
+    zdroj_musi_byt: lide.pirati.cz
+
+  - id: lide-03
+    kategorie: lide
+    otazka: Jaký e-mail má Olga Richterová?
+    tool: find_people
+    argumenty: {query: Richterová}
+    ocekavane: [olga.richterova@pirati.cz]
+    zdroj_musi_byt: lide.pirati.cz
+
+  - id: lide-04
+    kategorie: lide
+    otazka: Kdo předsedá pražskému krajskému sdružení?
+    tool: find_people
+    argumenty: {role: předseda, jednotka: KS Praha}
+    ocekavane: [Ondřej Melena]
+    zdroj_musi_byt: lide.pirati.cz
+
+  - id: lide-05
+    kategorie: lide
+    otazka: Kteří Piráti sedí ve Sněmovně?
+    tool: find_people
+    argumenty: {role: poslanec, limit: 30}
+    ocekavane: [Poslanecký klub Pirátů]
+    nesmi_obsahovat: [Nikdo neodpovídá]
+
+  # ------------------------------------------------------------------ orgány
+  - id: organy-01
+    kategorie: organy
+    otazka: Co je RP a kdo v něm sedí?
+    tool: get_org_unit
+    argumenty: {nazev_nebo_zkratka: RP}
+    ocekavane: [Republikové předsednictvo]
+    zdroj_musi_byt: lide.pirati.cz
+
+  - id: organy-02
+    kategorie: organy
+    otazka: Co je RV?
+    tool: get_org_unit
+    argumenty: {nazev_nebo_zkratka: RV}
+    ocekavane: [Republikový výbor]
+    zdroj_musi_byt: pirati.cz
+
+  - id: organy-03
+    kategorie: organy
+    otazka: Jaký je kontakt na krajské sdružení Praha?
+    tool: get_org_unit
+    argumenty: {nazev_nebo_zkratka: KS Praha}
+    ocekavane: [praha@pirati.cz]
+
+  - id: organy-04
+    kategorie: organy
+    otazka: Kdo vede Kancelář strany?
+    tool: get_org_unit
+    argumenty: {nazev_nebo_zkratka: Kancelář strany}
+    ocekavane: [Jiří Kárský]
+    zdroj_musi_byt: lide.pirati.cz
+
+  - id: organy-05
+    kategorie: organy
+    otazka: Jaké týmy spadají pod republikové předsednictvo?
+    tool: get_org_tree
+    argumenty: {root: RP, depth: 1}
+    ocekavane: [Kancelář strany]
+    zdroj_musi_byt: lide.pirati.cz
+
+  # ------------------------------------------------------------------ program
+  - id: program-01
+    kategorie: program
+    otazka: Co Piráti navrhují pro dostupné bydlení?
+    tool: get_program
+    argumenty: {tema: bydlení}
+    ocekavane: [ročních platů, dostupné bydlení, dostupnost bydlení]
+    zdroj_musi_byt: pirati.cz
+
+  - id: program-02
+    kategorie: program
+    otazka: Co říká program pro sněmovní volby 2025 o školství?
+    tool: get_program
+    argumenty: {tema: školství, dokument: sněmovní volby 2025}
+    ocekavane: [Špičkové školství]
+    zdroj_musi_byt: pirati.cz
+
+  - id: program-03
+    kategorie: program
+    otazka: Jaký mají Piráti program k digitalizaci státu?
+    tool: get_program
+    argumenty: {tema: digitalizace}
+    ocekavane: [Digitalizace státu]
+
+  - id: program-04
+    kategorie: program
+    otazka: Co je Pirátská hospodářská strategie?
+    tool: search_kb
+    argumenty: {query: hospodářská strategie, typ: [programovy-dokument]}
+    ocekavane: [Pirátská hospodářská strategie]
+
+  - id: program-05
+    kategorie: program
+    otazka: Co Piráti slibují v komunálních volbách 2026 k dopravě?
+    tool: get_program
+    argumenty: {tema: doprava, dokument: komunální volby 2026}
+    ocekavane: [Chytrá dopravní řešení, "autorita: program"]
+    nesmi_obsahovat: [nenalezen. Dostupné programové dokumenty]
+
+  # ------------------------------------------------------------------ stanoviska
+  - id: stanoviska-01
+    kategorie: stanoviska
+    otazka: Chtějí Piráti vystoupit z NATO?
+    tool: get_position
+    argumenty: {tema: NATO}
+    ocekavane: [Stanovisko Pirátů k spojenecké alianci NATO]
+    zdroj_musi_byt: pirati.cz
+
+  - id: stanoviska-02
+    kategorie: stanoviska
+    otazka: Jaký je postoj Pirátů k drogám a návykovému chování?
+    tool: get_position
+    argumenty: {tema: návykové chování}
+    ocekavane: [Stanovisko Pirátů k návykovému chování]
+
+  - id: stanoviska-03
+    kategorie: stanoviska
+    otazka: Jak mají podle Pirátů státy hlasovat v Radě EU?
+    tool: search_kb
+    argumenty: {query: hlasování v Radě EU, typ: [stanovisko]}
+    ocekavane: [Stanovisko Pirátů k hlasování v Radě Evropské unie]
+
+  - id: stanoviska-04
+    kategorie: stanoviska
+    otazka: Mají Piráti oficiální stanovisko k jaderné energetice?
+    tool: get_position
+    argumenty: {tema: jaderná energetika}
+    # báze stanovisko nemá: tool to musí říct, ne si ho vymyslet
+    ocekavane: [V bázi není žádné stanovisko]
+
+  - id: stanoviska-05
+    kategorie: stanoviska
+    otazka: Jaký je postoj Pirátů ke qwrtz xyzzy?
+    tool: search_kb
+    argumenty: {query: qwrtz xyzzy}
+    ocekavane: [Přesnou odpověď jsem nenašel]
+
+  # ------------------------------------------------------------------ tiskové zprávy
+  - id: tz-01
+    kategorie: tiskove-zpravy
+    otazka: Co Piráti vydali k Chat Control?
+    tool: search_press_releases
+    argumenty: {query: chat control, limit: 5}
+    ocekavane: [Chat Control 1.0, šifrov, soukrom]
+    nesmi_obsahovat: [Žádná tisková zpráva]
+    zdroj_musi_byt: pirati.cz
+
+  - id: tz-02
+    kategorie: tiskove-zpravy
+    otazka: Co Piráti říkali k poplatkům OSA?
+    tool: search_press_releases
+    argumenty: {query: OSA poplatky, limit: 5}
+    ocekavane: [poplatkům OSA, poplatky OSA, poplatky pro OSA]
+    zdroj_musi_byt: pirati.cz
+
+  - id: tz-03
+    kategorie: tiskove-zpravy
+    otazka: Jaké tiskové zprávy vydali Piráti k Agrofertu od roku 2025?
+    tool: search_press_releases
+    argumenty: {query: Agrofert, od: "2025-01-01", limit: 5}
+    ocekavane: [střet zájmů]
+    nesmi_obsahovat: [Žádná tisková zpráva]
+    zdroj_musi_byt: pirati.cz
+
+  - id: tz-04
+    kategorie: tiskove-zpravy
+    otazka: Co jsme vydali k dostupnému bydlení?
+    tool: search_press_releases
+    argumenty: {query: dostupné bydlení, limit: 5}
+    ocekavane: [dostupnost bydlení, dostupného bydlení, dostupnosti bydlení, dostupnější bydlení, dostupne-bydleni]
+    nesmi_obsahovat: [Žádná tisková zpráva]
+    zdroj_musi_byt: pirati.cz
+
+  - id: tz-05
+    kategorie: tiskove-zpravy
+    otazka: Vydali Piráti tiskovou zprávu o qwrtz xyzzy?
+    tool: search_press_releases
+    argumenty: {query: qwrtz xyzzy}
+    ocekavane: [Žádná tisková zpráva]
+
+  # ------------------------------------------------------------------ hlasování
+  - id: hlasovani-01
+    kategorie: hlasovani
+    otazka: Jak hlasuje poslanec Zdeněk Hřib?
+    tool: get_voting_record
+    argumenty: {poslanec: Hřib, limit: 5}
+    ocekavane: ["Souhrn hlasování: Zdeněk Hřib"]
+    zdroj_musi_byt: psp.cz
+
+  - id: hlasovani-02
+    kategorie: hlasovani
+    otazka: Jak hlasoval Ondřej Profant o novele stavebního zákona?
+    tool: get_voting_record
+    argumenty: {poslanec: Profant, query: stavební zákon, limit: 5}
+    ocekavane: [Novela z. - stavební zákon]
+    zdroj_musi_byt: psp.cz
+
+  - id: hlasovani-03
+    kategorie: hlasovani
+    otazka: Jak hlasovali Piráti o důvěře vládě?
+    tool: get_voting_record
+    argumenty: {query: důvěra vládě, limit: 5}
+    ocekavane: [Vyslovení důvěry vládě]
+    zdroj_musi_byt: psp.cz
+
+  - id: hlasovani-04
+    kategorie: hlasovani
+    otazka: Jak Piráti hlasovali o rozpočtech v aktuálním volebním období?
+    tool: get_voting_record
+    argumenty: {query: rozpočet, obdobi: 2025, limit: 5}
+    ocekavane: [Výsledek sněmovny]
+    nesmi_obsahovat: [Žádné hlasování neodpovídá]
+    zdroj_musi_byt: psp.cz
+
+  - id: hlasovani-05
+    kategorie: hlasovani
+    otazka: Jak hlasoval poslanec Nikdo Neexistuje?
+    tool: get_voting_record
+    argumenty: {poslanec: Nikdo Neexistuje}
+    ocekavane: [nenalezen]
+    nesmi_obsahovat: [Souhrn hlasování]
+
+  # ------------------------------------------------------------------ brand
+  - id: brand-01
+    kategorie: brand
+    otazka: Jaký hex kód má pirátská žlutá?
+    tool: get_brand
+    argumenty: {cast: barvy}
+    ocekavane: ["#fec934"]
+    zdroj_musi_byt: styleguide.pirati.cz
+
+  - id: brand-02
+    kategorie: brand
+    otazka: Jaká písma Piráti používají?
+    tool: get_brand
+    argumenty: {cast: fonty}
+    ocekavane: [Bebas Neue]
+    zdroj_musi_byt: styleguide.pirati.cz
+
+  - id: brand-03
+    kategorie: brand
+    otazka: Kde stáhnu logo Pirátů ve vektoru?
+    tool: get_brand
+    argumenty: {cast: loga}
+    ocekavane: [logo.svg]
+    zdroj_musi_byt: pirati.cz
+
+  - id: brand-04
+    kategorie: brand
+    otazka: Jak správně používat logo a barvy?
+    tool: get_brand
+    argumenty: {cast: pravidla}
+    ocekavane: [ochrannou zónu]
+
+  - id: brand-05
+    kategorie: brand
+    otazka: Jaká je hlavní černá barva Pirátů?
+    tool: get_brand
+    argumenty: {cast: vse}
+    ocekavane: ["#000000"]
+    nesmi_obsahovat: [Neznámá část]
+
+  # ------------------------------------------------------------------ šablony
+  - id: sablony-01
+    kategorie: sablony
+    otazka: Jak má vypadat tisková zpráva Pirátů?
+    tool: get_template
+    argumenty: {typ: tiskova-zprava}
+    ocekavane: [Město]
+
+  - id: sablony-02
+    kategorie: sablony
+    otazka: Jak napsat scénář na Reels?
+    tool: get_template
+    argumenty: {typ: reels}
+    ocekavane: [Hook]
+
+  - id: sablony-03
+    kategorie: sablony
+    otazka: Potřebuju šablonu briefu k tématu.
+    tool: get_template
+    argumenty: {typ: brief}
+    ocekavane: ["# Brief:"]
+
+  - id: sablony-04
+    kategorie: sablony
+    otazka: Kolik slov má mít pětiminutový projev?
+    tool: get_template
+    argumenty: {typ: projev}
+    ocekavane: [130 slov]
+
+  - id: sablony-05
+    kategorie: sablony
+    otazka: Jak psát příspěvky na sociální sítě?
+    tool: get_template
+    argumenty: {typ: social-post}
+    ocekavane: [Jedna myšlenka]
+    nesmi_obsahovat: [neexistuje]
+
+  # ------------------------------------------------------------------ schůzky (evidence kontaktů)
+  - id: schuzky-01
+    kategorie: schuzky
+    otazka: Jednal někdo z Pirátů s náměstkyní Kolářovou o KMČ?
+    tool: search_kb
+    argumenty: {query: náměstkyně Kolářová KMČ, typ: [schuzka], limit: 3}
+    ocekavane: [Schůzka s náměstkyní Kolářovou]
+    zdroj_musi_byt: evidence.pirati.cz
+
+  - id: schuzky-02
+    kategorie: schuzky
+    otazka: Proběhla schůzka k regulaci konopí a CBD?
+    tool: search_kb
+    argumenty: {query: regulace konopí CBD, typ: [schuzka], limit: 3}
+    ocekavane: [Schůzka kolem regulace konopí]
+    zdroj_musi_byt: evidence.pirati.cz
+
+  - id: schuzky-03
+    kategorie: schuzky
+    otazka: Setkali se Piráti se Svazem autorů a interpretů?
+    tool: search_kb
+    argumenty: {query: Svaz autorů a interpretů, typ: [schuzka], limit: 3}
+    ocekavane: [Svazu autorů a interpretů]
+    zdroj_musi_byt: evidence.pirati.cz
+
+  - id: schuzky-04
+    kategorie: schuzky
+    otazka: Jednali Piráti s Ekospolem o Zličíně?
+    tool: search_kb
+    argumenty: {query: memorandum Zličín Ekospol, typ: [schuzka], limit: 3}
+    ocekavane: [Memorandum Zličín - Ekospol]
+    zdroj_musi_byt: evidence.pirati.cz
+
+  - id: schuzky-05
+    kategorie: schuzky
+    otazka: Jsou v evidenci zaznamenané lobbistické kontakty?
+    tool: search_kb
+    argumenty: {query: lobbing, typ: [schuzka], limit: 3}
+    ocekavane: [Lobbing pana Bašty, Lobbing před]
+    zdroj_musi_byt: evidence.pirati.cz
+
+  # ------------------------------------------------------------------ systémy / kam s problémem
+  - id: systemy-01
+    kategorie: systemy
+    otazka: Kam nahlásit technický problém s pirátskými systémy?
+    tool: search_kb
+    argumenty: {query: technický problém helpdesk, limit: 5}
+    ocekavane: [Redmine]
+
+  - id: systemy-02
+    kategorie: systemy
+    otazka: Kde si obnovím heslo k pirátskému účtu?
+    tool: search_kb
+    argumenty: {query: obnova hesla jednotné přihlášení, limit: 5}
+    ocekavane: [auth.pirati.cz]
+
+  - id: systemy-03
+    kategorie: systemy
+    otazka: Jak se stát členem nebo příznivcem Pirátů?
+    tool: search_kb
+    argumenty: {query: přihláška člen nalodění, limit: 5}
+    # URL je v úryvku rozdělená zvýrazněním hledaného slova ([nalodeni].pirati.cz)
+    ocekavane: [stát příznivcem, nalodeni.pirati.cz]
+
+  - id: systemy-04
+    kategorie: systemy
+    otazka: Kde najdu smlouvy, které strana uzavřela?
+    tool: search_kb
+    argumenty: {query: registr smluv, typ: [system, navod], limit: 5}
+    ocekavane: [smlouvy.pirati.cz, uzavírám smlouvu]
+
+  - id: systemy-05
+    kategorie: systemy
+    otazka: Koho se zeptat na reformu školství?
+    tool: find_expert
+    argumenty: {tema: školství}
+    ocekavane: [Resortní tým Školství]
+    zdroj_musi_byt: lide.pirati.cz
+
+  # ------------------------------------------------------------------ média (externí články)
+  - id: media-01
+    kategorie: media
+    otazka: Co psala média o Jiřím Hlavenkovi a jeho byznysu s letenkami?
+    tool: search_kb
+    argumenty: {query: Hlavenka letenky, typ: [clanek-media], limit: 3}
+    ocekavane: [Hospodářské noviny]
+
+  - id: media-02
+    kategorie: media
+    otazka: Jaké články o Pirátech vyšly v médiích v roce 2026?
+    tool: search_kb
+    argumenty: {query: Články o Pirátech, typ: [clanek-media], od: "2026-01-01", limit: 3}
+    ocekavane: ["Autorita: externí média"]
+    nesmi_obsahovat: [báze nic nenašla]
+
+  - id: media-03
+    kategorie: media
+    otazka: Psala média o tom, že Piráti nepůjdou do koalice s ODS?
+    tool: search_kb
+    argumenty: {query: koalice ODS Michálek, typ: [clanek-media], limit: 3}
+    ocekavane: [Články o Pirátech]
+    nesmi_obsahovat: [báze nic nenašla]
+
+  - id: media-04
+    kategorie: media
+    otazka: Je mediální článek o Pirátech oficiální stanovisko strany?
+    tool: search_kb
+    argumenty: {query: Piráti, typ: [clanek-media], limit: 2}
+    # autorita externích médií musí být ve výstupu vyznačená
+    ocekavane: [externí média]
+
+  - id: media-05
+    kategorie: media
+    otazka: Co psala média o Ferjenčíkovi, Hřibovi a Bartošovi?
+    tool: search_kb
+    argumenty: {query: Ferjenčík Hřib Bartoš, typ: [clanek-media], limit: 3}
+    ocekavane: [CNN Prima News, sekáč]
+
+  # ------------------------------------------------------------------ sociální sítě
+  - id: socialni-01
+    kategorie: socialni-site
+    otazka: Co psal Ivan Bartoš na sítích o bydlení?
+    tool: get_social_posts
+    argumenty: {osoba: Bartoš, query: bydlení, limit: 5}
+    ocekavane: [Ivan Bartoš]
+    zdroj_musi_byt: [x.com, bsky.app]
+
+  - id: socialni-02
+    kategorie: socialni-site
+    otazka: Co naposledy psala Barbora Pipášová na X?
+    tool: get_social_posts
+    argumenty: {osoba: Pipášová, limit: 3}
+    ocekavane: [Barbora Pipášová]
+    zdroj_musi_byt: x.com
+
+  - id: socialni-03
+    kategorie: socialni-site
+    otazka: Co píší pirátští poslanci na Bluesky?
+    tool: get_social_posts
+    argumenty: {platforma: bluesky, limit: 3}
+    ocekavane: [Bluesky (@]
+    zdroj_musi_byt: bsky.app
+
+  - id: socialni-04
+    kategorie: socialni-site
+    otazka: Je příspěvek poslance o Agrofertu stanovisko strany?
+    tool: get_social_posts
+    argumenty: {query: Agrofert, limit: 3}
+    # výstup musí upozornit, že jde o názor jednotlivce
+    ocekavane: [NENÍ stanovisko strany, ne stanovisko strany]
+    zdroj_musi_byt: [x.com, bsky.app]
+
+  - id: socialni-05
+    kategorie: socialni-site
+    otazka: Co psal na sítích Nikdo Neexistuje?
+    tool: get_social_posts
+    argumenty: {osoba: Nikdo Neexistuje}
+    ocekavane: [nemá v bázi žádné příspěvky]
+
+  - id: hlasovani-ep-01
+    kategorie: hlasovani
+    otazka: Jak hlasovala Markéta Gregorová v Evropském parlamentu?
+    tool: get_voting_record
+    argumenty: {poslanec: Gregorová, komora: ep, limit: 3}
+    ocekavane: [Výsledek v EP]
+    nesmi_obsahovat: [nenalezen]
+    zdroj_musi_byt: howtheyvote.eu
+
+  - id: hlasovani-senat-01
+    kategorie: hlasovani
+    otazka: Jak hlasovala senátorka Adéla Šípová?
+    tool: get_voting_record
+    argumenty: {poslanec: Šípová, komora: senat, limit: 3}
+    ocekavane: [Výsledek v Senátu]
+    nesmi_obsahovat: [nenalezen]
+    zdroj_musi_byt: senat.cz
+
+  - id: brand-kurator-01
+    kategorie: brand
+    otazka: Jaká je ochranná zóna loga?
+    tool: search_kb
+    argumenty: {query: ochranná zóna loga, limit: 3}
+    ocekavane: [kurátorovaný obsah]
+    zdroj_musi_byt: styleguide.pirati.cz

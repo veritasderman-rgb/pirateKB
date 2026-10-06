@@ -47,7 +47,7 @@ DOC_PAGE_CHARS = 7000     # velikost stránky pro get_document
 DOC_TYPES = ["tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument",
              "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
              "materialy", "prispevek-socialni-site", "schuzka", "navod", "system",
-             "clanek-media"]
+             "clanek-media", "prepis-videa", "slovnik", "sablona", "vysledek", "material"]
 SOCIAL_PLATFORMS = ["x", "bluesky"]
 TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev"]
 BRAND_PARTS = ["vse", "barvy", "fonty", "loga", "pravidla"]
@@ -63,6 +63,11 @@ AUTORITA_POPIS = {
     "oficialni-evidence": "oficiální evidence lide.pirati.cz",
     "oficialni-styleguide": "oficiální styleguide.pirati.cz",
     "oficialni-data-psp": "otevřená data Poslanecké sněmovny",
+    "oficialni-data-senat": "veřejná data Senátu (hlasování senátorů)",
+    "oficialni-data-ep": "data o hlasování v Evropském parlamentu (HowTheyVote.eu)",
+    "kurator-schvaleno": "kurátorovaný obsah schválený kurátorem báze (nejvyšší spolehlivost v bázi)",
+    "kurator-navrh": "kurátorovaný obsah – NÁVRH, kurátor ho zatím neschválil",
+    "kurator": "kurátorovaný obsah sestavený z více zdrojů",
     "nazor-jednotlivce": "názor jednotlivce (NENÍ stanovisko strany)",
     "vyjadreni-politika": "vyjádření politika na sociální síti (názor jednotlivce, NENÍ stanovisko strany)",
 }
@@ -75,9 +80,12 @@ AUTORITA_PODLE_TYPU = {
 }
 
 SERVER_INSTRUCTIONS = """Znalostní báze České pirátské strany (lidé, organizace, program,
-stanoviska, tiskové zprávy, hlasování v PSP, příspěvky poslanců na X a Bluesky, brand,
-šablony). Data jsou automaticky vytěžená z veřejných zdrojů (pirati.cz, lide.pirati.cz,
-psp.cz, styleguide.pirati.cz, X, Bluesky) a nejsou kurátorovaná. Pravidla pro odpovědi:
+stanoviska, tiskové zprávy, hlasování v PSP, Senátu a Evropském parlamentu, příspěvky
+poslanců na X a Bluesky, přepisy videí z YouTube, weby krajských a místních sdružení,
+brand, šablony). Většina dat je automaticky vytěžená z veřejných zdrojů (pirati.cz a weby
+sdružení, lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, styleguide.pirati.cz, X,
+Bluesky, YouTube) a není kurátorovaná; dokumenty s autoritou „kurator-schvaleno“ schválil
+kurátor báze, „kurator-navrh“ je zatím jen návrh. Pravidla pro odpovědi:
 1. U každého tvrzení cituj URL ze pole „Zdroj“.
 2. Rozlišuj autoritu: program a usnesení = oficiální postoj strany; tisková zpráva =
    oficiální výstup, ale ne usnesení; článek na webu, profil, názor jednotlivce nebo
@@ -86,7 +94,8 @@ psp.cz, styleguide.pirati.cz, X, Bluesky) a nejsou kurátorovaná. Pravidla pro 
 4. Začni toolem search_kb nebo get_position; pro lidi find_people, pro brand get_brand,
    pro šablony get_template, pro vyjádření poslanců na sítích get_social_posts.
 5. Když báze nemá přesnou odpověď, řekni to a doporuč konkrétní osobu s kontaktem
-   (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu."""
+   (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu.
+6. Když nenajdeš odpověď ani po find_expert, zavolej report_gap s původní otázkou."""
 
 
 # =============================================================================
@@ -263,6 +272,11 @@ def _full_matches(results: list[dict], query: str) -> tuple[list[dict], bool]:
         return results, True
     if len(stems) < 2:
         return results, True
+    if results and all("shoda_vsech" in r for r in results):
+        # Index se stemmerem a aliasy už ví, zda se shodly všechny pojmy dotazu
+        # (i přes jiný tvar slova nebo synonymum); podřetězce by je mylně vyřadily.
+        full = [r for r in results if r["shoda_vsech"]]
+        return (full, True) if full else (results, False)
     full = []
     for r in results:
         hay = fold(" ".join(_s(r.get(k)) for k in ("nazev", "nadpis", "snippet")))
@@ -988,6 +1002,16 @@ def search_press_releases(query: str, od: str | None = None, do: str | None = No
     return _cap_with_tail(f"Tiskové zprávy k „{q}“ ({len(results)}):\n\n" + _fmt_results(results), tail)
 
 
+KOMORY = {
+    "psp": {"nazev": "Poslanecká sněmovna", "vysledek": "Výsledek sněmovny",
+            "zdroj": "https://www.psp.cz/sqw/hp.sqw?k=1300 (otevřená data PSP)"},
+    "senat": {"nazev": "Senát", "vysledek": "Výsledek v Senátu",
+              "zdroj": "https://www.senat.cz/ (RSS hlasování senátorů; celkové počty hlasů nejsou k dispozici)"},
+    "ep": {"nazev": "Evropský parlament", "vysledek": "Výsledek v EP",
+           "zdroj": "https://howtheyvote.eu/ (HowTheyVote.eu, licence ODbL; jen závěrečná hlasování)"},
+}
+
+
 def _fmt_vote(i: int, v: dict) -> str:
     souhrn = v.get("pirati_souhrn") or {}
     souhrn_txt = ", ".join(f"{k} {n}" for k, n in souhrn.items() if n) if isinstance(souhrn, dict) else _s(souhrn)
@@ -995,13 +1019,17 @@ def _fmt_vote(i: int, v: dict) -> str:
     lines = [f"{i}. **{nazev or 'bez názvu'}** ({_s(v.get('datum'))}"
              + (f" {_s(v.get('cas'))}" if not _blank(v.get("cas")) else "") + ")"]
     vys = _clean(v.get("vysledek"))
-    counts = f"pro {_s(v.get('pro'))}, proti {_s(v.get('proti'))}, zdrželo se {_s(v.get('zdrzel'))}"
-    lines.append(f"   Výsledek sněmovny: {vys or '?'} ({counts})")
+    komora = KOMORY.get(v.get("komora") or "psp", KOMORY["psp"])
+    if v.get("pro") is None and v.get("proti") is None:
+        counts = "celkové počty nejsou v datech"
+    else:
+        counts = f"pro {_s(v.get('pro'))}, proti {_s(v.get('proti'))}, zdrželo se {_s(v.get('zdrzel'))}"
+    lines.append(f"   {komora['vysledek']}: {vys or '?'} ({counts})")
     if not _blank(v.get("poslanec")):
         lines.append(f"   {_clean(v.get('poslanec'))}: **{_clean(v.get('hlas')) or '?'}**")
     if souhrn_txt:
         lines.append(f"   Piráti celkem: {souhrn_txt}")
-    lines.append(f"   Zdroj: {_s(v.get('url')) or 'psp.cz'} | id_hlasovani: {_s(v.get('id_hlasovani'))}"
+    lines.append(f"   Zdroj: {_s(v.get('url')) or '?'} | {komora['nazev']} | id_hlasovani: {_s(v.get('id_hlasovani'))}"
                  + (f" | období: {_s(v.get('obdobi'))}" if not _blank(v.get("obdobi")) else ""))
     return "\n".join(lines)
 
@@ -1052,24 +1080,36 @@ def find_expert(tema: str) -> str:
 @_guard
 def get_voting_record(poslanec: str | None = None, query: str | None = None,
                       od: str | None = None, do: str | None = None,
-                      obdobi: int | None = None, limit: int = 20) -> str:
-    """Hlasování pirátských poslanců v Poslanecké sněmovně (otevřená data psp.cz,
-    období 2017, 2021 a 2025). Vrací název hlasování, datum, výsledek, jak hlasovali
-    Piráti a odkaz na psp.cz. Při zadání `poslanec` (jméno nebo příjmení) přidá jeho
-    hlas u každého hlasování a celkový souhrn (ano/ne/zdržel/nehlasoval/nepřítomen).
-    query = slova z názvu hlasování (zákon, tisk); od/do = YYYY-MM-DD; obdobi = rok
-    voleb (2017, 2021, 2025); limit výchozí 20 (max 100)."""
-    if all(_blank(x) for x in (poslanec, query, od, do, obdobi)):
-        return ("Zadej aspoň jeden filtr: poslanec (jméno), query (název hlasování), od/do nebo obdobi. "
-                "Např. `get_voting_record(poslanec=\"Hřib\", query=\"rozpočet\")`.")
+                      obdobi: int | None = None, limit: int = 20,
+                      komora: str | None = None) -> str:
+    """Hlasování pirátských zástupců: Poslanecká sněmovna (psp.cz, období 2017, 2021,
+    2025), Senát (senat.cz, pirátští senátoři od 2012) a Evropský parlament
+    (HowTheyVote.eu, europoslanci od 2019; názvy hlasování anglicky). Vrací název
+    hlasování, datum, výsledek, jak hlasovali Piráti a odkaz na zdroj. Při zadání
+    `poslanec` (jméno nebo příjmení poslance, senátora či europoslance) přidá jeho hlas
+    u každého hlasování a celkový souhrn (ano/ne/zdržel/nehlasoval/nepřítomen).
+    query = slova z názvu hlasování (zákon, tisk; u EP anglicky); od/do = YYYY-MM-DD;
+    obdobi = rok začátku období (PSP 2017/2021/2025, Senát rok funkčního období,
+    EP 2019/2024); komora = psp | senat | ep (výchozí všechny); limit výchozí 20 (max 100)."""
+    if all(_blank(x) for x in (poslanec, query, od, do, obdobi, komora)):
+        return ("Zadej aspoň jeden filtr: poslanec (jméno), query (název hlasování), od/do, obdobi "
+                "nebo komora (psp, senat, ep). Např. `get_voting_record(poslanec=\"Hřib\", query=\"rozpočet\")`.")
+    k = _clean(komora).lower() if not _blank(komora) else None
+    if k in ("sněmovna", "snemovna", "ps"):
+        k = "psp"
+    if k in ("senát",):
+        k = "senat"
+    if k is not None and k not in KOMORY:
+        return "Neznámá komora „" + _s(komora) + "“. Povolené hodnoty: psp, senat, ep."
     kb = get_kb()
     limit = max(1, min(int(limit or 20), 100))
     votes = kb.search_votes(query=_clean(query) or None, poslanec=_clean(poslanec) or None,
                             od=od or None, do=do or None,
-                            obdobi=int(obdobi) if not _blank(obdobi) else None, limit=limit)
+                            obdobi=int(obdobi) if not _blank(obdobi) else None, limit=limit,
+                            komora=k)
     out: list[str] = []
     if not _blank(poslanec):
-        summary = kb.vote_summary(_clean(poslanec), od=od or None, do=do or None) or {}
+        summary = kb.vote_summary(_clean(poslanec), od=od or None, do=do or None, komora=k) or {}
         if summary.get("nalezen"):
             jm = summary.get("poslanec")
             jm = ", ".join(jm) if isinstance(jm, list) else _s(jm)
@@ -1083,14 +1123,17 @@ def get_voting_record(poslanec: str | None = None, query: str | None = None,
                        f"nepřítomen/omluven {summary.get('nepritomen', 0)}")
             out.append("")
         else:
-            out.append(f"Poslanec „{poslanec}“ v datech PSP (pirátský klub) nenalezen; zkus jen příjmení.\n")
+            out.append(f"„{poslanec}“ v datech hlasování (pirátští poslanci, senátoři a europoslanci) "
+                       "nenalezen; zkus jen příjmení.\n")
     if votes:
         out.append(f"## Hlasování ({len(votes)}" + (f", filtr „{query}“" if not _blank(query) else "") + ")")
         out.append("\n\n".join(_fmt_vote(i, v) for i, v in enumerate(votes, 1)))
     else:
         out.append("Žádné hlasování neodpovídá filtrům." + (" Zkus jiná slova v query." if not _blank(query) else ""))
-    out.append("\nZdroj dat: https://www.psp.cz/sqw/hp.sqw?k=1300 (otevřená data PSP); u každého hlasování "
-               "cituj jeho URL na psp.cz. Autorita: oficiální data PSP (hlas poslance, ne stanovisko strany).")
+    pouzite = {v.get("komora") or "psp" for v in votes} or ({k} if k else {"psp"})
+    out.append("\nZdroj dat: " + "; ".join(KOMORY[x]["zdroj"] for x in KOMORY if x in pouzite)
+               + ". U každého hlasování cituj jeho URL. Autorita: oficiální data o hlasování "
+               "(hlas zástupce, ne stanovisko strany).")
     return _cap("\n".join(out), "Sniž limit nebo zúž query/od/do.")
 
 
@@ -1261,8 +1304,9 @@ def kb_stats() -> str:
     if rest:
         out.append("\n## Další")
         out.extend(f"- {k}: {v}" for k, v in rest.items())
-    out.append("\nData jsou automaticky vytěžená a nekurátorovaná (viz data/README.md); zdroje: pirati.cz, "
-               "lide.pirati.cz, psp.cz, styleguide.pirati.cz, X a Bluesky (příspěvky poslanců).")
+    out.append("\nData jsou převážně automaticky vytěžená a nekurátorovaná (viz data/README.md); zdroje: "
+               "pirati.cz a weby sdružení, lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, "
+               "styleguide.pirati.cz, X, Bluesky a YouTube. Kurátorovaná vrstva je v content/.")
     return _cap("\n".join(out))
 
 
@@ -1297,8 +1341,11 @@ def tiskova_zprava(tema: str, mluvci: str | None = None) -> str:
         "6. Pod TZ uveď: seznam zdrojů (URL) s úrovní autority, co je potřeba ověřit, a připomínku "
         "schvalovacího procesu (mluvčí odsouhlasí citace, mediální odbor schválí vydání).",
     ]
+    hlidac = ("Pokud je k dispozici MCP Hlídače státu a TZ stojí na konkrétní smlouvě, zakázce, dotaci, "
+              "firmě nebo sponzorovi strany, ověř čísla a fakta tam a cituj URL z hlidacstatu.cz "
+              "(postoj Pirátů ber vždy jen ze znalostní báze).")
     return (f"Napiš návrh tiskové zprávy Pirátů na téma: {tema}" + (f" (mluvčí: {m})" if m else "") +
-            ".\n\nPostup:\n" + "\n".join(kroky) + "\n\n" + _PRAVIDLA_PROMPTU)
+            ".\n\nPostup:\n" + "\n".join(kroky) + "\n\n" + hlidac + "\n\n" + _PRAVIDLA_PROMPTU)
 
 
 @mcp.prompt(title="Scénář Reels")
@@ -1343,7 +1390,7 @@ def brief_k_tematu(tema: str) -> str:
         f"1. `get_position(\"{tema}\")` – stanovisko/program/TZ s autoritou.",
         f"2. `get_program(\"{tema}\")` – konkrétní programové body s názvem dokumentu a rokem.",
         f"3. `search_press_releases(\"{tema}\", limit=10)` – co jsme k tomu řekli a udělali (s daty).",
-        f"4. `get_voting_record(query=\"{tema}\", limit=10)` – relevantní hlasování v PSP, pokud existují.",
+        f"4. `get_voting_record(query=\"{tema}\", limit=10)` – relevantní hlasování v PSP, Senátu a EP, pokud existují.",
         f"5. `get_social_posts(query=\"{tema}\", limit=5)` – co k tématu psali poslanci na X/Bluesky "
         "(označ jako názory jednotlivců, ne stanovisko strany; cituj URL příspěvku).",
         f"6. `find_expert(\"{tema}\")` a `find_people(...)` – garant/resortní tým/mluvčí tématu s kontaktem.",
@@ -1351,8 +1398,11 @@ def brief_k_tematu(tema: str) -> str:
         "protiargumenty označ, kdo je říká, a odpověz věcně.",
         "8. Sekce „Co ověřit / co v KB chybí“ je povinná; uveď, koho se zeptat (z find_expert).",
     ]
+    hlidac = ("Pokud je k dispozici MCP Hlídače státu, doplň do faktů relevantní smlouvy, veřejné zakázky, "
+              "dotace a sponzory stran (s URL z hlidacstatu.cz a označením „externí zdroj“), postoj Pirátů "
+              "ale ber jen ze znalostní báze.")
     return (f"Připrav interní brief k tématu: {tema}.\n\nPostup:\n" + "\n".join(kroky) +
-            "\n\n" + _PRAVIDLA_PROMPTU)
+            "\n\n" + hlidac + "\n\n" + _PRAVIDLA_PROMPTU)
 
 
 @mcp.prompt(title="Odpověď občanovi")
@@ -1463,17 +1513,30 @@ def http_app(host: str = "0.0.0.0", stateless: bool | None = None,
     Ochrana proti DNS rebinding (kontrola hlavičky Host) se v mcp zapíná jen pro
     ``host`` 127.0.0.1/localhost; při ``0.0.0.0`` je vypnutá, aby prošel libovolný
     veřejný hostname (``<projekt>.vercel.app``, vlastní doména).
+
+    Aplikace je zabalená middlewary (zvenku dovnitř): omezení počtu požadavků na ``/mcp``
+    (``server/ratelimit.py``, env ``PIRATEKB_RATE_PER_MIN`` / ``PIRATEKB_RATE_PER_DAY``)
+    a volitelná autentizace Bearer tokeny z Keycloaku (``server/auth.py``, zapíná
+    ``PIRATEKB_AUTH=keycloak``). ``/health`` a ``/`` nejsou omezené ani chráněné.
     """
+    try:
+        from server import auth as _auth, ratelimit as _ratelimit
+    except ImportError:  # pragma: no cover - spuštěno jako skript server/mcp_server.py
+        import auth as _auth  # type: ignore[no-redef]
+        import ratelimit as _ratelimit  # type: ignore[no-redef]
+
     if stateless is None:
         stateless = _env_flag("PIRATEKB_STATELESS", True)
     if json_response is None:
         json_response = _env_flag("PIRATEKB_JSON_RESPONSE", True)
-    return mcp.streamable_http_app(
+    app = mcp.streamable_http_app(
         streamable_http_path="/mcp",
         stateless_http=stateless,
         json_response=json_response,
         host=host,
     )
+    app = _auth.wrap(app)
+    return _ratelimit.wrap(app)
 
 
 def run(transport: str = "stdio", host: str = "127.0.0.1", port: int = 8765,
@@ -1493,6 +1556,97 @@ def run(transport: str = "stdio", host: str = "127.0.0.1", port: int = 8765,
     else:
         log.info("stdio transport, index: %s", _state["db_path"])
         mcp.run("stdio")
+
+
+# =============================================================================
+# Zpětná vazba (report_gap) a telemetrie
+# =============================================================================
+# Přidáno na konec souboru: nový tool a resource, telemetrie obaluje už zaregistrované
+# tooly (těla toolů se nemění). Musí stát před blokem ``if __name__ == "__main__"``,
+# aby se zaregistrovalo i při spuštění ``python server/mcp_server.py``.
+
+if str(REPO_ROOT) not in sys.path:  # i pro `python server/mcp_server.py` (bez balíčku server)
+    sys.path.insert(0, str(REPO_ROOT))
+from server import gaps as _gaps  # noqa: E402
+from server import telemetry as _telemetry  # noqa: E402
+
+REPORT_GAP_VETA = ("Odpověz uživateli, že báze odpověď nemá a hlášení bylo zaznamenáno; "
+                   "doporuč find_expert.")
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def report_gap(otazka: str, poznamka: str = "", tool: str = "") -> str:
+    """Nahlásí, že znalostní báze nemá odpověď na otázku uživatele (podnět pro kurátory
+    k doplnění dat). Zavolej, když odpověď nenajdeš ani po find_expert.
+
+    Argumenty: otazka = původní otázka uživatele (bez osobních údajů, max. 500 znaků);
+    poznamka = volitelně co jsi zkoušel nebo co v bázi chybí; tool = volitelně název
+    toolu, který odpověď nenašel. Hlášení se uloží do evidence serveru a, je-li to
+    nastaveno, založí se GitHub issue pro kurátory (stejná otázka max. jednou za 7 dní)."""
+    q = _clean(otazka)
+    if not q:
+        return "Chybí otázka. Zavolej `report_gap(otazka=\"<původní otázka uživatele>\")`."
+    res = _gaps.report_gap(q, poznamka=_s(poznamka), tool=_s(tool))
+    out = [f"Hlášení zaznamenáno: „{res['zaznam']['otazka']}“."]
+    if res.get("issue_url"):
+        out.append(f"Založeno GitHub issue pro kurátory: {res['issue_url']}")
+    elif res.get("duplikat"):
+        out.append("Stejná otázka už byla nahlášena v posledních 7 dnech"
+                   + (f" ({res['duplikat_url']})" if res.get("duplikat_url") else "") + "; nové issue se nezakládá.")
+    if not res.get("soubor"):
+        out.append("(Uložení do lokální evidence se nepodařilo; hlášení je jen v logu serveru.)")
+    out.append("")
+    out.append(REPORT_GAP_VETA)
+    return "\n".join(out)
+
+
+@mcp.resource("kb://gaps/posledni", name="gaps_posledni", title="Poslední hlášení „báze nemá odpověď“",
+              description="Posledních 50 hlášení z toolu report_gap (čas, tool, stav; texty otázek "
+                          "jen na neveřejné instanci s PIRATEKB_GAPS_TEXTY=1).",
+              mime_type="text/markdown")
+def resource_gaps_posledni() -> str:
+    try:
+        return _gaps.format_recent(50)
+    except Exception as exc:  # noqa: BLE001
+        return f"Hlášení nejsou k dispozici: {exc}"
+
+
+def _with_telemetry_summary(fn: Callable[..., str]) -> Callable[..., str]:
+    """kb_stats + souhrn telemetrie od startu (tělo kb_stats zůstává beze změny)."""
+
+    @functools.wraps(fn)
+    def wrapper(*args: Any, **kwargs: Any) -> str:
+        out = fn(*args, **kwargs)
+        try:
+            return out + "\n\n" + _telemetry.summary_markdown()
+        except Exception as exc:  # noqa: BLE001
+            log.warning("souhrn telemetrie selhal: %s", exc)
+            return out
+
+    return wrapper
+
+
+def _install_telemetry() -> None:
+    """Obalí funkce zaregistrovaných toolů telemetrií.
+
+    Mění se jen ``Tool.fn``; JSON schéma (``parameters``) i popis toolu vznikly už při
+    registraci z podpisu a docstringu, takže ``tools/list`` zůstává stejný."""
+    manager = getattr(mcp, "_tool_manager", None)
+    if manager is None:  # pragma: no cover - jiná verze mcp
+        log.warning("telemetrie: tool manager nenalezen, volání se neměří")
+        return
+    for t in manager.list_tools():
+        fn = t.fn
+        if getattr(fn, "__telemetry__", False):
+            continue
+        if t.name == "kb_stats":
+            fn = _with_telemetry_summary(fn)
+        t.fn = _telemetry.wrap(fn, t.name)
+
+
+kb_stats = _with_telemetry_summary(kb_stats)  # i resource kb://stats ukazuje telemetrii
+_install_telemetry()
 
 
 if __name__ == "__main__":  # python server/mcp_server.py == stdio

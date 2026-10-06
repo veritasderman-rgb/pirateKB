@@ -5,3 +5,4 @@ pyyaml>=6
 markdownify>=0.12
 pdfplumber>=0.11
 feedparser>=6
+yt-dlp>=2025.1  # jen youtube.py (seznam videí a titulky, bez stahování médií)

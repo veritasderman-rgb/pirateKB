@@ -1,0 +1,67 @@
+---
+zdroj: https://pardubicky.pirati.cz/aktuality/piratsky-rok-2020-v-pardubickem-kraji-cast-1/
+nazev: Pirátský rok 2020 v Pardubickém kraji - část 1.
+typ: aktualita
+datum: '2021-01-19'
+autor: Piráti Pardubického kraje
+web: KS Pardubický kraj
+web_url: https://pardubicky.pirati.cz
+druh_webu: KS
+region: Pardubický kraj
+tagy:
+- Pardubice
+- Zastupitel
+- Chrudim
+- Chrast
+viditelnost: verejne
+autorita: web
+stazeno: '2026-10-06'
+---
+
+# Pirátský rok 2020 v Pardubickém kraji - část 1.
+
+**Přinášíme vám první část shrnutí činností našich zastupitelů a zastupitelek ze západní části Pardubického kraje, kteří v roce 2020 nelenili, pomáhali a přispívali ve společnosti, na mnoha radnicích, pardubickém magistrátu a nově na krajském zastupitelstvu.**
+
+## PARDUBICE
+
+Na rok 2020 budou pardubičtí Piráti vzpomínat jako na období, kdy pokračovali v roli konstruktivní opozice a také se aktivně zapojili do boje proti Covid-19. Už během první vlny, kdy Českou republiku trápil hlavně nedostatek základních ochranných pomůcek, nažhavili zastupitelé [Filip Vařecha](https://pardubice.pirati.cz/clenove/filip-varecha/) a [Ondřej Karas](https://pardubice.pirati.cz/clenove/ondrej-karas/) 3D tiskárnu z pirátského centra ParduPiCe a zvládli vyrobit a zkompletovat na 650 ochranných štítů, které putovaly například krajským sociálním službám. Sezemický zastupitel [Filip Mezera](https://pardubice.pirati.cz/clenove/filip-mezera/) se pak dokonce zapojil do celorepublikového projektu eRouška, kde měl na starosti především testování této aplikace. Kromě toho také Piráti podali Záchranný kruh jednotlivcům finančně zasaženým pandemií a zúčastnili se sbírky počítačů pro distanční výuku dětí.
+
+Na radnici čtyři pirátští zastupitelé a jeden Zelený (za Piráty) pravidelně celý rok reportovali zásadní body z každého jednání zastupitelstva. Rozhodování na základě čísel a dat je pro zodpovědné hlasování zásadní. Proto zastupitelé [Ivana Böhmová](https://pardubice.pirati.cz/clenove/ivana-bohmova/) a [Vojtěch Jirsa](https://pardubice.pirati.cz/clenove/vojtech-jirsa/) navrhli, aby vznikla analýza dopadů krize na rozpočet, a vyhodnocení, na jaké investice má být použita až 1 miliarda korun, kterou bude město čerpat z úvěru.
+
+Ze schválených investičních záměrů Piráti rádi podpořili kvalitně připravený projekt Centrální polytechnické dílny na místě Automatických mlýnů. Zelený [Kuba Kutílek](https://pardubice.pirati.cz/clenove/jakub-kutilek/) se naopak nespokojil s tím, jakým způsobem se připravuje „terminál“ Univerzita a požadoval revizi, později i zrušení stavby, která více než terminál připomíná spíše autobusovou zastávku. U druhého terminálu s názvem Jih se momentálně snaží o změnu projektu rekonstrukce ulice K Vápence ve snaze minimalizovat kácení lip v příjezdové aleji.
+
+Hlasitě pak Piráti bojovali proti neuvážené stavbě fotbalového stadionu v samotném centru města, který v budoucnosti může ohrozit financování jiných důležitých projektů (třeba chybějící lávku přes Labe mezi Polabinami a čtvrtí Závodu míru). A v rámci divokých a pravidelných diskuzí týkajících se hokejového klubu Dynamo upozorňovali Piráti na očividný střet zájmů a poukazovali na to, jak nehospodárně politici ve vedení města nakládají s finančními prostředky i klubem samotným. Pardubice prakticky nemají možnost odstoupit od smlouvy a zavazují se k povinnosti koupit po uplynutí dohody klub zpět! Z „prodeje“ klubu se tak stala pro město spíše velmi nevýhodná zápůjčka.
+
+V rámci zastupitelstva vyzvedla [Lenka Španihelová](https://pardubice.pirati.cz/clenove/lenka-spanihelova/) téma (ne)zaměstnávání lidí se zdravotním postižením, kde má město velké mezery. Iniciovala schůzku s Úřadem práce v Pardubicích městem a uspořádala pro zaměstnance sociálního odboru města workshop. O prázdninách se pak Lenka přestěhovala, čímž jí zanikl zastupitelský mandát, a následně byla zvolena zastupitelkou kraje. Na její místo nastoupil [Jan Hrubeš](https://pardubice.pirati.cz/clenove/jan-hrubes/), který během podzimní druhé vlny pandemie převzal iniciativu a s pirátskými právníky zpracoval novelu jednacího řádu, která by umožnila zastupitelům a veřejnosti vystoupit přes videohovor, pokud mají nařízenou karanténu nebo jsou doma v izolaci. Jeho návrh bohužel neprošel. Zato se povedlo prosadit pirátský návrh, aby vedení města jednalo s investorem stavby nového parkovacího domu za Domem hudby. Přestože bude soukromý, rádi bychom v něm vyčlenili alespoň 50 míst pro rezidenty, kteří by jinak složitě hledali místo, kde v centru zaparkovat svoje vozidlo. Na pátém obvodu pak budou po opakované urgenci nakoupeny závlahové vaky pro nově vysazené dřeviny.
+
+- [Více se dozvíte na **webu** pardubických Pirátů](https://pardubice.pirati.cz/)
+- [Nebo na **Facebooku** pardubických Pirátů](https://www.facebook.com/PiratiPardubice)
+
+---
+
+## CHRUDIM
+
+Letošní rok pro nás byl již druhým rokem na radnici. Naši pirátští místostarostové se již dobře zapracovali. [Aleš Nunvář](https://pardubicky.pirati.cz/lide/ales-nunvar/) se primárně věnuje investičním projektům města a odpadovému hospodářství. [Pavel Štěpánek](https://pardubicky.pirati.cz/lide/pavel-stepanek/) má na starosti dopravu a sociální a neziskový sektor. Ani náš další zastupitel nezahálí. [Daniel Lebduška](https://pardubicky.pirati.cz/lide/daniel-lebduska/) se věnuje vedení hospodářské a digitální komise města. V roce 2020 jsme museli přizpůsobit své pracovní návyky celosvětové pandemii a nouzovému stavu.
+
+Covid 19 měl bohužel dopad na rozpočet města a zpomalil realizaci některých projektů.
+
+*Přesto všechno se nám dařilo.*
+
+V nově otevřeném skate parku jsme podpořili první Skate a BMX závody, o kterých jste se mohli dočíst [**ZDE**](https://chrudim.pirati.cz/tiskove-zpravy/pirati-podporili-skate-bmx-zavody.html) . Jsme rádi, že máme v Chrudimi další sportoviště, kde se mohou lidé setkávat a trávit pohybem venku svůj volný čas. Jistě si k nám najde cestu více skateboardistů a park bude motivací i pro novou generaci, mezi kterou teď frčí zejména jízda a triky na koloběžkách. Skatepark mohou využit také inline bruslaři, jak na závodech předvedl náš předseda Ivan Bartoš.
+
+Dalším úspěchem je aplikace Mobilní rozhlas, která je jedním z kroků plánu, jak z Chrudimi udělat Smart City (Chytré město). Dostupnost informací a digitalizace je pro nás důležitým tématem, proto jsme rádi za projekt [**Tvořím Chrudim**](https://participace.mobilnirozhlas.cz/tvorimchrudim), v jehož prvním ročníku jste v roce 2020 hlasovali o realizaci investičních projektů. Těší nás, že se daří rozšiřovat veřejně dostupnou síť wifi.
+
+Nezapomněli jsme ani na životní prostředí. Otevřelo se Re-use centrum, kde můžete odložit staré (již nepotřebné, ale funkční) věci a vybrat si jiné, které by se vám hodily. Pokračujeme ve v obnově zeleně, v loňském roce jsme vysadili 115 stromů a 345 keřů. V roce 2021 zavádíme svoz bio odpadu od rodinných domů a v budoucnu chceme přidat nádoby na další tříděný odpad. Dále navrhujeme revizi plánovaného projektu velkého separačního dvora v průmyslové zóně, konkrétně vyškrtnutí nerentabilní kompostárny, která by obtěžovala své okolí. Na oslavu 17.listopadu jsme vysadili na náměstí v Chrasti lípu.
+
+Doufáme, že letošní rok bude lepší a podaří se nám realizovat další body z našeho pestrého programu. Těšíme se, že se s vámi brzy osobně setkáme na našich akcích.
+
+- [Více se dozvíte na **webu** chrudimských Pirátů](https://chrudim.pirati.cz/)
+- [Nebo na **Facebooku** chrudimských Pirátů](https://www.facebook.com/CeskaPiratskaStranaChrudim/)
+
+---
+
+## CHRAST
+
+V loňském roce jsme navázali na tradici svatováclavských trhů, které pořádáme od roku 2018. 3.ročník se bohužel nemohl konat v Chrasti, proto byl přesunut do nedalekých Rosic. I přes nepříznivé počasí jsme si užili setkání s místními a doufáme, že letos se vrátíme zpět na nádvoří zámku v Chrasti.
+
+- [Více se dozvíte na **facebooku** chrasteckých Pirátů](https://www.facebook.com/ceskapiratskastranachrast)

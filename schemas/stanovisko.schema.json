@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/veritasderman-rgb/pirateKB/schemas/stanovisko.schema.json",
+  "title": "content/stanoviska/: oficiální postoje strany",
+  "description": "Stanovisko musí mít doložitelný původ: usnesení orgánu (CF/RV/RP), program nebo tiskovou zprávu. Názor jednotlivce sem nepatří.",
+  "allOf": [{"$ref": "content.schema.json"}],
+  "required": ["datum", "autorita", "tema"],
+  "properties": {
+    "typ": {"const": "stanovisko"},
+    "autorita": {"enum": ["program", "usneseni", "tz"]},
+    "tema": {"type": "string", "minLength": 1, "description": "Krátké téma (např. bydlení, Chat Control)."},
+    "usneseni": {"type": ["string", "null"], "description": "URL usnesení orgánu, pokud existuje (forum.pirati.cz, wiki)."},
+    "organ": {"type": ["string", "null"], "description": "Který orgán stanovisko přijal (CF, RV, RP, klub)."}
+  }
+}

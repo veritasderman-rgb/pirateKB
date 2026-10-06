@@ -12,6 +12,8 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 |---|---|---|---|---|
 | [styleguide.pirati.cz](https://styleguide.pirati.cz) (Pattern Lab) | `styleguide.py` | `data/brand/barvy.yaml`, `fonty.yaml`, `styleguide.md` | značkové, neutrální a cizí barvy (hex), rodiny písem, shrnutí s odkazem na verzi styleguide | při vydání nové verze styleguide, jinak cca měsíčně |
 | [psp.cz otevřená data](https://www.psp.cz/sqw/hp.sqw?k=1300) | `psp.py` | `data/psp/poslanci.jsonl`, `hlasovani-2017.jsonl`, `hlasovani-2021.jsonl`, `hlasovani-2025.jsonl`, `README.md` | pirátští poslanci (členství v klubu, funkce) a každé sněmovní hlasování s tím, jak hlasovali Piráti | týdně (po jednacích týdnech), před volbami zkontrolovat seznam období v `TERMS` |
+| [senat.cz](https://www.senat.cz/senatori/) (RSS „Jak jsem hlasoval/a“ `hlasovani_rss.php?pid=<id>`, seznamy a profily senátorů) | `senat.py` | `data/senat/senatori.jsonl`, `hlasovani-<rok>.jsonl` (rok začátku funkčního období), `README.md` | pirátští senátoři (příslušnost Piráti nebo zvoleni za Piráty) s mandáty a obvody; každé hlasování, kde hlasoval pirátský senátor, ve schématu `data/psp` + `komora: senat`; celkové počty hlasů chybí (detail hlasování na senat.cz je za WAF, otevřená data hlasování Senát nevydává) | týdně `--jen-rss` (jen RSS známých senátorů); první týden v měsíci `--aktualni` (kontrola nových mandátů v aktuálním funkčním období, sloučí se s uloženým seznamem); bez parametru projde všechna období od 2012 |
+| [HowTheyVote.eu API](https://howtheyvote.eu/api/) (jmenovitá hlasování EP, ODbL) | `ep.py` | `data/ep/europoslanci.jsonl`, `hlasovani-2019.jsonl`, `hlasovani-2024.jsonl`, `README.md` | pirátští europoslanci (Gregorová, Peksa, Kolaja; další se najdou podle národní strany) a každé hlavní hlasování EP od 7/2019 s jejich hlasy a celkovými počty, ve schématu `data/psp` + `komora: ep`; názvy anglicky | týdně; interval ≥ 1 s, první běh ~45 min (countries.csv pro každé hlasování), další běhy jen nová hlasování (`--bez-souctu` bez celkových počtů za ~1 min) |
 | [pirati.cz](https://www.pirati.cz) | `pirati_web.py` | `data/pirati-web/aktuality/<rok>/*.md`, `program/*.md`, `lide/*.md`, `materialy.md`, `index.jsonl` | tiskové zprávy a články, programové dokumenty, stanoviska a kodexy, profily lidí na webu, odkazy na loga a soubory ke stažení | aktuality denně (`--only aktuality`), celý web měsíčně |
 | [lide.pirati.cz](https://lide.pirati.cz) | `lide_pirati.py` | `data/lide/tymy/*.md`, `regiony/*.md`, `osoby.jsonl`, `struktura.jsonl` | orgány, odbory a týmy, krajská a místní sdružení, lidé s funkcí (ne seznamy členů), hrany nadřízenosti | týdně, po celostátním fóru a volbách orgánů hned |
 | [Flickr Pirátů](https://www.flickr.com/photos/pirati/albums/) | `flickr.py` | `data/flickr/alba.jsonl`, `alba.md` | seznam fotoalb (název, počet fotek, odkaz, náhled, datum a licence tam, kde je Flickr bez klíče vydá; s API klíčem i popis a data všech alb), jen metadata, ne samotné fotky | měsíčně |
@@ -20,6 +22,8 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 | [Pirátská hospodářská strategie](https://majak.pirati.cz/documents/647/Piratska_Hospodarska_strategie.pdf) (PDF, PEER) | `dokumenty.py` | `data/dokumenty/hospodarska-strategie/00-cely-dokument.md`, `NN-<kapitola>.md` | obecný převod PDF -> Markdown (pdfplumber): nadpisy podle velikosti písma, tabulky, popisky grafů jako `> Graf:`; celý text a 7 kapitol s rozsahem stran; profily dokumentů v `DOKUMENTY` | při vydání nového dokumentu (přidat profil) |
 | [peer.pirati.cz](https://peer.pirati.cz) | `subweby.py` | `data/subweby/peer/*.md` | úvodní stránka s členy PEER (rozcestník), stránka strategie (programový dokument), články „Co si o tom myslíme“ (aktuality); konfigurace `WEBY` je připravená pro další weby z Majáku | týdně |
 | [majak.pirati.cz](https://majak.pirati.cz) | `subweby.py` | `data/majak/seznam-webu.md`, `napoveda/*.md`, `zalozeni-webu.md`, `uvod.md` | seznam všech pirátských webů v Majáku (mapa webů strany), nápověda a postupy pro správce webů; `/admin/` a `/trash-can/` se vynechávají | měsíčně |
+| regionální a tematické weby `*.pirati.cz` ze seznamu webů v Majáku (13 KS, 83 MS a místních webů, 31 tematických) | `subweby.py --z-majaku` | `data/subweby/<slug-webu>/*.md`, `data/subweby/stav.json` | hlavní stránky webů (rozcestník), aktuality a tiskové zprávy, profily lidí (osoba) s poli `web`, `druh_webu` (KS/MS/tematicky), `region` (kraj), `sdruzeni`, `misto`; z každé sitemap max 300 nových URL na běh, nejnovější články první | týdně `--z-majaku` (hotové weby se jen obnovují: nové URL ze sitemap + hlavní stránky); první naplnění několika běhy, viz poznámka |
+| [YouTube](https://www.youtube.com/@CeskaPiratskaStrana) kanál strany + osobní kanály politiků (`youtube_kanaly.yaml`) | `youtube.py` | `data/youtube/videa.jsonl`, `<rok>/<id>-<slug>.md`, `stav.json` | přepisy videí z titulků (ruční, jinak automatické titulky YouTube), popis a metadata videa (datum, délka, kanál); typ `prepis-videa`, autorita `web` (kanál strany) nebo `vyjadreni-politika` (osobní kanál); jen titulky, žádná média, žádný Whisper | denně `--limit 100` (nová videa); historii dotáhnou opakované běhy |
 | audit systémů `*.pirati.cz` (crt.sh, odkazy v datech, patičky webů, Maják seznam webů, seznam známých názvů) | `systemy.py` | `data/systemy/systemy.jsonl`, `systemy.md`, `kam-s-problemem.md`, `neaktivni.jsonl`, `neproverene.jsonl` | každá adresa: stav (funguje / přesměrování / vyžaduje přihlášení / chráněno / nefunguje), title, meta, odhad technologie, kategorie, k čemu slouží; průvodce „mám problém → kam jít“ (návrh ke schválení kurátorem); jen HTTP GET bez přihlášení, max 150 adres, interval 1 s | měsíčně (`--max 150`), crt.sh bývá 502, skript to zkouší opakovaně nebo použije cache |
 | Mediální monitoring: Google News RSS, GDELT DOC API, RSS českých médií (`media_zdroje.yaml`, klíčová slova `media_klicova_slova.yaml`) | `media.py` | `data/media/clanky.jsonl`, `<rok>/<rok>-<mesic>.md`, `stav.json` | články externích médií o Pirátech a jejich poslancích (současných i bývalých): titulek, médium, datum, URL, perex z RSS, zmíněné osoby; žádné plné texty (autorita `externi-media`) | denně `--denne` (Google News + RSS + GDELT za 7 dní); jednorázově `--historie --od 2017-01` (GDELT a Google News po měsících, lze přerušit a dotáhnout) |
 | kontrola výstupů | `validate.py` | jen výpis na stdout | ověří frontmatter `.md` a validitu `.jsonl`, souhrn podle složek a typů | po každém běhu ingestu a v CI |
@@ -93,6 +97,52 @@ názvy médií v `media_zdroje.yaml`; oba soubory kurátor upravuje ručně (ná
   občas projít záznamy se `shoda: dotaz` a doplnit vyloučení.
 - Dedup podle normalizované URL (bez utm parametrů) a podle (titulek, doména, den); běh nic nemaže.
 
+**Regionální a tematické weby (`subweby.py --z-majaku`).** Seznam webů bere z
+`data/majak/seznam-webu.md` (nejdřív `python3 subweby.py majak`). Zpracuje jen weby na `*.pirati.cz`;
+přeskočí osobní/kandidátské weby, vlastní domény, www.pirati.cz (pokrývá `pirati_web.py`) a weby
+s ruční konfigurací ve `WEBY` (peer, majak). Pořadí: krajská sdružení, místní sdružení a místní
+weby, tematické weby. Kraj a MS se odvozují z `data/lide/regiony` (název MS, nadřízené KS) a pro
+místní weby bez shody z ruční tabulky `MISTNI_WEBY` ve skriptu. Ze sitemap.xml bere hlavní stránky
+(kořen a 1. úroveň; výpisy sekcí článků vynechá), články (nejnovější podle `lastmod` první), profily
+lidí a ostatní podstránky; zařazení podle struktury stránky jako `pirati_web.py` (datum v hlavičce →
+`aktualita`, perex „Místo, datum –“ → `tiskova-zprava`, šablona profilu → `osoba`, jinak
+`rozcestnik`). U profilů se do frontmatteru ukládá jen stranický e-mail `@pirati.cz`. Limity běhu:
+`--limit-webu 60`, `--max-url 300` (nových URL na web), `--max-pozadavku 10000` (skutečné HTTP
+požadavky, cache se nepočítá), max 4 vlákna, pauza `INGEST_MIN_INTERVAL`. Stav je v
+`data/subweby/stav.json`: web, který nestihl všechny URL, je v dalším běhu znovu první; hotové weby
+se obnovují od nejstaršího běhu. `--jen <slug>` zpracuje vybraný web, `--z-majaku --seznam` vypíše
+zařazení všech webů a jejich stav. Měření 2026-10-06 (`--limit-webu 20`, interval 0,25 s, 4 vlákna):
+20 webů (13 KS a 7 MS) za 16 minut, 3 671 požadavků (≈ 4 stránky/s, ~78 s na 300 URL), 3 635
+souborů / 13 MB (aktualita 2 699, tiskova-zprava 371, osoba 395, rozcestnik 172). 12 webů je hotových,
+8 velkých KS má zbytek (celkem 3 925 URL, z toho Praha 1 821), 107 webů zatím nezahájeno (většinou
+malé, desítky stránek). Dotažení: `python3 subweby.py --z-majaku --limit-webu 60 --max-url 2000`
+dvakrát až třikrát po sobě (každý běh max 10 000 požadavků, cca 45 minut), potom týdně bez
+parametrů. `domazlice.pirati.cz` přesměrovává na plzensky.pirati.cz (ve stavu `presmerovano`);
+`/media/` vrací 403 a vynechává se. Šablonu Majáku mají všechny dosud zpracované weby.
+
+**YouTube (`youtube.py`).** Seznam videí přes `yt-dlp --flat-playlist --dump-json` (záložky
+`videos` a `streams`, nejnovější první, fronty kanálů a záložek se střídají), pro každé video jen
+metadata a titulky (`--skip-download --write-subs --write-auto-subs --sub-langs cs,cs-orig
+--sub-format json3/vtt`). Ruční titulky mají přednost; automatické se berou jen původní česká ASR
+stopa (`cs-orig`), ne strojový překlad z jiného jazyka. Přepis se slučuje do odstavců s časovou
+značkou `[mm:ss]` zhruba každé 2 minuty a bez opakovaných řádků. Video bez titulků má soubor
+s metadaty, popisem a poznámkou; pokud je mladší 14 dnů, další běh to zkusí znovu (YouTube generuje
+automatické titulky se zpožděním). Stav v `data/youtube/stav.json`, chybná videa se zkouší
+max. 3×. Parametry: `--limit N` (nových videí na běh, výchozí 100), `--kanal <text>`,
+`--hloubka N` (jen N posledních videí z každé záložky, rychlejší denní běh), `--pauza 2`,
+`--cookies cookies.txt` (nebo `YTDLP_COOKIES`), `--cekani 60,180,600`, `--znovu`.
+Ověřeno 2026-10-06 z cloudového prostředí: kanál strany má 579 videí + 32 přenosů, kanál Markéty
+Gregorové 267 + 1. Seznam videí funguje bez omezení; stahování titulků po zhruba 10 videích
+rychlým tempem vrátilo **HTTP 429** a pak „Sign in to confirm you're not a bot“ (asi 10 minut).
+Proto skript stahuje jen jednu stopu na video, mezi videi čeká 5–7,5 s a po blokaci čeká
+60/180/600 s, pak skončí (kód 3) a další běh pokračuje. S tímto tempem prošlo 30 videí za 284 s bez
+blokace (celkem 42 videí: 29 s přepisem, z toho 28 automatických a 1 ruční titulky; 13 bez českých
+titulků: krátké klipy bez řeči nebo cizojazyčné, desetihodinové přenosy fóra; ~0,94 mil. znaků
+přepisů, 1,3 MB). YouTube navíc někdy vrátí metadata bez seznamu titulků, i když je video má;
+proto se „bez titulků“ ověřuje druhým načtením a ještě jedním během. Zbylých ~840 videí dotáhne
+denní běh `--limit 100` (cca 9 dní) nebo GitHub Actions / lokální běh; z cloudu při blokaci
+`--cookies`.
+
 Sdílený kód je v `common.py` (`polite_get`, `write_markdown`, `write_jsonl`, `slugify`,
 `clean_text`, `today`).
 
@@ -116,8 +166,10 @@ python3 psp.py                 # desítky sekund, stahuje ~20 MB zipů
 python3 lide_pirati.py         # minuty (stovky stránek)
 python3 pirati_web.py          # desítky minut (tisíce článků, 4 vlákna)
 python3 subweby.py             # sekundy (peer.pirati.cz, majak.pirati.cz)
+python3 subweby.py --z-majaku --limit-webu 20   # ~20 minut; regionální a tematické weby, opakovat, dokud nejsou hotové
 python3 dokumenty.py           # desítky sekund, stáhne PDF (3 MB) a převede ho
 python3 socialni_site.py       # minuty (Bluesky API + headless Chromium pro X)
+python3 youtube.py --limit 100 # desítky minut (yt-dlp, jen titulky)
 python3 validate.py            # nenulový exit kód při chybách
 ```
 

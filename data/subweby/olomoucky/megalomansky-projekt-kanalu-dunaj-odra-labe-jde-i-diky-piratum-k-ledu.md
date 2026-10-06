@@ -1,0 +1,30 @@
+---
+zdroj: https://olomoucky.pirati.cz/aktuality/megalomansky-projekt-kanalu-dunaj-odra-labe-jde-i-diky-piratum-k-ledu/
+nazev: Megalomanský projekt kanálu Dunaj-Odra-Labe jde i díky Pirátům k ledu!
+typ: aktualita
+datum: '2023-04-01'
+autor: Martina Ježková
+web: KS Olomoucký kraj
+web_url: https://olomoucky.pirati.cz
+druh_webu: KS
+region: Olomoucký kraj
+tagy:
+- Piráti
+- Olomoucký
+- Kraj
+viditelnost: verejne
+autorita: web
+stazeno: '2026-10-06'
+---
+
+# Megalomanský projekt kanálu Dunaj-Odra-Labe jde i díky Pirátům k ledu!
+
+Olomoucký kraj, 8. 2. 2023 - Vláda ČR na dnešním jednání schválila faktickou stopku na projekt kanálu Dunaj-Odra-Labe, proti kterému dlouhodobě bojovali jak Piráti v Přerově, tak v Olomouckém kraji. Projekt nedával smysl z finančního ani užitkového hlediska a navíc by přinesl ekologickou devastaci krajiny.
+
+*„Plánování kanálu DOL desítky let blokovalo rozvoj Přerova v oblasti územní rezervy pro dopravní cestu i obrovské přístaviště. Na vedení města jsme za Piráty už v minulém volebním období tlačili, aby projekt odmítlo, ale argumentovali třeba turismem, což vůbec nedávalo smysl. Jsem proto ráda, že je s projektem konec. Přerov teď bude moci využít své lokality třeba pro výstavbu bytů,“* říká pirátská zastupitelka Přerova **Lenka Jüngling**.
+
+Pirátští zastupitelé v Přerově v roce 2019 iniciovali memorandum proti proti kanálu Dunaj-Odra-Labe. Koaliční strany KDU-ČSL a ODS se však tehdy překvapivě navzdory svým celostátním postojům návrh nepodpořily.
+
+*„Je dobře, že současná vláda projekt zastavila. Miliardy, které minulá vláda chtěla do projektu DOL investovat, se mohou rozumně využít třeba na udržování a rozvoj dálnic nebo na na investice do vysokorychlostní železnice, která u nás stále chybí a dává daleko větší smysl. Kanál by se totiž nevyplatil ani z přepravní kapacity, takže bychom měli jen obří stavbu, která by požírala peníze,“* říká krajský zastupitel za Piráty **Jaromír Horký**, který v roce 2019 v Přerově inicioval připojení města k memorandu proti kanálu DOL, které však radnice zamítla.
+
+*„Za Olomoucký kraj jsme projekt odmítli už v roce 2020, jsem proto rád, že je projekt ukončen úplně. Kanál by měl katastrofální dopad na životní prostředí a rozhodně by nijak nepomohl ani nedostatku vody v krajině,“* dodává krajský radní za Piráty **Martin Šmída**.
