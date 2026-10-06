@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "python -m server.kb.build",
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 120,
+      "excludeFiles": "{.cache/**,ingest/**,server/tests/**,docs/**,**/__pycache__/**}"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ]
+}
