@@ -19,6 +19,14 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 > Najdi, jestli máme stanovisko k jaderné energetice. Pokud ne, řekni to a doporuč,
 > koho se zeptat.
 
+## Předpisy a usnesení orgánů strany
+
+> Co rozhodl republikový výbor o pracovních skupinách RV? U každého usnesení dej
+> číslo, rok, výsledek a odkaz.
+
+> Kdy naposledy strana změnila stanovy a co stanovy říkají o složení republikového
+> předsednictva? Upozorni, jestli citovaný text není jen historické znění.
+
 ## Kdo je kdo a na koho se obrátit
 
 > Kdo vede resortní tým pro školství a jak ho kontaktuji?
@@ -49,11 +57,24 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 
 > Jaké návrhy zákonů předložil Jakub Michálek a které z nich prošly?
 
+> Které pozměňovací návrhy podala Olga Richterová a které z nich Sněmovna přijala?
+> U každého dej tisk, písmeno ve 2. čtení a odkaz na hlasování.
+
+> Kdo z Pirátů předsedá nebo místopředsedá výborům a komisím Sněmovny? A ve kterých
+> výborech sedí Zdeněk Hřib?
+
 > Co říkal Ivan Bartoš ve Sněmovně k digitalizaci stavebního řízení? Dej mi tři
 > nejrelevantnější citace s odkazem na stenozáznam.
 
 > Jak hlasovala Markéta Gregorová v Evropském parlamentu o podpoře Ukrajiny? Názvy
 > hlasování v EP jsou anglicky, hledej tedy i „Ukraine“.
+
+> Co říkala Markéta Gregorová v Evropském parlamentu o Číně a Tchaj-wanu? Cituj
+> originál projevu s odkazem na doslovný záznam a odliš ho od neautorizovaného
+> českého překladu.
+
+> Na co se pirátští europoslanci ptali Evropské komise k ochraně médií a co jim
+> Komise odpověděla?
 
 > Na co se interpelovali pirátští poslanci ministra zdravotnictví?
 

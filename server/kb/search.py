@@ -43,6 +43,8 @@ RECENCY_HALF_LIFE = 2.0
 # oficiální pozice strany: bonus ve výši max. bonusu za novost, aby je nepřebily čerstvé články
 AUTHORITY_BONUS = {"program": RECENCY_MAX, "stanovisko": RECENCY_MAX,
                    "programovy-dokument": RECENCY_MAX, "predpis": 2.0}
+# dotaz = přesně zkratka organizační jednotky (RV, RP, KK): jednotka před ostatní výsledky
+ZKRATKA_BONUS = 1.0
 # dokumenty s verzemi: ve výsledcích zůstane jen nejnovější verze se stejným názvem
 VERSIONED_TYPES = {"program", "stanovisko", "programovy-dokument", "predpis"}
 _TITLE_NOISE = frozenset(stem_tokens(
@@ -330,6 +332,9 @@ class KB:
                 scored, hybrid = fused, True
 
         scored = self._dedup_versions(scored)
+        if not (kolekce or autor or od or do) and (not typ or "organizacni-jednotka" in typ):
+            scored = self._boost_zkratka_jednotky(query, plan, scored, today, preferuj_nove,
+                                                  bez_kolekce, hybrid)
         forms = plan.highlight_forms()
         out, per_doc = [], {}
         for r in scored:
@@ -354,6 +359,50 @@ class KB:
             if len(out) >= limit:
                 break
         return out
+
+    def _jednotky_podle_zkratky(self) -> dict[str, list[str]]:
+        """fold(zkratka) -> id dokumentů organizačních jednotek (cache na instanci)."""
+        cache = getattr(self, "_zkratky_cache", None)
+        if cache is None:
+            cache = {}
+            try:
+                for r in self._rows("SELECT id, zkratka FROM org_units WHERE zkratka IS NOT NULL AND zkratka <> ''"):
+                    cache.setdefault(fold(r["zkratka"]).strip(), []).append(r["id"])
+            except sqlite3.DatabaseError:
+                cache = {}
+            self._zkratky_cache = cache
+        return cache
+
+    def _boost_zkratka_jednotky(self, query: str, plan: QueryPlan, scored: list[dict], today: dt.date,
+                                preferuj_nove: bool, bez_kolekce: list[str] | None, hybrid: bool) -> list[dict]:
+        """Dotaz = přesně zkratka organizační jednotky („RV“, „RP“, „KK“): jednotka jde na první
+        místo. Jinak by ji u zkratky, kterou nese v názvu mnoho dokumentů (255 usnesení „RV …“),
+        přebily dokumenty se zkratkou v nadpisu a jednotka by nebyla ani mezi kandidáty FTS."""
+        q = fold(query or "").strip()
+        if not q or " " in q or len(plan.concepts) != 1:
+            return scored
+        ids = self._jednotky_podle_zkratky().get(q)
+        if not ids:
+            return scored
+        params: list = list(ids)
+        where = self._not_in_clause("d.kolekce", bez_kolekce, params)
+        rows = self._rows(
+            f"SELECT {self._chunk_select()}, 0.0 AS rank FROM chunks c JOIN documents d ON d.id = c.doc_id "
+            f"WHERE d.typ = 'organizacni-jednotka' AND d.id IN ({','.join('?' * len(ids))}){where} "
+            "AND c.poradi = (SELECT MIN(c2.poradi) FROM chunks c2 WHERE c2.doc_id = c.doc_id)", params)
+        if not rows:
+            return scored
+        top = max((float(r["score"]) for r in scored), default=0.0)
+        top_rrf = max((float(r.get("rrf") or 0.0) for r in scored), default=0.0)
+        boosted = []
+        for r in rows:
+            r = self._score_chunk(r, plan, today, preferuj_nove)
+            r["score"] = round(max(float(r["score"]), top) + ZKRATKA_BONUS, 3)
+            if hybrid:
+                r["rrf"], r["podobnost"] = top_rrf + 1e-6, None
+            boosted.append(r)
+        ids_set = {r["doc_id"] for r in boosted}
+        return boosted + [r for r in scored if r["doc_id"] not in ids_set]
 
     def _chunk_select(self) -> str:
         stems = ", c.nadpisy_stem, c.text_stem, c.nazev_stem" if self.stemmed else ""
@@ -1247,19 +1296,44 @@ class KB:
 
     # ------------------------------------------------------------ projevy ve Sněmovně
 
-    def resolve_speaker(self, poslanec: str) -> list[str]:
+    # komora projevu: PSP dokumenty pole `komora` nemají (= "psp"), projevy z EP mají "ep"
+    _SPEECH_KOMORA_SQL = "COALESCE(json_extract(meta, '$.komora'), 'psp')"
+
+    @staticmethod
+    def speech_chamber(komora: str | None) -> str | None:
+        """"psp" | "ep" | None (obě); přijímá i „Sněmovna“, „EP“, „europarlament“, „vse“."""
+        k = fold(komora or "").strip()
+        if not k or k in ("vse", "obe", "all", "*"):
+            return None
+        if k in ("psp", "ps", "snemovna", "poslanecka snemovna"):
+            return "psp"
+        if k in ("ep", "europarlament", "evropsky parlament"):
+            return "ep"
+        raise ValueError(f"Neznámá komora „{komora}“. Povoleno: psp, ep (bez = obě).")
+
+    def _speech_komora_clause(self, komora: str | None, params: list) -> str:
+        if not komora:
+            return ""
+        params.append(komora)
+        return f" AND {self._SPEECH_KOMORA_SQL} = ?"
+
+    def resolve_speaker(self, poslanec: str, komora: str | None = None) -> list[str]:
         """Jména autorů projevů (typ ``projev``) odpovídající dotazu: celé jméno nebo jen
-        příjmení, bez diakritiky, i v jiném pádě („Bartoše“), nebo id_osoba z psp.cz."""
+        příjmení, bez diakritiky, i v jiném pádě („Bartoše“), nebo id_osoba z psp.cz / id
+        europoslance (osoba_ep). ``komora`` = "psp" | "ep" | None (obě)."""
         q = fold(poslanec).strip()
         if not q:
             return []
+        kp: list = []
+        kc = self._speech_komora_clause(komora, kp)
         if q.isdigit():
             return [r["autor"] for r in self._rows(
                 "SELECT DISTINCT autor FROM documents WHERE typ = 'projev' "
-                "AND json_extract(meta, '$.osoba_psp') = ?", (q,)) if r["autor"]]
+                "AND (json_extract(meta, '$.osoba_psp') = ? OR json_extract(meta, '$.osoba_ep') = ?)" + kc,
+                [q, q] + kp) if r["autor"]]
         names = [r["autor"] for r in self._rows(
-            "SELECT DISTINCT autor FROM documents WHERE typ = 'projev' AND autor IS NOT NULL "
-            "ORDER BY autor")]
+            "SELECT DISTINCT autor FROM documents WHERE typ = 'projev' AND autor IS NOT NULL" + kc
+            + " ORDER BY autor", kp)]
         exact = [n for n in names if fold(n) == q]
         if exact:
             return exact
@@ -1293,6 +1367,7 @@ class KB:
         return {
             "doc_id": doc["id"], "nazev": doc["nazev"], "jmeno": doc["autor"],
             "osoba_psp": meta.get("osoba_psp"), "obdobi": meta.get("obdobi"),
+            "komora": meta.get("komora") or "psp", "jazyk": v.get("jazyk"),
             "schuze": meta.get("schuze"), "datum": v.get("datum"), "cas": v.get("cas"),
             "bod": v.get("bod"), "role": v.get("role"), "url": v.get("url") or doc["zdroj"],
             "nadpis": v.get("nadpis"), "znaku": v.get("znaku"), "autorita": doc["autorita"],
@@ -1310,17 +1385,20 @@ class KB:
 
     def search_speeches(self, query: str | None = None, poslanec: str | None = None,
                         od: str | None = None, do: str | None = None,
-                        limit: int = 10) -> list[dict]:
+                        limit: int = 10, komora: str | None = "psp") -> list[dict]:
         """Vystoupení pirátských poslanců ve Sněmovně (typ ``projev``).
 
         S ``query`` fulltext v textu vystoupení (stejné skóre jako ``search``), bez něj
         nejnovější vystoupení. ``poslanec`` = jméno, příjmení (i bez diakritiky, i skloněné)
         nebo id_osoba; nenalezený poslanec -> prázdný seznam. ``od``/``do`` filtrují datum
-        vystoupení. Každá položka má datum, čas, schůzi, bod, URL na stenozáznam a úryvek."""
+        vystoupení. Každá položka má datum, čas, schůzi, bod, URL na stenozáznam a úryvek.
+        ``komora``: "psp" (výchozí, jen Sněmovna – kvůli volajícím, kteří píší „ve Sněmovně“),
+        "ep" (plénum Evropského parlamentu, ingest/ep_aktivita.py) nebo None (obě)."""
         limit = max(1, int(limit))
+        komora = self.speech_chamber(komora)
         autori = None
         if poslanec and fold(poslanec).strip():
-            autori = self.resolve_speaker(poslanec)
+            autori = self.resolve_speaker(poslanec, komora)
             if not autori:
                 return []
         docs_cache: dict[str, tuple[dict, dict, dict[str, str]]] = {}
@@ -1357,6 +1435,8 @@ class KB:
             ranked = []
             for doc_id, dscore in doc_score.items():
                 doc, meta, sections = load(doc_id)
+                if komora and (meta.get("komora") or "psp") != komora:
+                    continue
                 for v in meta.get("vystoupeni") or []:
                     if not self._in_range(v.get("datum"), od, do):
                         continue
@@ -1379,7 +1459,7 @@ class KB:
             return out
 
         params: list = []
-        where = "typ = 'projev'" + self._in_clause("autor", autori, params)
+        where = "typ = 'projev'" + self._in_clause("autor", autori, params) + self._speech_komora_clause(komora, params)
         if do:
             where += " AND datum <= ?"
             params.append(do[:10] + "~")
@@ -1393,14 +1473,17 @@ class KB:
         out.sort(key=lambda x: (str(x["datum"] or ""), str(x["cas"] or "")), reverse=True)
         return out[:limit]
 
-    def speeches_summary(self, poslanec: str) -> dict:
-        """Počty vystoupení poslance ve Sněmovně: celkem, po obdobích, počet schůzí, od–do."""
-        autori = self.resolve_speaker(poslanec)
+    def speeches_summary(self, poslanec: str, komora: str | None = "psp") -> dict:
+        """Počty vystoupení poslance: celkem, po obdobích, počet schůzí (v EP dnů s rozpravou),
+        od–do, ``podle_komory``. ``komora`` jako u search_speeches (výchozí jen Sněmovna)."""
+        komora = self.speech_chamber(komora)
+        autori = self.resolve_speaker(poslanec, komora)
         if not autori:
             return {"poslanec": poslanec, "nalezen": False, "celkem": 0}
         params: list = []
         rows = self._rows("SELECT autor, datum, meta FROM documents WHERE typ = 'projev'"
-                          + self._in_clause("autor", autori, params), params)
+                          + self._in_clause("autor", autori, params) + self._speech_komora_clause(komora, params), params)
+        po_komore: dict[str, int] = {}
         po_obdobi: dict[str, int] = {}
         celkem, datumy = 0, []
         for r in rows:
@@ -1409,9 +1492,12 @@ class KB:
             celkem += n
             k = str(meta.get("obdobi") or "?")
             po_obdobi[k] = po_obdobi.get(k, 0) + n
+            kk = meta.get("komora") or "psp"
+            po_komore[kk] = po_komore.get(kk, 0) + n
             datumy += [str(v.get("datum")) for v in meta.get("vystoupeni") or [] if v.get("datum")]
         return {"poslanec": autori[0] if len(autori) == 1 else autori, "nalezen": True,
                 "celkem": celkem, "schuzi": len(rows), "podle_obdobi": dict(sorted(po_obdobi.items())),
+                "podle_komory": po_komore,
                 "od": min(datumy, default=None), "do": max(datumy, default=None)}
 
     # ------------------------------------------------------------ brand, program, statistiky

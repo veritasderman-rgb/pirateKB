@@ -107,6 +107,9 @@ s rozšířeným `ALLOWED_TYP`, viz bod 0).
 
 ## (b) Server: `git apply docs/integrace/ep-aktivita.patch`
 
+*Stav 2026-10-07: patch je zapojený do `server/` a transportní soubor `ep-aktivita.patch` byl odstraněn;
+popis níže zůstává jako dokumentace změn.*
+
 Patch mění tři soubory (309 řádků diffu); test `server/tests/test_ep_aktivita.py::test_get_speeches_finds_ep_speech`
 ověřuje obě varianty (bez patche i s ním; s patchem navíc chování parametru `komora`).
 

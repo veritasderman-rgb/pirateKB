@@ -14,8 +14,11 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 | [psp.cz otevřená data](https://www.psp.cz/sqw/hp.sqw?k=1300) | `psp.py` | `data/psp/poslanci.jsonl`, `hlasovani-2017.jsonl`, `hlasovani-2021.jsonl`, `hlasovani-2025.jsonl`, `README.md` | pirátští poslanci (členství v klubu, funkce) a každé sněmovní hlasování s tím, jak hlasovali Piráti | týdně (po jednacích týdnech), před volbami zkontrolovat seznam období v `TERMS` |
 | [psp.cz stenoprotokoly](https://www.psp.cz/eknih/2021ps/stenprot/zip/index.htm) (zipy schůzí, online stránky `sNNNTTT.htm`, otevřená data `steno.zip`/`schuze.zip`) | `steno.py` | `data/psp/steno/<obdobi>/<schuze>-<poslanec>.md`, `vystoupeni.jsonl`, `stav.json` | všechna vystoupení pirátských poslanců ve Sněmovně (období 2017, 2021, 2025, i v roli člena vlády): text, datum a čas, schůze, bod jednání, odkaz na stenozáznam s kotvou `#rN`; typ `projev`, autorita `vyjadreni-politika`; bez řízení schůze (předsedající) a procedurálních vět pod 120 znaků | týdně `--obdobi 2025 --max-stranek 600` (nové schůze + poslední 2 znovu); celé naplnění jednorázově bez parametrů (~1–2 h, ~300 zipů) |
 | [psp.cz otevřená data](https://www.psp.cz/sqw/hp.sqw?k=1300) (`tisky.zip`, `sbirka.zip`, `interp.zip`, `poslanci.zip`; ústní interpelace období 2025 z veřejných stránek `interp.sqw?o=10`) | `tisky.py` | `data/psp/tisky/<obdobi>/<cislo>-<slug>.md`, `tisky.jsonl`; `data/psp/interpelace/<obdobi>/pisemna-<cislo>-<slug>.md`, `ustni-<poslanec>.md`, `interpelace.jsonl` | návrhy zákonů, které spolupředložil pirátský poslanec (člen klubu k datu předložení), a vládní návrhy předložené pirátským členem vlády (`pirati_role: vlada`): navrhovatelé, výsledek (schválen, zamítnut, vzat zpět, vrácen, nedokončen, projednává se), číslo ve Sbírce, průběh projednávání s hlasováními a hlasy Pirátů; písemné a ústní interpelace pirátských poslanců (na koho, ve věci, výsledek, odkaz na stenozáznam); typy `tisk` a `interpelace`, autorita `oficialni-data-psp` | týdně `--obdobi 2025` po `psp.py` (potřebuje `data/psp/hlasovani-*.jsonl`); ~1–3 min bez cache, s cache sekundy |
+| [psp.cz otevřená data](https://www.psp.cz/sqw/hp.sqw?k=1300) (`sd.zip`, `schuze.zip`, `hl-*.zip`, `poslanci.zip`) + stránky tisků, texty návrhů, tisky „Pozměňovací a jiné návrhy“, stenozáznamy 3. čtení | `pozmenovaky.py` | `data/psp/pozmenovaky/<obdobi>/<tisk>-<sd>.md`, `pozmenovaky.jsonl`; `data/psp/organy/<obdobi>.md`, `clenstvi.jsonl`, `organy.jsonl` | písemné pozměňovací návrhy pirátských poslanců (2017–dnes): tisk, předkladatel a spolupředkladatelé, datum, popis a začátek textu, přednesení ve 2. čtení (písmeno), výsledek ve 3. čtení podle stenozáznamu s hlasy Pirátů; členství a funkce ve výborech, podvýborech, komisích a delegacích; typy `pozmenovaci-navrh` a `organy-psp`, autorita `oficialni-data-psp` | týdně `--aktualni` po `psp.py` a `steno.py`; plný běh bez cache ~1,5–2 h (~2 500 požadavků, 1/s), s cache minuty |
+| [rv.pirati.cz](https://rv.pirati.cz/usneseni/) (usnesení 2020–2023, zprávy ze zasedání, zápisy), rp.pirati.cz, rejstřík stran MV, GitHub [pirati-cz/sbirka](https://github.com/pirati-cz/sbirka) a [pirati-cz/rules](https://github.com/pirati-cz/rules) (archiv předpisů a rozhodnutí 2010–2017); wiki.pirati.cz jen když projde výzvou Cloudflare (dnes ne) | `predpisy.py` | `data/strana/predpisy/<zkratka>.md`, `predpisy.jsonl`; `data/strana/usneseni/rv/<rok>/<NNN>-<slug>.md`, `zasedani-<datum>.md`, `rv/zasedani.md`, `usneseni.jsonl`, `zasedani.jsonl`; `data/strana/stav.json` | vnitřní předpisy strany (typ `predpis`: historická úplná znění s `platnost: historicke-zneni`, aktuální citace stanov o RV a RP, podvýbory RV, registrační údaje stanov z rejstříku MV) a usnesení republikového výboru (typ `usneseni`, autorita `usneseni-organu-strany`: číslo, rok/datum, text, hlasování v počtech, odkaz na fórum; zprávy ze zasedání RV) | týdně `--aktualni` (~5 s s cache); plný běh jednou za měsíc |
 | [senat.cz](https://www.senat.cz/senatori/) (RSS „Jak jsem hlasoval/a“ `hlasovani_rss.php?pid=<id>`, seznamy a profily senátorů) | `senat.py` | `data/senat/senatori.jsonl`, `hlasovani-<rok>.jsonl` (rok začátku funkčního období), `README.md` | pirátští senátoři (příslušnost Piráti nebo zvoleni za Piráty) s mandáty a obvody; každé hlasování, kde hlasoval pirátský senátor, ve schématu `data/psp` + `komora: senat`; celkové počty hlasů chybí (detail hlasování na senat.cz je za WAF, otevřená data hlasování Senát nevydává) | týdně `--jen-rss` (jen RSS známých senátorů); první týden v měsíci `--aktualni` (kontrola nových mandátů v aktuálním funkčním období, sloučí se s uloženým seznamem); bez parametru projde všechna období od 2012 |
 | [HowTheyVote.eu API](https://howtheyvote.eu/api/) (jmenovitá hlasování EP, ODbL) | `ep.py` | `data/ep/europoslanci.jsonl`, `hlasovani-2019.jsonl`, `hlasovani-2024.jsonl`, `README.md` | pirátští europoslanci (Gregorová, Peksa, Kolaja; další se najdou podle národní strany) a každé hlavní hlasování EP od 7/2019 s jejich hlasy a celkovými počty, ve schématu `data/psp` + `komora: ep`; názvy anglicky | týdně; interval ≥ 1 s, první běh ~45 min (countries.csv pro každé hlasování), další běhy jen nová hlasování (`--bez-souctu` bez celkových počtů za ~1 min) |
+| [Open Data Portal EP, API v2](https://data.europarl.europa.eu/api/v2/) (`/meps`, `/corporate-bodies`, `/speeches`, `/meetings`, `/parliamentary-questions`, `/plenary-documents`, `/committee-documents`; doslovné záznamy dne do 6/2021 a texty otázek/odpovědí z `data.europarl.europa.eu/distribution/…`) | `ep_aktivita.py` | `data/ep/projevy/<poslanec>/<rok>/<datum>-<bod>.md`, `data/ep/otazky/<rok voleb>/<id>-<slug>.md`, `data/ep/zpravy/<rok voleb>/<id>-<slug>.md`, `data/ep/cinnost/{clenstvi,projevy,otazky,zpravy,pozmenovaci-navrhy}.jsonl`, `stav.json`, `README.md` | činnost pirátských europoslanců (Kolaja, Peksa, Gregorová): projevy v plénu (doslovný záznam v jazyce originálu + český překlad EP, bez řízení schůze), otázky Komisi/Radě/VP-HR s odpověďmi, zprávy a stanoviska, kde byli (stínovými) zpravodaji, pozměňovací návrhy k plenárním zprávám (jen počty), členství ve výborech a delegacích od–do; typy `projev` (autorita `projev-ep`, `komora: ep`), `dotaz-ep`, `zprava-ep` (autorita `oficialni-data-ep`) | týdně `--aktualni` po `ep.py` (potřebuje `data/ep/europoslanci.jsonl`); první plný běh ~1,5 h (sken autorů ~34 600 otázek), týdně ~1–3 min |
 | [opendata.praha.eu](https://opendata.praha.eu/) (Výsledky hlasování ZHMP, CSV), [archiv usnesení ISM OBIS](https://usneseni.praha.eu/), [volby.cz](https://www.volby.cz/opendata/opendata.htm) (kandidáti KV2018/KV2022) | `praha.py` | `data/praha/zastupitele.jsonl`, `hlasovani-2018.jsonl`, `hlasovani-2022.jsonl`, `usneseni-zhmp.jsonl`, `usneseni-rhmp.jsonl`, `usneseni/zhmp/<rok>/*.md`, `usneseni/rhmp/<rok>/*.md`, `README.md` | pirátští zastupitelé hl. m. Prahy (2018–2022, 2022–2026) a jejich funkce v Radě HMP (doložené usnesením ZHMP); každé hlasování ZHMP o usnesení s hlasy Pirátů ve schématu `data/psp` + `komora: zhmp`; všechna schválená usnesení ZHMP a RHMP od 15. 11. 2018 (číslo, datum, název, tisk, předkladatel, útvar), Markdown pro všechna usnesení ZHMP a pro usnesení RHMP předložená pirátským radním (typ `usneseni`, autorita `usneseni-zhmp` / `usneseni-rhmp`) | týdně `--aktualni` (aktuální období, seznamy usnesení za 60 dní, nové detaily; ~5–10 min); první naplnění bez parametrů (~5 h kvůli ~24 000 detailům RHMP, lze přerušit a navázat) |
 | [volby.gov.cz otevřená data ČSÚ](https://volby.gov.cz/opendata/opendata.htm) (registry kandidátů a kandidátních listin, číselníky stran `cvs`/`cpp`/`cns`, souhrnné XML `vysledky`) | `volby.py` | `data/volby/vysledky/<druh>-<rok>.md`, `vysledky.jsonl`, `zvoleni/<druh>-<rok>.jsonl`, `zvoleni/<druh>-<rok>[-<kraj>].md`, `README.md` | výsledky Pirátů (kód strany 720, samostatně i v koalicích podle `SLOZENI`) ve volbách do Sněmovny (2010–2025), EP (2014–2024), krajů (2012–2024), obcí (2010–2022) a Senátu (2010–2025): hlasy, %, mandáty, partneři; zvolení Piráti (příslušnost nebo navržení Piráty) jmenovitě s kandidátkou, pořadím a přednostními hlasy; nezvolení jen počty; typ `volby`, autorita `oficialni-data-csu` | měsíčně (první týden v měsíci) a ručně po volbách; ~35 s z cache, první běh 53 MB / 2–3 min. `--volby ps-2021 kv-2022 se` jen vybrané volby, `--seznam` konfigurace; nové volby = řádek v `VOLBY` |
 | [pirati.cz](https://www.pirati.cz) | `pirati_web.py` | `data/pirati-web/aktuality/<rok>/*.md`, `program/*.md`, `lide/*.md`, `materialy.md`, `index.jsonl` | tiskové zprávy a články, programové dokumenty, stanoviska a kodexy, profily lidí na webu, odkazy na loga a soubory ke stažení | aktuality denně (`--only aktuality`), celý web měsíčně |
@@ -83,6 +86,40 @@ jsou v `interp.zip` jen do dubna 2025; novější dny skript bere z veřejných 
 `interp.sqw?o=10&s=<schůze>&dx=<datum>` (stav podle legendy stránky: přednesená, nepřednesená,
 zrušená). Každý běh přepíše výstupy zpracovaných období a smaže soubory, které už neodpovídají
 žádnému tisku (`--obdobi 2025` nechá starší období beze změny).
+
+**Pozměňovací návrhy a výbory (`pozmenovaky.py`).** Písemné pozměňovací návrhy jsou v otevřených
+datech jako sněmovní dokumenty typu 13 (`sd.zip`); text, popis a odkaz na tisk „Pozměňovací a
+jiné návrhy“ (T/n) jsou na stránce tisku `historie.sqw`. Z PDF tisku T/n skript čte, pod jakým
+písmenem byl návrh přednesen ve 2. čtení; návrh, který v T/n chybí, se nestal platně podaným
+(`nepodan`). Výsledek ve 3. čtení: hlasování téže schůze a bodu (`bod_schuze.id_typ = 5`), písmeno
+podle řeči zpravodaje ve stenozáznamu těsně před hlasováním (hlasování o proceduře, o návrhu
+jako celku a o zamítnutí se přeskočí). Názvy hlasování v otevřených datech k tomu nestačí, jsou
+jen název tisku. Státní rozpočet má návrhy v příloze XLSM, tam rozhoduje jen jméno předkladatele.
+Členství ve výborech, komisích a podvýborech je z `poslanci.zip` (`zarazeni`, `funkce`).
+Stránky a texty uzavřených období se cachují natrvalo, aktuální období 6 dní.
+
+**Předpisy a usnesení orgánů strany (`predpisy.py`).** Aktuální znění předpisů je jen na
+wiki.pirati.cz, která je za výzvou Cloudflare (403), a usnesení RP/RV/CF jsou na fóru, které má
+v robots.txt `Disallow: /`. Skript proto bere jen to, co je veřejně a s dovolením robots.txt:
+seznamy přijatých usnesení RV 2020–2023 a zprávy ze zasedání z rv.pirati.cz, citace stanov
+z rv/rp.pirati.cz, datum poslední registrované změny stanov z rejstříku MV a archiv předpisů
+a rozhodnutí RV 2010–2017 z veřejných repozitářů GitHub (git clone do `.cache/predpisy/repos`).
+Historická znění mají `platnost: historicke-zneni` a v textu varování s odkazem na aktuální znění.
+Každý běh zkusí wiki jednou (robots.txt); když projde, uloží `_export/raw` předpisů jako
+`platnost: aktualni`. Fórum se neprochází, ukládají se jen odkazy z rv.pirati.cz. GDPR: ze
+starých rozhodnutí jen oddíly „Usnesení“, bez prezence, seznamů přítomných, jmenovitého hlasování
+a průběhu diskuse; e-maily a telefony se mažou; z rejstříku MV jen jméno, funkce a datum od.
+`--aktualni`: výpisy z rv.pirati.cz a MV s cache 1 den, bez `git pull`.
+
+**Činnost europoslanců (`ep_aktivita.py`).** Webové stránky europarl.europa.eu jsou za AWS WAF
+(HTTP 202 s JS výzvou), skript proto bere vše z Open Data Portalu EP. Projevy od 7/2021 jsou
+v API `/speeches` (text ve všech jazycích; ukládá se originál a čeština), starší z doslovného
+záznamu dne (`CRE-9-<datum>-REV.xml`, dny zasedání z `/meetings`). Autora otázky API uvádí jen
+v detailu: plný běh projde detaily všech otázek 9. a 10. období po dávkách 40 id a prohledaná
+čísla uloží do `data/ep/cinnost/stav.json`; `--aktualni` pak bere jen nová čísla z posledních
+dvou let, projevy posledních 60 dní, nové zprávy a stanoviska a znovu stahuje jen nezodpovězené
+otázky (HTTP cache v Actions nepotřebuje). Stínové zpravodaje API uvádí jen u návrhů zpráv (PR)
+a stanovisek (AD), které vydává zhruba od roku 2023.
 
 **Piráti ve vládě (`vlada.py`).** Ministry a období drží konstanta `MINISTRI` (ověřeno na
 vlada.gov.cz); filtr období je inkluzivní a u Lipavského končí 30. 9. 2024 (od 1. 10. 2024
@@ -258,6 +295,9 @@ python3 styleguide.py          # sekundy
 python3 psp.py                 # desítky sekund, stahuje ~20 MB zipů
 python3 steno.py               # 1–2 hodiny poprvé (~300 zipů stenoprotokolů); pak týdně --obdobi 2025
 python3 tisky.py               # ~1–3 min (4 zipy ~6 MB + ~10 stránek interpelací); po psp.py
+python3 pozmenovaky.py --aktualni  # ~1–5 min; po psp.py a steno.py (hlasy Pirátů, zipy stenozáznamů)
+python3 predpisy.py            # ~45 s bez cache (rv.pirati.cz, MV, 2× git clone); týdně --aktualni
+python3 ep_aktivita.py         # ~1,5 h poprvé (sken autorů otázek); pak týdně --aktualni (minuty); po ep.py
 python3 volby.py               # ~35 s z cache, první běh 2–3 min (53 MB ZIPů ČSÚ)
 python3 financovani.py         # ~3 min poprvé (ÚDH, Fio, Piroplácení), s cache ~10 s
 python3 lide_pirati.py         # minuty (stovky stránek)
@@ -293,6 +333,9 @@ zkušební běh). Při výpadku spuštění prostě zopakujte: hotové stránky 
   DokuWiki umí surový text stránky přes `<URL stránky>?do=export_raw` a seznam stránek
   jmenného prostoru přes `?do=index`; (b) požádat technické oddělení o export jmenných
   prostorů s předpisy a návody. Skript pro převod exportu do `data/wiki/` zatím neexistuje.
+  `predpisy.py` wiki každý běh jednou zkusí (robots.txt, `_export/raw/rules/<x>`) a když projde,
+  uloží aktuální znění předpisů do `data/strana/predpisy/`; do té doby jsou v bázi jen historická
+  znění do 2017 z archivu sbírky.
 - **mrak.pirati.cz** (Nextcloud, grafický manuál, šablony, dokumenty odborů) vyžaduje
   heslo aplikace a přístup člena. Postup, omezení zátěže a pravidla pro výběr složek jsou
   v [`docs/ingest/mrak-scraping-prompt.md`](../docs/ingest/mrak-scraping-prompt.md);

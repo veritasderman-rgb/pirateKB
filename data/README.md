@@ -39,14 +39,41 @@ data/
       <obdobi>/ustni-<poslanec>.md        všechny ústní interpelace poslance v období, `##` = jedna interpelace
                          (typ interpelace, autorita oficialni-data-psp; pole druh pisemna|ustni, osoba_psp, interpelovany)
       interpelace.jsonl  jedna interpelace na řádek (druh, datum, poslanec, interpelovaný, funkce, věc, stav, url)
+    pozmenovaky/         pozměňovací návrhy pirátských poslanců (pozmenovaky.py)
+      <obdobi>/<tisk>-<cislo_sd>.md  jeden písemný pozměňovací návrh (sněmovní dokument): k jakému tisku, kdo,
+                         kdy, popis psp.cz, začátek textu a odůvodnění, zda přednesen ve 2. čtení a pod jakým
+                         písmenem, hlasování ve 3. čtení s hlasy Pirátů (typ pozmenovaci-navrh, autorita
+                         oficialni-data-psp; pole autori_pirati, osoby_psp, obdobi, cislo_tisku, cislo_sd,
+                         pismena, podan_ve_2_cteni, vysledek, prirazeni, hlasovani)
+      pozmenovaky.jsonl  jeden návrh na řádek bez textu (+ hlasování s písmeny, výsledkem a hlasy Pirátů)
+    organy/              Piráti ve výborech, komisích, podvýborech, delegacích a vedení Sněmovny (pozmenovaky.py)
+      <obdobi>.md        přehled období: kdo co vede, členové po orgánech, po poslancích (typ organy-psp)
+      clenstvi.jsonl     jeden řádek = členství nebo funkce (osoba, orgán, typ orgánu, funkce, od, do, url)
+      organy.jsonl       orgány s pirátskými členy a funkcemi
   senat/                 hlasování pirátských senátorů (senat.py, RSS „Jak jsem hlasoval/a“ ze senat.cz)
     senatori.jsonl       pirátští senátoři (příslušnost Piráti nebo zvoleni za Piráty): mandáty, obvod, kluby
     hlasovani-<rok>.jsonl  jedno hlasování na řádek (rok = začátek funkčního období), stejná pole jako psp/ + `komora`
     README.md            popis polí (typ hlasovani, autorita oficialni-data-senat)
-  ep/                    hlasování pirátských europoslanců (ep.py, API HowTheyVote.eu)
+  ep/                    hlasování pirátských europoslanců (ep.py, API HowTheyVote.eu) a jejich činnost (ep_aktivita.py)
     europoslanci.jsonl   pirátští europoslanci: id EP, jméno, období, frakce
     hlasovani-<rok>.jsonl  jedno hlavní hlasování EP na řádek (rok = rok voleb), stejná pole jako psp/ + `komora`
     README.md            popis polí (typ hlasovani, autorita oficialni-data-ep)
+    projevy/             projevy pirátských europoslanců v plénu (ep_aktivita.py, doslovný záznam CRE)
+      <poslanec>/<rok>/<datum>-<bod>.md  vystoupení poslance v jedné rozpravě v jeden den, `##` = vystoupení
+                         (typ projev, autorita projev-ep, komora ep; pole osoba_ep, obdobi = rok voleb 2019/2024,
+                         obdobi_cislo, jazyk_originalu, zdroj_rozprava, vystoupeni)
+    otazky/              otázky europoslanců Komisi, Radě a VP/HR s odpověďmi (ep_aktivita.py)
+      <rok voleb>/<id>-<slug>.md  typ dotaz-ep, autorita oficialni-data-ep; pole druh, autori_pirati, osoby_ep,
+                         interpelovany (adresát), cislo, odpoved, odpoved_datum, zdroj_odpoved
+    zpravy/              zprávy a stanoviska, kde byl Pirát (stínovým) zpravodajem (ep_aktivita.py)
+      <rok voleb>/<id>-<slug>.md  typ zprava-ep, autorita oficialni-data-ep; pole druh zprava|stanovisko,
+                         role_pirati, procedura, vybor, dokumenty
+    cinnost/             přehledy činnosti europoslanců (ep_aktivita.py)
+      clenstvi.jsonl     členství ve výborech, delegacích, meziskupinách, skupině, funkce v EP (od–do)
+      projevy.jsonl, otazky.jsonl, zpravy.jsonl  jeden záznam na řádek (bez textu)
+      pozmenovaci-navrhy.jsonl  pozměňovací návrhy k plenárním zprávám s pirátským autorem (jen metadata)
+      stav.json          stav skenování (prohledaná čísla otázek a dokumentů) pro --aktualni
+      README.md          přehled a počty (typ rozcestnik)
   praha/                 hlavní město Praha (praha.py): otevřená data MHMP, archiv usnesení OBIS, kandidáti ČSÚ
     zastupitele.jsonl    pirátští členové ZHMP: období, kandidátka, pirat_podle, mandát (první/poslední hlasování),
                          funkce v Radě HMP (volba/rezignace v ZHMP, předkladatel usnesení RHMP)
@@ -129,6 +156,21 @@ data/
                          (typ usneseni, autorita usneseni-vlady; pole datum = den jednání, jednani radne|mimoradne,
                          poradi, cislo_jednaci, predkladatel, ministr, vysledek, veklep, odok_jednani)
     tz.jsonl, usneseni.jsonl  rejstříky bez textu; stav.json: počty, čerpání limitu požadavků, chyby
+  strana/                vnitřní předpisy a usnesení orgánů strany (predpisy.py)
+    predpisy/<zkratka>.md  předpis: historické úplné znění (platnost historicke-zneni, do 2017, z archivu
+                         sbirka.pirati.cz / github.com/pirati-cz/rules), aktuální citace stanov o RV a RP
+                         (st-citace, druh vynatek), podvýbory RV (druh souhrn), registrace stanov u MV (stanovy-registrace-mv,
+                         autorita oficialni-rejstrik-mv); typ predpis, autorita predpis; pole zkratka, vydal (CF|RV|AO|MV),
+                         druh, platnost aktualni|historicke-zneni, platnost_od, ucinnost_od, verze, verze_historie,
+                         aktualni_zneni_url (wiki), stav_ve_sbirce_2017, overeno_k, posledni_zmena_registrovana_mv, zdroje
+    predpisy/predpisy.jsonl  rejstřík předpisů bez textu
+    usneseni/rv/<rok>/<NNN>-<slug>.md   usnesení republikového výboru (typ usneseni, autorita usneseni-organu-strany;
+                         pole organ, organ_nazev, cislo, rok, datum (jen když je známé), ucinnost, zmocneni, vysledek
+                         prijato|neprijato, hlasovani {pro, proti, zdrzel}, forum_url, programove, druh usneseni)
+    usneseni/rv/<rok>/zasedani-<datum>.md  zpráva ze zasedání RV (druh zasedani; datum, datum_do, datum_zverejneni,
+                         misto, zapis_url, usneseni_url)
+    usneseni/rv/zasedani.md  přehled zasedání RV (typ rozcestnik)
+    usneseni/usneseni.jsonl, zasedani.jsonl  rejstříky; stav.json: stav zdrojů a počty
   systemy/               audit systémů a adres Pirátů (*.pirati.cz, externí služby strany)
     systemy.jsonl        jedna adresa na řádek (url, název, kategorie, technologie, stav, vyžaduje přihlášení, popis, kam s čím, zdroj objevení)
     systemy.md           tabulky po kategoriích (typ system); kam-s-problemem.md: průvodce „mám problém → kam jít“ (typ navod, návrh ke schválení)
@@ -143,7 +185,7 @@ Každý `.md` soubor začíná blokem `---` … `---`. Povinná pole:
 |---|---|---|
 | `zdroj` | URL stránky nebo datové sady, ze které text pochází; slouží jako citace | URL |
 | `nazev` | název dokumentu (titulek článku, název orgánu, osoby…) | text |
-| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka`, `prispevek-socialni-site`, `navod`, `clanek-media`, `prepis-videa` (přepis videa z titulků YouTube), `projev` (vystoupení poslance ve Sněmovně ze stenozáznamu), `tisk` (sněmovní tisk = návrh zákona předložený Piráty), `interpelace` (písemná nebo ústní interpelace pirátského poslance), `volby` (výsledky voleb a zvolení Piráti z otevřených dat ČSÚ), `financni-zprava` (financování strany: výroční finanční zpráva, zpráva o kampani, rozpočet, souhrn transparentního účtu; rozlišuje pole `druh`), `usneseni` (usnesení vlády, zastupitelstva a rady obce) |
+| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka`, `prispevek-socialni-site`, `navod`, `clanek-media`, `prepis-videa` (přepis videa z titulků YouTube), `projev` (vystoupení poslance ve Sněmovně ze stenozáznamu), `tisk` (sněmovní tisk = návrh zákona předložený Piráty), `interpelace` (písemná nebo ústní interpelace pirátského poslance), `volby` (výsledky voleb a zvolení Piráti z otevřených dat ČSÚ), `financni-zprava` (financování strany: výroční finanční zpráva, zpráva o kampani, rozpočet, souhrn transparentního účtu; rozlišuje pole `druh`), `usneseni` (usnesení vlády, zastupitelstva a rady obce a usnesení orgánů strany; rozlišuje `autorita`), `pozmenovaci-navrh` (písemný pozměňovací návrh pirátského poslance k návrhu zákona, s výsledkem ve 3. čtení), `organy-psp` (přehled členství a funkcí pirátských poslanců ve výborech, komisích a podvýborech PS za volební období), `dotaz-ep` (otázka pirátského europoslance Komisi, Radě nebo VP/HR s odpovědí), `zprava-ep` (zpráva nebo stanovisko EP, kde byl Pirát zpravodajem nebo stínovým zpravodajem); `projev` zahrnuje i projevy v plénu EP (`komora: ep`) |
 | `viditelnost` | vrstva přístupu v MCP serveru | `verejne` (bez přihlášení), `clenske` (jen přihlášení piráti); v `data/` je dnes vše `verejne` |
 | `stazeno` | kdy skript dokument stáhl (stáří dat) | `YYYY-MM-DD` |
 
@@ -152,12 +194,12 @@ Volitelná pole:
 | Pole | Význam | Hodnoty |
 |---|---|---|
 | `datum` | datum vydání dokumentu (článku, usnesení); chybí, pokud ho zdroj neuvádí | `YYYY-MM-DD`, u exportů i ISO 8601 |
-| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `audit` (automatický audit, heuristika, k ověření kurátorem), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz, piroplaceni.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, `oficialni-data-senat` (senat.cz), `oficialni-data-ep` (hlasování EP přes HowTheyVote.eu), `oficialni-data-csu` (výsledky voleb, Český statistický úřad, volby.gov.cz), `oficialni-udhpsh` (výroční finanční zpráva nebo zpráva o financování kampaně podaná Úřadu pro dohled nad hospodařením politických stran; úřední údaje, za jejichž správnost odpovídá strana), `oficialni-transparentni-ucet` (měsíční souhrn pohybů na transparentním účtu strany podle výpisu banky; kategorie odvozené heuristikou), `vyjadreni-politika` (vlastní příspěvek poslance na sociální síti nebo jeho projev ve Sněmovně, ne stanovisko strany), `externi-media` (externí média: článek o Pirátech, není výstup strany, může být kritický i nepřesný), `vlada-resort` (tisková zpráva nebo aktualita ministerstva či úřadu vedeného pirátským ministrem; výstup resortu, ne stanovisko strany), `usneseni-vlady` (rozhodnutí vlády ČR jako celku podle „Výsledků jednání vlády“; závazné znění je v ODok; ne stanovisko strany), `usneseni-zhmp` (usnesení Zastupitelstva hl. m. Prahy: rozhodnutí orgánu města, ne stanovisko strany), `usneseni-rhmp` (usnesení Rady hl. m. Prahy, předložené pirátským radním; rozhodnutí Rady jako celku, ne stanovisko strany), `oficialni-data-praha` (otevřená data MHMP, README složky `data/praha`), později `nazor-jednotlivce` |
+| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `audit` (automatický audit, heuristika, k ověření kurátorem), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz, piroplaceni.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, `oficialni-data-senat` (senat.cz), `oficialni-data-ep` (hlasování EP přes HowTheyVote.eu), `oficialni-data-csu` (výsledky voleb, Český statistický úřad, volby.gov.cz), `oficialni-udhpsh` (výroční finanční zpráva nebo zpráva o financování kampaně podaná Úřadu pro dohled nad hospodařením politických stran; úřední údaje, za jejichž správnost odpovídá strana), `oficialni-transparentni-ucet` (měsíční souhrn pohybů na transparentním účtu strany podle výpisu banky; kategorie odvozené heuristikou), `vyjadreni-politika` (vlastní příspěvek poslance na sociální síti nebo jeho projev ve Sněmovně, ne stanovisko strany), `externi-media` (externí média: článek o Pirátech, není výstup strany, může být kritický i nepřesný), `vlada-resort` (tisková zpráva nebo aktualita ministerstva či úřadu vedeného pirátským ministrem; výstup resortu, ne stanovisko strany), `usneseni-vlady` (rozhodnutí vlády ČR jako celku podle „Výsledků jednání vlády“; závazné znění je v ODok; ne stanovisko strany), `usneseni-zhmp` (usnesení Zastupitelstva hl. m. Prahy: rozhodnutí orgánu města, ne stanovisko strany), `usneseni-rhmp` (usnesení Rady hl. m. Prahy, předložené pirátským radním; rozhodnutí Rady jako celku, ne stanovisko strany), `oficialni-data-praha` (otevřená data MHMP, README složky `data/praha`), později `nazor-jednotlivce`, `predpis` (vnitřní předpis strany; u `platnost: historicke-zneni` jde o starší znění, které už nemusí platit), `usneseni-organu-strany` (usnesení orgánu strany – RV, RP, CF – podle seznamu, který orgán sám zveřejnil, nebo zpráva ze zasedání orgánu; oficiální rozhodnutí v působnosti orgánu), `oficialni-rejstrik-mv` (údaje z rejstříku politických stran Ministerstva vnitra) |
 
 Skripty přidávají další pole podle zdroje: `autor`, `tagy` (články), `telefon`,
 `socialni_site` (profily na webu), `druh`, `zkratka`, `nadrazeny`, `kontakty`, `role`
 (organizační jednotky), `poradi` (program), `verze_styleguide` (brand), `osoba`, `platforma`, `ucet`, `pocet_prispevku`, `overit` (příspěvky na sociálních sítích; `overit: true` = účet nebyl spolehlivě ověřen), `web`, `web_url`, `druh_webu`, `region`, `sdruzeni`, `misto` (regionální weby), `kanal_url`, `delka_s`, `titulky`, `prenos` (videa), `osoba_psp`, `obdobi`, `schuze`, `pocet_vystoupeni`, `vystoupeni` (stenozáznamy), `navrhovatele_pirati`, `osoby_psp`, `pocet_ostatnich_navrhovatelu`, `pirati_role`, `navrhovatel`, `druh_navrhu`, `typ_navrhu`, `cislo_tisku`, `stav`, `faze`, `vysledek`, `sbirka`, `garancni_vybor`, `hlasovani`, `hlasovani_zaverecne` (sněmovní tisky), `druh`, `interpelovany`, `pocet`, `pocet_prednesenych`, `interpelovani` (interpelace), `volby`, `volby_nazev`, `rok`, `zdroj_data`, `kraj`, `kandidatka`, `kandidatka_typ`, `partneri`, `hlasy`, `procenta`, `mandaty`, `zvoleno_piratu`, `pocet_zvolenych`, `obce` (volby), `druh`, `rok`, `prijmy_celkem`, `statni_prispevky_celkem`, `statni_prispevek_cinnost`, `statni_prispevek_volby`, `statni_prispevek_institut`, `dary_celkem`, `dary_fo_penezni`, `dary_fo_darcu`, `dary_po_penezni`, `clenske_prispevky`, `vydaje_volby_celkem`, `mzdove_vydaje`, `zamestnanci_celkem`, `dluhy_celkem`, `volby`, `klic_udh`, `subjekt`, `vydaje_celkem`, `prijmy_limit`, `vydaje_limit`, `vydaje_proplaceno`, `ucet`, `cislo_uctu`, `kategorie_uctu`, `obdobi_od`, `obdobi_do` (financování). Tělo souboru je
-Markdown převedený z HTML, obvykle začíná nadpisem `# <nazev>`, `ministr`, `resort`, `vysledky` (TZ resortů a usnesení vlády), `jednani`, `poradi`, `cislo_jednaci`, `predkladatel`, `vysledek`, `veklep`, `odok_jednani`, `prilohy` (usnesení vlády, DIA), `organ`, `cislo`, `tisk`, `predkladatel_pirati`, `url_archiv`, `hlasovani` (usnesení ZHMP/RHMP; `autor` = předkladatel podle archivu).
+Markdown převedený z HTML, obvykle začíná nadpisem `# <nazev>`, `ministr`, `resort`, `vysledky` (TZ resortů a usnesení vlády), `jednani`, `poradi`, `cislo_jednaci`, `predkladatel`, `vysledek`, `veklep`, `odok_jednani`, `prilohy` (usnesení vlády, DIA), `organ`, `cislo`, `tisk`, `predkladatel_pirati`, `url_archiv`, `hlasovani` (usnesení ZHMP/RHMP; `autor` = předkladatel podle archivu), `zkratka`, `vydal`, `vydal_nazev`, `platnost`, `platnost_od`, `ucinnost_od`, `verze`, `verze_historie`, `aktualni_zneni_url`, `stav_ve_sbirce_2017`, `overeno_k`, `zdroje`, `posledni_zmena_registrovana_mv`, `posledni_zmena_stanov`, `cislo_registrace` (předpisy), `organ_nazev`, `rok`, `ucinnost`, `zmocneni`, `forum_url`, `programove`, `datum_do`, `datum_presnost`, `datum_zverejneni`, `misto`, `zapis_url`, `usneseni_url` (usnesení a zasedání orgánů strany), `autori_pirati`, `cislo_sd`, `nazev_tisku`, `popis_psp`, `pismena`, `podan_ve_2_cteni`, `prirazeni` (pozměňovací návrhy), `pocet_clenstvi`, `pocet_vedoucich_funkci`, `poslanci`, `predsedove` (přehled orgánů PS), `komora`, `osoba_ep`, `obdobi_cislo`, `jazyk_originalu`, `zdroj_rozprava` (projevy v EP), `druh`, `autori_pirati`, `osoby_ep`, `pocet_autoru`, `cislo`, `id_dokumentu`, `odpoved`, `odpoved_datum`, `zdroj_odpoved` (otázky europoslanců), `role_pirati`, `procedura`, `vybor`, `dokumenty` (zprávy a stanoviska EP).
 
 JSONL soubory mají jeden JSON objekt na řádek (UTF-8, bez BOM); popis polí je v docstringu
 příslušného skriptu a u hlasování v `data/psp/README.md`, `data/senat/README.md`, `data/ep/README.md` a `data/praha/README.md`, u voleb v `data/volby/README.md`.
@@ -167,12 +209,17 @@ příslušného skriptu a u hlasování v `data/psp/README.md`, `data/senat/READ
 | Zdroj | Licence / podmínky | Poznámka |
 |---|---|---|
 | pirati.cz | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) podle patičky webu | při citaci uvádět zdroj (`zdroj`) a zachovat licenci; loga a fotografie na webu mohou mít vlastní pravidla užití (viz grafický manuál) |
+| rv.pirati.cz, rp.pirati.cz | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) podle patičky webů | usnesení a zprávy ze zasedání RV, citace stanov; odkazy na fórum se jen ukládají, fórum se neprochází (robots.txt `Disallow: /`) |
+| sbirka.pirati.cz, github.com/pirati-cz/sbirka a pirati-cz/rules | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) podle patičky sbirka.pirati.cz; repozitář rules licenci neuvádí, jde o vnitřní předpisy, které strana sama zveřejnila | archiv 2010–2017, historická znění; ze zápisů jen oddíly „Usnesení“ |
+| mv.gov.cz rejstřík politických stran | úřední evidence (zákon č. 424/1991 Sb.) | ukládáme jen údaje o straně, datum změny stanov a jméno, funkci a datum od statutárních zástupců; data narození a adresy ne |
 | styleguide.pirati.cz | licence na stránce neuvedena; provozuje stejný technický odbor jako pirati.cz | barvy a názvy písem nejsou autorské dílo, samotné fonty (soubory) ale ano, viz jejich licence |
 | psp.cz otevřená data | otevřená data Poslanecké sněmovny, volně k dalšímu užití s uvedením zdroje | <https://www.psp.cz/sqw/hp.sqw?k=1300> |
 | psp.cz stenozáznamy | stenoprotokoly jsou sněmovní publikace, tedy úřední dílo bez autorskoprávní ochrany (§ 3 písm. a) zákona č. 121/2000 Sb.); citovat s odkazem na stenozáznam | ukládáme jen vystoupení pirátských poslanců, ne ostatních řečníků; text je přepis psp.cz, u nových schůzí neautorizovaný |
 | psp.cz sněmovní tisky a interpelace | otevřená data PSP (`tisky.zip`, `interp.zip`, `sbirka.zip`), volně s uvedením zdroje; veřejné stránky ústních interpelací jsou úřední informace | ukládáme jen tisky a interpelace s pirátským navrhovatelem/interpelujícím; jména ostatních spolupředkladatelů jen v úplném názvu tisku (tak jak ho zveřejňuje psp.cz), v metadatech jen jejich počet |
+| psp.cz pozměňovací návrhy a orgány | otevřená data PSP (`sd.zip`, `schuze.zip`, `hl-*.zip`, `poslanci.zip`), volně s uvedením zdroje; texty návrhů a stenozáznamy jsou úřední dokumenty | z textu návrhu ukládáme jen nadpis a začátek (~2,5 kB), celé znění je v odkazu na psp.cz; jen návrhy pirátských poslanců a jen členství Pirátů |
 | senat.cz | obsah webu Senátu (© Senát PČR); RSS hlasování je oficiální veřejný zdroj, údaje o hlasování jsou úřední informace | <https://www.senat.cz/senatori/>; ukládáme jen hlasy pirátských senátorů a metadata hlasování s odkazem |
 | howtheyvote.eu | data o hlasování pod [ODbL](https://opendatacommons.org/licenses/odbl/) (obsah databáze DbCL), viz <https://howtheyvote.eu/about#license>; uvádět HowTheyVote.eu jako zdroj, odvozená databáze musí zůstat pod ODbL | fotky europoslanců a shrnutí hlasování nejsou pod DbCL (ty neukládáme); API je experimentální, bez záruky dostupnosti |
+| data.europarl.europa.eu (Open Data Portal EP) | opakované použití povoleno s uvedením zdroje (právní upozornění EP <https://www.europarl.europa.eu/legal-notice/cs/>; texty a data Open Data Portalu) | ukládáme jen činnost pirátských europoslanců; u projevů text v jazyce originálu a český překlad z API (neautorizovaný, zpravidla strojový), ostatní jazyky ne; ze zpráv jen metadata a odkazy |
 | opendata.praha.eu (Výsledky hlasování ZHMP) | otevřená data MHMP; podmínky užití podle katalogu: neobsahuje osobní údaje ani autorská díla, není chráněnou databází | ukládáme jen hlasy pirátských zastupitelů a celkové počty, ne hlasy ostatních |
 | usneseni.praha.eu (ISM OBIS) | usnesení orgánů obce jsou úřední dílo bez autorskoprávní ochrany (§ 3 písm. a) zákona č. 121/2000 Sb.) | ukládáme metadata (číslo, datum, název, tisk, předkladatel, útvar), ne PDF; jména úředníků ze sloupce „Zpracovali“ se neukládají |
 | volby.cz (ČSÚ, KV2018, KV2022) | otevřená data ČSÚ | z registru kandidátů jen jméno, tituly, kandidátka, pořadí, mandát, počet hlasů pirátských kandidátů (bez věku, povolání a bydliště) |
@@ -216,6 +263,11 @@ Před zařazením čehokoli do `content/` nebo do veřejné vrstvy serveru zkont
   souhrnně. Z transparentních účtů jen **měsíční agregace** (součty, počty, kategorie),
   žádné jednotlivé transakce, jména plátců ani zprávy pro příjemce; mzdový účet se
   nezpracovává. Kdo potřebuje konkrétní dar, najde ho na portálu ÚDH nebo na výpisu banky.
+- **Usnesení orgánů strany** (`predpisy.py`): ukládají se texty usnesení a jména funkcionářů ve funkci
+  (členové RV a RP, jednatelé, vedoucí odborů, kandidáti, o nichž orgán rozhodl). Ze starých zápisů
+  (sbírka 2010–2014) jen oddíly „Usnesení“: prezenční listiny, seznamy přítomných a pozorovatelů,
+  jmenovité hlasování a průběh diskuse se vynechávají, výsledek hlasování jen v počtech. Fórum
+  strany se neprochází. Z rejstříku MV jen jméno, funkce a datum od, ne data narození a adresy.
 - Žádné údaje třetích osob (občané, kteří straně psali, protistrany ve sporech apod.).
   Pokud se takový údaj v textu článku objeví, jde o citaci veřejného zdroje; při kurátorství
   do `content/` se posoudí, zda ho ponechat.

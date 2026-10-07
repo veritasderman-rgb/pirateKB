@@ -4,7 +4,7 @@ Tři cesty podle toho, kdo jste. Všechny vedou k témuž: vaše AI dostane tool
 `search_kb`, `find_people`, `get_position`, `get_voting_record`, `get_brand`,
 `get_template`, skladebné nástroje jako `profil_politika`, `casova_osa`, `over_tvrzeni`
 nebo `zkontroluj_text` a prompty jako `tiskova_zprava` nebo `reels_scenar`. Úplný seznam
-34 toolů je v [README](../../README.md#co-server-umí).
+36 toolů je v [README](../../README.md#co-server-umí).
 
 ## A. Nejjednodušší: připojit hostovaný server (pro běžné piráty)
 
