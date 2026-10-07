@@ -8,7 +8,7 @@ stahovat ručně, a kdokoli si může kdykoli ověřit, co a kdy se aktualizoval
 | Plán | Kdy | Co běží | Orientační doba |
 |---|---|---|---|
 | `denni` | každý den 04:17 UTC (06:17 letního času v Praze) | `evidence` (nové schůzky), `media --denne`, `socialni_site` (X a Bluesky), `psp`, `pirati_web --only aktuality` (nové články ze sitemapy) | minuty až desítky minut |
-| `tydenni` | neděle 03:23 UTC | všechno: `styleguide`, `psp`, `lide_pirati`, `pirati_web`, `flickr`, `evidence --plne`, `socialni_site`, `subweby`, `dokumenty`, `systemy` | desítky minut (limit jobu je 60 minut) |
+| `tydenni` | neděle 03:23 UTC | všechno: `styleguide`, `psp`, `steno --obdobi 2025` (stenozáznamy, jen nové a poslední 2 schůze), `lide_pirati`, `pirati_web`, `flickr`, `evidence --plne`, `socialni_site`, `subweby`, `dokumenty`, `systemy` | desítky minut (limit jobu je 60 minut) |
 
 Workflow [`.github/workflows/update-data.yml`](../.github/workflows/update-data.yml) spouští
 [`scripts/update_data.sh`](../scripts/update_data.sh). Postup každého běhu:

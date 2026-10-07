@@ -26,7 +26,7 @@ DB_PATH = Path(os.environ.get("PIRATEKB_DB") or REPO_ROOT / "index" / "kb.sqlite
 EXPECTED_TOOLS = {
     "search_kb", "get_document", "find_people", "get_org_unit", "get_org_tree", "get_program",
     "get_position", "search_press_releases", "get_voting_record", "get_brand", "get_template",
-    "kb_stats", "get_social_posts", "find_expert",
+    "kb_stats", "get_social_posts", "find_expert", "get_speeches",
 }
 EXPECTED_PROMPTS = {"tiskova_zprava", "reels_scenar", "social_post", "brief_k_tematu", "odpoved_obcanovi"}
 EXPECTED_RESOURCES = {"kb://brand/barvy", "kb://brand/fonty", "kb://program/seznam", "kb://stats"}
@@ -116,6 +116,25 @@ class FakeKB:
                 "podle_platformy": {"x": 1}, "ucty": {"x": "hrib"}, "odpovedi": 0, "reposty": 0,
                 "od": "2026-09-01T10:00:00+02:00", "do": "2026-09-01T10:00:00+02:00"}
 
+    SPEECH = {"doc_id": "psp/steno/2025/016-zdenek-hrib", "nazev": "Vystoupení: Zdeněk Hřib na 16. schůzi PSP (2026)",
+              "jmeno": "Zdeněk Hřib", "osoba_psp": "6552", "obdobi": 2025, "schuze": 16, "datum": "2026-05-05",
+              "cas": "14:10", "bod": "bod 5: Zákon o podpoře bydlení", "role": "Poslanec",
+              "url": "https://www.psp.cz/eknih/2025ps/stenprot/016schuz/s016002.htm#r7",
+              "snippet": "Dostupné [bydlení] je pro nás priorita.", "autorita": "vyjadreni-politika", "score": 5.0}
+
+    def search_speeches(self, query=None, poslanec=None, od=None, do=None, limit=10):
+        if query and "bydlen" not in query.lower():
+            return []
+        if poslanec and "hrib" not in poslanec.lower() and "hřib" not in poslanec.lower():
+            return []
+        return [dict(self.SPEECH)]
+
+    def speeches_summary(self, poslanec):
+        if "hrib" not in poslanec.lower() and "hřib" not in poslanec.lower():
+            return {"poslanec": poslanec, "nalezen": False, "celkem": 0}
+        return {"poslanec": "Zdeněk Hřib", "nalezen": True, "celkem": 1, "schuzi": 1,
+                "podle_obdobi": {"2025": 1}, "od": "2026-05-05", "do": "2026-05-05"}
+
     def find_expert(self, tema, limit=3):
         osoba = {"id": "1", "jmeno": "Zdeněk Hřib", "role": "předseda", "jednotka": "Republikové předsednictvo",
                  "url": "https://lide.pirati.cz/osoba/1/", "profil_web": None,
@@ -189,6 +208,7 @@ def test_mock_tools_do_not_crash(fake_kb):
     assert "Oficiální stanovisko" in pos and "Program" in pos and "Nedávné výstupy" in pos
     assert "Vyjádření poslanců na sítích" in pos and "https://x.com/hrib/status/1" in pos
     assert "NE stanovisko strany" in pos
+    assert "Vystoupení ve Sněmovně" in pos and "s016002.htm#r7" in pos
     assert "Vyjádření poslanců na sítích" not in mcp_server.get_position("digitalizace")
     assert "psp.cz" in mcp_server.get_voting_record(poslanec="Hřib")
     assert "**Rozpočet**" in mcp_server.get_voting_record(poslanec="Hřib")  # hvězdičky z dat odstraněny
@@ -215,6 +235,17 @@ def test_mock_social_posts(fake_kb):
     assert "nemá v bázi žádné příspěvky" in mcp_server.get_social_posts(osoba="Nikdo")
     assert "Žádný příspěvek neodpovídá" in mcp_server.get_social_posts(query="jaderná energetika")
     assert "Neznámá platforma" in mcp_server.get_social_posts(platforma="facebook")
+
+
+def test_mock_speeches(fake_kb):
+    out = mcp_server.get_speeches(poslanec="Hřib", query="bydlení")
+    assert "Souhrn: Zdeněk Hřib" in out and "Celkem 1 vystoupení na 1 schůzích" in out
+    assert "**Zdeněk Hřib**, 2026-05-05 14:10 – 16. schůze PSP (2025–)" in out
+    assert "Bod: bod 5: Zákon o podpoře bydlení" in out and "s016002.htm#r7" in out
+    assert "ne stanovisko strany" in out and "get_position" in out
+    assert "nemá v bázi žádná vystoupení" in mcp_server.get_speeches(poslanec="Nikdo")
+    assert "Žádné vystoupení neodpovídá" in mcp_server.get_speeches(query="jaderná energetika")
+    assert "nejnovější" in mcp_server.get_speeches()
 
 
 def test_mock_find_expert(fake_kb):
@@ -300,6 +331,7 @@ def test_stdio_smoke():
                 res["stats"] = _text(await session.call_tool("kb_stats", {}))
                 res["expert"] = _text(await session.call_tool("find_expert", {"tema": "školství"}))
                 res["social"] = _text(await session.call_tool("get_social_posts", {"limit": 3}))
+                res["speeches"] = _text(await session.call_tool("get_speeches", {"limit": 3}))
                 res["prompt"] = _text(await session.get_prompt("tiskova_zprava", {"tema": "dostupné bydlení"}))
                 res["res_barvy"] = _text(await session.read_resource("kb://brand/barvy"))
                 res["res_tpl"] = _text(await session.read_resource("kb://templates/reels"))
@@ -320,6 +352,7 @@ def test_stdio_smoke():
     assert "Resortní tým Školství" in res["expert"] and "@pirati.cz" in res["expert"]
     assert "Kancelář strany" in res["expert"]
     assert "nejnovější" in res["social"] or "nejsou žádné příspěvky" in res["social"]
+    assert "nejnovější" in res["speeches"] or "nejsou žádná vystoupení" in res["speeches"]
     assert "get_position" in res["prompt"] and "dostupné bydlení" in res["prompt"]
     assert "#fec934" in res["res_barvy"]
     assert "Hook" in res["res_tpl"]

@@ -1,0 +1,91 @@
+---
+zdroj: https://www.psp.cz/eknih/2017ps/stenprot/029schuz/s029009.htm
+nazev: 'Vystoupení: Ivan Bartoš na 29. schůzi PSP (2019)'
+typ: projev
+datum: '2019-04-25'
+autor: Ivan Bartoš
+osoba_psp: '6433'
+obdobi: 2017
+schuze: 29
+pocet_vystoupeni: 2
+role:
+- Poslanec
+autorita: vyjadreni-politika
+viditelnost: verejne
+tagy:
+- stenozáznam
+- Poslanecká sněmovna
+- období 2017–2021
+- Ivan Bartoš
+zdroj_schuze: https://www.psp.cz/eknih/2017ps/stenprot/029schuz/index.htm
+stazeno: '2026-10-06'
+vystoupeni:
+- nadpis: 2019-04-25 11:20
+  datum: '2019-04-25'
+  cas: '11:20'
+  bod: null
+  url: https://www.psp.cz/eknih/2017ps/stenprot/029schuz/s029009.htm#r2
+  role: Poslanec
+  znaku: 7718
+- nadpis: 2019-04-25 11:30
+  datum: '2019-04-25'
+  cas: '11:30'
+  bod: null
+  url: https://www.psp.cz/eknih/2017ps/stenprot/029schuz/s029010.htm#r2
+  role: Poslanec
+  znaku: 9151
+---
+
+# Vystoupení: Ivan Bartoš na 29. schůzi PSP (2019)
+
+Stenozáznam 29. schůze Poslanecké sněmovny (volební období 2017–2021), vystoupení: Ivan Bartoš (Poslanec). Projev poslance ve Sněmovně je jeho vyjádření, ne stanovisko strany. Přepis podle psp.cz; každé vystoupení má odkaz na stenozáznam.
+
+## 2019-04-25 11:20
+
+*Poslanec Ivan Bartoš* · stenozáznam: https://www.psp.cz/eknih/2017ps/stenprot/029schuz/s029009.htm#r2
+
+Dobré dopoledne, vážený pane předsedající, tři ministři z vlády Andreje Babiše zde přítomní, pane Faltýnku (Poslanec Faltýnek rázně mimo mikrofon: Dobrý den!), kolegyně, kolegové. Chtěl bych vystoupit možná s kratším příspěvkem než moji předřečníci.
+
+Když si potřebuji provětrat trochu hlavu ze Sněmovny, chodím domů pěšky a občas jdu přes Staroměstské náměstí a tam je známý pomník mistra Jana Husa, kde je napsáno Milujte se, pravdy každému přejte. Tak asi těžko tady nutit poslance, aby nějakým způsobem změnili dynamiku vzájemných vztahů a křivd z dob minulých, ale pravdu bychom si asi zasloužili my v Poslanecké sněmovně a i lidé, kteří nás volí, jednotlivé strany, občané České republiky, pro které přece politiku děláme. A tedy musím říct, že často se nám vůbec možnosti se dozvědět odpověď, tu pravdu, nedostává.
+
+Proč je tahle dnešní schůze svolána? Tahle dnešní schůze je, že vláda má nějaký program a možná si odškrtává, tohle jsme protlačili, tohle jsme schválili, ale jakmile se objeví nějaká, řekněme, událost nebo shrnutí nebo nějaké nezávislé zhodnocení nebo nějaká nová legislativa, která se jí nehodí, v tu chvíli se Sněmovna nějakým způsobem uzamkne a body, které je potřeba probrat nebo najít nějaké společné řešení nebo je třeba jenom vysvětlit v rámci dotazů na ministry, nefungují, nejsou zařazovány na jednání Sněmovny, na interpelacích je často odpovídáno nějakými pinklými grafy nebo prostě věcmi, které vůbec nesouvisí s danou otázkou, nejlépe ve druhé fázi, kdy je druhá odpověď, na kterou už poslanec nemůže reagovat. Já jsem viděl dneska ráno, když jsem šel do práce nějak kolem půl šesté, možná v prvním zpravodajství, nějaké reakce premiéra Andreje Babiše k této schůzi a zase jsem tam viděl posměch, ignoraci - já jedu tady na D4, vy si tam dělejte, co chcete. Možná potom je namístě se ptát, proč tedy pan předseda Vondráček schůzi svolával na dnešek, když tady premiér nebyl, a myslím si, že bychom si ji měli asi zopakovat, až tady bude pan premiér, kterého se týkají jako předsedy vlády všechny tři důležité body.
+
+Teď nebudu procházet zprávu NKÚ, i když pro mě je tam velmi alarmující, a je to důležité téma pro pirátskou stranu ještě předtím, než jsme vstoupili do Sněmovny, a to je problematika výstavby bytů, vůbec poptávky po bytech nejen takzvaných sociálních, ale 150 tisíc lidí každý rok v České republice shání bydlení, které je cenově nedostupné. Nejedná se pouze o nějaké sociální případy nebo lidi, kteří jsou senioři nebo v nějaké hmotné nouzi nebo matky, je to prostě číslo, které český trh neuspokojuje, a kroky vlády v tomto směru jsou žalostné. Ostatně zákon o sociálním bydlení, který byl v minulém období shozen ze stolu, jak jsme se dozvěděli, nebude, bude tady nějaký investiční program. Tak uvidíme, jestli se tohle téma třeba ještě nezvedne.
+
+Chtěl bych hovořit k důležité věci, a opět se týká osoby pana premiéra, ale nejen pana premiéra, ale i třeba ministra Tomana. Na začátku jsem hovořil o citátu mistra Jana Husa "pravdy každému přejte" a na ty dotazy, které si myslím, že jsou naprosto validní, které se týkají střetu zájmů vysoce postavených politiků, se opět dozvídáme od premiéra, a je to takové dost typické, že označuje všechny své oponenty, buď že to dělali také - což se nás, Pirátů, naštěstí netýká, my jsme první volební období v Poslanecké sněmovně -, anebo prostě hledá nějaké viníky, takže se postupně dovídáme - a to pan Prchal, nebo kdo, vymyslel velmi chytře, spojit to s tím výkřikem Kampaň!, všichni to potom různě používají v různých memech a ono to jaksi rozmělňuje podstatu problému, který tady řešíme. A ten problém je dlouhodobě v České republice - historicky korupce, historicky prolínání byznysu s politikou, a tudíž upřednostňování byznysových zájmů nad zájmy občanů a České republiky, který tedy, dříve aspoň, byl hodnocen jako třeba korupční nebo nějaký nežádoucí lobbing, bohužel se to od jisté doby, a není to doména tohoto volebního období, jaksi stává standardem.
+
+Jenom musím říct, protože se od pana Babiše často dozvídám i v nějakých třeba osobních reakcích nebo v reakcích na pana předsedu klubu Jakuba Michálka, že to je nějaká jako osobní msta. Pana Babiše jsem potkal asi rok předtím, než vzniklo hnutí ANO, on tak mapoval ten politický terén, to bylo jako to období, kdy on s politiky vesele komunikoval a budoval svoje impérium, a my jsme s Piráty začínali dělat politiku odspodu v momentu, kdy tady byli úplně jiní lidé, kteří také měli své problémy. Já nebudu jmenovat nikoho tady ve Sněmovně, ale řešili jsme kauzy typu pan Drábek a pan Šiška a sKarty a korupční skandály jiných politiků a zneužívání pravomocí, a kdyby nebyl premiérem Andrej Babiš a někdo jiný by byl v té samé situaci, a z pohledu střetu zájmů finančního nařízení Evropské unie je v tom například ministr Toman, tak bychom prostě řešili toho politika, který tento problém má, a tlačili bychom na něj, aby ten problém vyřešil. Toliko k naší motivaci.
+
+Střet zájmů je nežádoucí, holt pan Babiš už příchodem do politiky na svůj post ministra financí nemusel jednat s politiky o dotační politice, už nemusel řešit nákup firem, najednou on se stal tím politikem, který zároveň má své podnikatelské aktivity, nebo měl své podnikatelské aktivity, v rámci svého holdingu nejen v České republice, ale v dalších zemích Evropské unie. Jenom bych chtěl ukázat takový graf. (Ukazuje tištěný materiál.) Stále tady nemáme projekční plátno. Tento graf končí v roce 2017. Já jsem se od pana Babiše dozvěděl v jedné televizní debatě, že to je nějaký vylhaný graf. Tak ten je z výročních zpráv společnosti Agrofert. To je tady rok 2006 a tady už 2017 Andrej Babiš v politice. Sami máme rok 2019. Já ten graf ještě nemám aktualizovaný, možná ho budeme nějakým způsobem aktualizovat.
+
+Ale co se stalo v minulém volebním období, kdy Piráti ještě nebyli v Poslanecké sněmovně? Mám tady takovou poměrně chronologii, já vezmu jenom ty kritické momenty, protože řešíme jeden velmi konkrétní případ, který, jak jsem řekl, se týká premiéra, který bohužel zde není a nemůže vystoupit, ale týká se třeba i ministra Tomana. Myslím si, že takový bod, který je často řešen a omílán v médiích, a pan premiér se na něj odkazuje, i lidé, kteří mu nějakým způsobem kryjí záda, je do toho 2. 2. 2017. Tam byl pan Andrej Babiš stoprocentním vlastníkem akcií koncernu Agrofert, SynBio, pak vznikly ty dva svěřenecké fondy, kde on své podnikatelské aktivity jakoby přesunul do těch fondů, a tím měl být vyřešen střet zájmů, a tím měl pak vyhovět i legislativě, která vstoupila v platnost 9. 2. 2017 a mimo jiné, tato novela - to je česká legislativa - zakazovala, aby společnost ovládaná členem vlády získávala dotace, investiční pobídky, veřejné zakázky.
+
+Tady na tohle téma upozorňoval třeba pan pirátský senátor Lukáš Wagenknecht. Ten vlastně popisoval, jakým způsobem funguje osoba obmyšlená v těch fondech, jak funguje potom návrat těch fondů, když politik třeba přestane fungovat v politickém režimu. A tahle situace prostě zde byla v předchozím volebním období. Podle slovenského rejstříku konečných vlastníků - a on v České republice není veřejný a vláda se tomu brání, my jsme i navrhovali třeba podmínění státních zakázek firmám, u kterých není jasný konečný vlastník, prý by to byla přílišná byrokracie koukat se do té tabulky, kdo tedy ve finále je konečným vlastníkem - se ukázalo, že Andrej Babiš je stále v pozici tzv. osoby obmyšlené, tudíž on je ten beneficient. Toliko ke zjištění ze slovenského rejstříku konečných vlastníků.
+
+Ale my jsme získali analýzy evropských právníků ze severských zemí, které definují tuto pozici stále ve střetu se stávající legislativou České republiky z předchozího volebního období.
+
+Je tady nějak hlučno, tak já troch zvýším hlas.
+
+## 2019-04-25 11:30
+
+*Poslanec Ivan Bartoš* · stenozáznam: https://www.psp.cz/eknih/2017ps/stenprot/029schuz/s029010.htm#r2
+
+Já už budu pomalu pokračovat k tomu konci. Už jsme v roce 2018. My jsme upozorňovali na začátku léta roku 2018, vyšly o tom i články, že se blíží vstoupení v platnost evropského, nikoliv českého, ale evropského finančního nařízení, které je proti střetu zájmů, a oslovili jsme i třeba jednotlivé rezorty v České republice, jakým způsobem se tedy postaví k tomu, že toto evropské nařízení začne platit, v jaké roli potom bude pan premiér Babiš. My jsme se nesetkali příliš s nějakou odezvou. Odpovědí nám bylo, že z pohledu České republiky je všechno v pořádku, protože zde přece existují fondy, kde jsou ty věci převedeny, a netřeba to řešit.
+
+My jsme potom v roce 2018 25. 7. zveřejnili analýzu, která dokazovala, že Andrej Babiš je z pohledu evropského finančního nařízení ve střetu zájmů a svoji situaci musí řešit. Protože se stále nic nedělo, my jsme se obrátili na evropské komisaře, myslím, že to udělala ještě Transparency International, jejíž tedy šéf byl bývalým oblíbencem Andreje Babiše, než mu začalo vadit, jak pan Andrej Babiš funguje v české politice, a obrátili jsme se na komisaře Oettingera, Hogana a paní Cretu, aby tuto věc řešila s českými ministerstvy a dala jim metodologii, jakým způsobem se postavit k pozici pana Tomana, který tedy podle jiného grafu je, a to hovořím o tom evropském nařízení, vlastně v tom konfliktu kvůli členům své rodiny, kteří podnikají v oblastech, kde jsou přerozdělovány evropské dotace. A odpovědí tedy bylo, že se Evropská komise, resp. ti jednotliví komisaři tím budou zabývat, a že tedy dají nějakou metodologii, popř. provedou šetření. Já jsem se s paní Cretu setkal 6. 9. 2019. Já říkám ta data, protože my se často dozvídáme od pana premiéra, že protože jsou Velikonoce, tak je to na něj atak, protože se tomu nemůže věnovat. Protože jsou Vánoce, tak je to načasováno, a protože jsou tyto volby a tyto volby, tak je to celé kampaň do eurovoleb. Tak tuto věc jsme začali řešit v sedmém měsíci roku 2018, ostatně od té doby se jí potom věnuje i paní Cretu v rámci kontroly a máme vlastně téměř rok poté před evropskými volbami a stále zde, nevím z jakého důvodu, není nějaké vyjádření třeba jiné, než šlo z ministerstev a netýkalo se evropského finančního nařízení, ale nemáme zde ani výsledky šetření Evropské komise. Já jsem se s paní Cretu sešel v Praze a oni tedy přislíbili, že výsledky z tohoto budou k dispozici v lednu. Jinak máme k tomu řadu dokumentů. Já mám tady takový štos, ten vám ani snad nemusím ukazovat.
+
+Co asi je důležité, v 9. měsíci 2018 podala Evropské komisi podnět v souvislosti se střetem zájmů Andreje Babiše také Transparency International. A já už budu pokračovat spíše letem světem, protože těch událostí se udála celá spousta. My jsme se dozvěděli, že tedy Evropská komise bude šetřit střet zájmů Andreje Babiše a provede audit, který ale nesahá do toho období od platnosti evropského nařízení, ale do toho předchozího období. Takže ta data, která si Komise vyžádala od jednotlivých rezortů, které jsou zodpovědné za rozdělování dotací, se týkala toho období před platností, kde tedy evidentně jsou také pochybnosti.
+
+Vlastně v posledním měsíci minulého roku se na veřejnost dostala, a já tak trochu věřím, že tam zabojovala i nějaká čest těch právníků, kteří fungují pod Evropskou komisí, protože oni vypracovali právní analýzu, která potvrzuje střet zájmů českého premiéra, a tuto když předávali Evropské komisi, tak se dostala na veřejnost. Takže někde od prosince od právního oddělení Evropské komise, což je těleso, které má celkový počet zaměstnanců asi 400, tak ne každý je z nich právník, ale není to nějaké právní oddělení dvou lidí, které píše ad hoc analýzy na objednávku, jak se mi zdá, že se občas děje v České republice, když někdo potřebuje zdůvodnit nějaký svůj krok. A komisař Oettinger přislíbil oproti Evropské komisi a paní Cretu, která hovořila o lednu, tak komisař Oettinger přislíbil, že tyto výsledky šetření i toho auditu budou k dispozici v dubnu. Já jsem se setkal s panem Oettingerem v Mnichově na Munich Security Conference, kde i tento termín potvrdil. My jsme se dozvěděli - mezitím o tom třeba hlasoval Evropský parlament, že tedy střet premiéra České republiky je problematický, hlasovalo pro to asi 447 poslanců Evropského parlamentu, včetně členů frakce, ve které je ANO v Evropském parlamentu, včetně frakce ALDE. Takže i Evropský parlament, který se také podle vyjádření pana Babiše spikl a dělá na něj kampaň asi, tak ten také je přesvědčen o tom, že to je problém.
+
+Minulý týden odvysílala německá veřejnoprávní televize ZDF dokument, takže jsme se nově dozvěděli, že proti panu Babišovi se spiklo Německo, zejména kvůli jeho tvrdé protiimigrační politice, což je mimo jiné argument, který zazníval i zde ve Sněmovně, když jsme tady chtěli řešit Evropský parlament, jak hlasoval v souvislosti s podobnou situací, ve které je pan Orbán v Maďarsku, což mně trošku vysvětluje, proč si tak rozumí na té V4, tak ten také není šikanován za tvrdou protiimigrační politiku, ale ten je kritizován za to, že stejně tak v Maďarsku se přerozdělují evropské peníze způsobem, který není transparentní a který prostě nahrává určité skupině podnikatelů, ne tedy asi přímo panu Orbánovi, ale minimálně blízkých panu Orbánovi.
+
+Takže o tom hlasoval Evropský parlament, odvysílala o tom informace i ZDF a pan Oettinger se na utajeném jednání, což nebývá úplně zvykem, nebyl zde přístup veřejnosti, ale ty informace samozřejmě téměř v přímém přenosu někteří poslanci zveřejnili, jsme se dozvěděli, že termín, kdy budou výsledky poslány, ne zveřejněny, české vládě, je 15. května, což by samo o sobě nebyl problém, blíží se evropské volby. Já si myslím, že pan Babiš, který sám říká, jak je transparentní a jak je to všechno kampaň, má přece úžasnou možnost ten, podle tedy jeho očekávání, asi pozitivní výsledek co nejvíc tlačit, aby se před volbami ukázalo, že to Německo, že ti poslanci, že ta média, že ty nezávislé instituce, které auditují, že Evropská komise, že paní Grässle, že paní Cretu, že pan Oettinger tedy na něj jedou tu kampaň, jak on říká, tak jsme asi chtěli, abychom dali panu Babišovi tu možnost nějakým způsobem s těmi výsledky, které, doufám, budou k tomu 15. květnu zaslány, tedy snad už budou zaslány, tak abychom nějakým způsobem s nimi před volbami mohli seznámit veřejnost a ukázalo se, jak to tedy z pohledu evropského finančního nařízení je.
+
+Je tam tedy takový malý trik, bych řekl. Výsledky toho auditu a vlastně ten závěr šetření Evropské komise bude v režimu neveřejném, dostane ho vláda. Vláda má dva měsíce na to, aby se Evropské komisi k tomuto výsledku šetření vyjádřila. To nás dává časově někdy do června, července. To už bude zvolen nový Evropský parlament, bude se ustavovat Evropská komise a ten stav, kdy premiér České republiky podle zjištění právníků Evropské komise je ve střetu zájmů, máme zastaveno proplácení dotací firmě Agrofert z EU, ne, že by ty dotace dál nešly z našich národních zdrojů, takže ten bude trvat minimálně tuto dobu, než dojde k nějakému rozhodnutí.
+
+Proto my jsme chtěli na základě tohoto vyjádření komisaře Oettingera, který byl kritizován evropskými poslanci za tento liknavý postup, a my jsme se museli obrátit znovu na Evropskou komisi, a pokud tady nebude nějaké řešení v zákonných termínech, budeme muset pravděpodobně jít až k Evropskému soudnímu dvoru pro tu nečinnost, tak jsme chtěli, aby Sněmovna jako orgán, který kontroluje vládu, a aby jako i vláda vyslala signál Evropské komisi, popř. jsme se domluvili zde s vládou, že ty výsledky, pokud to bude možné, zveřejní jak Evropská komise, tak i vláda v momentě, kdy je obdrží, anebo zpracuje tu odpověď tak rychle, aby se to skutečně stihlo ještě v tom původním složení Evropského parlamentu, aby občané i politici, opoziční politici, politici vládní koalice prostě viděli, jaká ta věc opravdu je. To bylo v tom mém úvodu, to pravdu každému přejte. Tento bod nebyl zařazen. Dozvěděli jsme se tedy, že to je opět všechno nějaká kampaň. Takže my jsme chtěli navrhnout i usnesení, které by bylo tímto směrem, žádali bychom Evropskou komisi.
+
+A není to pravda, že náš ministr teda, nebo náš pan premiér, nemá hlas v rámci Evropy. Vždyť nám tady vykládá, jak ty věci tlačí a ovlivňuje. Zejména tedy, když je potřeba proti zastropování dotací, z kterých má sám prospěch, nebo Agrofert holding má z toho prospěch. Budeme stále v té rétorice před tím rozhodnutím, ačkoliv tu zprávu evropských právníků zde mám ve fotokopii. Kdybyste se chtěli někdo podívat, co je v té zprávě napsáno, rád vám ji poskytnu nebo ji zašlu mailem.
+
+Takže my jsme chtěli, aby Sněmovna toto projednala. A tento jasný signál, který je v zájmu i poslanců, i vlády, i pana premiéra Evropské komisi vyslala a šla tou cestou zveřejnění výsledků tohoto auditu co nejdříve. Tento bod nebyl zařazen na jednání Sněmovny. Je to jeden z těch tří důležitých bodů, který je na jednání dnešní mimořádné schůze, na které teda pan premiér není. A já vás prosím, umožněme, aby tato schůze začala se schváleným programem, a pojďme se bavit o tom usnesení, protože já si myslím, že je to v zájmu skutečně všech. Já vám děkuji za váš čas. (Potlesk poslanců Pirátů.)

@@ -1,0 +1,103 @@
+---
+zdroj: https://www.psp.cz/eknih/2021ps/stenprot/113schuz/s113050.htm
+nazev: 'Vystoupení: Jakub Michálek na 113. schůzi PSP (2024)'
+typ: projev
+datum: '2024-10-02'
+autor: Jakub Michálek
+osoba_psp: '6477'
+obdobi: 2021
+schuze: 113
+pocet_vystoupeni: 2
+role:
+- Poslanec
+autorita: vyjadreni-politika
+viditelnost: verejne
+tagy:
+- stenozáznam
+- Poslanecká sněmovna
+- období 2021–2025
+- Jakub Michálek
+zdroj_schuze: https://www.psp.cz/eknih/2021ps/stenprot/113schuz/index.htm
+stazeno: '2026-10-06'
+vystoupeni:
+- nadpis: '2024-10-02 18:00 – bod 1: Vládní návrh zákona, kterým se mění zákon č. 155/1995 Sb., o důchodovém pojištění, ve znění pozdějších předpisů, a další související zákony /sněmovní tisk 696/'
+  datum: '2024-10-02'
+  cas: '18:00'
+  bod: 'bod 1: Vládní návrh zákona, kterým se mění zákon č. 155/1995 Sb., o důchodovém pojištění, ve znění pozdějších předpisů, a další související zákony /sněmovní tisk 696/'
+  url: https://www.psp.cz/eknih/2021ps/stenprot/113schuz/s113050.htm#r6
+  role: Poslanec
+  znaku: 16269
+- nadpis: '2024-10-02 18:30 – bod 1: Vládní návrh zákona, kterým se mění zákon č. 155/1995 Sb., o důchodovém pojištění, ve znění pozdějších předpisů, a další související zákony /sněmovní tisk 696/'
+  datum: '2024-10-02'
+  cas: '18:30'
+  bod: 'bod 1: Vládní návrh zákona, kterým se mění zákon č. 155/1995 Sb., o důchodovém pojištění, ve znění pozdějších předpisů, a další související zákony /sněmovní tisk 696/'
+  url: https://www.psp.cz/eknih/2021ps/stenprot/113schuz/s113053.htm#r10
+  role: Poslanec
+  znaku: 1932
+---
+
+# Vystoupení: Jakub Michálek na 113. schůzi PSP (2024)
+
+Stenozáznam 113. schůze Poslanecké sněmovny (volební období 2021–2025), vystoupení: Jakub Michálek (Poslanec). Projev poslance ve Sněmovně je jeho vyjádření, ne stanovisko strany. Přepis podle psp.cz; každé vystoupení má odkaz na stenozáznam.
+
+## 2024-10-02 18:00 – bod 1: Vládní návrh zákona, kterým se mění zákon č. 155/1995 Sb., o důchodovém pojištění, ve znění pozdějších předpisů, a další související zákony /sněmovní tisk 696/
+
+*Poslanec Jakub Michálek* · stenozáznam: https://www.psp.cz/eknih/2021ps/stenprot/113schuz/s113050.htm#r6
+
+Vážený pane místopředsedo, vážený pane ministře, vážené paní poslankyně, vážení poslanci, já určitě nebudu vystupovat dlouho, protože my se hlásíme k tomu, že nechceme, aby Poslanecká sněmovna jednala obstrukčním způsobem, abychom to vyřídili v civilizované podobě, aby tady zazněly argumenty, abychom se skutečně dostali k meritu věci.
+
+Já nepochybně souhlasím s panem ministrem a s vládou, že reforma je potřeba. Ostatně je to věc, na které jsme se shodli v programovém prohlášení, kterou jsme slibovali před volbami, takže je správné, že tady nad tím sedíme a že to dokončíme.
+
+Pojďme se bavit o té podobě, protože celkem když se podíváme na finanční situaci, tak je zcela neudržitelné, abychom nic nedělali, a byť to někdo nazývá parametrickými změnami - a ony to jsou částečně změny parametrů - tak jsou to změny, které jsou z velké části neodkladné, změny, které musíme udělat, protože pokud bychom je neudělali teď a odkládali jsme je do budoucna třeba 10 let, tak to potom akorát zhoršíme a dopadne to daleko hůř na ty, kteří tady budou stát nebo sedět po nás. Ten systém je dneska už desítky miliard v minusu i po tom, co jsme provedli změny valorizace, takže (je) evidentní, že to nestačí. Dokonce se nám zhoršila situace s porodností, takže musíme i v této oblasti něco dělat.
+
+Já se nemůžu ztotožnit s tím, co tady říkají kolegové z opozice - že tady chybí respekt pro seniory. Myslím si, že kroky vlády vůbec nevypovídají o tom, že by nepřiznávala seniorům, kteří si za svoji celoživotní práci zaslouží adekvátní příjmy tak, aby měli dobrou životní úroveň jako celý zbytek společnosti. Dokonce když se podíváme na to, jakým způsobem se valorizovaly jednotlivé částky, tak u seniorů valorizace je bezkonkurenčně největší v porovnání se všemi ostatními skupinami obyvatel. Čili prosím, mějme respekt pro všechny občany České republiky. Snažme se nevytrhávat jednu skupinu z naší společnosti tak, jako nevytrháváme jednotlivé lidi z rodiny. Jsem také rád, že pan ministr doplnil - což bylo patrně nedopatření - omezení zastropování na 67 let, protože to je věc, o které jsme se takto bavili i v předchozích diskusích.
+
+Takže pokud jde o základní teze reformy, tak my je v Pirátské straně podporujeme. Smířili jsme se s realitou, zejména moje generace třicátníků, čtyřicátníků, že si budeme muset částečně spořit na důchod sami, že se o nás stát nepostará, že zkrátka demografie je neúprosná, snižuje se počet ekonomicky aktivních obyvatel a budeme se muset nějakým způsobem o sebe postarat a spořit si část peněz sami. Nicméně...
+
+Souhlasím taky s tím, co říkají kolegové z opozice - pojďme řešit otázky ekonomické, kterým jsou lidé vystaveni, jako jsou ceny v obchodech, což vláda samozřejmě může ovlivnit pouze zprostředkovaně. Vláda, respektive nezávislé orgány, které jsou v exekutivě, jako ÚOHS, můžou například kontrolovat kartely, můžeme řešit podmínky dotací tak, abychom méně peněz dávali na dotace takzvaným dotačním podnikatelům, dotační ekonomice, ale více peněz dali třeba domácnostem, protože některé státy jako třeba Rakousko berou peníze, které dostávají z povolenek, a ty peníze redistribuují svému obyvatelstvu tak, aby si mohli dovolit koupit třeba novější auto nebo zateplit barák, aniž by museli vyplňovat složité formuláře.
+
+Takže teď po tom, co jsem uvedl, že podporujeme v zásadě ty teze, tak bych chtěl promluvit i o některých našich připomínkách, výhradách, které k tomu návrhu tak, jak byl předložen, máme. Za prvé, budu mluvit o plánovaném vyškrtnutí náročných profesí. My jsme na vládě udělali poměrně složitý kompromis, že se dohodlo, že budou do kategorie náročných pozic spadat osoby, které jsou ve třetí a čtvrté kategorii - to je něco přes 100 000 lidí - kteří by měli nárok na předčasný důchod, který by byl spojen s tím, že jejich zaměstnavatel jim na ten v uvozovkách předčasný důchod bude přispívat, že bude platit vyšší pojistné.
+
+Bohužel v návaznosti (na to), tady návrh přišel do Poslanecké sněmovny, zatlačili zaměstnavatelé a najednou nějakých 90 000 lidí - čili drtivá většina těch lidí, kteří pracují v těžkých podmínkách, kteří pracují v mrazu, v chladu, v prachu, jsou to opravdu velmi náročné profese, ve vibracích, kde to má vliv na jejich tělesnou konstituci - vypadnou z toho plánovaného okruhu předčasných důchodů. Takže se tady vlastně vytvořila obrovská disproporce mezi tím, že tito lidé, kteří by si ten předčasný důchod zasloužili a u kterých by to bylo logické, tak ti vypadnou, a naopak pokud jde o předčasné důchody v roce 2022, tak tato vláda udělala úplný opak - to znamená, že nadměrně motivovala lidi k tomu, aby šli do předčasného důchodu, včetně těch lidí, kteří by to úplně nepotřebovali, a samozřejmě ti lidé samozřejmě postupovali racionálně, a pokud to pro ně bylo výhodné, tak tu nabídku využili a spíš je otázka opravdu na představitele státu, proč to celé bylo nastavené takto nešťastně v roce 2022, kdy v důsledku mimořádné valorizace vznikla velká disproporce. Ta disproporce spočívá v tom, že když člověk poctivě pracoval, nešel do důchodu, pracoval déle, tak ten důchod, který byl přiznán o několik let později, byl nižší než předčasný důchod, který byl přiznán v důsledku mimořádné valorizace, a rozdíl činí nějaké 2 000 korun, čili je to významná nespravedlnost.
+
+Je škoda, že se to na Ministerstvu práce a sociálních věcí takto zpracovalo, a když se podíváme na rozpočtové náklady, tak se dostáváme do poměrně vysokých částek, protože jenom jednorázově tato vlna asi 55 000 lidí, kteří využili tuto propagovanou možnost, nás stála 14 miliard korun. Když to srovnáme s náklady, co nás to bude stát ročně do budoucna, tak to je dalších 1,5 miliardy korun, takže celkové dopady suma sumárum jsou nějakých 44 miliard korun. Takže 44 miliard korun, to je samozřejmě částka, kterou jeden úředník z Ministerstva práce a sociálních věcí okomentoval slovy, že nějakých 50 miliard nehraje roli v důchodovém systému. Na druhou stranu je to poměrně částka, která je velmi vysoká, která... Myslím si, že pokud šetříme v tom systému, tak bychom měli šetřit důsledně a neznamená to, že jenom musíme... že bychom měli snižovat důchody. Pro to já nejsem, aby se snižovaly předčasné důchody, já jsem pro to, aby se zvyšovaly, ale aby se srovnala výše důchodu tak, aby to bylo spravedlivé, protože už jsme se tady několikrát bavili o tom, že bychom měli vycházet z toho systému, že aspoň část peněz přenastavíme pomocí osobního konta, kdyby byla osobní konta, která by lícovala s tou zásluhovou složkou zcela transparentně pomocí pojistné matematiky. V případě nějakých srozumitelných redukčních hranic si myslím, že bychom tady tuto diskusi vůbec nevedli, protože by to bylo zkrátka předvídatelné.
+
+Takže tolik je asi moje druhá výhrada. Já jsem... To je věc, kterou jsem i říkal panu ministrovi, když se ten návrh připravoval i koaličně projednával, že mi to přijde jako záležitost, které by se ministerstvo mělo věnovat. Bohužel ministerstvo dospělo k závěru, že ta obrovská mezera mezi předčasnými důchody vzniká v důsledku mimořádných valorizací, že nenachází žádný ústavně konformní způsob, jakým to řešit, takže tam jsme se zasekli a zůstává tam tato disproporce.
+
+Třetí výhrada, kterou mám k tomu návrhu a která taky už byla zmiňovaná opakovaně, spočívá v tom, že tam chybí v podstatě investiční pilíř. To je věc, bez které důchodová reforma může fungovat jenom částečně. My jsme jako vláda - ještě když jsme byli ve vládě - tak jsme předložili DIP, investiční produkt, který částečně může toto suplovat, ale nezaměřili jsme se na druhou důležitou část a to je, jakým způsobem vyřešit stávající fondy. To znamená tam, kde je obrovské množství peněz, nějakých 600 miliard korun, kde to bylo nastaveno velmi konzervativně, takže člověk chtěl si spořit na důchod, chtěl být zodpovědný, tak si tam uložil peníze, tím se tam nastřádalo nějakých 600 miliard, ale bohužel to bylo nastaveno tak konzervativně, že část fondů prostě třeba jenom nakupuje státní dluhopisy, takže třeba 90 procent jejich portfolia jsou státní dluhopisy, no a je tam omezení, celé je to postaveno tak, že se musí snažit, aby byli na nule nebo něco málo nad nulou, a potom si ta finanční instituce strhne provizi 0,6 procenta a dostáváme se do situace, kdy lidé v době, kdy je rekordní inflace, tak jejich zhodnocení bohužel je nastaveno tak, že to je v podstatě nula, že takhle v podstatě krmíme finanční instituce.
+
+Takže to určitě šťastná cesta nebyla. Myslím si, že správné by bylo, aby vláda tedy usilovala o reformní úsilí, přišla na to, jakým způsobem ne transformovat tyto fondy, ale možná v některých ohledech rozvolnit, aby peníze se daly třeba investovat do výstavby nových bytů, do něčeho, co bude vracet zpátky peníze do systému.
+
+Těch příkladů v zahraničí je obrovské množství, ať už se podíváme na severské státy, nebo ať se podíváme třeba na Singapur, kde existuje několik státních fondů, takže tam máme... v Singapuru třeba existuje státní fond, který spravuje národní rezervy. Není to věc tak vzdálená, jak by se mohlo zdát, protože třeba jeden z těch singapurských fondů koupil 30 procent ve společnosti CETIN v roce 2021. Takže 30 procent tam vlastní Singapurci přes tento státní fond a stejně tak ty fondy se snaží hledat investiční příležitosti tak, aby zhodnotily peníze ať už seniorům, nebo pro centrální banku, nebo pro koho to spravují.
+
+Kdyby se nám podařilo podmínky uvolnit, ale současně je nechat takové, aby nebylo možné peníze rozkrást, což si myslím, že je taky zcela zásadní, to je ten druhý, opačný extrém, kdy peníze... - jeden extrém je, že se nic nevynese - a druhý extrém je, že peníze někam zmizí a lidi přijdou o svoje celoživotní úspory na penzi. Pokud najdeme něco mezi, jako to bylo v severských státech, tak potom peníze by samozřejmě měly i pozitivní efekt na české kapitálové trhy, kde my máme jako Česká republika problém, že pražská burza reálně má velmi velký nedostatek reálných obchodovatelných aktiv, se kterými by se tam mohlo obchodovat - v podstatě z těch velkých firem je tam jenom ČEZ. Toto by byla možnost, jak podpořit český akciový trh, pokud by to bylo nastaveno s pojistkami třeba na velikost portfolia, které by se do toho mohly promítnout.
+
+My už jsme o tom mluvili v našem plánu Republika v pohybu, kde jsme navrhli právě způsob, jak spojit s důchodovou reformou i tu reformu... ten investiční pilíř a jak zajistit, že těchto 600 miliard korun bude pracovat ve prospěch lidí, kteří tam úložky mají, a ono by stačilo, klidně nechme - pokud to někdo chce mít takto - tak klidně nechme tu možnost, že to může být takto, ale současně většina lidí tak nějak spoléhá, že stát zvolí vhodnou variantu, proto taky v severských státech někdy je investiční fond, který se stará se státním dozorem, se státním kompetentním obsazením o to, aby tam bylo zhodnocení. Takže šlo o to, abychom třeba změnili výchozí nastavení, jakým způsobem budou zhodnocovány prostředky u lidí, kteří to sami řešit nechtějí, ale prostě jenom si chtějí zodpovědně spořit na důchod, ale nejsou nějací experti na finanční trh. Takže to je ta třetí výhrada k tomu chybějícímu investičnímu pilíři.
+
+Čtvrtá poznámka se týká toho, že bychom měli jako stát usilovat o to, abychom více propagovali možnost postupného přechodu do důchodu. Ono už to tady zaznělo, dneska to je možné - taky vláda se zasadila o zkrácené úvazky, což je taky pozitivní, ale není s tím spojena dostatečná informovanost lidí, jaké možnosti můžou využít, jak už je to dneska výhodné, že když někdo si to rozloží... Tady jde čistě o propagační složku, kterou by jim stát mohl zajistit. Třeba když vezmu ten zmiňovaný Singapur, tak když jedete v Singapuru metrem, tak tam, kde čekáte na nástupišti na metro, vidíte velkou reklamu na x různých věcí, které jsou v zájmu státu, počínaje tím, jak si má člověk spořit na důchod, a velmi jakoby přátelsky, nenásilně vysvětleno až po to, že hledají nové dozorce do věznic - protože stejně jako my mají nedostatek lidí ve věznicích.
+
+No a samozřejmě součástí motivační složky by mohlo být i (to), že bychom rozvíjeli programy, které umožňují seniorům zůstat v takové kondici, aby dokázali žít plnohodnotný život, aby pro ně bylo... aby se naučili pečovat třeba i o svoji flexibilitu a nedostávali se do závislého postavení v domovech důchodců, což jsou věci, které by měly podporovat zdravotní pojišťovny, ale víme, že ta podpora prevence je věc, která teprve začíná a v současné době je z mého pohledu zatím zcela nedostatečná, i když jsou to peníze, které by se nám bohatě vrátily.
+
+No a poslední poznámku jsem chtěl věnovat tomu, že my skutečně máme průběžný systém. To znamená, nestačí, že se staráme o to, kdo kolik kde ukládá, kdo kdy odchází do důchodu, ale musíme se starat i o to, abychom měli... aby tady byli lidé motivováni zakládat rodiny. A nemyslím to v tom slova smyslu, že bychom měli dělat sociální inženýrství, že by se kvůli důchodovému systému mělo tlačit na lidi nějak, aby měli děti navíc, aby pomohli zachránit náš důchodový systém. Tak to by bylo samozřejmě absurdní, ale myslím si, že je zcela legitimní debata o tom, jaké jsou motivace mladých lidí zakládat rodiny a jestli ty podmínky dneska jsou ideální. Já myslím, že každý máme vlastní životní zkušenost při zvažování toho, kdy, jak zakládat rodinu a tak dále, a že určitě těch faktorů tam bude více. Nicméně z těch nejdůležitějších určitě připadají v úvahu příjmy, aby byla rodina zajištěná. To znamená, z našeho pohledu se domníváme, že ta věc, kde může stát pomoci, je valorizovat rodičovský příspěvek, to znamená, zvyšovat rodičovský příspěvek aspoň tak, jako se zvyšují tím tempem důchody tak, aby nedocházelo k rozevírání nůžek mezi různými skupinami obyvatel, kteří prostě z objektivních důvodů jsou závislí na státu ve své životní situaci.
+
+Za druhé, tím druhým faktorem je určitě bydlení a tady souhlasím s tím, co už zaznělo, že máme velký problém. Máme tady krizi drahého bydlení a bohužel plánovaná výstavba, státní podpora výstavby, není taková, jaká by měla být. Není to... Nedá se na to spolehnout. Zákon o podpoře bydlení jsme se dneska dozvěděli, že bude osekán. Neexistuje tady v podstatě regulace toho, že se nám vylidňují centra pomocí investičních bytů, v kterých potom bydlí turisti přes Airbnb a nemůžou tam bydlet rodiny, a z těch center měst se stávají skanzeny nebo v lepším případě letní letoviska pro cizince, jako to tady máme třeba v hlavním městě Praze.
+
+No a poslední faktor, ten se týká pocitu bezpečí, do kterého se samozřejmě promítá válka. Tak tady asi nemá smysl to nějak sáhodlouze rozebírat. Válku je potřeba vyhrát a uzavřít nějakým důstojným mírem tak, abychom mohli zase normálně žít.
+
+Já jsem chtěl poděkovat... Máme tyto připomínky k návrhu, takže pro mě osobně jsou tyto důvody spíše (tím), proč to nepodpořit, ale budu čekat na tu finální variantu. Zatím to směřuje k tomu, že dojde k výrazné odchylce od vládního návrhu, který jsme odsouhlasili, takže to je pro mě spíš důvodem to nepodpořit, ale chtěl jsem poděkovat panu ministrovi, že tady takhle dlouho s námi je. Teď zrovna si odskočil, ale... (Ministr se ozývá od vládních lavic.) Pardon, neviděl jsem vás, omlouvám se. Takže jsem chtěl poděkovat panu ministrovi, že se účastní rozpravy a že se tomu věnuje, protože už jenom to, že se tato vláda vrhla do toho, že důchodovou reformu udělá, tak je věc, kterou je potřeba pochválit, a ta odvaha - byť samozřejmě máme teď občas mezi sebou nějaké přestřelky - tak ta odvaha samotná, že do toho vláda jde, je pozitivní.
+
+Já jsem potom ještě dostal nějaké příběhy od občanů, kteří mají dotazy k tomu systému předčasných důchodů, a zase je to pořád vlastně dokolečka to, že občané upozorňují na to, že ten systém je těžko předvídatelný, protože se neodvíjí od peněz, které by do toho uložili. Ten dotaz se týká předčasných důchodů bez výplaty a toho, v jakém okamžiku si člověk požádal a podle čeho se potom vyměřuje i u lidí, kteří déle pracovali, ale požádali si o to z nějakých... protože se o tom mluvilo v médiích dříve a teď už to není revidovatelné, ale vzhledem k tomu, že respektuju čas Poslanecké sněmovny, tak tady nebudu celý příběh číst, ale pošlu ho panu ministrovi a poprosím ho, jestli by na to mohl odpovědět písemně tak, aby se občané dozvěděli, jaké jsou možnosti řešit jejich životní situaci s předčasnými důchody. Děkuji za pozornost.
+
+## 2024-10-02 18:30 – bod 1: Vládní návrh zákona, kterým se mění zákon č. 155/1995 Sb., o důchodovém pojištění, ve znění pozdějších předpisů, a další související zákony /sněmovní tisk 696/
+
+*Poslanec Jakub Michálek* · stenozáznam: https://www.psp.cz/eknih/2021ps/stenprot/113schuz/s113053.htm#r10
+
+Děkuji za slovo, pane místopředsedo. Takže pojďme to vzít popořádku. Já jsem neříkal, že se to nastavilo v roce 2022, v roce 2022 byla ta mimořádná valorizace. Ten systém se nastavoval předtím - to snad bylo ještě za předchozí vlády, myslím, že za ČSSD, kdy se stanovilo, jak bude vypadat mimořádná valorizace, no a oni si tehdy nedovedli představit, že bude vysoká inflace - akorát ten negativní efekt nastal až v tom roce 2022.
+
+Za druhé tady byla kritika, že stavíme málo bytů jako stát. No tak to souhlasím, ale bohužel i developeři říkají, že postavit barák trvá 10 let, a to maximum, co my jsme mohli udělat, je sehnat peníze na státní podporu bydlení, což jsme udělali, sehnali jsme 8 miliard korun, které vláda odsouhlasila.
+
+A teď budeme samozřejmě sledovat, jestli tedy splní to, co je v tom vládním usnesení, nebo ne. Samozřejmě, že jsme všechno neprosadili v koalici, co jsme chtěli. My jsme chtěli využít peníze z fondů EU, aby se postavilo ještě víc bytů, ale to bohužel nakonec se vláda rozhodla, že půjčku si brát nebude. Pan ministr Stanjura s tím nesouhlasil, takže půjčka se nevzala a ty byty se stavět nebudou.
+
+Pokud jde o ten dotaz od Patrika Nachera, tak odpovím: Byl tady zájem zařadit návrh zákona, který řeší Airbnb. Dobrá zpráva je, že ten návrh je zpracovaný, ten návrh předložila vláda, a dokonce implementuje i návaznost na příslušné nařízení EU, takže neexistuje jednodušší věc než požádat o předřazení tohoto vládního návrhu na program Poslanecké sněmovny. Mně se to bohužel v koalici nepodařilo, ale třeba vám, když jste v opozici, a nám, když jsme teďka v opozici, tak se to podaří třeba lépe. Takže tolik jenom poznámky na moje předřečníky.
+
+Pokud jde o moje stanovisko k tomuto návrhu, já jsem se vyjadřoval k tomu, co šlo na vládu. Od té doby se ten návrh mění pomocí pozměňovacích návrhů, takže nevím, takže jsem se vyjadřoval i k tomu výsledku, jaký bude po jednání tady v Poslanecké sněmovně.

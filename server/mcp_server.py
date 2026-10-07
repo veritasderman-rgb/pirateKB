@@ -47,7 +47,7 @@ DOC_PAGE_CHARS = 7000     # velikost stránky pro get_document
 DOC_TYPES = ["tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument",
              "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
              "materialy", "prispevek-socialni-site", "schuzka", "navod", "system",
-             "clanek-media", "prepis-videa", "slovnik", "sablona", "vysledek", "material"]
+             "clanek-media", "prepis-videa", "projev", "slovnik", "sablona", "vysledek", "material"]
 SOCIAL_PLATFORMS = ["x", "bluesky"]
 TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev"]
 BRAND_PARTS = ["vse", "barvy", "fonty", "loga", "pravidla"]
@@ -69,30 +69,33 @@ AUTORITA_POPIS = {
     "kurator-navrh": "kurátorovaný obsah – NÁVRH, kurátor ho zatím neschválil",
     "kurator": "kurátorovaný obsah sestavený z více zdrojů",
     "nazor-jednotlivce": "názor jednotlivce (NENÍ stanovisko strany)",
-    "vyjadreni-politika": "vyjádření politika na sociální síti (názor jednotlivce, NENÍ stanovisko strany)",
+    "vyjadreni-politika": "vyjádření politika (příspěvek na sociální síti nebo projev ve Sněmovně; "
+                          "názor jednotlivce, NENÍ stanovisko strany)",
 }
 AUTORITA_PODLE_TYPU = {
     "program": "program", "programovy-dokument": "program", "stanovisko": "stanovisko",
     "predpis": "usneseni", "tiskova-zprava": "tz", "aktualita": "web", "rozcestnik": "web",
     "osoba": "oficialni-evidence", "organizacni-jednotka": "oficialni-evidence",
     "brand": "oficialni-styleguide", "hlasovani": "oficialni-data-psp", "materialy": "web",
-    "prispevek-socialni-site": "vyjadreni-politika", "system": "audit",
+    "prispevek-socialni-site": "vyjadreni-politika", "system": "audit", "projev": "vyjadreni-politika",
 }
 
 SERVER_INSTRUCTIONS = """Znalostní báze České pirátské strany (lidé, organizace, program,
-stanoviska, tiskové zprávy, hlasování v PSP, Senátu a Evropském parlamentu, příspěvky
-poslanců na X a Bluesky, přepisy videí z YouTube, weby krajských a místních sdružení,
-brand, šablony). Většina dat je automaticky vytěžená z veřejných zdrojů (pirati.cz a weby
-sdružení, lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, styleguide.pirati.cz, X,
-Bluesky, YouTube) a není kurátorovaná; dokumenty s autoritou „kurator-schvaleno“ schválil
-kurátor báze, „kurator-navrh“ je zatím jen návrh. Pravidla pro odpovědi:
+stanoviska, tiskové zprávy, hlasování v PSP, Senátu a Evropském parlamentu, vystoupení
+pirátských poslanců ve Sněmovně ze stenozáznamů (2017–dnes), příspěvky poslanců na X a
+Bluesky, přepisy videí z YouTube, weby krajských a místních sdružení, brand, šablony).
+Většina dat je automaticky vytěžená z veřejných zdrojů (pirati.cz a weby sdružení,
+lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, styleguide.pirati.cz, X, Bluesky, YouTube)
+a není kurátorovaná; dokumenty s autoritou „kurator-schvaleno“ schválil kurátor báze,
+„kurator-navrh“ je zatím jen návrh. Pravidla pro odpovědi:
 1. U každého tvrzení cituj URL ze pole „Zdroj“.
 2. Rozlišuj autoritu: program a usnesení = oficiální postoj strany; tisková zpráva =
-   oficiální výstup, ale ne usnesení; článek na webu, profil, názor jednotlivce nebo
-   příspěvek poslance na sociální síti ≠ stanovisko strany.
+   oficiální výstup, ale ne usnesení; článek na webu, profil, názor jednotlivce, projev
+   poslance ve Sněmovně nebo příspěvek poslance na sociální síti ≠ stanovisko strany.
 3. Nikdy nevymýšlej stanoviska. Pokud báze nic nemá, řekni to a navrhni, u koho to ověřit.
 4. Začni toolem search_kb nebo get_position; pro lidi find_people, pro brand get_brand,
-   pro šablony get_template, pro vyjádření poslanců na sítích get_social_posts.
+   pro šablony get_template, pro vyjádření poslanců na sítích get_social_posts, pro to,
+   co poslanci řekli ve Sněmovně (stenozáznamy), get_speeches.
 5. Když báze nemá přesnou odpověď, řekni to a doporuč konkrétní osobu s kontaktem
    (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu.
 6. Když nenajdeš odpověď ani po find_expert, zavolej report_gap s původní otázkou."""
@@ -903,7 +906,8 @@ def _social_for_topic(kb: Any, tema: str, limit: int = 5) -> list[dict]:
 def get_position(tema: str) -> str:
     """Oficiální postoj Pirátů k tématu, seřazený podle autority: 1) stanoviska a
     usnesení/předpisy, 2) program, 3) pět nejnovějších tiskových zpráv k tématu
-    (+ podsekce s vyjádřeními poslanců na X/Bluesky, jen názory jednotlivců).
+    (+ podsekce s vystoupeními poslanců ve Sněmovně a s vyjádřeními na X/Bluesky, jen
+    názory jednotlivců).
     Každá část uvádí úroveň autority a datum. Použij vždy, když se ptají „co si
     Piráti myslí o…“, před psaním TZ, postu nebo odpovědi občanovi.
     Pokud báze nemá stanovisko ani program, řekni to – nic nedomýšlej."""
@@ -960,6 +964,13 @@ def get_position(tema: str) -> str:
         out.append("")
     # krátké závěrečné bloky (sítě, kontakt, citace) jdou mimo oříznutou část, aby nezmizely
     tail: list[str] = []
+    speeches = _speeches_for_topic(kb, t, limit=3)
+    if speeches:
+        tail.append("### Vystoupení ve Sněmovně (stenozáznamy)")
+        tail.append("*Autorita: projev poslance ve Sněmovně = jeho vyjádření, NE stanovisko strany; "
+                    "jen jako ilustrace argumentů, s citací URL stenozáznamu. Víc dá get_speeches.*")
+        tail.append("\n\n".join(_fmt_speech(i, v, 250) for i, v in enumerate(speeches, 1)))
+        tail.append("")
     social = _social_for_topic(kb, t, limit=5)
     if social:
         tail.append("### Vyjádření poslanců na sítích (X, Bluesky)")
@@ -1223,6 +1234,108 @@ def get_social_posts(osoba: str | None = None, query: str | None = None,
     out.append(f"Autorita: {AUTORITA_POPIS['vyjadreni-politika']}. {SOCIAL_DISCLAIMER} "
                "Oficiální postoj strany ověř přes get_position.")
     return _cap("\n".join(out), "Sniž limit nebo zúž query/osoba/od/do.")
+
+
+SPEECH_DISCLAIMER = ("Projev poslance ve Sněmovně = jeho vyjádření, ne stanovisko strany (to je program "
+                     "a usnesení orgánů). Cituj URL stenozáznamu u každého vystoupení a uveď řečníka, datum "
+                     "a bod jednání; text je přepis stenozáznamu psp.cz.")
+OBDOBI_LABEL = {2017: "2017–2021", 2021: "2021–2025", 2025: "2025–"}
+
+
+def _fold_safe(text: Any) -> str:
+    try:
+        from server.kb.text import fold
+    except Exception:  # noqa: BLE001
+        return _clean(text).lower()
+    return fold(_clean(text))
+
+
+def _fmt_speech(i: int, v: dict, text_len: int = 500) -> str:
+    kdy = " ".join(_s(x) for x in (v.get("datum"), v.get("cas")) if not _blank(x))
+    head = f"{i}. **{_clean(v.get('jmeno'))}**"
+    role = _clean(v.get("role"))
+    if role and _fold_safe(role) not in ("poslanec", "poslankyne"):
+        head += f" ({role})"
+    head += f", {kdy}" if kdy else ""
+    try:
+        obd = OBDOBI_LABEL.get(int(v.get("obdobi")), _s(v.get("obdobi")))
+    except (TypeError, ValueError):
+        obd = _s(v.get("obdobi"))
+    if not _blank(v.get("schuze")):
+        head += f" – {_s(v.get('schuze'))}. schůze PSP" + (f" ({obd})" if obd else "")
+    lines = [head]
+    if not _blank(v.get("bod")):
+        lines.append(f"   Bod: {_snippet(v.get('bod'), 220)}")
+    if not _blank(v.get("snippet")):
+        lines.append(f"   > {_snippet(v.get('snippet'), text_len)}")
+    lines.append(f"   Zdroj: {_s(v.get('url')) or 'neuveden'}"
+                 + (f" | doc_id: `{_s(v.get('doc_id'))}`" if not _blank(v.get("doc_id")) else ""))
+    return "\n".join(lines)
+
+
+def _speeches_for_topic(kb: Any, tema: str, limit: int = 3) -> list[dict]:
+    """Nejrelevantnější vystoupení Pirátů ve Sněmovně k tématu; prázdný seznam, když KB zdroj nemá."""
+    fn = getattr(kb, "search_speeches", None)
+    if fn is None:
+        return []
+    try:
+        items = fn(query=tema, limit=limit * 2) or []
+    except Exception as exc:  # noqa: BLE001
+        log.warning("search_speeches selhal: %s", exc)
+        return []
+    full, _ = _full_matches(items, tema)
+    return full[:limit]
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_speeches(poslanec: str | None = None, query: str | None = None,
+                 od: str | None = None, do: str | None = None, limit: int = 10) -> str:
+    """Vystoupení pirátských poslanců v Poslanecké sněmovně ze stenozáznamů psp.cz
+    (volební období 2017, 2021 a 2025, i projevy v roli člena vlády). Vrací úryvky
+    s řečníkem, datem a časem, číslem schůze, bodem jednání a URL stenozáznamu (s kotvou
+    na vystoupení). Projev poslance ve Sněmovně je jeho vyjádření, ne stanovisko strany.
+
+    Argumenty (volitelné, lze kombinovat): poslanec = jméno nebo jen příjmení (diakritika
+    a pád nevadí, např. „Bartoš“, „Hřiba“) nebo id_osoba z psp.cz; query = hledaná slova
+    v textu vystoupení (skloňování nevadí); od/do = rozmezí data YYYY-MM-DD; limit = počet
+    (výchozí 10, max 30). Bez query vrací nejnovější vystoupení. Při zadání poslance vrátí
+    nejdřív souhrn (počet vystoupení po obdobích). Použij pro „co říkal X ve Sněmovně
+    k…“, citace z rozpravy a argumenty z projednávání zákonů."""
+    kb = get_kb()
+    fn = getattr(kb, "search_speeches", None)
+    if fn is None:
+        return "Index neobsahuje stenozáznamy; spusť `python3 ingest/steno.py` a `python -m server.kb.build`."
+    limit = max(1, min(int(limit or 10), 30))
+    o, q = _clean(poslanec) or None, _clean(query) or None
+    out: list[str] = []
+    if o:
+        summary = (getattr(kb, "speeches_summary", None) or (lambda x: {}))(o) or {}
+        if not summary.get("nalezen"):
+            return (f"Poslanec „{o}“ nemá v bázi žádná vystoupení ve Sněmovně (stenozáznamy pokrývají "
+                    "pirátské poslance v obdobích 2017, 2021 a 2025). Zkus jen příjmení; seznam poslanců dá "
+                    "find_people(role=\"poslanec\").")
+        jm = summary.get("poslanec")
+        jm = ", ".join(jm) if isinstance(jm, list) else _s(jm)
+        po = summary.get("podle_obdobi") or {}
+        po_txt = ", ".join(f"{OBDOBI_LABEL.get(int(k), k) if str(k).isdigit() else k}: {n}" for k, n in po.items())
+        out.append(f"## Souhrn: {jm}")
+        out.append(f"Celkem {summary.get('celkem', 0)} vystoupení na {summary.get('schuzi', 0)} schůzích"
+                   + (f" ({_s(summary.get('od'))} – {_s(summary.get('do'))})" if summary.get("od") else "")
+                   + (f"; podle období: {po_txt}" if po_txt else "") + ".")
+        out.append("")
+    items = fn(query=q, poslanec=o, od=od or None, do=do or None, limit=limit) or []
+    if not items:
+        filt = ", ".join(f"{k}={v}" for k, v in (("poslanec", o), ("query", q), ("od", od), ("do", do)) if v)
+        return "\n".join(out) + (f"Žádné vystoupení neodpovídá filtrům ({filt}). " if filt else
+                                 "V bázi zatím nejsou žádná vystoupení ze stenozáznamů. ") + \
+            "Zkus jiná slova, širší období nebo bez filtru; oficiální postoj strany dá get_position."
+    out.append(f"## Vystoupení ve Sněmovně ({len(items)}" + (f", k „{q}“" if q else ", nejnovější") + ")")
+    out.append("\n\n".join(_fmt_speech(i, v) for i, v in enumerate(items, 1)))
+    out.append("")
+    out.append(f"Autorita: {AUTORITA_POPIS['vyjadreni-politika']}. {SPEECH_DISCLAIMER} "
+               "Celé vystoupení: get_document(doc_id); oficiální postoj strany: get_position.")
+    return _cap("\n".join(out), "Sniž limit nebo zúž query/poslanec/od/do.")
 
 
 @mcp.tool(structured_output=False)

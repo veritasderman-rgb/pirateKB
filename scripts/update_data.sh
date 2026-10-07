@@ -102,6 +102,10 @@ case "$MODE" in
   tydenni)
     run_src styleguide    brand
     run_src psp           psp
+    # Stenozáznamy: jen aktuální období; hotové schůze se přeskočí (data/psp/steno/stav.json),
+    # poslední 2 schůze se zpracují znovu. Schůze bez zipu (psp.cz ho vydává ~3 měsíce po schůzi)
+    # se stahují po stránkách jen tam, kde mluví Pirát; limit stránek drží běh v řádu minut.
+    run_src steno         psp/steno --obdobi 2025 --max-stranek 600
     run_src lide_pirati   lide
     run_src pirati_web    pirati-web
     run_src flickr        flickr

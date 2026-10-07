@@ -208,7 +208,7 @@ def test_tools_list_schema_unchanged_by_wrappers():
 
     tools = mcp_server.mcp._tool_manager.list_tools()
     names = {t.name for t in tools}
-    assert "report_gap" in names and len(names) == 15
+    assert "report_gap" in names and len(names) == 16
     for t in tools:
         assert getattr(t.fn, "__telemetry__", False), t.name
         fresh = Tool.from_function(t.fn, structured_output=False)

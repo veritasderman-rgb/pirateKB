@@ -2,7 +2,7 @@
 
 Server zpřístupňuje [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
 znalostní bázi České pirátské strany: lidi a organizační strukturu, program, tiskové
-zprávy, hlasování poslanců, příspěvky poslanců na X a Bluesky, brand a šablony. AI asistent (Claude, ChatGPT, Cursor…) se
+zprávy, hlasování poslanců, vystoupení poslanců ve Sněmovně (stenozáznamy), příspěvky poslanců na X a Bluesky, brand a šablony. AI asistent (Claude, ChatGPT, Cursor…) se
 pak místo hádání ptá přímo do báze a u odpovědí uvádí zdroj.
 
 Data pocházejí z [`data/`](../data/README.md) (automaticky vytěžená, zatím
@@ -11,7 +11,7 @@ nekurátorovaná). Architektura je v [`docs/navrh-architektury.md`](../docs/navr
 ## Co server umí
 
 Server při startu otevře SQLite index (`index/kb.sqlite`) postavený z `data/` a
-nabízí AI čtyři druhy věcí (15 toolů, 5 promptů, 6 resources). Tooly volá AI sama
+nabízí AI čtyři druhy věcí (16 toolů, 5 promptů, 6 resources). Tooly volá AI sama
 podle potřeby, prompty si vybírá uživatel (v Claude Desktopu v nabídce „+“), resources
 jsou čtecí odkazy.
 
@@ -23,10 +23,11 @@ jsou čtecí odkazy.
 | tool | `get_org_unit` | detail orgánu, odboru, týmu nebo sdružení: vedení, působnost, kontakty |
 | tool | `get_org_tree` | strom organizační struktury (nadřízené a podřízené jednotky) |
 | tool | `get_program` | programové dokumenty a jejich obsah podle tématu |
-| tool | `get_position` | stanovisko strany k tématu (program, usnesení, stanoviska) s uvedením autority zdroje |
+| tool | `get_position` | stanovisko strany k tématu (program, usnesení, stanoviska) s uvedením autority zdroje; zvlášť vystoupení ve Sněmovně a příspěvky na sítích jako názory jednotlivců |
 | tool | `search_press_releases` | hledání v tiskových zprávách a aktualitách, filtr podle data a tématu |
 | tool | `get_voting_record` | hlasování pirátských poslanců, senátorů a europoslanců (PSP, Senát, EP; podle jména, tématu, období, komory `psp`/`senat`/`ep`) |
 | tool | `get_social_posts` | příspěvky pirátských poslanců na X a Bluesky (podle osoby, tématu, platformy, data); vyjádření jednotlivce, ne stanovisko strany, vždy s URL příspěvku |
+| tool | `get_speeches` | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů psp.cz (období 2017, 2021, 2025; podle poslance, tématu, data): řečník, datum a čas, schůze, bod jednání, úryvek a URL stenozáznamu s kotvou; projev = vyjádření poslance, ne stanovisko strany; `get_position` přidá nejrelevantnější vystoupení jako samostatnou sekci |
 | tool | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec k tématu s veřejným kontaktem (e-mail, telefon jen pokud je na pirati.cz); ostatní tooly ho nabídnou samy, když báze přesnou odpověď nemá |
 | tool | `get_brand` | barvy a písma z grafického manuálu |
 | tool | `get_template` | šablona podle typu (např. tisková zpráva) |
@@ -318,6 +319,8 @@ můžete dodat „použij znalostní bázi Pirátů“.
 12. „Kdo mi odpoví na otázku k reformě školství?“ (tool `find_expert`; když báze přesnou
     odpověď nemá, AI řekne „Přesnou odpověď jsem nenašel, ale nejlepší osobou k zodpovězení
     je …“ s e-mailem, telefon jen pokud je na pirati.cz)
+13. „Co říkal Zdeněk Hřib ve Sněmovně o dostupném bydlení?“ (tool `get_speeches`; odpověď cituje
+    URL stenozáznamu, datum a bod jednání a označí projev jako vyjádření poslance, ne stanovisko strany)
 
 Další nápady: „Kolik poslanců dnes Piráti mají?“, „Které programové dokumenty
 existují?“, „Co všechno v bázi je a jak je stará?“ (tool `kb_stats`).

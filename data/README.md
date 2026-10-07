@@ -22,6 +22,13 @@ data/
     poslanci.jsonl       pirátští poslanci: jméno, tituly, členství v klubu, funkce
     hlasovani-<rok>.jsonl  jedno hlasování na řádek, včetně hlasů jednotlivých Pirátů
     README.md            popis polí
+    steno/               stenozáznamy: vystoupení pirátských poslanců ve Sněmovně (steno.py)
+      <obdobi>/<schuze>-<slug-poslance>.md  všechna vystoupení jednoho poslance na jedné schůzi; každé
+                         vystoupení = nadpis `## datum čas – bod` + odkaz na stenozáznam (#rN) + text
+                         (typ projev, autorita vyjadreni-politika; pole autor, osoba_psp, obdobi, schuze,
+                         pocet_vystoupeni, role, vystoupeni = metadata vystoupení)
+      vystoupeni.jsonl   jedno vystoupení na řádek bez textu (datum, čas, osoba, role, bod, url, znaků, soubor)
+      stav.json          zpracované schůze a počty vynechaných vystoupení (předsedající, krátké)
   senat/                 hlasování pirátských senátorů (senat.py, RSS „Jak jsem hlasoval/a“ ze senat.cz)
     senatori.jsonl       pirátští senátoři (příslušnost Piráti nebo zvoleni za Piráty): mandáty, obvod, kluby
     hlasovani-<rok>.jsonl  jedno hlasování na řádek (rok = začátek funkčního období), stejná pole jako psp/ + `komora`
@@ -88,7 +95,7 @@ Každý `.md` soubor začíná blokem `---` … `---`. Povinná pole:
 |---|---|---|
 | `zdroj` | URL stránky nebo datové sady, ze které text pochází; slouží jako citace | URL |
 | `nazev` | název dokumentu (titulek článku, název orgánu, osoby…) | text |
-| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka`, `prispevek-socialni-site`, `navod`, `clanek-media`, `prepis-videa` (přepis videa z titulků YouTube) |
+| `typ` | druh dokumentu, podle něj se volí nástroj a chunkování | `tiskova-zprava`, `aktualita`, `stanovisko`, `program`, `programovy-dokument`, `predpis`, `rozcestnik`, `osoba`, `organizacni-jednotka`, `brand`, `hlasovani`, `materialy`, `schuzka`, `prispevek-socialni-site`, `navod`, `clanek-media`, `prepis-videa` (přepis videa z titulků YouTube), `projev` (vystoupení poslance ve Sněmovně ze stenozáznamu) |
 | `viditelnost` | vrstva přístupu v MCP serveru | `verejne` (bez přihlášení), `clenske` (jen přihlášení piráti); v `data/` je dnes vše `verejne` |
 | `stazeno` | kdy skript dokument stáhl (stáří dat) | `YYYY-MM-DD` |
 
@@ -97,11 +104,11 @@ Volitelná pole:
 | Pole | Význam | Hodnoty |
 |---|---|---|
 | `datum` | datum vydání dokumentu (článku, usnesení); chybí, pokud ho zdroj neuvádí | `YYYY-MM-DD`, u exportů i ISO 8601 |
-| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `audit` (automatický audit, heuristika, k ověření kurátorem), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, `oficialni-data-senat` (senat.cz), `oficialni-data-ep` (hlasování EP přes HowTheyVote.eu), `vyjadreni-politika` (vlastní příspěvek poslance na sociální síti, ne stanovisko strany), `externi-media` (externí média: článek o Pirátech, není výstup strany, může být kritický i nepřesný), později `nazor-jednotlivce` |
+| `autorita` | kdo za textem stojí; AI ho má uvádět v odpovědi, aby nevydávala článek za stanovisko strany | `program`, `usneseni` (CF/RV/RP), `tz` (tisková zpráva), `web` (text na webu), `audit` (automatický audit, heuristika, k ověření kurátorem), `oficialni-evidence` (lide.pirati.cz, evidence.pirati.cz), `oficialni-styleguide`, `oficialni-data-psp`, `oficialni-data-senat` (senat.cz), `oficialni-data-ep` (hlasování EP přes HowTheyVote.eu), `vyjadreni-politika` (vlastní příspěvek poslance na sociální síti nebo jeho projev ve Sněmovně, ne stanovisko strany), `externi-media` (externí média: článek o Pirátech, není výstup strany, může být kritický i nepřesný), později `nazor-jednotlivce` |
 
 Skripty přidávají další pole podle zdroje: `autor`, `tagy` (články), `telefon`,
 `socialni_site` (profily na webu), `druh`, `zkratka`, `nadrazeny`, `kontakty`, `role`
-(organizační jednotky), `poradi` (program), `verze_styleguide` (brand), `osoba`, `platforma`, `ucet`, `pocet_prispevku`, `overit` (příspěvky na sociálních sítích; `overit: true` = účet nebyl spolehlivě ověřen), `web`, `web_url`, `druh_webu`, `region`, `sdruzeni`, `misto` (regionální weby), `kanal_url`, `delka_s`, `titulky`, `prenos` (videa). Tělo souboru je
+(organizační jednotky), `poradi` (program), `verze_styleguide` (brand), `osoba`, `platforma`, `ucet`, `pocet_prispevku`, `overit` (příspěvky na sociálních sítích; `overit: true` = účet nebyl spolehlivě ověřen), `web`, `web_url`, `druh_webu`, `region`, `sdruzeni`, `misto` (regionální weby), `kanal_url`, `delka_s`, `titulky`, `prenos` (videa), `osoba_psp`, `obdobi`, `schuze`, `pocet_vystoupeni`, `vystoupeni` (stenozáznamy). Tělo souboru je
 Markdown převedený z HTML, obvykle začíná nadpisem `# <nazev>`.
 
 JSONL soubory mají jeden JSON objekt na řádek (UTF-8, bez BOM); popis polí je v docstringu
@@ -114,6 +121,7 @@ příslušného skriptu a u hlasování v `data/psp/README.md`, `data/senat/READ
 | pirati.cz | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) podle patičky webu | při citaci uvádět zdroj (`zdroj`) a zachovat licenci; loga a fotografie na webu mohou mít vlastní pravidla užití (viz grafický manuál) |
 | styleguide.pirati.cz | licence na stránce neuvedena; provozuje stejný technický odbor jako pirati.cz | barvy a názvy písem nejsou autorské dílo, samotné fonty (soubory) ale ano, viz jejich licence |
 | psp.cz otevřená data | otevřená data Poslanecké sněmovny, volně k dalšímu užití s uvedením zdroje | <https://www.psp.cz/sqw/hp.sqw?k=1300> |
+| psp.cz stenozáznamy | stenoprotokoly jsou sněmovní publikace, tedy úřední dílo bez autorskoprávní ochrany (§ 3 písm. a) zákona č. 121/2000 Sb.); citovat s odkazem na stenozáznam | ukládáme jen vystoupení pirátských poslanců, ne ostatních řečníků; text je přepis psp.cz, u nových schůzí neautorizovaný |
 | senat.cz | obsah webu Senátu (© Senát PČR); RSS hlasování je oficiální veřejný zdroj, údaje o hlasování jsou úřední informace | <https://www.senat.cz/senatori/>; ukládáme jen hlasy pirátských senátorů a metadata hlasování s odkazem |
 | howtheyvote.eu | data o hlasování pod [ODbL](https://opendatacommons.org/licenses/odbl/) (obsah databáze DbCL), viz <https://howtheyvote.eu/about#license>; uvádět HowTheyVote.eu jako zdroj, odvozená databáze musí zůstat pod ODbL | fotky europoslanců a shrnutí hlasování nejsou pod DbCL (ty neukládáme); API je experimentální, bez záruky dostupnosti |
 | lide.pirati.cz | veřejná evidence České pirátské strany (organizační struktura a funkcionáři) | vytěžujeme jen veřejnou část bez přihlášení |

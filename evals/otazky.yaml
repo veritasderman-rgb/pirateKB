@@ -5,7 +5,7 @@
 # Každá otázka:
 #   id               jedinečný identifikátor (prefix = kategorie)
 #   kategorie        lide | organy | program | stanoviska | tiskove-zpravy | hlasovani | brand |
-#                    sablony | schuzky | systemy | media | socialni-site
+#                    sablony | schuzky | systemy | media | socialni-site | projevy
 #   otazka           jak by se zeptal člověk (pro čtenáře a reporty)
 #   tool, argumenty  který tool MCP serveru má AI zavolat a s čím
 #   ocekavane        aspoň jeden z řetězců musí být ve výstupu (bez ohledu na diakritiku a velikost)
@@ -526,3 +526,30 @@ otazky:
     argumenty: {query: ochranná zóna loga, limit: 3}
     ocekavane: [kurátorovaný obsah]
     zdroj_musi_byt: styleguide.pirati.cz
+
+  # ------------------------------------------------------------------ projevy ve Sněmovně (stenozáznamy)
+  - id: projevy-01
+    kategorie: projevy
+    otazka: Co říkal Ivan Bartoš ve Sněmovně o digitalizaci stavebního řízení?
+    tool: get_speeches
+    argumenty: {poslanec: Bartoše, query: digitalizace stavebního řízení, limit: 5}
+    ocekavane: [ministr pro místní rozvoj]
+    nesmi_obsahovat: [Lukáš Bartoň, Žádné vystoupení neodpovídá]
+    zdroj_musi_byt: psp.cz
+
+  - id: projevy-02
+    kategorie: projevy
+    otazka: Co říkal Zdeněk Hřib ve Sněmovně o dostupném bydlení?
+    tool: get_speeches
+    argumenty: {poslanec: Hřib, query: dostupné bydlení, limit: 5}
+    ocekavane: [stenprot/0]
+    nesmi_obsahovat: [Žádné vystoupení neodpovídá, nemá v bázi žádná vystoupení]
+    zdroj_musi_byt: psp.cz
+
+  - id: projevy-03
+    kategorie: projevy
+    otazka: Jak Piráti ve Sněmovně hájili registr smluv?
+    tool: get_position
+    argumenty: {tema: registr smluv}
+    ocekavane: [Vystoupení ve Sněmovně (stenozáznamy)]
+    zdroj_musi_byt: psp.cz

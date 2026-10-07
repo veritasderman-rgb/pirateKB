@@ -97,8 +97,10 @@ def test_documents(kb: KB):
     assert kb.get_document("neexistuje") is None
     lst = kb.list_documents(typ=["tiskova-zprava"], limit=5)
     assert len(lst) == 5 and all(d["typ"] == "tiskova-zprava" for d in lst)
-    lst = kb.list_documents(kolekce=["psp"])
+    lst = kb.list_documents(kolekce=["psp"], typ=["hlasovani"])
     assert lst and lst[0]["doc_id"] == "psp/README"
+    # stenozáznamy (typ projev) jsou ve stejné kolekci psp
+    assert all(d["typ"] == "projev" for d in kb.list_documents(kolekce=["psp"], typ=["projev"], limit=3))
 
 
 # ---------------------------------------------------------------- lidé a jednotky
