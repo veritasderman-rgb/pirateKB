@@ -1,0 +1,66 @@
+{
+ "posledni_beh": "2026-10-07",
+ "rezim": "aktualni",
+ "kroky": [
+  "mv",
+  "rules",
+  "rv",
+  "sbirka",
+  "vynatky",
+  "wiki",
+  "zasedani"
+ ],
+ "trvani_s": 3,
+ "souhrn": {
+  "predpisy": 29,
+  "predpisy_aktualni": 3,
+  "usneseni": 231,
+  "zasedani_zpravy": 24,
+  "zasedani_celkem": 37
+ },
+ "zdroje": {
+  "mv.gov.cz rejstřík stran": {
+   "stav": "ok",
+   "posledni_zmena_stanov": "2026-02-02"
+  },
+  "github.com/pirati-cz/sbirka": {
+   "stav": "ok",
+   "predpisu": 24,
+   "rozhodnuti": 105
+  },
+  "github.com/pirati-cz/rules": {
+   "stav": "ok",
+   "predpisu": 10
+  },
+  "wiki.pirati.cz": {
+   "stav": "nedostupne",
+   "duvod": "robots.txt nedostupný (HTTP 403, výzva Cloudflare) – neprochází se"
+  },
+  "https://rv.pirati.cz/pruvodce-clena-rv/": {
+   "stav": "ok",
+   "znaku": 2003
+  },
+  "https://rp.pirati.cz/o-nas/": {
+   "stav": "ok",
+   "znaku": 1279
+  },
+  "https://rv.pirati.cz/podvybory/": {
+   "stav": "ok",
+   "znaku": 2989
+  },
+  "rv.pirati.cz/usneseni": {
+   "stav": "ok",
+   "stranek": 5,
+   "usneseni": 126
+  },
+  "rv.pirati.cz/aktuality": {
+   "stav": "ok",
+   "clanku": 24,
+   "zasedani_ze_seznamu": 18
+  },
+  "forum.pirati.cz": {
+   "stav": "preskoceno",
+   "duvod": "robots.txt: Disallow: / (ukládají se jen odkazy)"
+  }
+ }
+}
