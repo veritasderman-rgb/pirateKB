@@ -276,7 +276,12 @@ def _load_documents(data_dir: Path, con: sqlite3.Connection,
         if prefix:
             rel = Path(prefix) / rel
             stav = _s(fm.get("stav"))
-            if stav in ("navrh", "schvaleno"):
+            vlastni = _s(fm.get("autorita"))
+            # schválený dokument s vlastní autoritou (např. program resortního týmu) si ji
+            # ponechá; ostatní (autorita kurator nebo žádná) se řídí stavem schválení
+            if stav == "schvaleno" and vlastni and vlastni != "kurator":
+                pass
+            elif stav in ("navrh", "schvaleno"):
                 fm = {**fm, "autorita": f"kurator-{stav}"}
         doc_id = rel.as_posix()
         kolekce = rel.parts[0]

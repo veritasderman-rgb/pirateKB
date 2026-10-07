@@ -81,6 +81,8 @@ AUTORITA_POPIS = {
                                     "(kategorie odvozené heuristikou)",
     "kurator-schvaleno": "kurátorovaný obsah schválený kurátorem báze (nejvyšší spolehlivost v bázi)",
     "kurator-navrh": "kurátorovaný obsah – NÁVRH, kurátor ho zatím neschválil",
+    "program-resortniho-tymu": "program resortního týmu schválený jeho vedoucím (oficiální výstup "
+                               "resortního týmu, ne volební program schválený celostátním fórem)",
     "kurator": "kurátorovaný obsah sestavený z více zdrojů",
     "nazor-jednotlivce": "názor jednotlivce (NENÍ stanovisko strany)",
     "vyjadreni-politika": "vyjádření politika (příspěvek na sociální síti nebo projev ve Sněmovně; "
