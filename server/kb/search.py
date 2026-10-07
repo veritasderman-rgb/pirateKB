@@ -1426,7 +1426,7 @@ class KB:
     def program_documents(self) -> list[dict]:
         rows = self._rows(
             "SELECT id, nazev, typ, zdroj, datum, autorita, delka, meta FROM documents "
-            "WHERE id LIKE 'pirati-web/program/%' ORDER BY id")
+            "WHERE id LIKE 'pirati-web/program/%' OR id LIKE 'content/program/%' ORDER BY id")
         out = []
         for r in rows:
             meta = _loads(r["meta"], {})

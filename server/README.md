@@ -49,7 +49,7 @@ jsou čtecí odkazy.
 | tool | `rozhodnuti_organu` | usnesení a rozhodnutí orgánů strany (RP, RV, CF, KS, MS, fóra) ze zápisů: orgán, datum, doslovný text, výsledek, odkaz; dnes jen zmínky z Evidence kontaktů a schůzek (formální zápisy orgánů v bázi zatím nejsou), ověřit v originále |
 | tool | `hledat_interni` | jen pro ověřené členy (instance s přihlášením): hledání v neveřejných dokumentech |
 | tool | `navrhnout_do_baze` | jen pro ověřené členy: návrh doplnění z chatu jako GitHub issue s labelem `kb-navrh` ke schválení kurátorem |
-| tool | `kb_stats` | co je v bázi: počty dokumentů podle typu, stáří dat; navíc souhrn anonymní telemetrie od startu serveru |
+| tool | `kb_stats` | co je v bázi: počty dokumentů podle typu, stáří dat; navíc souhrn anonymní telemetrie od startu serveru a (s `PIRATEKB_STATS_DB`) trvalé statistiky za 30 dní |
 | tool | `report_gap` | nahlásí, že báze na otázku odpověď nemá (lokální evidence + GitHub issue s labelem `kb-gap`); AI ho volá, když nenajde odpověď ani po `find_expert` |
 | prompt | `tiskova_zprava` | napíše tiskovou zprávu k tématu ve stylu strany a podle stanovisek z báze |
 | prompt | `reels_scenar` | scénář krátkého videa (reels, TikTok) k tématu |
@@ -408,6 +408,26 @@ konec `server/mcp_server.py`); těla toolů ani jejich JSON schémata v `tools/l
 (hlídá test `test_tools_list_schema_unchanged_by_wrappers`). `data/gaps/` a `data/telemetry/`
 jsou v `.gitignore`, aby se lokální zápisy necommitovaly s daty.
 
+**Trvalá statistika (Postgres).** Log Vercelu vydrží jen 1 den a paměť i soubor zmizí při
+restartu. Proto lze události ukládat i do Postgresu (Neon): stačí nastavit
+`PIRATEKB_STATS_DB` na connection string a nasadit znovu. Server pak zapisuje každé
+volání toolu (stejné údaje jako výše + rodina klienta z User-Agent, zda byl volající
+přihlášený, nasazení a prostředí) a každé připojení konektoru (MCP `initialize`:
+název a verze klientské aplikace, verze protokolu). Kvůli odhadu počtu různých klientů
+za den ukládá i denní pseudonym (HMAC IP + User-Agent s denně měněnou solí, která se
+po 2 dnech maže). IP, text dotazu ani identita se neukládají.
+
+Zápis jde přes frontu v paměti a vlákno na pozadí (dávky po 10 s / 50 událostech), takže
+volání toolu nikdy nečeká na databázi a výpadek databáze nic nerozbije. Bez proměnné se
+nic nemění. Schéma a pohledy pro vyhodnocení jsou v `server/statistika.sql`, report
+vytvoří `python3 scripts/statistika.py` (Markdown, volitelně `--html`). Co se ukládá, jak
+data číst v Neonu a jak posoudit přínos serveru popisuje [docs/statistika.md](../docs/statistika.md).
+
+| Proměnná | Výchozí | Význam |
+|---|---|---|
+| `PIRATEKB_STATS_DB` | (nenastaveno) | connection string Postgresu pro trvalou statistiku; bez něj vypnuto |
+| `PIRATEKB_TELEMETRY` | zapnuto | `0` vypne telemetrii i trvalou statistiku |
+
 ### Evals (kvalita odpovědí)
 
 `evals/otazky.yaml` obsahuje 96 typických otázek v 21 kategoriích (lidé, orgány, program,
@@ -443,7 +463,9 @@ slova z argumentů.
   data. Nevystavujte ho veřejně s jinými než veřejnými daty; pro interní použití
   zapněte přihlášení přes Keycloak (`PIRATEKB_AUTH=keycloak`, [docs/auth-keycloak.md](../docs/auth-keycloak.md)),
   VPN nebo omezení na proxy. Proti zahlcení chrání rate limit na `/mcp`. Server data báze jen čte; zapisuje jen
-  hlášení `report_gap` a anonymní telemetrii (viz [Zpětná vazba a evals](#zpětná-vazba-a-evals)).
+  hlášení `report_gap` a anonymní telemetrii (viz [Zpětná vazba a evals](#zpětná-vazba-a-evals)),
+  s `PIRATEKB_STATS_DB` i trvale do Postgresu: bez textu dotazů, IP adres a identity, jen
+  s denním pseudonymem pro počet různých klientů za den (viz [docs/statistika.md](../docs/statistika.md)).
 - **Logy.** MCP server a reverzní proxy mohou logovat IP adresy a dotazy. Dotazy
   mohou obsahovat osobní údaje, které do nich uživatel sám napíše. Logy držte krátce,
   nesdílejte je a v proxy zvažte vypnutí logování těla požadavků. Dotazy a odpovědi

@@ -20,8 +20,8 @@ Jeden zdroj pravdy o Pirátské straně, ke kterému se každý pirát připojí
   a kontrola textu před zveřejněním.
 
 Stav: **běžící prototyp**. Server je veřejně nasazený na Vercelu a data se obnovují
-automaticky každý den. Kurátorovaná vrstva (`content/`) je založená, zatím obsahuje
-jen návrhy. Architektura a plán jsou v [docs/navrh-architektury.md](docs/navrh-architektury.md).
+automaticky každý den. Kurátorovaná vrstva (`content/`) je založená, kromě schváleného
+programu resortního týmu pro zdravotnictví obsahuje zatím jen návrhy. Architektura a plán jsou v [docs/navrh-architektury.md](docs/navrh-architektury.md).
 
 ## Připojení (hostovaný server na Vercelu)
 
@@ -134,7 +134,9 @@ nahlásí.
   všechny tooly. Členské tooly `hledat_interni` a `navrhnout_do_baze` (návrh doplnění z chatu
   → GitHub issue `kb-navrh` ke schválení kurátorem). Čeká na klienta v Keycloaku. Viz
   [docs/auth-keycloak.md](docs/auth-keycloak.md).
-- **Telemetrie:** anonymní, bez textu dotazů.
+- **Telemetrie a statistika používání:** anonymní, bez textu dotazů, IP adres a identity;
+  volitelně trvale v Postgresu (počty volání toolů a připojení konektoru), aby šlo po
+  měsících vyhodnotit, jestli server dává smysl. Viz [docs/statistika.md](docs/statistika.md).
 - **Evals:** 96 testovacích otázek běží v CI při každém pull requestu.
 - **Skills pro Claude** ve složce [`skills/`](skills/README.md): tisková zpráva, brief a
   sociální sítě, včetně toho, kdy přibrat MCP Hlídače státu.
@@ -182,6 +184,9 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky
 
 **Kurátorovaná vrstva** [`content/`](content/README.md) obsahuje pravidla brandu, tón
 komunikace, šablonu tiskové zprávy a slovník 326 zkratek a pojmů, zatím jako návrh.
+Schválený je program resortního týmu pro zdravotnictví
+[„Zdravotnictví pro 21. století“](content/program/zdravotnictvi-pro-21-stoleti.md)
+(autorita `program-resortniho-tymu`; `get_program` ho prohledává spolu s programy z pirati.cz).
 V [`inbox/vysledky/`](inbox/vysledky/README.md) je 150 automatických návrhů „co jsme
 dokázali“ ke kontrole kurátorem. Postup kurátora popisuje [docs/kurator.md](docs/kurator.md).
 
@@ -236,7 +241,7 @@ kurátorovaným obsahem a brandem má kurátor báze. Postup je v
 
 ```
 data/      automaticky vytěžená data (nekurátorovaná)
-content/   kurátorovaný obsah (brand, šablony, slovník, výsledky, stanoviska)
+content/   kurátorovaný obsah (brand, šablony, slovník, výsledky, stanoviska, programy resortních týmů)
 inbox/     syrové příspěvky a návrhy ke kontrole kurátorem
 schemas/   JSON Schema pro content/ a inbox/
 ingest/    konektory zdrojů a kontrola dat (validate.py)

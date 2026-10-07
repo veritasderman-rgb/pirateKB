@@ -679,7 +679,10 @@ def zapis_mesice(rows: list[dict], stazeno: str) -> tuple[int, int]:
         y, m = ym.split("-")
         items.sort(key=lambda r: (r["datum"], r["medium"], r["titulek"]), reverse=True)
         meta = {
-            "zdroj": "monitoring (Google News, GDELT, RSS)",
+            # měsíční přehled odkazuje sám na sebe v repozitáři (jako systemy.py); jednotlivé
+            # články se citují odkazem v textu
+            "zdroj": f"https://github.com/veritasderman-rgb/pirateKB/blob/main/data/media/{y}/{ym}.md",
+            "zdroj_monitoringu": "Google News, GDELT, RSS",
             "nazev": f"Články o Pirátech, {MESICE[int(m) - 1]} {y}",
             "typ": "clanek-media",
             "autorita": "externi-media",
