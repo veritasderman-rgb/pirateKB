@@ -394,6 +394,50 @@ def test_main_zapise_a_validuje(tmp_path, monkeypatch):
     assert {p: p.stat().st_mtime_ns for p in strana.rglob("*.md")} == pred
 
 
+def test_main_pri_chybe_zdroje_nemaze(tmp_path, monkeypatch):
+    """Plný běh, ve kterém zdroj selže (síť, git), nesmí smazat dřív stažené soubory;
+    úspěšný plný běh zastaralé soubory dál uklízí."""
+    data = _run_fixture(tmp_path, monkeypatch)
+    strana = data / "strana"
+    usn = strana / "usneseni" / "rv" / "2023" / "001-navrh-k-eurokomisari-pro-cf.md"
+    zas = strana / "usneseni" / "rv" / "2023" / "zasedani-2023-08-26.md"
+    rr = strana / "predpisy" / "rr.md"
+    jsonl = (strana / "usneseni" / "usneseni.jsonl").read_text(encoding="utf-8")
+    assert usn.exists() and zas.exists() and rr.exists()
+
+    # rv.pirati.cz nedostupný (síťová chyba) a git pull sbírky selže
+    puvodni, git_ok = predpisy.polite_get, predpisy.git_repo
+
+    def sit_dole(url, **kw):
+        if url.startswith("https://rv.pirati.cz/"):
+            raise ConnectionError("Network is unreachable")
+        return puvodni(url, **kw)
+
+    def git_chyba(name, refresh):
+        predpisy.stav_zdroju[f"git:{name}"] = {"stav": "chyba", "duvod": "Could not resolve host: github.com"}
+        return None
+
+    monkeypatch.setattr(predpisy, "polite_get", sit_dole)
+    monkeypatch.setattr(predpisy, "git_repo", git_chyba)
+    monkeypatch.setattr(predpisy, "stav_zdroju", {})
+    assert predpisy.main(["--interval", "0"]) == 0
+    assert usn.exists() and zas.exists() and rr.exists()
+    assert (strana / "usneseni" / "usneseni.jsonl").read_text(encoding="utf-8") == jsonl
+    stav = json.loads((strana / "stav.json").read_text(encoding="utf-8"))
+    assert stav["zdroje"]["rv.pirati.cz/usneseni"]["stav"] == "chyba"
+    assert stav["zdroje"]["git:sbirka"]["stav"] == "chyba"
+
+    # úspěšný plný běh zastaralé soubory smaže
+    stary_p, stary_u = strana / "predpisy" / "zruseny.md", strana / "usneseni" / "rv" / "2023" / "999-zruseno.md"
+    stary_p.write_text("---\n---\n", encoding="utf-8")
+    stary_u.write_text("---\n---\n", encoding="utf-8")
+    monkeypatch.setattr(predpisy, "polite_get", puvodni)
+    monkeypatch.setattr(predpisy, "git_repo", git_ok)
+    monkeypatch.setattr(predpisy, "stav_zdroju", {})
+    assert predpisy.main(["--interval", "0"]) == 0
+    assert not stary_p.exists() and not stary_u.exists() and usn.exists() and rr.exists()
+
+
 # ----------------------------------------------------------------------------- integrace rozhodnuti_organu
 
 def _organy_ns(monkeypatch) -> dict:

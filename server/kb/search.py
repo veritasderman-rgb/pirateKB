@@ -1426,7 +1426,17 @@ class KB:
             # chunky na dokument a chunk může obsahovat víc vystoupení. Proto se odsud berou
             # jen kandidátní dokumenty a shoda se vyhodnotí znovu po jednotlivých
             # vystoupeních: odkaz a čas patří vždy tomu vystoupení, jehož text se shoduje.
-            hits = self.search(query, typ=["projev"], autor=autori, od=od_sql, do=do,
+            # Komora se omezí už ve výběru kandidátů (kolekce projevů dané komory), jinak by
+            # větší sněmovní korpus u častého dotazu zaplnil okno a projevy z EP by chyběly.
+            kolekce = None
+            if komora:
+                kp: list = []
+                kolekce = [r["kolekce"] for r in self._rows(
+                    "SELECT DISTINCT kolekce FROM documents WHERE typ = 'projev'"
+                    + self._speech_komora_clause(komora, kp), kp)]
+                if not kolekce:
+                    return []
+            hits = self.search(query, typ=["projev"], kolekce=kolekce, autor=autori, od=od_sql, do=do,
                                limit=max(limit * 6, 40), preferuj_nove=False)
             doc_score: dict[str, float] = {}
             for h in hits:

@@ -521,3 +521,28 @@ def test_tooly_ze_specifikace(tmp_path, monkeypatch):
     finally:
         mcp_server._state["kb"] = None
         kb.close()
+
+
+def test_amendments_filtry_pred_orezem_fulltextu(tmp_path, monkeypatch):
+    """Filtry (poslanec, výsledek, období, tisk) se uplatní před ořezem fulltextu a `celkem`
+    počítá všechny shody, i když dotaz odpovídá stovkám návrhů jiných poslanců."""
+    data = _mini_data(tmp_path, monkeypatch)
+    vzor = (data / "psp/pozmenovaky/2025/300-1965.md").read_text(encoding="utf-8")
+    for i in range(320):
+        sd = 5000 + i
+        text = vzor.replace("cislo_sd: 1965", f"cislo_sd: {sd}").replace("SD 1965", f"SD {sd}")
+        text += "\nZákon zákon zákona zákonem zákonu, návrh zákona a zákon o zákonech.\n"
+        (data / f"psp/pozmenovaky/2025/300-{sd}.md").write_text(text, encoding="utf-8")
+    db = tmp_path / "kb.sqlite"
+    build_index(data, db, embeddings_provider=None)
+    kb = KB(db, embeddings_provider=None)
+    q = _spec_ns()["amendments_query"]
+    try:
+        res = q(kb, poslanec="Michálek", query="zákon")
+        assert sorted(d["meta"]["cislo_sd"] for d in res["items"]) == [396, 402] and res["celkem"] == 2
+        res = q(kb, query="zákon", tisk="47", vysledek="nepřijat")
+        assert [d["meta"]["cislo_sd"] for d in res["items"]] == [402]
+        res = q(kb, poslanec="Richterová", query="zákon")
+        assert res["celkem"] == 321 and res["souhrn"] == {"projednava-se": 321}
+    finally:
+        kb.close()

@@ -1064,9 +1064,10 @@ def get_position(tema: str) -> str:
     if not t:
         return "Zadej téma, např. `get_position(\"jaderná energetika\")`."
     kb = get_kb()
-    # stanoviska + předpisy + usnesení orgánů strany (typ usneseni mají i usnesení vlády a Prahy)
+    # stanoviska + předpisy + usnesení orgánů strany (typ usneseni mají i usnesení vlády a Prahy,
+    # proto se hledá jen v kolekci strana – jinak by je stovky usnesení Prahy vytlačily z limitu)
     st_raw = _anotuj_predpisy(kb, kb.search(t, typ=["stanovisko", "predpis"], limit=8) or [])
-    us_strany = [r for r in kb.search(t, typ=["usneseni"], limit=8) or []
+    us_strany = [r for r in kb.search(t, typ=["usneseni"], kolekce=["strana"], limit=8) or []
                  if r.get("autorita") == "usneseni-organu-strany"]
     historicke = [r for r in st_raw if r.get("platnost") == "historicke-zneni"]
     st_all = sorted([r for r in st_raw if r.get("platnost") != "historicke-zneni"] + us_strany,
@@ -2070,15 +2071,6 @@ def amendments_query(kb: Any, poslanec: str | None = None, query: str | None = N
             out.update(nalezen=False)
             return out
         out["poslanec"] = jmena
-    if query and fold(query).strip():
-        cand, seen = [], set()
-        for h in kb.search(query, typ=["pozmenovaci-navrh"], limit=300, preferuj_nove=False):
-            if h["doc_id"] in docs and h["doc_id"] not in seen:
-                seen.add(h["doc_id"])
-                cand.append({**docs[h["doc_id"]], "snippet": h.get("snippet")})
-    else:
-        cand = sorted(docs.values(), key=lambda d: (d["datum"] or "", d["doc_id"]), reverse=True)
-
     def keep(d: dict) -> bool:
         m = d["meta"]
         if jmena is not None and not set(jmena) & set(m.get("autori_pirati") or []):
@@ -2089,7 +2081,20 @@ def amendments_query(kb: Any, poslanec: str | None = None, query: str | None = N
             return False
         return rok is None or str(m.get("obdobi")) == str(rok)
 
-    sel = [d for d in cand if keep(d)]
+    # filtry nad metadaty se uplatní před fulltextem; fulltext pak dostane okno na všechny
+    # chunky pozměňovacích návrhů, aby se nic neořízlo a `celkem`/`souhrn` platily pro všechny shody
+    docs = {k: d for k, d in docs.items() if keep(d)}
+    if query and fold(query).strip():
+        sel, seen = [], set()
+        if docs:
+            n = kb._rows("SELECT COUNT(*) AS n FROM chunks c JOIN documents d ON d.id = c.doc_id "
+                         "WHERE d.typ = 'pozmenovaci-navrh'")[0]["n"]
+            for h in kb.search(query, typ=["pozmenovaci-navrh"], limit=max(n, 1), preferuj_nove=False):
+                if h["doc_id"] in docs and h["doc_id"] not in seen:
+                    seen.add(h["doc_id"])
+                    sel.append({**docs[h["doc_id"]], "snippet": h.get("snippet")})
+    else:
+        sel = sorted(docs.values(), key=lambda d: (d["datum"] or "", d["doc_id"]), reverse=True)
     out.update(celkem=len(sel), souhrn=dict(_Counter(d["meta"].get("vysledek") for d in sel)),
                items=sel[:max(1, int(limit))])
     return out

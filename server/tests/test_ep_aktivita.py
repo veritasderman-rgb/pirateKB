@@ -159,6 +159,25 @@ def test_get_speeches_finds_ep_speech(tmp_path, monkeypatch):
         assert "nemá v bázi žádná vystoupení" in mcp_server.get_speeches(poslanec="Peksa", komora="psp")
 
 
+def test_search_speeches_ep_not_crowded_out_by_psp(tmp_path, monkeypatch):
+    """Komora se uplatní už při výběru kandidátů: mnoho sněmovních projevů se silnější shodou
+    nesmí vytlačit z okna fulltextu jediný projev z EP."""
+    data = _write_speeches(tmp_path, monkeypatch)
+    vzor = next((data / "ep" / "projevy").glob("marketa-gregorova/2020/*.md")).read_text(encoding="utf-8")
+    psp = vzor.replace("komora: ep\n", "").replace("Markéta Gregorová", "Petr Poslanec")
+    psp = psp.replace("Hellfire missiles", "Iranian regime protesters Iranian regime protesters. Hellfire missiles")
+    for i in range(120):
+        p = data / "psp" / "steno" / "2017" / f"{i:03d}-petr-poslanec.md"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(psp, encoding="utf-8")
+    db = tmp_path / "kb.sqlite"
+    build_index(data, db, embeddings_provider=None)
+    kb = KB(db, embeddings_provider=None)
+    assert len(kb.search_speeches(query="Iranian regime protesters", komora="psp", limit=50)) == 50
+    items = kb.search_speeches(query="Iranian regime protesters", komora="ep")
+    assert [x["jmeno"] for x in items] == ["Markéta Gregorová"] and items[0]["komora"] == "ep"
+
+
 QUESTION = {
     "identifier": "E-9-2022-000342", "document_date": "2022-01-27",
     "work_type": "def/ep-document-types/QUESTION_WRITTEN", "creator": ["person/197549", "person/88882"],

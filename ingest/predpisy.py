@@ -996,6 +996,15 @@ def _uklid(slozka: Path, prepsano: set[Path]) -> int:
     return n
 
 
+def _sitove_chyby() -> int:
+    """Počet síťových chyb zapsaných funkcí fetch (404 a zákaz v robots.txt se nepočítají)."""
+    return len((stav_zdroju.get("chyby") or {}).get("url") or [])
+
+
+def _git_selhal(name: str) -> bool:
+    return (stav_zdroju.get(f"git:{name}") or {}).get("stav") == "chyba"
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--aktualni", action="store_true", help="týdenní inkrementální běh (kratší cache výpisů, bez git pull)")
@@ -1012,6 +1021,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # --- předpisy
     prepsano_p: set[Path] = set()
+    chyb_p = _sitove_chyby()
     mv = krok_mv(dnes, args.aktualni) if "mv" in kroky else None
     posl = (mv or {}).get("posledniZmenaStanov")
     predpisy: dict[str, dict] = {}
@@ -1043,13 +1053,20 @@ def main(argv: list[str] | None = None) -> int:
             zapis_predpis(p, prepsano_p, dnes)
     if mv:
         zapis_mv(mv, prepsano_p, dnes)
+    # úklid zastaralých souborů jen po bezchybném běhu všech zdrojů; při chybě sítě nebo gitu
+    # by výsledky byly neúplné a smazaly by se platné soubory (chyba zůstane ve stav.json)
     if plny:
-        _uklid(OUT_P, prepsano_p)
+        if _sitove_chyby() == chyb_p and not any(_git_selhal(z) for z in ("sbirka", "rules")):
+            _uklid(OUT_P, prepsano_p)
+        else:
+            stav_zdroju["uklid:predpisy"] = {"stav": "preskoceno", "duvod": "chyba zdroje – soubory ponechány"}
 
     # --- usnesení
     prepsano_u: set[Path] = set()
     rows: list[dict] = []
     usn: list[dict] = []
+    chyb_u = _sitove_chyby()
+    sbirka_ok = not _git_selhal("sbirka") and (REPO_CACHE / "sbirka" / ".git").exists()
     if "rv" in kroky:
         usn.extend(krok_rv(args.aktualni))
     if "sbirka" in kroky:
@@ -1062,7 +1079,9 @@ def main(argv: list[str] | None = None) -> int:
     for u in sorted(usn, key=lambda u: (u["organ"], u["rok"], u["poradi"], u.get("slug_dir") or "")):
         _, row = zapis_usneseni(u, prepsano_u, dnes)
         rows.append(row)
+    chyb_z = _sitove_chyby()
     zasedani = krok_zasedani(args.aktualni) if "zasedani" in kroky else []
+    zasedani_ok = _sitove_chyby() == chyb_z
     zas_rows = []
     for z in zasedani:
         if z.get("jen_seznam"):
@@ -1075,7 +1094,7 @@ def main(argv: list[str] | None = None) -> int:
             rows.append(row)
             zas_rows.append({k: z.get(k) for k in ("datum", "datum_do", "nazev", "misto", "znacka", "zapis_url",
                                                    "usneseni_url", "zdroj")} | {"zprava": row["soubor"]})
-    if zas_rows:
+    if zas_rows and zasedani_ok:   # neúplný seznam zasedání nepřepíše přehled z dřívějška
         zas_rows.sort(key=lambda r: r["datum"] or "")
         write_jsonl(OUT_U / "zasedani.jsonl", zas_rows)
         tab = "\n".join(
@@ -1093,9 +1112,13 @@ def main(argv: list[str] | None = None) -> int:
                        "| Datum | Zasedání | Zpráva v bázi | Zápis a usnesení (fórum) |\n|---|---|---|---|\n" + tab)
         prepsano_u.add(path)
     if {"rv", "sbirka", "zasedani"} <= kroky:
-        _uklid(OUT_U, prepsano_u)
-        rows.sort(key=lambda r: (r["organ"], r["datum"] or f"{r['rok']}-99", r["soubor"]))
-        write_jsonl(OUT_U / "usneseni.jsonl", rows)
+        if _sitove_chyby() != chyb_u or not sbirka_ok:
+            # neúplné výsledky: soubory i rejstřík usneseni.jsonl zůstanou z posledního úplného běhu
+            stav_zdroju["uklid:usneseni"] = {"stav": "preskoceno", "duvod": "chyba zdroje – soubory ponechány"}
+        else:
+            _uklid(OUT_U, prepsano_u)
+            rows.sort(key=lambda r: (r["organ"], r["datum"] or f"{r['rok']}-99", r["soubor"]))
+            write_jsonl(OUT_U / "usneseni.jsonl", rows)
 
     # --- rejstřík předpisů (z .md na disku, aby odpovídal i dílčímu běhu)
     prow = []
