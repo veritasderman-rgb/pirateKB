@@ -8,7 +8,10 @@ stahovat ručně, a kdokoli si může kdykoli ověřit, co a kdy se aktualizoval
 | Plán | Kdy | Co běží | Orientační doba |
 |---|---|---|---|
 | `denni` | každý den 04:17 UTC (06:17 letního času v Praze) | `evidence` (nové schůzky), `media --denne`, `socialni_site` (X a Bluesky), `psp`, `pirati_web --only aktuality` (nové články ze sitemapy) | minuty až desítky minut |
-| `tydenni` | neděle 03:23 UTC | všechno: `styleguide`, `psp`, `steno --obdobi 2025` (stenozáznamy, jen nové a poslední 2 schůze), `tisky --obdobi 2025` (sněmovní tisky a interpelace), `lide_pirati`, `pirati_web`, `flickr`, `evidence --plne`, první týden v měsíci `volby` (ČSÚ) a `financovani` (účty a rozpočty; v lednu, dubnu–červnu a prosinci i výroční zprávy a kampaně), `socialni_site`, `subweby`, `dokumenty`, `systemy` | desítky minut (limit jobu je 60 minut) |
+| `tydenni` | neděle 03:23 UTC | všechno: `styleguide`, `psp`, `steno --obdobi 2025` (stenozáznamy, jen nové a poslední 2 schůze), `tisky --obdobi 2025` (sněmovní tisky a interpelace), `lide_pirati`, `pirati_web`, `flickr`, `evidence --plne`, první týden v měsíci `volby` (ČSÚ) a `financovani` (účty a rozpočty; v lednu, dubnu–červnu a prosinci i výroční zprávy a kampaně), `socialni_site`, `subweby`, `praha --aktualni` (hlasování ZHMP a usnesení ZHMP a Rady HMP, ~5–10 min), `dokumenty`, `systemy` | desítky minut (limit jobu je 60 minut) |
+
+`vlada.py` (Piráti ve vládě 2021–2024) je uzavřená historie, automaticky se nespouští; MZV se
+dotahuje ručně `--only mzv`.
 
 Workflow [`.github/workflows/update-data.yml`](../.github/workflows/update-data.yml) spouští
 [`scripts/update_data.sh`](../scripts/update_data.sh). Postup každého běhu:

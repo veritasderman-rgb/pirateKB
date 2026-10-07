@@ -7,7 +7,10 @@ i „bydleni“ dají stejný kmen ``bydln``. Kroky:
 1. odstranění pádové/číselné koncovky (nejdelší pravidlo, které splní minimální délku),
 2. odstranění přivlastňovací přípony (``-ov``, ``-in``, ``-uv``),
 3. normalizace (``čt→ck``, ``št→sk``, ``c/č→k``, ``z/ž→h``, vypuštění pohyblivého ``e``,
-   ``ů→o`` uprostřed).
+   ``ů→o`` uprostřed), takže „novela“, „Novela“, „novele“ i „novelou“ dají ``novl``.
+
+Navíc několik odvozených slov se stejným kmenem (``_DERIVACE``): „novelizace“ a
+„novelizovat“ = „novela“.
 
 Výjimky, aby krátká slova a zkratky fungovaly přesně: slova do 2 znaků, tokeny
 s číslicí a zkratky psané velkými písmeny (``NATO``, ``DPH``, ``EU``; 2–5 znaků) se
@@ -46,6 +49,13 @@ u uz v vam vas vase ve vice vsak vsechno vy z za zda ze zpet
 """.split())
 
 _WORD_RE = re.compile(r"[A-Za-z0-9]+")
+
+# Odvozená slova se stejným významem pro hledání, která light stemmer (jen pádové koncovky)
+# nespojí: „novelizace“, „novelizovat“, „novelizuje“ -> stejný kmen jako „novela“, „novele“ (novl).
+# Prefix po odstranění diakritiky, malými písmeny -> kmen.
+_DERIVACE: tuple[tuple[str, str], ...] = (
+    ("noveliz", "novl"),
+)
 
 
 def strip_diacritics(text: str | None) -> str:
@@ -99,6 +109,9 @@ def stem(word: str) -> str:
         return w
     if raw.isupper() and len(raw) <= 5:   # zkratka (NATO, OECD, SPOLU)
         return w
+    for prefix, kmen in _DERIVACE:
+        if w.startswith(prefix):
+            return kmen
     if len(w) == 3:                       # jen normalizace (žen -> zn jako ženy, dům -> dom)
         return _normalize_fix(w)
     s = _remove_possessive(_remove_case(w))

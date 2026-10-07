@@ -37,10 +37,22 @@ Konfigurace (env):
 ``PIRATEKB_AUTH_AUDIENCE``  očekávané ``aud`` (čárkami oddělený seznam); prázdné = nekontroluje se
 ``PIRATEKB_REQUIRED_GROUP`` skupina/role nutná pro přístup (čárkami = stačí kterákoli); jinak 403
 ``PIRATEKB_MEMBER_GROUP``   skupina/role, která vidí i ``clenske`` (výchozí = REQUIRED_GROUP)
+``PIRATEKB_STDIO_VIDITELNOST`` úrovně viditelnosti pro lokální běh bez HTTP (stdio, skripty);
+                            čárkami, výchozí ``verejne``; v HTTP režimu se ignoruje
 ========================== =========================================================
+
+Vynucení viditelnosti dat (``viditelnost`` dokumentu: ``verejne`` | ``clenske`` | …):
+middleware po ověření tokenu spočítá :func:`viditelnost_pro` a uloží ji (spolu s
+:class:`AuthInfo`) do contextvars; mcp 2.2.0 spouští handler toolu v kontextu
+odesílatele zprávy a synchronní tooly přes ``anyio.to_thread`` (kontext kopíruje), takže
+hodnotu vidí i ``server.kb.search.KB`` bez změny signatur toolů. :func:`aktualni_viditelnost`
+vrací: hodnotu z contextvar, jinak v HTTP režimu (aplikace prošla :func:`wrap`) jen
+``verejne``, jinak (stdio / skript) ``PIRATEKB_STDIO_VIDITELNOST`` (výchozí ``verejne``).
 """
 from __future__ import annotations
 
+import contextlib
+import contextvars
 import json
 import logging
 import os
@@ -69,6 +81,16 @@ SCOPE_CONFIG_KEY = "piratekb_auth_config"
 
 VIDITELNOST_VEREJNE = frozenset({"verejne"})
 VIDITELNOST_CLENSKE = frozenset({"verejne", "clenske"})
+ENV_STDIO_VIDITELNOST = "PIRATEKB_STDIO_VIDITELNOST"
+
+# viditelnost a identita aktuálního požadavku (nastavuje middleware / nastav_viditelnost)
+_viditelnost_var: contextvars.ContextVar[frozenset[str] | None] = contextvars.ContextVar(
+    "piratekb_viditelnost", default=None)
+_identita_var: contextvars.ContextVar["AuthInfo | None"] = contextvars.ContextVar(
+    "piratekb_identita", default=None)
+# True, jakmile proces obalil ASGI aplikaci přes wrap() (HTTP server): stdio proměnná se
+# pak ignoruje a bez kontextu požadavku platí jen „verejne“ (fail closed)
+_http_rezim = False
 
 
 class TokenError(Exception):
@@ -435,10 +457,15 @@ class KeycloakAuthMiddleware:
         state[SCOPE_STATE_KEY] = info
         state[SCOPE_CONFIG_KEY] = self.config
         scope["state"] = state
+        vid = frozenset(viditelnost_pro(scope, self.config))
         ctx_token = auth_context_var.set(user)
+        vid_token = _viditelnost_var.set(vid)
+        id_token = _identita_var.set(info)
         try:
             await self.app(scope, receive, send)
         finally:
+            _identita_var.reset(id_token)
+            _viditelnost_var.reset(vid_token)
             auth_context_var.reset(ctx_token)
 
 
@@ -484,7 +511,8 @@ def viditelnost_pro(request: Any = None, config: AuthConfig | None = None) -> se
     členskou skupinu; ``{"verejne", "clenske"}`` pro přihlášené se skupinou/rolí z
     ``PIRATEKB_MEMBER_GROUP`` (výchozí = ``PIRATEKB_REQUIRED_GROUP``). Bez nastavené
     členské skupiny se ``clenske`` nepřiděluje nikomu (účet na auth.pirati.cz mají i
-    nečlenové). Zatím jsou všechna data veřejná, funkce je příprava pro filtrování.
+    nečlenové). Middleware výsledek ukládá do kontextu požadavku, odkud ho čte
+    :func:`aktualni_viditelnost` (a filtr v ``server.kb.search.KB``).
     """
     if config is None:
         config = _request_state(request).get(SCOPE_CONFIG_KEY)  # konfigurace aktivního middlewaru
@@ -501,8 +529,78 @@ def viditelnost_pro(request: Any = None, config: AuthConfig | None = None) -> se
     return set(VIDITELNOST_VEREJNE)
 
 
+def normalizuj_viditelnost(value: Any) -> str:
+    """Hodnota pole ``viditelnost`` malými písmeny; chybějící / prázdná = ``verejne``."""
+    s = str(value or "").strip().lower()
+    return s or "verejne"
+
+
+def stdio_viditelnost(env: dict[str, str] | None = None) -> frozenset[str]:
+    """Úrovně pro lokální běh bez HTTP z ``PIRATEKB_STDIO_VIDITELNOST`` (čárkami);
+    ``verejne`` je vždy zahrnuto, výchozí jen ``verejne``."""
+    env = os.environ if env is None else env
+    return frozenset({"verejne", *(normalizuj_viditelnost(x) for x in _csv(env.get(ENV_STDIO_VIDITELNOST)))})
+
+
+def http_rezim() -> bool:
+    """Běží proces jako HTTP server (aplikace prošla :func:`wrap`)?"""
+    return _http_rezim
+
+
+def aktualni_viditelnost() -> frozenset[str]:
+    """Úrovně viditelnosti, které smí vidět aktuální volající.
+
+    1. hodnota z kontextu požadavku (nastavuje :class:`KeycloakAuthMiddleware` podle
+       :func:`viditelnost_pro`, případně :func:`nastav_viditelnost`);
+    2. jinak v HTTP režimu jen ``verejne`` (anonymní požadavek, autentizace vypnutá);
+    3. jinak (stdio, skripty, testy) ``PIRATEKB_STDIO_VIDITELNOST`` (výchozí ``verejne``).
+    """
+    vid = _viditelnost_var.get()
+    if vid is not None:
+        return vid
+    if _http_rezim:
+        return VIDITELNOST_VEREJNE
+    return stdio_viditelnost()
+
+
+def aktualni_identita() -> AuthInfo | None:
+    """Ověřená identita aktuálního požadavku (z tokenu), nebo ``None``."""
+    info = _identita_var.get()
+    if info is not None:
+        return info
+    try:
+        return auth_info_from(None)
+    except Exception:  # noqa: BLE001 - mimo kontext mcp
+        return None
+
+
+def je_overeny_clen() -> bool:
+    """Smí volající vidět neveřejná data? (HTTP: token se členskou skupinou;
+    stdio: ``PIRATEKB_STDIO_VIDITELNOST`` obsahuje jinou úroveň než ``verejne``.)"""
+    return bool(aktualni_viditelnost() - VIDITELNOST_VEREJNE)
+
+
+@contextlib.contextmanager
+def nastav_viditelnost(urovne: Iterable[str], identita: AuthInfo | None = None):
+    """Nastaví viditelnost (a identitu) pro blok kódu – pro testy, skripty a vlastní
+    middleware. ``verejne`` se přidá vždy."""
+    vid = frozenset({"verejne", *(normalizuj_viditelnost(u) for u in urovne)})
+    t1 = _viditelnost_var.set(vid)
+    t2 = _identita_var.set(identita)
+    try:
+        yield vid
+    finally:
+        _identita_var.reset(t2)
+        _viditelnost_var.reset(t1)
+
+
 def wrap(app: Any, config: AuthConfig | None = None, verifier: KeycloakTokenVerifier | None = None) -> Any:
-    """Zabalí ASGI aplikaci autentizací podle env. Při vypnuté autentizaci vrátí ``app``."""
+    """Zabalí ASGI aplikaci autentizací podle env. Při vypnuté autentizaci vrátí ``app``.
+
+    Volání přepne proces do HTTP režimu: :func:`aktualni_viditelnost` pak bez ověřené
+    identity vrací jen ``verejne`` a ``PIRATEKB_STDIO_VIDITELNOST`` ignoruje."""
+    global _http_rezim
+    _http_rezim = True
     config = config if config is not None else AuthConfig.from_env()
     if config is None:
         return app

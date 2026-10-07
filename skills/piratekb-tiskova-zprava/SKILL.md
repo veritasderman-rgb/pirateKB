@@ -29,7 +29,9 @@ z vlastní paměti. Postoj strany bez zdroje nesmí vzniknout.
 6. **Fakta zvenku** (volitelně): viz „Kdy použít Hlídač státu“.
 7. **Napiš TZ.** 300–500 slov a 2–4 citace. Citace mluvčího formuluj jako návrh k jeho
    schválení.
-8. **Kontrola proti programu** a kontrolní seznam (níže), pak výstup v předepsané podobě.
+8. **Kontrola proti programu** a kontrolní seznam (níže). Hotový návrh pošli do
+   `zkontroluj_text(text="<návrh>", druh="tiskova-zprava")` a opravy z nálezů „blokující“
+   zapracuj; pak výstup v předepsané podobě.
 
 ## Struktura TZ (podle praxe na pirati.cz 2025–2026)
 

@@ -1,0 +1,52 @@
+{
+ "kroky": {
+  "mmr": {
+   "zapsano": 435,
+   "dne": "2026-10-07"
+  },
+  "digitalizace": {
+   "zapsano": 30,
+   "dne": "2026-10-07"
+  },
+  "legislativa": {
+   "zapsano": 78,
+   "dne": "2026-10-07"
+  },
+  "dia": {
+   "zapsano": 33,
+   "dne": "2026-10-07"
+  },
+  "usneseni": {
+   "jednani": 143,
+   "bodu": 3701,
+   "piratskych": 929,
+   "zapsano": 786,
+   "bez_rozhodnuti": 143,
+   "dne": "2026-10-07"
+  },
+  "mzv": {
+   "ve_vypisu": 661,
+   "zapsano": 40,
+   "zbyva": 404,
+   "dne": "2026-10-07"
+  }
+ },
+ "posledni_beh": "2026-10-07",
+ "pozadavku_sit": 42,
+ "trvani_s": 1033,
+ "chyby": [
+  "404 https://mzv.gov.cz/jnp/cz/udalosti_a_media/archiv_zprav/rok_2023/index.html?page=1",
+  "404 https://mzv.gov.cz/jnp/cz/udalosti_a_media/archiv_zprav/rok_2024/index.html?page=1"
+ ],
+ "souhrn": {
+  "tz": 828,
+  "tz_podle_resortu": {
+   "dia": 33,
+   "digitalizace": 30,
+   "legislativa": 78,
+   "mmr": 435,
+   "mzv": 252
+  },
+  "usneseni": 786
+ }
+}

@@ -1,0 +1,29 @@
+---
+zdroj: https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061053057054057055054
+nazev: 'Usnesení ZHMP č. 15/14: k návrhu Memoranda o spolupráci na urychlení přípravy a realizace významných dopravních staveb na území hlavního města Prahy a Středočeského kraje'
+typ: usneseni
+viditelnost: verejne
+stazeno: '2026-10-07'
+datum: '2020-03-19'
+autorita: usneseni-zhmp
+organ: zhmp
+cislo: 15/14
+tisk: Z-8007
+autor: Rada HMP
+hlasovani:
+- 3180150023
+---
+
+# Usnesení ZHMP č. 15/14: k návrhu Memoranda o spolupráci na urychlení přípravy a realizace významných dopravních staveb na území hlavního města Prahy a Středočeského kraje
+
+- Orgán: Zastupitelstvo hl. m. Prahy
+- Číslo usnesení: 15/14 ze dne 2020-03-19
+- Číslo tisku: Z-8007
+- Předkladatel: Rada HMP
+
+Detail a plný text (PDF): https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061053057054057055054 – funguje po otevření archivu https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-ZHMP-1.
+
+## Hlasování ZHMP 2020-03-19 09:18
+Výsledek: prijato (pro 36, proti 0, zdrželo se 0, nehlasovalo 0, přítomno 36).
+Předmět: usnesení k Z-8007
+Piráti: ano 10, nepritomen 3 (Eva Horáková nepritomen, Aneta Heidlová nepritomen, Jana Komrsková nepritomen)

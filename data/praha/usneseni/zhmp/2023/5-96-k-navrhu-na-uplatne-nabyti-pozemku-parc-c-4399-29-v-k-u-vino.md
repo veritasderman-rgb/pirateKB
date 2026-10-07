@@ -1,0 +1,29 @@
+---
+zdroj: https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054054051052057052
+nazev: 'Usnesení ZHMP č. 5/96: k návrhu na úplatné nabytí pozemku parc. č. 4399/29 v k. ú. Vinohrady, obec Praha, z vlastnictví společnosti České dráhy, a.s. do vlastnictví hlavního města Prahy'
+typ: usneseni
+viditelnost: verejne
+stazeno: '2026-10-07'
+datum: '2023-06-22'
+autorita: usneseni-zhmp
+organ: zhmp
+cislo: 5/96
+tisk: Z-11387
+autor: Rada HMP
+hlasovani:
+- 3220050165
+---
+
+# Usnesení ZHMP č. 5/96: k návrhu na úplatné nabytí pozemku parc. č. 4399/29 v k. ú. Vinohrady, obec Praha, z vlastnictví společnosti České dráhy, a.s. do vlastnictví hlavního města Prahy
+
+- Orgán: Zastupitelstvo hl. m. Prahy
+- Číslo usnesení: 5/96 ze dne 2023-06-22
+- Číslo tisku: Z-11387
+- Předkladatel: Rada HMP
+
+Detail a plný text (PDF): https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054054051052057052 – funguje po otevření archivu https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-ZHMP-1.
+
+## Hlasování ZHMP 2023-06-23 00:43
+Výsledek: prijato (pro 36, proti 0, zdrželo se 0, nehlasovalo 10, přítomno 46).
+Předmět: usnesení k Z-11387
+Piráti: ano 11, nehlasoval 2 (Jaromír Beránek nehlasoval, David Bodeček nehlasoval)

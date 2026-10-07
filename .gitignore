@@ -14,4 +14,6 @@ index/
 # Lokální zápisy MCP serveru (telemetrie, hlášení report_gap); trvalá evidence jsou GitHub issues
 data/telemetry/
 data/gaps/
+# návrhy členů z toolu navrhnout_do_baze (čekají na kurátora; trvalá evidence = GitHub issues kb-navrh)
+data/navrhy/
 evals/vysledky.json

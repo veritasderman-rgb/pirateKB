@@ -30,6 +30,18 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 
 > Jak vypadá organizační struktura strany od republikového předsednictva dolů?
 
+## Profil politika a obce
+
+> Připrav mi profil Olgy Richterové před debatou: funkce ve straně, mandáty, jak
+> hlasuje, jaké návrhy zákonů předložila a co poslední dobou píše na sítích. U každé
+> části dej zdroj.
+
+> Jak jsou na tom Piráti v Liberci? Kdo vede místní sdružení, kolik máme zastupitelů,
+> jak jsme dopadli v posledních volbách a co o nás píšou média.
+
+> Jedu na výjezd do Olomouckého kraje. Shrň mi pirátské zastupitele a poslance z kraje
+> a doplň z Hlídače státu největší zakázky krajského úřadu.
+
 ## Hlasování, zákony a vystoupení
 
 > Jak hlasovali pirátští poslanci o novele stavebního zákona? Uveď datum, výsledek
@@ -45,6 +57,27 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 
 > Na co se interpelovali pirátští poslanci ministra zdravotnictví?
 
+> Kde pirátští poslanci v letech 2021–2025 nehlasovali jednotně? Seřaď to podle
+> významu a u každého hlasování napiš, kdo hlasoval jinak než většina klubu.
+
+## Časová osa tématu
+
+> Jak se u Pirátů vyvíjelo téma stavebního zákona od roku 2017? Udělej časovou osu:
+> program, návrhy zákonů, hlasování, vystoupení ve Sněmovně, působení ve vládě
+> a tiskové zprávy, u každého milníku datum a odkaz.
+
+> Kdy jsme poprvé začali mluvit o chat control a jak se náš postoj vyvíjel? Odliš
+> oficiální výstupy strany od vyjádření jednotlivých politiků.
+
+## Novinky a podklad pro newsletter
+
+> Co nového se u Pirátů dělo za poslední týden? Připrav podklad pro interní newsletter:
+> hlavní tiskové zprávy, jak hlasovali naši poslanci, nejsdílenější příspěvky
+> a zmínky v médiích, vše s odkazy.
+
+> Shrň, co v bázi přibylo od 1. září, jen hlasování a návrhy zákonů. Ke každé položce
+> jednu větu a odkaz.
+
 ## Co jsme dokázali
 
 > Připrav přehled toho, co Piráti prosadili ve vládě v letech 2021–2024. Ke každé
@@ -53,6 +86,28 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 > Které zákony s pirátským navrhovatelem vyšly ve Sbírce zákonů v období 2017–2021?
 
 > Jak dopadly volby 2017 a 2021? Dej mi procenta, mandáty a s kým jsme kandidovali.
+
+## Piráti ve vládě 2021–2024
+
+> Co předložil Ivan Bartoš jako ministr pro místní rozvoj vládě k digitalizaci
+> stavebního řízení a jak to vláda schválila? U každého bodu dej čj. a odkaz.
+
+> Jaké tiskové zprávy vydalo MZV za Jana Lipavského k předsednictví EU? Upozorni, do
+> kdy byl ministrem za Piráty.
+
+> Co prosadil Michal Šalomoun jako ministr pro legislativu? Odliš usnesení vlády od
+> tiskových zpráv a připomeň, že nejde o stanovisko strany.
+
+## Pražské zastupitelstvo a Rada hl. m. Prahy
+
+> Jak hlasoval Zdeněk Hřib v pražském zastupitelstvu o tramvaji do Holešovic? Dej
+> datum, výsledek a jak hlasovali ostatní Piráti.
+
+> Která usnesení Rady hl. m. Prahy předložil Adam Zábranský k bydlení? Ke každému
+> číslo usnesení a odkaz do archivu usnesení.
+
+> Co Piráti v Praze prosadili v dopravě v letech 2018–2022? Spoj usnesení zastupitelstva
+> a rady s tiskovými zprávami a odliš rozhodnutí města od stanoviska strany.
 
 ## Tiskové zprávy, sítě a video
 
@@ -66,6 +121,18 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 > Každé tvrzení podlož zdrojem z báze.
 
 > Jaké jsou barvy a písma Pirátů a kde stáhnu oficiální logo?
+
+## Ověření tvrzení a kontrola textu před zveřejněním
+
+> Je pravda, že Piráti hlasovali pro nový stavební zákon? Ověř to v datech hlasování
+> a v programu a napiš, co přesně platí a co ne.
+
+> V debatě zaznělo, že Zdeněk Hřib jako primátor zdražil jízdné. Najdi podklady pro
+> i proti a odliš fakta od interpretace.
+
+> Zkontroluj mi tuto tiskovou zprávu před odesláním: sedí funkce a citace mluvčích,
+> má tvrzení „Piráti prosazují…“ oporu v programu, jsou čísla podložená zdrojem
+> a dodržuje brand a tón strany? Vypiš, co je nutné opravit a co jen doporučuješ.
 
 ## Žádosti podle zákona 106 a dotazy zastupitele
 

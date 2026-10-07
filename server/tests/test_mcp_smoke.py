@@ -28,6 +28,7 @@ EXPECTED_TOOLS = {
     "get_position", "search_press_releases", "get_voting_record", "get_brand", "get_template",
     "kb_stats", "get_social_posts", "find_expert", "get_speeches", "get_bills", "get_election_results",
     "find_elected", "get_party_finances", "lhuty_zadosti", "pruvodce_zadosti",
+    "get_government_record", "get_resolutions",
 }
 EXPECTED_PROMPTS = {"tiskova_zprava", "reels_scenar", "social_post", "brief_k_tematu", "odpoved_obcanovi"}
 EXPECTED_RESOURCES = {"kb://brand/barvy", "kb://brand/fonty", "kb://program/seznam", "kb://stats",
@@ -61,7 +62,9 @@ class FakeKB:
         "snippet": "200 000 nových domovů a větší [dostupnost] [bydlení].", "score": 9.5,
     }
 
-    def search(self, query, typ=None, kolekce=None, od=None, do=None, limit=10):
+    def search(self, query, typ=None, kolekce=None, od=None, do=None, limit=10, bez_kolekce=None):
+        if self.DOC["kolekce"] in (bez_kolekce or []):
+            return []
         return [dict(self.DOC)] if "bydlen" in query.lower() else []
 
     def get_document(self, doc_id):

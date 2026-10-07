@@ -1,0 +1,25 @@
+---
+zdroj: https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054049055055050052
+nazev: 'Usnesení RHMP č. 974: k publikaci informací o veřejných zakázkách městskými společnostmi'
+typ: usneseni
+viditelnost: verejne
+stazeno: '2026-10-07'
+datum: '2021-05-03'
+autorita: usneseni-rhmp
+organ: rhmp
+cislo: '974'
+tisk: R-39438
+autor: radní Mgr. Adam Zábranský
+predkladatel_pirati:
+- Adam Zábranský
+---
+
+# Usnesení RHMP č. 974: k publikaci informací o veřejných zakázkách městskými společnostmi
+
+- Orgán: Rada hl. m. Prahy
+- Číslo usnesení: 974 ze dne 2021-05-03
+- Číslo tisku: R-39438
+- Předkladatel: radní Mgr. Adam Zábranský
+- Pirátský předkladatel: Adam Zábranský
+
+Detail a plný text (PDF): https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054049055055050052 – funguje po otevření archivu https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-RHMP-1.

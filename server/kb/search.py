@@ -3,15 +3,28 @@
 Všechny metody vracejí obyčejné dict/list, aby se daly přímo serializovat do JSON
 pro MCP. Textové dotazy jsou odolné na diakritiku: tokenizér FTS5 i normalizace
 dotazu diakritiku odstraňují, takže „bydleni“ najde „bydlení“.
+
+Viditelnost: spojení s indexem dostane dočasné pohledy ``temp.documents`` a
+``temp.chunks``, které v SQLite zastíní stejnojmenné tabulky (nekvalifikovaný název se
+hledá nejdřív ve schématu ``temp``). Pohledy propustí jen dokumenty, jejichž
+``viditelnost`` (prázdná = ``verejne``) patří do :func:`aktualni_viditelnost` volajícího
+(``server.auth.aktualni_viditelnost``: HTTP podle tokenu, stdio podle
+``PIRATEKB_STDIO_VIDITELNOST``), a chunky jen takových dokumentů. Filtr tak platí pro
+všechny metody i pro přímé SQL nad ``kb.con`` / ``kb._rows`` v toolech; nevztahuje se
+jen na explicitní ``main.documents`` / ``main.chunks`` a na čtení sloupců ``chunks_fts``
+bez JOINu na ``chunks`` (FTS5 čte obsah z ``main.chunks``) – to se v kódu nepoužívá.
 """
 from __future__ import annotations
 
+import contextlib
+import contextvars
 import datetime as dt
 import json
 import logging
 import re
 import sqlite3
 from pathlib import Path
+from typing import Callable, Iterable
 
 from . import embeddings as emb_mod
 from .aliases import AliasIndex, alias_key
@@ -59,6 +72,64 @@ def _loads(value, default):
         return default
 
 
+# ---------------------------------------------------------------- viditelnost
+
+VEREJNE = "verejne"
+_JEN_VEREJNE = frozenset({VEREJNE})
+# zúžení viditelnosti pro blok kódu (např. hledání jen v neveřejných dokumentech);
+# průnik s oprávněním volajícího, takže nikdy nic nepřidá
+_zuzeni_var: contextvars.ContextVar[frozenset[str] | None] = contextvars.ContextVar(
+    "piratekb_kb_zuzeni", default=None)
+_provider: Callable[[], Iterable[str]] | None = None
+
+
+def _norm_vid(value) -> str:
+    s = str(value or "").strip().lower()
+    return s or VEREJNE
+
+
+def _opravneni() -> frozenset[str]:
+    """Úrovně, které smí vidět volající (``server.auth.aktualni_viditelnost``).
+    Když modul auth nejde načíst nebo selže, platí jen ``verejne`` (fail closed)."""
+    global _provider
+    try:
+        if _provider is None:
+            from server.auth import aktualni_viditelnost as _provider_fn
+            _provider = _provider_fn
+        return frozenset(_norm_vid(v) for v in _provider())
+    except Exception as exc:  # noqa: BLE001
+        log.warning("viditelnost nelze určit (%s) – jen veřejná data", exc)
+        return _JEN_VEREJNE
+
+
+def aktualni_viditelnost() -> frozenset[str]:
+    """Úrovně viditelnosti dokumentů, které KB právě vrací (oprávnění ∩ zúžení)."""
+    vid = _opravneni()
+    zuzeni = _zuzeni_var.get()
+    return vid & zuzeni if zuzeni is not None else vid
+
+
+@contextlib.contextmanager
+def zuzit_viditelnost(urovne: Iterable[str]):
+    """V bloku vrací KB jen dokumenty s danými úrovněmi (a jen pokud je volající smí
+    vidět). Např. ``with zuzit_viditelnost({"clenske"}): kb.search(...)`` = jen neveřejné."""
+    nove = frozenset(_norm_vid(u) for u in urovne)
+    stare = _zuzeni_var.get()
+    token = _zuzeni_var.set(nove if stare is None else stare & nove)
+    try:
+        yield
+    finally:
+        _zuzeni_var.reset(token)
+
+
+def _sql_vidi(value) -> int:
+    return 1 if _norm_vid(value) in aktualni_viditelnost() else 0
+
+
+def _sql_verejne() -> int:
+    return 1 if VEREJNE in aktualni_viditelnost() else 0
+
+
 class KB:
     """Čtecí přístup k indexu. Instance je bezpečná pro opakované volání z jednoho vlákna."""
 
@@ -71,6 +142,7 @@ class KB:
         self.con = sqlite3.connect(f"file:{self.db_path}?mode=ro", uri=True,
                                    check_same_thread=False)
         self.con.row_factory = sqlite3.Row
+        self._install_visibility()
         self._brand: dict | None = None
         # starší index (schema 2) nemá kmeny ani aliasy -> prefixové hledání jako dřív
         self.stemmed = self._has_column("chunks", "text_stem")
@@ -81,6 +153,57 @@ class KB:
 
     def close(self) -> None:
         self.con.close()
+
+    # ------------------------------------------------------------ viditelnost
+
+    def _install_visibility(self) -> None:
+        """Dočasné pohledy ``documents`` a ``chunks`` s filtrem viditelnosti (viz docstring
+        modulu). Funkce jsou ``deterministic``: ``piratekb_verejne()`` bez argumentů se tak
+        vyhodnotí jednou za příkaz (veřejné řádky stojí jen porovnání řetězců) a hodnota
+        se v rámci jednoho příkazu nemění (kontext volajícího je po dobu dotazu stejný)."""
+        con = self.con
+        con.create_function("piratekb_vidi", 1, _sql_vidi, deterministic=True)
+        con.create_function("piratekb_verejne", 0, _sql_verejne, deterministic=True)
+        cols = {r[1] for r in con.execute("PRAGMA main.table_info(documents)")}
+        if not cols:
+            return
+        if "viditelnost" not in cols:     # velmi starý index: vše veřejné
+            con.executescript("""
+                CREATE TEMP VIEW IF NOT EXISTS documents AS
+                    SELECT * FROM main.documents WHERE piratekb_verejne();
+                CREATE TEMP VIEW IF NOT EXISTS chunks AS
+                    SELECT * FROM main.chunks WHERE piratekb_verejne();
+            """)
+            return
+        public = f"coalesce(lower(trim(viditelnost)), '') IN ('', '{VEREJNE}')"
+        # Chunky: id neveřejných dokumentů (jich je málo) se předpočítají jednou do
+        # temp tabulky – index se nahrazuje atomicky (os.replace), otevřené spojení
+        # vidí neměnný snímek. Poddotazy nad ní jsou nekorelované (jednou za příkaz),
+        # takže filtr chunků nestojí lookup na každý řádek ani čtení celé tabulky
+        # documents. Rozhoduje ale vždy dynamický pohled documents.
+        con.executescript(f"""
+            CREATE TEMP TABLE IF NOT EXISTS piratekb_neverejne (
+                id TEXT PRIMARY KEY, viditelnost TEXT);
+            DELETE FROM temp.piratekb_neverejne;
+            INSERT INTO temp.piratekb_neverejne
+                SELECT id, viditelnost FROM main.documents WHERE NOT ({public});
+            CREATE TEMP VIEW IF NOT EXISTS documents AS
+                SELECT * FROM main.documents
+                WHERE CASE WHEN {public} THEN piratekb_verejne()
+                           ELSE piratekb_vidi(viditelnost) END;
+            CREATE TEMP VIEW IF NOT EXISTS chunks AS
+                SELECT * FROM main.chunks
+                WHERE CASE WHEN piratekb_verejne()
+                    THEN doc_id NOT IN (SELECT id FROM temp.piratekb_neverejne
+                                        WHERE NOT piratekb_vidi(viditelnost))
+                    ELSE doc_id IN (SELECT id FROM temp.piratekb_neverejne
+                                    WHERE piratekb_vidi(viditelnost))
+                END;
+        """)
+
+    def viditelnost(self) -> frozenset[str]:
+        """Úrovně viditelnosti, které KB vrací aktuálnímu volajícímu."""
+        return aktualni_viditelnost()
 
     # ------------------------------------------------------------ interní
 
@@ -134,6 +257,13 @@ class KB:
         return f" AND {column} IN ({','.join('?' * len(values))})"
 
     @staticmethod
+    def _not_in_clause(column: str, values: list[str] | None, params: list) -> str:
+        if not values:
+            return ""
+        params.extend(values)
+        return f" AND coalesce({column}, '') NOT IN ({','.join('?' * len(values))})"
+
+    @staticmethod
     def _date_clause(column: str, od: str | None, do: str | None, params: list) -> str:
         sql = ""
         if od:
@@ -151,7 +281,8 @@ class KB:
     def search(self, query: str, typ: list[str] | None = None,
                kolekce: list[str] | None = None, od: str | None = None,
                do: str | None = None, limit: int = 10,
-               preferuj_nove: bool = True, autor: list[str] | None = None) -> list[dict]:
+               preferuj_nove: bool = True, autor: list[str] | None = None,
+               bez_kolekce: list[str] | None = None) -> list[dict]:
         """Plnotextové hledání v chuncích; vrací max. 2 chunky z jednoho dokumentu.
 
         Dotaz -> pojmy (kmeny + přesné tvary + aliasy, viz ``server/kb/query.py``) -> FTS5
@@ -160,7 +291,8 @@ class KB:
         ``RECENT_TYPES``) + oficiální pozice. U programu/stanovisek zůstane jen nejnovější
         verze dokumentu se stejným názvem. Se zapnutými embeddingy se pořadí BM25 a
         kosinové podobnosti spojí přes reciprocal rank fusion (pole ``rrf``, ``podobnost``).
-        ``autor`` = přesná jména v poli ``autor`` (např. z ``resolve_speaker``).
+        ``autor`` = přesná jména v poli ``autor`` (např. z ``resolve_speaker``);
+        ``bez_kolekce`` = kolekce, které se vynechají (např. ``["vlada"]`` u TZ strany).
         """
         plan = self._plan(query)
         if not plan:
@@ -169,6 +301,7 @@ class KB:
         where = ""
         where += self._in_clause("d.typ", typ, params)
         where += self._in_clause("d.kolekce", kolekce, params)
+        where += self._not_in_clause("d.kolekce", bez_kolekce, params)
         where += self._in_clause("d.autor", autor, params)
         where += self._date_clause("d.datum", od, do, params)
         candidates = max(limit * 12, 150)
@@ -192,7 +325,7 @@ class KB:
         vec = self._vector_index()
         if vec is not None:
             fused = self._fuse_vectors(vec, query, scored, plan, today, preferuj_nove,
-                                       typ, kolekce, od, do, candidates, autor)
+                                       typ, kolekce, od, do, candidates, autor, bez_kolekce)
             if fused is not None:
                 scored, hybrid = fused, True
 
@@ -374,13 +507,14 @@ class KB:
 
     def _fuse_vectors(self, vec: emb_mod.VectorIndex, query: str, scored: list[dict],
                       plan: QueryPlan, today: dt.date, preferuj_nove: bool, typ, kolekce,
-                      od, do, candidates: int, autor=None) -> list[dict] | None:
+                      od, do, candidates: int, autor=None, bez_kolekce=None) -> list[dict] | None:
         allowed = None
-        if typ or kolekce or od or do or autor:
+        if typ or kolekce or od or do or autor or bez_kolekce:
             params: list = []
             where = ""
             where += self._in_clause("d.typ", typ, params)
             where += self._in_clause("d.kolekce", kolekce, params)
+            where += self._not_in_clause("d.kolekce", bez_kolekce, params)
             where += self._in_clause("d.autor", autor, params)
             where += self._date_clause("d.datum", od, do, params)
             allowed = {r[0] for r in self.con.execute(
@@ -917,6 +1051,75 @@ class KB:
             "od": min((r["od"] for r in rows), default=None),
             "do": max((r["do"] for r in rows), default=None),
         }
+
+    # ------------------------------------------------------------ usnesení (ZHMP, RHMP, vláda)
+
+    def search_resolutions(self, organ: str | None = None, query: str | None = None,
+                           predkladatel: str | None = None, od: str | None = None,
+                           do: str | None = None, limit: int = 20,
+                           kolekce: list[str] | None = None) -> list[dict]:
+        """Usnesení (dokumenty typu `usneseni`: ZHMP a RHMP z `data/praha`, vláda z `data/vlada`).
+
+        organ = zhmp | rhmp (pole `organ` ve frontmatteru); query = fulltext (stejné hledání jako
+        search_kb, omezené na typ usneseni); predkladatel = jméno/příjmení (bez ohledu na diakritiku),
+        hledá se v `autor` (předkladatel podle archivu) a `predkladatel_pirati`; od/do = YYYY-MM-DD;
+        kolekce = omezení na kolekce (např. ``["praha"]``). Bez query řadí od nejnovějších."""
+        pred = fold(predkladatel or "").split()
+
+        def ok(meta: dict, autor: str | None) -> bool:
+            if organ and (meta.get("organ") or "") != organ:
+                return False
+            if pred:
+                hay = fold(" ".join([str(autor or "")]
+                                    + [str(x) for x in meta.get("predkladatel_pirati") or []]))
+                return all(t in hay for t in pred)
+            return True
+
+        cols = "id, nazev, zdroj, datum, autor, autorita, kolekce, meta"
+        snippets: dict[str, str] = {}
+        if query:
+            # organ/předkladatel se filtrují až nad výsledky fulltextu, proto se okno
+            # kandidátů zvětšuje, dokud nestačí na limit nebo dokud fulltext nedojde
+            cap = max(limit * 10, 100)
+            while True:
+                hits = self.search(query, typ=["usneseni"], kolekce=kolekce, od=od, do=do,
+                                   limit=cap, preferuj_nove=False)
+                ids = list(dict.fromkeys(h["doc_id"] for h in hits))
+                if not ids:
+                    return []
+                rows = self._rows(f"SELECT {cols} FROM documents WHERE id IN ({','.join('?' * len(ids))})", ids)
+                hotovo = len(hits) < cap or not (organ or pred)
+                if hotovo or sum(ok(_loads(r.get("meta"), {}), r.get("autor")) for r in rows) >= limit:
+                    break
+                cap *= 4
+            for h in hits:
+                snippets.setdefault(h["doc_id"], h.get("snippet") or "")
+            order = {d: i for i, d in enumerate(ids)}
+            rows.sort(key=lambda r: order[r["id"]])
+        else:
+            params: list = []
+            where = "typ = 'usneseni'" + self._in_clause("kolekce", kolekce, params)
+            where += self._date_clause("datum", od, do, params)
+            if organ:
+                where += " AND json_extract(meta, '$.organ') = ?"
+                params.append(organ)
+            rows = self._rows(f"SELECT {cols} FROM documents WHERE {where} ORDER BY datum DESC, id DESC", params)
+        out = []
+        for r in rows:
+            meta = _loads(r.get("meta"), {})
+            if not ok(meta, r.get("autor")):
+                continue
+            out.append({
+                "doc_id": r["id"], "nazev": r["nazev"], "datum": r["datum"], "zdroj": r["zdroj"],
+                "autorita": r["autorita"], "kolekce": r["kolekce"], "organ": meta.get("organ"),
+                "cislo": meta.get("cislo"), "tisk": meta.get("tisk"), "predkladatel": r["autor"],
+                "predkladatel_pirati": meta.get("predkladatel_pirati") or [],
+                "hlasovani": meta.get("hlasovani") or [], "url_archiv": meta.get("url_archiv"),
+                "snippet": snippets.get(r["id"]),
+            })
+            if len(out) >= limit:
+                break
+        return out
 
     # ------------------------------------------------------------ sociální sítě
 

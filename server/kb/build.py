@@ -26,7 +26,7 @@ from .stem import stem_text
 from .text import chunk_markdown, fold, split_frontmatter
 
 SCHEMA_VERSION = "3"
-STEMMER = "cz-light-1"   # server/kb/stem.py; změna pravidel = nový název + rebuild
+STEMMER = "cz-light-2"   # server/kb/stem.py; změna pravidel = nový název + rebuild
 
 # volební období PSP: id období v otevřených datech -> rok voleb
 PSP_OBDOBI = {"172": 2017, "173": 2021, "174": 2025}
@@ -135,7 +135,7 @@ CREATE TABLE votes (
     pirati        TEXT,     -- JSON {jmeno: hlas}
     pirati_souhrn TEXT,     -- JSON {hlas: pocet}
     nazev_stem    TEXT,
-    komora        TEXT      -- psp | senat | ep
+    komora        TEXT      -- psp | senat | ep | zhmp
 );
 CREATE INDEX votes_komora ON votes(komora);
 CREATE INDEX votes_datum ON votes(datum);
@@ -499,15 +499,19 @@ def _load_org_units(data_dir: Path, con: sqlite3.Connection) -> dict:
 
 # ---------------------------------------------------------------- hlasování
 
-def _load_votes(data_dir: Path, con: sqlite3.Connection) -> dict:
-    """Hlasování z PSP (`data/psp`), Senátu (`data/senat`) a EP (`data/ep`).
+VOTE_FOLDERS = {"psp": "psp", "senat": "senat", "ep": "ep", "praha": "zhmp"}  # složka v data/ -> komora
 
-    Všechny tři složky mají stejné schéma `hlasovani-<rok>.jsonl`; Senát a EP mají
-    syntetická `id_hlasovani` (1e9+ resp. 2e9+), takže s PSP nekolidují."""
+
+def _load_votes(data_dir: Path, con: sqlite3.Connection) -> dict:
+    """Hlasování z PSP (`data/psp`), Senátu (`data/senat`), EP (`data/ep`) a Zastupitelstva
+    hl. m. Prahy (`data/praha`, komora `zhmp`).
+
+    Všechny složky mají stejné schéma `hlasovani-<rok>.jsonl`; Senát, EP a ZHMP mají
+    syntetická `id_hlasovani` (1e9+, 2e9+, 3e9+), takže s PSP nekolidují."""
     n_votes = n_members = 0
     by_komora: dict[str, int] = {}
-    for komora in ("psp", "senat", "ep"):
-        folder = data_dir / komora
+    for slozka, komora in VOTE_FOLDERS.items():
+        folder = data_dir / slozka
         for path in sorted(folder.glob("hlasovani-*.jsonl")) if folder.is_dir() else []:
             m = re.search(r"(\d{4})", path.name)
             obdobi = int(m.group(1)) if m else None

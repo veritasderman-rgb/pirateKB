@@ -3,10 +3,10 @@
 Návod pro technické oddělení: jak zapnout přihlašování k MCP serveru Pirátské znalostní
 báze účtem z [auth.pirati.cz](https://auth.pirati.cz) a jak to vyzkoušet.
 
-Dnes server běží **bez autentizace**, protože obsahuje jen veřejná data. Přihlášení je
-připravené pro chvíli, kdy do báze přibudou členská data (`viditelnost: clenske`), nebo
-když chceme přístup omezit jen na členy. Zapíná se jedinou proměnnou prostředí, kód
-se nemění.
+Veřejná instance běží **bez autentizace** a vrací jen veřejná data. Dokumenty
+s `viditelnost: clenske` server vrací jen ověřeným členům (viz
+[Viditelnost dat](#viditelnost-dat-veřejná-a-členská-vrstva)). Přihlášení se zapíná
+jedinou proměnnou prostředí, kód se nemění.
 
 ## Jak to funguje
 
@@ -127,15 +127,57 @@ byste DCR povolili, omezte politiky alespoň na povolené redirect URI
 | `PIRATEKB_REQUIRED_GROUP` | skupina nebo role nutná pro přístup, např. `clenove`; čárkami víc možností (stačí kterákoli) | ne |
 | `PIRATEKB_MEMBER_GROUP` | skupina, která uvidí i členská data (`clenske`); výchozí = `PIRATEKB_REQUIRED_GROUP` | ne |
 | `PIRATEKB_AUTH_ISSUER` | jiný realm (výchozí `https://auth.pirati.cz/auth/realms/pirati`), např. testovací | ne |
+| `PIRATEKB_CLENSKA_URL` | adresa členské instance (s přihlášením) bez `/mcp`; ukáže se v nápovědě toolů `hledat_interni` a `navrhnout_do_baze` nepřihlášeným | ne |
+| `PIRATEKB_STDIO_VIDITELNOST` | jen lokální běh (stdio, skripty): úrovně viditelnosti, čárkami, např. `verejne,clenske`; výchozí `verejne`. **V HTTP režimu se ignoruje.** | ne |
+| `PIRATEKB_STDIO_AUTOR` | jen lokální běh: jméno autora návrhů z `navrhnout_do_baze` | ne |
 
 Na Vercelu: Project → Settings → Environment Variables. Po změně je potřeba nový deploy
 (Redeploy). Kontejner musí mít odchozí přístup na `auth.pirati.cz`, protože stahuje
 discovery dokument a JWKS.
 
-Viditelnost dat: funkce `server.auth.viditelnost_pro(request)` vrací `{"verejne"}`
-(nepřihlášený, autentizace vypnutá, nebo uživatel mimo členskou skupinu) nebo
-`{"verejne", "clenske"}`. Zatím ji žádný tool nepoužívá, protože všechna data jsou
-veřejná. Je připravená pro filtrování, až členská data přibudou.
+## Viditelnost dat (veřejná a členská vrstva)
+
+Každý dokument má v `frontmatter` pole `viditelnost`: `verejne` (bez přihlášení),
+`clenske` (jen ověření členové). Dokument bez pole je veřejný. Jiné hodnoty (např.
+`interni`) dnes nevidí nikdo ze serveru, ani člen.
+
+**Kdo co vidí:**
+
+| Situace | Vidí |
+|---|---|
+| HTTP bez autentizace (`PIRATEKB_AUTH` nenastaveno, veřejný konektor) | jen `verejne` |
+| HTTP s tokenem, uživatel **nemá** skupinu z `PIRATEKB_MEMBER_GROUP` (nebo není nastavena) | jen `verejne` |
+| HTTP s tokenem, uživatel má členskou skupinu | `verejne` + `clenske` |
+| lokální běh (stdio) | podle `PIRATEKB_STDIO_VIDITELNOST`, výchozí jen `verejne` |
+
+**Jak je to vynucené.** Middleware (`server/auth.py`) po ověření tokenu spočítá
+`viditelnost_pro(request)` a uloží ji spolu s identitou do `contextvars` požadavku.
+Knihovna mcp spouští handler toolu v kontextu zprávy, která ho vyvolala (i ve stavovém
+režimu se session), takže hodnotu vidí i KB bez změny signatur toolů. Spojení s indexem
+(`server/kb/search.py`) má dočasné SQL pohledy `documents` a `chunks`, které zastíní
+stejnojmenné tabulky. Každý dotaz, ať z metod KB (`search`, `get_document`,
+`list_documents`, `search_speeches`, `stats`…) nebo z přímého SQL v toolech, tak vidí jen
+povolené dokumenty. Neveřejný dokument se tváří jako neexistující: `get_document` vrátí
+„v bázi není“, ne „zakázáno“, a statistiky ho nezapočítají. Bez ověřené identity v HTTP
+procesu platí vždy jen `verejne`. Když modul `server.auth` nejde načíst, KB vrací jen
+veřejná data (fail closed).
+
+**Doporučené nasazení:** veřejná instance bez autentizace (pro kohokoli) a samostatná
+členská instance (`PIRATEKB_AUTH=keycloak`, `PIRATEKB_MEMBER_GROUP=<členská skupina>`,
+případně `PIRATEKB_REQUIRED_GROUP`). Na veřejné instanci nastavte `PIRATEKB_CLENSKA_URL`,
+aby nápověda členských toolů ukazovala, kam se připojit.
+
+**Členské tooly** (`server/analyzy/clenove.py`):
+
+- `hledat_interni(query, limit=10)` hledá jen v neveřejných dokumentech, jen pro ověřené
+  členy. Nepřihlášenému vrátí návod, jak připojit konektor s přihlášením.
+- `navrhnout_do_baze(nazev, text, zdroj="", typ="", duvod="")`: člen navrhne doplnění
+  nebo opravu báze z chatu. S `GITHUB_TOKEN` se založí issue s labelem `kb-navrh` v `GAPS_REPO`
+  (text ve formátu souboru pro `inbox/`, `stav: navrh`, autor = jméno nebo uživatelské
+  jméno z tokenu, **nikdy e-mail**). Bez tokenu se návrh uloží do `NAVRHY_FILE` (výchozí
+  `data/navrhy/navrhy.jsonl`) a tool vrátí text pro kurátora. Platí dedup 7 dní a strop
+  `NAVRHY_MAX_ISSUES_DAY` (20 issues za 24 h) a `NAVRHY_MAX_NA_AUTORA` (5 návrhů za 24 h).
+  Návrh není součástí báze, dokud ho kurátor nezařadí.
 
 ## Vyzkoušení
 
@@ -222,3 +264,17 @@ Enterprise přidává konektor vlastník organizace.)
   `mcp.server.auth.middleware.auth_context.get_access_token()`.
 - Rate limit (`server/ratelimit.py`) platí i pro neautentizované požadavky, takže zahlcení
   `/mcp` neplatnými tokeny se omezí stejně jako ostatní provoz.
+- Filtr viditelnosti obejde jen kód, který v SQL napíše explicitně `main.documents` /
+  `main.chunks` (test `test_zadny_kod_neobchazi_pohledy` to v `server/` hlídá), nebo kód,
+  který čte sloupce `chunks_fts` bez JOINu na `chunks` (FTS5 čte obsah přímo z
+  `main.chunks`). Nový kód má vždy spojit `chunks_fts` s `chunks` a `documents`, jak to
+  dělá `KB.search`.
+- Tabulky `people`, `org_units`, `votes` a `social_posts` pole viditelnost nemají. Plní
+  se jen z veřejných zdrojů (lide.pirati.cz, psp.cz, X, Bluesky). Kdyby do nich měla
+  přibýt neveřejná data, musí build pole uložit a KB pro ně dostane stejný pohled.
+- Tooly, které čtou soubory přímo z disku (`get_template` a šablony v průvodci žádostmi
+  podle zákona 106, obojí z `content/sablony/`), filtrem neprocházejí. Do
+  `content/sablony/` proto nepatří `clenske` obsah. Návody (`content/navody/`) se čtou
+  přes index, takže filtr pro ně platí.
+- Výsledky bm25 se počítají ze statistik celého FTS indexu včetně neveřejných chunků.
+  Ovlivní to jen pořadí výsledků, ne jejich obsah.
