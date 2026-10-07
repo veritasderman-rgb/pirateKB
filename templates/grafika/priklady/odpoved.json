@@ -1,0 +1,19 @@
+{
+  "_poznamka": "FIKTIVNÍ UKÁZKA. Osoba, obec, úřad i čísla jsou smyšlené, slouží jen k ukázce šablony.",
+  "sablona": "odpoved",
+  "fiktivni": true,
+  "nadpis": "Úřad odpověděl. *Co jsme zjistili*",
+  "predmet": "Smlouvy na rekonstrukci náměstí",
+  "urad": "Městský úřad Příklad",
+  "fakta": [
+    {"cislo": "48,2", "jednotka": "mil. Kč", "popis": "cena díla podle smlouvy o dílo"},
+    {"cislo": "3", "jednotka": "dodatky", "popis": "ke smlouvě uzavřené v roce 2025"},
+    {"cislo": "15", "jednotka": "dní", "popis": "trvalo, než úřad odpověděl"}
+  ],
+  "datum_podani": "2. 3. 2026",
+  "lhuta_do": "17. 3. 2026",
+  "datum_odpovedi": "17. 3. 2026",
+  "autor": {"jmeno": "Jana Nováková", "funkce": "zastupitelka", "strana": "Piráti", "obec": "Město Příklad"},
+  "zdroj": "Odpověď MěÚ Příklad na žádost podle zákona č. 106/1999 Sb. ze dne 17. 3. 2026 (fiktivní)",
+  "datum": "18. 3. 2026"
+}

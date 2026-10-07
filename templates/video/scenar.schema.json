@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pirati/pirateKB/templates/video/scenar.schema.json",
+  "title": "Scénář krátkého videa k žádosti podle zákona 106/1999 Sb. nebo dotazu zastupitele",
+  "description": "Vstup pro templates/video/video.html a scripts/render_video.py. Strukturu kontroluje toto schéma; limity slov, celkovou délku 15–45 s a rychlost čtení kontroluje validuj_scenar() v scripts/render_video.py (ta je závazná). Text v *hvězdičkách* se zvýrazní žlutě (u citace žlutou linkou).",
+  "type": "object",
+  "required": ["autor", "zdroj", "sceny"],
+  "properties": {
+    "_poznamka": {"type": "string"},
+    "verze": {"const": 1},
+    "nazev": {"type": "string"},
+    "faze": {"enum": ["podano", "odpoved", "stiznost", "dotaz", "zjisteni"]},
+    "fiktivni": {"type": "boolean", "description": "true = v obraze se zobrazí štítek UKÁZKA · FIKTIVNÍ DATA"},
+    "format": {"enum": ["1080x1920", "1920x1080", "9:16", "16:9"], "default": "1080x1920"},
+    "fps": {"type": "integer", "minimum": 24, "maximum": 30, "default": 30},
+    "stitek": {"type": "string", "maxLength": 32, "description": "žlutý štítek v hlavičce, výchozí „Zákon 106/1999 Sb.“"},
+    "logo": {"type": "string", "description": "URL nebo cesta k oficiálnímu logu, nebo „text“ pro textovou značku PIRÁTI"},
+    "autor": {
+      "type": "object",
+      "required": ["jmeno", "obec"],
+      "properties": {
+        "jmeno": {"type": "string", "minLength": 3},
+        "funkce": {"type": "string"},
+        "strana": {"type": "string"},
+        "obec": {"type": "string", "minLength": 2}
+      }
+    },
+    "zdroj": {"type": "string", "minLength": 5, "description": "hlavní zdroj (odpověď úřadu s datem, č. j., odkaz); zobrazí se v závěru"},
+    "sceny": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "required": ["typ", "delka"],
+        "properties": {
+          "typ": {"enum": ["titulek", "fakt", "citace", "casova-osa", "vyzva", "zaver"]},
+          "delka": {"type": "number", "minimum": 2, "maximum": 8},
+          "kicker": {"type": "string"},
+          "nadpis": {"type": "string"},
+          "podnadpis": {"type": "string"},
+          "cislo": {"type": "string", "maxLength": 9},
+          "jednotka": {"type": "string", "maxLength": 14},
+          "popis": {"type": "string"},
+          "text": {"type": "string"},
+          "zdroj": {"type": "string"},
+          "odkaz": {"type": "string"},
+          "titulky": {"type": "string", "description": "titulky v obraze (text případného voiceoveru)"},
+          "body": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "required": ["datum", "popis"],
+              "properties": {
+                "datum": {"type": "string", "maxLength": 14},
+                "popis": {"type": "string"},
+                "poznamka": {"type": "string", "maxLength": 24},
+                "zvyraznit": {"type": "boolean"}
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "allOf": [
+          {"if": {"properties": {"typ": {"const": "titulek"}}}, "then": {"required": ["nadpis"]}},
+          {"if": {"properties": {"typ": {"const": "fakt"}}}, "then": {"required": ["cislo", "popis", "zdroj"]}},
+          {"if": {"properties": {"typ": {"const": "citace"}}}, "then": {"required": ["text", "zdroj"]}},
+          {"if": {"properties": {"typ": {"const": "casova-osa"}}}, "then": {"required": ["body"]}},
+          {"if": {"properties": {"typ": {"const": "vyzva"}}}, "then": {"required": ["nadpis"]}}
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

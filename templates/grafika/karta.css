@@ -1,0 +1,368 @@
+/*
+ * Karty k žádostem podle zákona 106/1999 Sb. a dotazům zastupitelů.
+ * Barvy a písma podle styleguide.pirati.cz 2.22.0 (data/brand/styleguide.md):
+ *   Pirati Yellow #fec934, Primary Black #000000, White #ffffff,
+ *   Grey 800 #1f1f1f, Grey 600 #262626, Grey 400 #343434, Grey 300 #4c4c4c, Grey 200 #adadad.
+ *   Bebas Neue = nadpisy a čísla, Roboto / Roboto Condensed = text a popisky.
+ * Kontrast: bílý text na černé, černý na žluté. Žlutá je jen akcent (čísla, štítky, linky).
+ */
+:root {
+  --zluta: #fec934;
+  --cerna: #000000;
+  --bila: #ffffff;
+  --seda-800: #1f1f1f;
+  --seda-600: #262626;
+  --seda-400: #343434;
+  --seda-300: #4c4c4c;
+  --seda-200: #adadad;
+  --text-tlumeny: #f0f0f0;   /* Grey 125 */
+  --fit: 1;            /* zmenšení typografie, nastavuje karta.js, když se text nevejde */
+  --w: 1080px;
+  --h: 1350px;
+  --px: 80px;          /* boční okraj */
+  --pt: 76px;          /* horní okraj */
+  --pb: 64px;          /* dolní okraj */
+  --nadpis: 148px;     /* základní velikost nadpisu (před --fit) */
+  --font-nadpis: 'Bebas Neue', Helvetica, Arial, sans-serif;
+  --font-text: 'Roboto', Helvetica, Arial, sans-serif;
+  --font-uzky: 'Roboto Condensed', 'Roboto', Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--cerna); }
+body { width: var(--w); height: var(--h); overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+.karta {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  background: var(--cerna);
+  color: var(--bila);
+  font-family: var(--font-text);
+  display: flex;
+  flex-direction: column;
+  padding: var(--pt) var(--px) var(--pb);
+}
+
+/* jemná šestisloupcová mřížka na pozadí (editoriální styl, skoro neviditelná) */
+.mrizka {
+  position: absolute;
+  inset: 0 var(--px);
+  pointer-events: none;
+  background-image: repeating-linear-gradient(to right,
+    rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px, transparent calc((100% - 1px) / 6));
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+.karta > *:not(.mrizka) { position: relative; }
+
+/* ------------------------------------------------------------- horní lišta */
+.lista {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 22px;
+  border-bottom: 2px solid var(--seda-400);
+  flex: 0 0 auto;
+}
+.lista-vlevo { display: flex; align-items: center; gap: 22px; min-width: 0; }
+.faze {
+  background: var(--zluta);
+  color: var(--cerna);
+  font-family: var(--font-uzky);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 9px 16px 8px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.kicker {
+  font-family: var(--font-uzky);
+  font-weight: 700;
+  font-size: calc(24px * var(--fit));
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--seda-200);
+  margin: 0;
+}
+.misto {
+  font-family: var(--font-uzky);
+  font-weight: 500;
+  font-size: 23px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--seda-200);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fiktivni {
+  border: 2px solid var(--seda-200);
+  color: var(--seda-200);
+  font-family: var(--font-uzky);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 7px 12px 6px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------- obsah */
+.obsah {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: calc(48px * var(--fit));
+  padding-top: calc(56px * var(--fit));
+  padding-bottom: 32px;
+}
+.hlava { display: flex; flex-direction: column; gap: calc(26px * var(--fit)); }
+
+.nadpis {
+  font-family: var(--font-nadpis);
+  font-weight: 400;
+  font-size: calc(var(--nadpis) * var(--fit));
+  line-height: 0.93;
+  letter-spacing: 0.004em;
+  margin: 0;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+}
+.nadpis .zvyrazneni {
+  display: inline-block;          /* zvýrazněná fráze se neláme do dvou řádků */
+  background: var(--zluta);
+  color: var(--cerna);
+  padding: 0.1em 0.07em 0;
+  line-height: 0.9;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.linka {
+  width: 132px;
+  height: 10px;
+  background: var(--zluta);
+  flex: 0 0 auto;
+}
+.predmet {
+  font-size: calc(40px * var(--fit));
+  font-weight: 500;
+  line-height: 1.22;
+  margin: 0;
+}
+.urad {
+  font-size: calc(28px * var(--fit));
+  color: var(--seda-200);
+  margin: 0;
+  line-height: 1.3;
+}
+.urad strong { color: var(--bila); font-weight: 500; }
+
+.telo { display: flex; flex-direction: column; gap: calc(36px * var(--fit)); }
+
+/* stav řízení: Podáno → Lhůta → Odpověď */
+.kroky {
+  display: grid;
+  grid-template-columns: repeat(var(--pocet, 3), 1fr);
+  position: relative;
+}
+.krok { position: relative; padding-top: calc(38px * var(--fit)); padding-right: 16px; }
+.krok::before {                  /* vodorovná linka mezi body */
+  content: '';
+  position: absolute;
+  top: calc(10px * var(--fit));
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--seda-400);
+}
+.krok.hotovo::before, .krok.aktivni::before, .krok.varovani::before { background: var(--zluta); }
+.krok.aktivni::before { background: linear-gradient(to right, var(--zluta) 0 50%, var(--seda-400) 50% 100%); }
+.krok .bod {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(24px * var(--fit));
+  height: calc(24px * var(--fit));
+  border: 3px solid var(--seda-300);
+  background: var(--cerna);
+}
+.krok.hotovo .bod { background: var(--zluta); border-color: var(--zluta); }
+.krok.aktivni .bod { background: var(--cerna); border-color: var(--zluta); box-shadow: inset 0 0 0 5px var(--cerna), inset 0 0 0 20px var(--zluta); }
+.krok.varovani .bod { background: var(--bila); border-color: var(--bila); }
+.krok .stitek {
+  font-family: var(--font-uzky);
+  font-weight: 700;
+  font-size: calc(22px * var(--fit));
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--seda-200);
+}
+.krok.hotovo .stitek, .krok.aktivni .stitek, .krok.varovani .stitek { color: var(--bila); }
+.krok .datum {
+  font-family: var(--font-nadpis);
+  font-size: calc(44px * var(--fit));
+  line-height: 1;
+  margin-top: 8px;
+  color: var(--bila);
+}
+.krok.ceka .datum { color: var(--seda-300); }
+
+/* klíčová čísla */
+.fakta { display: flex; flex-direction: column; }
+.fakt {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  column-gap: 28px;
+  padding: calc(20px * var(--fit)) 0 calc(22px * var(--fit));
+  border-top: 2px solid var(--seda-400);
+}
+.fakt:last-child { border-bottom: 2px solid var(--seda-400); }
+.fakt .hodnota { display: flex; align-items: baseline; gap: 12px; white-space: nowrap; }
+.fakt .cislo {
+  font-family: var(--font-nadpis);
+  color: var(--zluta);
+  font-size: calc(170px * var(--fit));
+  line-height: 0.82;
+}
+.fakt .jednotka {
+  font-family: var(--font-nadpis);
+  font-size: calc(58px * var(--fit));
+  line-height: 1;
+}
+.fakt .popis {
+  font-size: calc(29px * var(--fit));
+  line-height: 1.25;
+  color: var(--text-tlumeny);
+  padding-bottom: 6px;
+}
+.fakta.jeden .fakt .cislo { font-size: calc(260px * var(--fit)); }
+.fakta.jeden .fakt { grid-template-columns: 1fr; row-gap: 14px; }
+
+/* velké číslo u stížnosti (dny bez odpovědi) */
+.pocitadlo { display: flex; align-items: flex-end; gap: 28px; }
+.pocitadlo .cislo {
+  font-family: var(--font-nadpis);
+  color: var(--zluta);
+  font-size: calc(260px * var(--fit));
+  line-height: 0.8;
+}
+.pocitadlo .popis {
+  font-family: var(--font-nadpis);
+  font-size: calc(62px * var(--fit));
+  line-height: 0.95;
+  padding-bottom: 6px;
+}
+
+/* odstavec a otázky */
+.text {
+  font-size: calc(30px * var(--fit));
+  line-height: 1.4;
+  color: var(--text-tlumeny);
+  margin: 0;
+}
+.otazky { list-style: none; margin: 0; padding: 0; counter-reset: otazka; }
+.otazky li {
+  counter-increment: otazka;
+  display: grid;
+  grid-template-columns: calc(64px * var(--fit)) 1fr;
+  gap: 8px;
+  font-size: calc(30px * var(--fit));
+  line-height: 1.32;
+  padding: calc(14px * var(--fit)) 0;
+  border-top: 1px solid var(--seda-400);
+}
+.otazky li::before {
+  content: counter(otazka, decimal-leading-zero);
+  font-family: var(--font-nadpis);
+  color: var(--zluta);
+  font-size: calc(36px * var(--fit));
+  line-height: 1.05;
+}
+.otazky-nadpis, .stitek-sekce {
+  font-family: var(--font-uzky);
+  font-weight: 700;
+  font-size: calc(22px * var(--fit));
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--seda-200);
+  margin: 0 0 6px;
+}
+
+/* citace dotazu */
+.citace {
+  margin: 0;
+  border-left: 8px solid var(--zluta);
+  padding: 4px 0 4px 32px;
+  font-size: calc(38px * var(--fit));
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* ------------------------------------------------------------- patička */
+.paticka {
+  flex: 0 0 auto;
+  border-top: 2px solid var(--seda-400);
+  padding-top: 26px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 32px;
+  row-gap: 14px;
+  align-items: center;
+}
+.autor .jmeno { font-size: 32px; font-weight: 700; line-height: 1.15; }
+.autor .funkce { font-size: 24px; color: var(--seda-200); line-height: 1.3; margin-top: 4px; }
+.zdroj {
+  grid-column: 1 / -1;
+  font-family: var(--font-uzky);
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--seda-200);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.zdroj b { color: var(--bila); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.znacka { display: flex; align-items: center; justify-content: flex-end; height: 64px; }
+.znacka img { height: 64px; width: auto; display: block; }
+.znacka .textova {             /* náhradní textová značka, když oficiální logo nejde načíst */
+  font-family: var(--font-nadpis);
+  font-size: 58px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--bila);
+}
+
+/* ------------------------------------------------------------- formáty */
+/* 1080×1080: méně místa na výšku */
+.f-ctverec { --pt: 64px; --pb: 56px; --nadpis: 124px; }
+.f-ctverec .fakt .cislo { font-size: calc(132px * var(--fit)); }
+.f-ctverec .fakta.jeden .fakt .cislo { font-size: calc(210px * var(--fit)); }
+.f-ctverec .pocitadlo .cislo { font-size: calc(200px * var(--fit)); }
+
+/* 1080×1350: výchozí hodnoty */
+
+/* 1080×1920 (story): nic důležitého do horních ~13 % a dolních ~16 % kvůli UI aplikací */
+.f-story { --pt: 250px; --pb: 300px; --nadpis: 164px; }
+.f-story .obsah { justify-content: center; }
+
+/* 1920×1080: dva sloupce, nadpis vlevo, data vpravo */
+.f-sirka { --px: 96px; --pt: 72px; --pb: 60px; --nadpis: 128px; }
+.f-sirka .obsah {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  column-gap: 96px;
+  align-items: center;
+}
+.f-sirka .fakt .cislo { font-size: calc(150px * var(--fit)); }
+.f-sirka .fakta.jeden .fakt .cislo { font-size: calc(240px * var(--fit)); }

@@ -1,0 +1,15 @@
+{
+  "_poznamka": "FIKTIVNÍ UKÁZKA. Osoba, obec a orgány jsou smyšlené.",
+  "sablona": "dotaz",
+  "fiktivni": true,
+  "kicker": "Dotaz zastupitele podle § 82 zákona o obcích",
+  "predmet": "Výdaje města za externí právní služby",
+  "adresat": "Rada města Příklad",
+  "dotaz": "Kolik město zaplatilo za externí právní služby v letech 2024 až 2026 a na základě jakých smluv?",
+  "datum_podani": "10. 6. 2026",
+  "lhuta": "30 dní",
+  "lhuta_do": "10. 7. 2026",
+  "autor": {"jmeno": "Jana Nováková", "funkce": "zastupitelka", "strana": "Piráti", "obec": "Město Příklad"},
+  "zdroj": "Dotaz vznesený na zasedání zastupitelstva 10. 6. 2026 (fiktivní)",
+  "datum": "10. 6. 2026"
+}

@@ -11,7 +11,7 @@ nekurátorovaná). Architektura je v [`docs/navrh-architektury.md`](../docs/navr
 ## Co server umí
 
 Server při startu otevře SQLite index (`index/kb.sqlite`) postavený z `data/` a
-nabízí AI čtyři druhy věcí (16 toolů, 5 promptů, 6 resources). Tooly volá AI sama
+nabízí AI čtyři druhy věcí (22 toolů, 11 promptů, 7 resources). Tooly volá AI sama
 podle potřeby, prompty si vybírá uživatel (v Claude Desktopu v nabídce „+“), resources
 jsou čtecí odkazy.
 
@@ -28,9 +28,15 @@ jsou čtecí odkazy.
 | tool | `get_voting_record` | hlasování pirátských poslanců, senátorů a europoslanců (PSP, Senát, EP; podle jména, tématu, období, komory `psp`/`senat`/`ep`) |
 | tool | `get_social_posts` | příspěvky pirátských poslanců na X a Bluesky (podle osoby, tématu, platformy, data); vyjádření jednotlivce, ne stanovisko strany, vždy s URL příspěvku |
 | tool | `get_speeches` | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů psp.cz (období 2017, 2021, 2025; podle poslance, tématu, data): řečník, datum a čas, schůze, bod jednání, úryvek a URL stenozáznamu s kotvou; projev = vyjádření poslance, ne stanovisko strany; `get_position` přidá nejrelevantnější vystoupení jako samostatnou sekci |
+| tool | `get_bills` | návrhy zákonů předložené Piráty (i vládní návrhy pirátských ministrů): výsledek, Sbírka, závěrečné hlasování, odkaz na psp.cz; filtr podle poslance, tématu, výsledku (`stav`) a období; interpelace přes `search_kb(typ=["interpelace"])` |
+| tool | `get_election_results` | výsledky Pirátů ve volbách (ČSÚ, Sněmovna, EP, Senát, kraje, obce od 2010): hlasy, %, mandáty, koalice; celostátně, po krajích, v obci |
+| tool | `find_elected` | zvolení Piráti (poslanci, europoslanci, senátoři, krajští a obecní zastupitelé) podle jména, obce, kraje, druhu a roku voleb; výsledek voleb, ne aktuální stav mandátu |
+| tool | `get_party_finances` | financování strany: výroční finanční zprávy ÚDH, kampaně, rozpočty z Piroplácení a měsíční souhrny transparentních účtů; dárci – fyzické osoby jen souhrnně, jmenovitě jen právnické osoby |
+| tool | `pruvodce_zadosti` | žádost podle zákona 106/1999 Sb. a dotaz zastupitele krok za krokem (`faze` pripravuji / odeslano / odpoved / problem): předvyplněná šablona, lhůty, stížnost, odvolání, odkazy na prompty `video_106` a `grafika_106` |
+| tool | `lhuty_zadosti` | lhůty žádosti nebo dotazu zastupitele s paragrafy a ICS; AI je zapíše do kalendáře přes konektor uživatele |
 | tool | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec k tématu s veřejným kontaktem (e-mail, telefon jen pokud je na pirati.cz); ostatní tooly ho nabídnou samy, když báze přesnou odpověď nemá |
 | tool | `get_brand` | barvy a písma z grafického manuálu |
-| tool | `get_template` | šablona podle typu (např. tisková zpráva) |
+| tool | `get_template` | šablona podle typu: tisková zpráva, post, reels, brief, projev, zadání `video-106` a `grafika-106` (server/prompts/), texty podání `zadost-106`, `stiznost-106`, `odvolani-106`, `dotaz-zastupitele` (kurátorovaná vrstva content/sablony/) |
 | tool | `kb_stats` | co je v bázi: počty dokumentů podle typu, stáří dat; navíc souhrn anonymní telemetrie od startu serveru |
 | tool | `report_gap` | nahlásí, že báze na otázku odpověď nemá (lokální evidence + GitHub issue s labelem `kb-gap`); AI ho volá, když nenajde odpověď ani po `find_expert` |
 | prompt | `tiskova_zprava` | napíše tiskovou zprávu k tématu ve stylu strany a podle stanovisek z báze |
@@ -38,11 +44,16 @@ jsou čtecí odkazy.
 | prompt | `social_post` | příspěvek na sociální sítě |
 | prompt | `brief_k_tematu` | stručný podklad k tématu: stanovisko, argumenty, čísla, hlasování |
 | prompt | `odpoved_obcanovi` | věcná a zdvořilá odpověď občanovi na dotaz nebo kritiku |
+| prompt | `zadost_106`, `dotaz_zastupitele` | připraví žádost o informace nebo dotaz zastupitele se správným paragrafem |
+| prompt | `po_odeslani`, `odpoved_prisla` | lhůty do kalendáře a komunikace po odeslání, vyhodnocení odpovědi úřadu |
+| prompt | `video_106` | scénář krátkého videa k žádosti / dotazu (`faze` podano, odpoved, zjisteni, stiznost, dotaz; `shrnuti` = text podání nebo odpovědi) pro šablonu `templates/video/` |
+| prompt | `grafika_106` | data karty na sítě k žádosti / dotazu (`faze` podano, odpoved, stiznost, dotaz; `format`) pro šablonu `templates/grafika/` |
 | resource | `kb://brand/barvy` | seznam barev s hex kódy |
 | resource | `kb://brand/fonty` | role písma a rodiny |
 | resource | `kb://templates/{typ}` | šablona daného typu |
 | resource | `kb://program/seznam` | seznam programových dokumentů |
 | resource | `kb://stats` | statistika báze |
+| resource | `kb://navod/prompty` | vzorové prompty podle účelu (`docs/prompty.md`) |
 | resource | `kb://gaps/posledni` | posledních 50 hlášení z `report_gap` (čas, tool, stav; texty jen s `PIRATEKB_GAPS_TEXTY=1`) |
 
 Přesné parametry tooly popisují samy MCP klientovi (JSON schéma); AI je vidí, uživatel
@@ -322,6 +333,11 @@ můžete dodat „použij znalostní bázi Pirátů“.
 13. „Co říkal Zdeněk Hřib ve Sněmovně o dostupném bydlení?“ (tool `get_speeches`; odpověď cituje
     URL stenozáznamu, datum a bod jednání a označí projev jako vyjádření poslance, ne stanovisko strany)
 
+14. „Jaké návrhy zákonů předložil Jakub Michálek a které z nich prošly?“ (tool `get_bills`)
+15. „Kdo za Piráty zasedá v zastupitelstvu Liberce?“ (tool `find_elected`; výsledek voleb ČSÚ)
+16. „Kolik měli Piráti příjmů v roce 2024 a kdo byl největší dárce mezi firmami?“ (tool
+    `get_party_finances`; dárci – fyzické osoby jen souhrnně)
+
 Další nápady: „Kolik poslanců dnes Piráti mají?“, „Které programové dokumenty
 existují?“, „Co všechno v bázi je a jak je stará?“ (tool `kb_stats`).
 
@@ -375,9 +391,9 @@ jsou v `.gitignore`, aby se lokální zápisy necommitovaly s daty.
 
 ### Evals (kvalita odpovědí)
 
-`evals/otazky.yaml` obsahuje 60 typických otázek ve 12 kategoriích (lidé, orgány, program,
+`evals/otazky.yaml` obsahuje 80 typických otázek v 17 kategoriích (lidé, orgány, program,
 stanoviska, tiskové zprávy, hlasování, brand, šablony, schůzky, systémy / kam s problémem,
-média, sociální sítě). U každé je tool a argumenty, které má AI zavolat, a co musí výstup
+média, sociální sítě, projevy, sněmovní tisky, interpelace, volby, financování). U každé je tool a argumenty, které má AI zavolat, a co musí výstup
 obsahovat (`ocekavane`, aspoň jeden řetězec, bez ohledu na diakritiku), volitelně co nesmí
 (`nesmi_obsahovat`) a z jaké domény musí být citovaná URL (`zdroj_musi_byt`). Součástí jsou
 i negativní otázky: báze nesmí vymyslet stanovisko, které nemá, a u nesmyslu musí říct

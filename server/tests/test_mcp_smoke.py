@@ -26,10 +26,12 @@ DB_PATH = Path(os.environ.get("PIRATEKB_DB") or REPO_ROOT / "index" / "kb.sqlite
 EXPECTED_TOOLS = {
     "search_kb", "get_document", "find_people", "get_org_unit", "get_org_tree", "get_program",
     "get_position", "search_press_releases", "get_voting_record", "get_brand", "get_template",
-    "kb_stats", "get_social_posts", "find_expert", "get_speeches",
+    "kb_stats", "get_social_posts", "find_expert", "get_speeches", "get_bills", "get_election_results",
+    "find_elected", "get_party_finances", "lhuty_zadosti", "pruvodce_zadosti",
 }
 EXPECTED_PROMPTS = {"tiskova_zprava", "reels_scenar", "social_post", "brief_k_tematu", "odpoved_obcanovi"}
-EXPECTED_RESOURCES = {"kb://brand/barvy", "kb://brand/fonty", "kb://program/seznam", "kb://stats"}
+EXPECTED_RESOURCES = {"kb://brand/barvy", "kb://brand/fonty", "kb://program/seznam", "kb://stats",
+                      "kb://navod/prompty"}
 
 
 def _text(result) -> str:

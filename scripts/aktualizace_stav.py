@@ -15,15 +15,18 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# skript -> (popis, složka v data/). Pořadí = pořadí řádků v tabulce.
+# skript -> (popis, složka v data/ nebo n-tice složek, jejichž počty se sečtou). Pořadí = pořadí řádků.
 ZDROJE = [
     ("styleguide", "styleguide.pirati.cz (barvy, písma)", "brand"),
     ("psp", "psp.cz otevřená data (poslanci, hlasování)", "psp"),
     ("steno", "psp.cz stenozáznamy (vystoupení pirátských poslanců)", "psp/steno"),
+    ("tisky", "psp.cz sněmovní tisky a interpelace Pirátů", ("psp/tisky", "psp/interpelace")),
     ("lide_pirati", "lide.pirati.cz (struktura, lidé s funkcí)", "lide"),
     ("pirati_web", "pirati.cz (aktuality, program, profily)", "pirati-web"),
     ("flickr", "Flickr Pirátů (metadata alb)", "flickr"),
     ("evidence", "evidence.pirati.cz (lobbistické schůzky)", "evidence"),
+    ("volby", "volby.gov.cz (výsledky voleb a zvolení Piráti, ČSÚ)", "volby"),
+    ("financovani", "financování strany (ÚDH, transparentní účty Fio, Piroplácení)", "financovani"),
     ("socialni_site", "X a Bluesky poslanců", "social"),
     ("subweby", "subwebů strany", "subweby"),
     ("dokumenty", "dokumenty strany (PDF)", "dokumenty"),
@@ -83,7 +86,11 @@ def main() -> int:
 
     radky = []
     for klic, popis, slozka in ZDROJE:
-        md, jsonl = spocitej(data / slozka)
+        slozky = (slozka,) if isinstance(slozka, str) else slozka
+        md = jsonl = 0
+        for sl in slozky:
+            m, j = spocitej(data / sl)
+            md, jsonl = md + m, jsonl + j
         prev = stary.get(klic, {"beh": "—", "vysledek": "nespuštěno", "uspech": "—"})
         beh, vysledek, uspech = prev["beh"], prev["vysledek"], prev["uspech"]
         if klic in nove:

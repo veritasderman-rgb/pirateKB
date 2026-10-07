@@ -106,10 +106,26 @@ case "$MODE" in
     # poslední 2 schůze se zpracují znovu. Schůze bez zipu (psp.cz ho vydává ~3 měsíce po schůzi)
     # se stahují po stránkách jen tam, kde mluví Pirát; limit stránek drží běh v řádu minut.
     run_src steno         psp/steno --obdobi 2025 --max-stranek 600
+    # Sněmovní tisky a interpelace (po psp, potřebuje data/psp/hlasovani-*.jsonl): aktuální období se
+    # přepočítá z otevřených dat (zipy se cachují 1 den), ústní interpelace období 2025 z webu psp.cz
+    # (stránky starší 21 dní z cache); ~2 s s cache, 1–3 min bez cache. Zapisuje i do psp/interpelace.
+    run_src tisky         psp/tisky --obdobi 2025
     run_src lide_pirati   lide
     run_src pirati_web    pirati-web
     run_src flickr        flickr
     run_src evidence      evidence --plne
+    # Volby (ČSÚ) a financování strany jen první týdenní běh v měsíci (stejně jako senat --aktualni).
+    # Volby se mění jen po volbách; ZIPy jsou v cache, ~35 s, první běh 53 MB.
+    # Financování: transparentní účty a rozpočty (Fio po měsících, uzavřené měsíce z cache; ~30 s);
+    # výroční zprávy ÚDH (termín podání 1. 4.) a zprávy o kampaních (do 90 dnů po volbách) navíc
+    # v lednu, dubnu–červnu a prosinci (úplný běh, ~1 min).
+    if [ "$(date -u +%d)" -le 7 ]; then
+      run_src volby       volby
+      case "$(date -u +%m)" in
+        01|04|05|06|12) run_src financovani financovani ;;
+        *)              run_src financovani financovani --jen ucty rozpocty ;;
+      esac
+    fi
     run_src socialni_site social
     run_src subweby       subweby
     # Regionální a tematické weby z Majáku: po dávkách (stav v data/subweby/stav.json),

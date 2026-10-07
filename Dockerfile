@@ -17,6 +17,7 @@ COPY ingest/ ingest/
 COPY server/ server/
 COPY data/ data/
 COPY content/ content/
+COPY docs/prompty.md docs/prompty.md
 
 # Index se staví při buildu image, start kontejneru je pak okamžitý.
 RUN python -m server.kb.build
