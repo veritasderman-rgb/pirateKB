@@ -8,7 +8,7 @@ tagy:
 - Životní prostředí
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti ke svozu odpadních vod v Plzni: Neřízená dotace
@@ -51,6 +51,6 @@ Statutární město Plzeň se roku 2002 zavázalo vybudovat kanalizaci v městsk
 
 <h3>Kontakty</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#5a3733312f363b29743c3f28303f343933311a2a33283b2e33743920), vedoucí mediálního odboru Pirátů, 737 943 770
-- [Ing. Lukáš Bartoň, Ph.D.](https://www.pirati.cz/lide/lukas_barton), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e9859c82889ac78b889b9d8687a999809b889d80c78a93) předseda KS Plzeňského kraje, 723 199 594
-- [Miluš Kotišová](https://www.pirati.cz), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#fa9793968f89d491958e9389958c9bba8a93889b8e93d49980) koordinátorka pro Plzeňský kraj, 770 113 650
+- [Mikuláš Ferjenčík](https://www.pirati.cz), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#35585c5e405954461b5350475f505b565c5e75455c4754415c1b564f), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Ing. Lukáš Bartoň, Ph.D.](https://www.pirati.cz/lide/lukas_barton), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#d9b5acb2b8aaf7bbb8abadb6b799a9b0abb8adb0f7baa3) předseda KS Plzeňského kraje, 723 199 594
+- [Miluš Kotišová](https://www.pirati.cz), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#87eaeeebf2f4a9ece8f3eef4e8f1e6c7f7eef5e6f3eea9e4fd) koordinátorka pro Plzeňský kraj, 770 113 650

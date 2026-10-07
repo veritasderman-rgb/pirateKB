@@ -9,7 +9,7 @@ tagy:
 - Celostátní
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti si volí celostátního lídra pro letošní volby do poslanecké sněmovny
@@ -39,4 +39,4 @@ Volba probíhá hlasováním na [tomto odkazu](https://forum.pirati.cz/hlasovani
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#492420223c25283a672f2c3b232c272a20220939203b283d20672a33), šéf mediálního odboru Pirátů, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#660b0f0d130a0715480003140c0308050f0d26160f1407120f48051c), šéf mediálního odboru Pirátů, 737 943 770

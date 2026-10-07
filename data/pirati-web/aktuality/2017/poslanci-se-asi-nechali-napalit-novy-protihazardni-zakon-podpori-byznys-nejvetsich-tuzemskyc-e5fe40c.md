@@ -8,7 +8,7 @@ tagy:
 - Legislativa
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Poslanci se asi nechali napálit: nový protihazardní zákon podpoří byznys největších tuzemských hráčů. Ministerstvo financi uděluje první licence na provozování online sázek
@@ -34,5 +34,5 @@ Odstrašujícím příkladem je město Jablonec nad Nisou, kde po původním zá
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#59302f3837773b382b2d362a1929302b382d30773a23), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#365b5f5d435a5745185053445c5358555f5d76465f4457425f18554c), vedoucí mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#355c43545b1b575447415a4675455c4754415c1b564f), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#8be6e2e0fee7eaf8a5edeef9e1eee5e8e2e0cbfbe2f9eaffe2a5e8f1), vedoucí mediálního odboru Pirátů, 737 943 770

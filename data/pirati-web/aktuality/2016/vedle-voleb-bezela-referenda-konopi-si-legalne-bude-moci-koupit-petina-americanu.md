@@ -8,7 +8,7 @@ tagy:
 - Konopí
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Vedle voleb běžela referenda: Konopí si legálně bude moci koupit pětina Američanů.
@@ -26,4 +26,4 @@ Na federální úrovni je v USA konopí stále nelegální. Můžeme doufat, že
 
 <h3>Kontakty</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik) [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#2b4642405e474a58054d4e59414e454842406b5b42594a5f42054851), šéf mediálního odboru, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik) [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#25484c4e504944560b4340574f404b464c4e65554c5744514c0b465f), šéf mediálního odboru, 737 943 770

@@ -8,7 +8,7 @@ tagy:
 - Životní prostředí
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Výzva Pirátů poslancům: Nedopusťte plundrování přírody NP Šumava
@@ -33,5 +33,5 @@ Hlasování o novele Zákona o ochraně přírody a krajiny uskuteční v Poslan
 <h3>Kontakty</h3>
 
 - [Renata Chmelová](http://renatachmelova.cz/), senátorka s podporou Pirátů, [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection)
-- [Ing. Dana Balcarová](https://www.pirati.cz/lide/dana_balcarova), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#86e2e7e8e7a8e4e7eae5e7f4e9f0e7c6f6eff4e7f2efa8e5fc), garant programu Životní prostředí České pirátské strany, 732 103 330
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#d8b5b1b3adb4b9abf6bebdaab2bdb6bbb1b398a8b1aab9acb1f6bba2), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Ing. Dana Balcarová](https://www.pirati.cz/lide/dana_balcarova), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#3b5f5a555a15595a57585a49544d5a7b4b52495a4f52155841), garant programu Životní prostředí České pirátské strany, 732 103 330
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e5888c8e90898496cb8380978f808b868c8ea5958c9784918ccb869f), vedoucí mediálního odboru Pirátů, 737 943 770

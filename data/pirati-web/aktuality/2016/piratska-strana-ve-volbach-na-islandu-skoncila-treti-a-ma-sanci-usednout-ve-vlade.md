@@ -8,7 +8,7 @@ tagy:
 - Zahraničí
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Pirátská strana ve volbách na Islandu skončila třetí a má šanci usednout ve vládě.
@@ -35,5 +35,5 @@ Volby vyhrála s 29 %, čili 21 mandáty vládní Strana nezávislosti, s níž 
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#afc6d9cec181cdcedddbc0dcefdfc6ddcedbc681ccd5), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#ea8783819f868b99c48c8f98808f84898381aa9a83988b9e83c48990), šéf mediálního odboru, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#4a233c2b2464282b383e25390a3a23382b3e23642930), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#076a6e6c726b6674296162756d6269646e6c47776e7566736e29647d), šéf mediálního odboru, 737 943 770

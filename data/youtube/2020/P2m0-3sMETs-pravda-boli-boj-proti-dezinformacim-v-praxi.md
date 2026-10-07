@@ -8,10 +8,9 @@ kanal_url: https://www.youtube.com/channel/UCcf12G_5igxOSZBFSt4eEAQ
 delka_s: 5401
 titulky: zadne
 osoba: Markéta Gregorová
-prenos: true
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Pravda bolí: Boj proti dezinformacím v praxi

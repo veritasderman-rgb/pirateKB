@@ -8,7 +8,7 @@ tagy:
 - Ekonomika
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Česko je v EU druhou zemí nejvíce ohroženou robotizací. Odpovědí by mohl být nepodmíněný základní příjem
@@ -29,5 +29,5 @@ Myšlenka základního nepodmíněného příjmu se snaží reagovat právě na 
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#b0ddd9dbc5dcd1c39ed6d5c2dad5ded3d9dbf0c0d9c2d1c4d99ed3ca), vedoucí mediálního odboru Pirátů, 737 943 770
-- [PaedDr. Ivo Vašíček](https://www.pirati.cz/lide/ivo_vasicek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f099869fde8691839993959bb0809982918499de938a), místopředseda Pirátů
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#1f7276746a737e6c31797a6d757a717c76745f6f766d7e6b76317c65), vedoucí mediálního odboru Pirátů, 737 943 770
+- [PaedDr. Ivo Vašíček](https://www.pirati.cz/lide/ivo_vasicek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f9908f96d78f988a909a9c92b989908b988d90d79a83), místopředseda Pirátů

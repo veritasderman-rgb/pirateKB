@@ -9,7 +9,7 @@ tagy:
 - Volby
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # V sobotu 18. března zasedá Celostátní fórum Pirátské strany
@@ -60,4 +60,4 @@ Po skončení oficiálního programu pokračujeme v 18:30 společenským večere
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#0b6662607e676a78256d6e79616e656862604b7b62796a7f62256871), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#1f7276746a737e6c31797a6d757a717c76745f6f766d7e6b76317c65), vedoucí mediálního odboru Pirátů, 737 943 770

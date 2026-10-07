@@ -8,7 +8,7 @@ tagy:
 - Vzdělávání
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti podporují Chartu Aliance pro otevřené vzdělávání
@@ -34,5 +34,5 @@ Několik pirátských cílů v této oblasti:
 
 <h3>Kontakty</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik) [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#1e7377756b727f6d30787b6c747b707d77755e6e776c7f6a77307d64), vedoucí mediálního odboru Pirátů, 737 943 770
-- [Adam Zábranský](https://www.pirati.cz/lide/adam_zabransky) [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#3e5f5a5f5310445f5c4c5f504d55477e4e574c5f4a57105d44), pražský zastupitel za Piráty, 721 006 868
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik) [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e78a8e8c928b8694c98182958d8289848e8ca7978e9586938ec9849d), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Adam Zábranský](https://www.pirati.cz/lide/adam_zabransky) [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#264742474b085c4744544748554d5f66564f5447524f08455c), pražský zastupitel za Piráty, 721 006 868

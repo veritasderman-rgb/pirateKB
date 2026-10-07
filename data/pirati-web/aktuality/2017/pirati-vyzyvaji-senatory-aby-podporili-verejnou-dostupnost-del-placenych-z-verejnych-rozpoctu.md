@@ -8,7 +8,7 @@ tagy:
 - Legislativa
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti vyzývají senátory, aby podpořili veřejnou dostupnost děl placených z veřejných rozpočtů
@@ -62,5 +62,5 @@ V oblasti autorského práva Piráti prosazují i další změny, které však p
 
 <h3>Kontakty</h3>
 
-- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#98f2f9f3edfab6f5f1fbf0f9f4fdf3d8e8f1eaf9ecf1b6fbe2), pražský zastupitel, místopředseda Pirátů, 775 978 550
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#0e6367657b626f7d20686b7c646b606d67654e7e677c6f7a67206d74), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#cda7aca6b8afe3a0a4aea5aca1a8a68dbda4bfacb9a4e3aeb7), pražský zastupitel, místopředseda Pirátů, 775 978 550
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#385551534d54594b165e5d4a525d565b51537848514a594c51165b42), vedoucí mediálního odboru Pirátů, 737 943 770

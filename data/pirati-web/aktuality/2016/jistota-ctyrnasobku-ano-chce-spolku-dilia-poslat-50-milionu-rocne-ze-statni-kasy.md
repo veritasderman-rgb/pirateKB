@@ -8,7 +8,7 @@ tagy:
 - Kontrola moci a mocných
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Jistota čtyřnásobku - ANO chce spolku Dilia poslat 50 milionů ročně ze státní kasy.
@@ -40,4 +40,4 @@ Navýšení poplatku za půjčenou knihu na čtyřnásobek, konkrétně z 0,5 K�
 
 <h3>Kontakt</h3>
 
-- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#2e444f455b4c0043474d464f424b456e5e475c4f5a47004d54), 775 978 550, pražský zastupitel a předseda pražských Pirátů
+- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e88289839d8ac685818b8089848d83a898819a899c81c68b92), 775 978 550, pražský zastupitel a předseda pražských Pirátů

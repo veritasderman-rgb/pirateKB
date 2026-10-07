@@ -10,7 +10,7 @@ tagy:
 - Obchod a průmysl
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Vláda dnes chtěla podepsat smlouvu CETA. Informace o dopadech na české hospodářství nemá.
@@ -30,5 +30,5 @@ Dopadovou studii si ministerstvo objednalo až letos v srpnu u Ekonomické fakul
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#bad3ccdbd494d8dbc8ced5c9facad3c8dbced394d9c0), předseda Pirátů, 603 415 378
-- [Ondřej Profant](https://www.pirati.cz/lide/ondrej_profant), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#ec8382889e8986c29c9e838a8d8298ac9c859e8d9885c28f96), garant programového bodu Svoboda informací a člen expertní skupiny MPO, 607 580 015
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#523b24333c7c303320263d2112223b2033263b7c3128), předseda Pirátů, 603 415 378
+- [Ondřej Profant](https://www.pirati.cz/lide/ondrej_profant), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e08f8e8492858ace90928f86818e94a0908992819489ce839a), garant programového bodu Svoboda informací a člen expertní skupiny MPO, 607 580 015

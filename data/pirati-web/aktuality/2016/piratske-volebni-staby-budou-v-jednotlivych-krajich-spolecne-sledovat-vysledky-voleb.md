@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Pirátské volební štáby budou v jednotlivých krajích společně sledovat výsledky voleb
@@ -37,4 +37,4 @@ Kde se bude čekat na výsledky?
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#ef8286849a838e9cc1898a9d858a818c8684af9f869d8e9b86c18c95), pražský zastupitel a vedoucí mediálního odboru Pirátů, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#98f5f1f3edf4f9ebb6fefdeaf2fdf6fbf1f3d8e8f1eaf9ecf1b6fbe2), pražský zastupitel a vedoucí mediálního odboru Pirátů, 737 943 770

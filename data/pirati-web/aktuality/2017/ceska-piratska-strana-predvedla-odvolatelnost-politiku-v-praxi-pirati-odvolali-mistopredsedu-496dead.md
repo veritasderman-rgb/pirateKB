@@ -9,7 +9,7 @@ tagy:
 - Přímá demokracie
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Česká pirátská strana předvedla odvolatelnost politiků v praxi, Piráti odvolali místopředsedu Ivo Vašíčka
@@ -28,5 +28,5 @@ Ivo Vašíček zůstává členem Pirátské strany a krajským zastupitelem v J
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#6b021d0a0545090a191f04182b1b02190a1f02450811), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f09d999b859c9183de9695829a959e93999bb0809982918499de938a), šéf mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#8ce5faede2a2eeedfef8e3ffccfce5feedf8e5a2eff6), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#0a6763617f666b79246c6f78606f646963614a7a63786b7e63246970), šéf mediálního odboru Pirátů, 737 943 770

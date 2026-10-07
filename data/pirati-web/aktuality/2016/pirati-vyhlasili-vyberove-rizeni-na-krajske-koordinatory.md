@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti vyhlásili výběrové řízení na krajské koordinátory
@@ -105,4 +105,4 @@ Zadavatel nebo výběrová komise může výběrové řízení před uplynutím 
 
 <h3>Kontakt</h3>
 
-- [Barbora Hradečná](https://www.pirati.cz/lide/barbora_hradecna), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#52303320303d20337c3a20333637313c3312223b2033263b7c3128), personální odbor, 778 702 243
+- [Barbora Hradečná](https://www.pirati.cz/lide/barbora_hradecna), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#2b494a594944594a0543594a4f4e48454a6b5b42594a5f42054851), personální odbor, 778 702 243

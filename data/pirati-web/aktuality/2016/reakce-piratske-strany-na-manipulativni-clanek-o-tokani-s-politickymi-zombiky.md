@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Reakce Pirátské strany na manipulativní článek o „tokání s politickými zombíky“
@@ -30,4 +30,4 @@ Pro Piráty, kteří považují přizpůsobení společnosti éře masivní robo
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#6c01050719000d1f420a091e0609020f05072c1c051e0d1805420f16), pražský zastupitel a šéf mediálního odboru, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#3a5753514f565b49145c5f48505f545953517a4a53485b4e53145940), pražský zastupitel a šéf mediálního odboru, 737 943 770

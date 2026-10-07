@@ -8,7 +8,7 @@ tagy:
 - Lidská práva
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti a Česká asociace paraplegiků - CZEPA: Bariéry svobody - netradiční oslava svátku 17. listopadu.
@@ -35,5 +35,5 @@ Smyslem akce je připomenout, že mezi námi žije víc než 8 000 vozíčkář�
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#731a05121d5d111201071c0033031a0112071a5d1009), 603 415 378, předseda Pirátů
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#3e57485f50105c5f4c4a514d7e4e574c5f4a57105d44), 603 415 378, předseda Pirátů
 - Alena Jančíková, [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection), 608 124 252, ředitelka České asociace paraplegiků - CZEPA

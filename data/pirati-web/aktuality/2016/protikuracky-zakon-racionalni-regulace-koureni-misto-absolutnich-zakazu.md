@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Protikuřácký zákon: Racionální regulace kouření místo absolutních zákazů
@@ -29,4 +29,4 @@ Piráti jsou si vědomi faktu, že extrémní plošný zákaz s okamžitou úči
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#b0ddd9dbc5dcd1c39ed6d5c2dad5ded3d9dbf0c0d9c2d1c4d99ed3ca), pražský zastupitel a šéf mediálního odboru, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#492420223c25283a672f2c3b232c272a20220939203b283d20672a33), pražský zastupitel a šéf mediálního odboru, 737 943 770

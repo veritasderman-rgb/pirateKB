@@ -8,7 +8,7 @@ tagy:
 - Senát
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti podporují návrh senátora Michálka omezit funkce v Senátu.
@@ -29,5 +29,5 @@ V tomto volebním období bylo v Senátu zřízeno téměř 30 funkcí místopř
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#bdd4cbdcd393dfdccfc9d2cefdcdd4cfdcc9d493dec7), předseda Pirátů, 603 415 378
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#bcd5caddd292deddcec8d3cffcccd5ceddc8d592dfc6), předseda Pirátů, 603 415 378
 - Vít Šimral, [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection), 606 220 985, asistent senátora Michálka za Piráty

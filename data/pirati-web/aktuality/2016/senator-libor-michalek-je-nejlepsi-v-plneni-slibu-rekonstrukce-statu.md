@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Senátor Libor Michálek je nejlepší v plnění slibů Rekonstrukce státu
@@ -25,4 +25,4 @@ Senátor Michálek kromě podpory protikorupčních zákonů představil i vlast
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#c8a5a1a3bda4a9bbe6aeadbaa2ada6aba1a388b8a1baa9bca1e6abb2), pražský zastupitel a šéf mediálního odboru, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#3b5652504e575a48155d5e49515e555852507b4b52495a4f52155841), pražský zastupitel a šéf mediálního odboru, 737 943 770

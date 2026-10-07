@@ -8,7 +8,7 @@ tagy:
 - Kauzy
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti: Sobotka a Babiš tají vlastníky firem, podporují tím korupci.
@@ -44,5 +44,5 @@ Pirátská strana zveřejnila stanovisko Ministerstva financí, podle něhož Č
 
 <h3>Kontakty</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#c5a8acaeb0a9a4b6eba3a0b7afa0aba6acae85b5acb7a4b1aceba6bf), šéf mediálního odboru, 737 943 770
-- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#0c666d67796e2261656f646d6069674c7c657e6d7865226f76), předseda pražského klubu Pirátů, 775 978 550
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#b3dedad8c6dfd2c09dd5d6c1d9d6ddd0dad8f3c3dac1d2c7da9dd0c9), šéf mediálního odboru, 737 943 770
+- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#4d272c26382f6320242e252c2128260d3d243f2c3924632e37), předseda pražského klubu Pirátů, 775 978 550

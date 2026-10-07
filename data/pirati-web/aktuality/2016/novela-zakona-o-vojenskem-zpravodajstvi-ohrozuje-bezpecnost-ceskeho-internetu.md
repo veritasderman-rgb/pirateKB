@@ -8,7 +8,7 @@ tagy:
 - Cenzura
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Novela zákona o Vojenském zpravodajství ohrožuje bezpečnost českého Internetu.
@@ -39,5 +39,5 @@ V praxi rozvědka zabrání jen malému počtu útoků. Spíše odhaluje totožn
 
 <h3>Kontakty</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#7e1317150b121f0d50181b0c141b101d17153e0e170c1f0a17501d04), vedoucí mediálního odboru Pirátů, 737 943 770
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#dcb5aabdb2f2bebdaea8b3af9cacb5aebda8b5f2bfa6), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e18c888a948d8092cf8784938b848f82888aa1918893809588cf829b), vedoucí mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#620b14030c4c000310160d1122120b1003160b4c0118), předseda Pirátů, 603 415 378

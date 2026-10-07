@@ -9,7 +9,7 @@ tagy:
 - Transparence
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Hypertransparentní klub. Pražští Piráti získali cenu za otevřenost.
@@ -29,5 +29,5 @@ Do soutěže letos veřejnost přihlásila rekordních 162 subjektů. Nominace n
 
 <h3>Kontakt</h3>
 
-- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#482229233d2a6625212b2029242d230838213a293c21662b32), 775 978 550, pražský zastupitel a předseda pražských Pirátů
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f39e9a98869f9280dd95968199969d909a98b3839a8192879add9089), 737 943 770, vedoucí mediálního odboru
+- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#93f9f2f8e6f1bdfefaf0fbf2fff6f8d3e3fae1f2e7fabdf0e9), 775 978 550, pražský zastupitel a předseda pražských Pirátů
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#15787c7e607974663b7370677f707b767c7e55657c6774617c3b766f), 737 943 770, vedoucí mediálního odboru

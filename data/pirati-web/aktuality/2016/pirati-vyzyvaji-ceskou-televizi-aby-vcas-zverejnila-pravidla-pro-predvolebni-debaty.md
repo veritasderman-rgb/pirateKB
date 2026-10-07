@@ -8,7 +8,7 @@ tagy:
 - Média
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti vyzývají Českou televizi, aby včas zveřejnila pravidla pro předvolební debaty.
@@ -27,5 +27,5 @@ Ve své výzvě Piráti také navrhují, aby prostor dostaly všechny politické
 
 <h3>Kontakt</h3>
 
-- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e48e858f9186ca898d878c8588818fa4948d9685908dca879e), 775 978 550, pražský zastupitel a předseda pražských Pirátů
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#610c080a140d00124f0704130b040f02080a211108130015084f021b), 737 943 770, vedoucí mediálního odboru
+- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#a7cdc6ccd2c589cacec4cfc6cbc2cce7d7ced5c6d3ce89c4dd), 775 978 550, pražský zastupitel a předseda pražských Pirátů
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#dfb2b6b4aab3beacf1b9baadb5bab1bcb6b49fafb6adbeabb6f1bca5), 737 943 770, vedoucí mediálního odboru

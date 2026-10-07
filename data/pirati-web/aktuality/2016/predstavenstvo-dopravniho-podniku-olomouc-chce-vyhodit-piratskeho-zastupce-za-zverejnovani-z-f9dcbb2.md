@@ -8,7 +8,7 @@ tagy:
 - Regiony
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Představenstvo Dopravního podniku Olomouc chce vyhodit pirátského zástupce za zveřejňování zápisů z jeho jednání.
@@ -30,5 +30,5 @@ Po komunálních volbách 2014 odsadili Piráti v koalici se zelenými a nezávi
 
 <h3>Kontakty</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e18c888a948d8092cf8784938b848f82888aa1918893809588cf829b), šéf mediálního odboru Pirátů, 737 943 770
-- [Jakub Nepejchal](https://www.pirati.cz/lide/jakub_nepejchal), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#d6bcb7bda3b4f8b8b3a6b3bcb5beb7ba96a6bfa4b7a2bff8b5ac), 778 711 166, vedoucí personálního odboru Pirátů
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#85e8eceef0e9e4f6abe3e0f7efe0ebe6eceec5f5ecf7e4f1ecabe6ff), šéf mediálního odboru Pirátů, 737 943 770
+- [Jakub Nepejchal](https://www.pirati.cz/lide/jakub_nepejchal), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#cba1aaa0bea9e5a5aebbaea1a8a3aaa78bbba2b9aabfa2e5a8b1), 778 711 166, vedoucí personálního odboru Pirátů
