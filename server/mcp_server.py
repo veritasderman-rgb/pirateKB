@@ -1582,8 +1582,16 @@ def government_records(kb: Any, ministr: str | None = None, query: str | None = 
             (f"%{VLADA_MINISTRI[key][0]}%",))}
     q = _clean(query)
     if q:
-        items = kb.search(q, typ=typ, kolekce=["vlada"], od=od or None, do=do or None,
-                          limit=200 if allowed is not None else limit, preferuj_nove=False)
+        # filtr na ministra až nad výsledky fulltextu: okno kandidátů se zvětšuje,
+        # dokud nestačí na limit nebo dokud fulltext nedojde
+        cap = 200 if allowed is not None else limit
+        while True:
+            items = kb.search(q, typ=typ, kolekce=["vlada"], od=od or None, do=do or None,
+                              limit=cap, preferuj_nove=False)
+            if allowed is None or len(items) < cap or \
+                    len({r["doc_id"] for r in items if r["doc_id"] in allowed}) >= limit:
+                break
+            cap *= 4
     else:
         items = kb.list_documents(typ=typ, kolekce=["vlada"], od=od or None, do=do or None,
                                   limit=5000 if allowed is not None else limit)

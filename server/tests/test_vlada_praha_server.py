@@ -243,3 +243,58 @@ def test_tooly_registrovane_a_dostupne():
             "hledat_interni", "navrhnout_do_baze"}
     assert nove <= names
     assert all(callable(getattr(mcp_server, n, None)) for n in names)   # evals/run.py volá tooly jako atributy
+
+
+# ------------------------------------------------------------------- filtry nad mnoha kandidáty
+
+@pytest.fixture(scope="module")
+def kb_plny(tmp_path_factory):
+    """Hodně dokumentů se stejným slovem od jiného předkladatele / ministra a jeden hledaný
+    navíc, nejstarší (fulltext bez preferuj_nove ho řadí až za ostatní)."""
+    data = tmp_path_factory.mktemp("data_plny")
+    for i in range(300):
+        _md(data / f"praha/usneseni/rhmp/2025/{i}-rozpocet.md",
+            {"zdroj": f"https://usneseni.praha.eu/ina/tedusndetail.aspx?par=x{i}",
+             "nazev": f"Usnesení RHMP č. {1000 + i}: k rozpočtu, rozpočtové opatření a rozpočet {i}",
+             "typ": "usneseni", "viditelnost": "verejne", "datum": "2025-01-01", "autorita": "usneseni-rhmp",
+             "organ": "rhmp", "cislo": str(1000 + i), "autor": "radní Ing. Někdo Jiný", "predkladatel_pirati": []},
+            "# Rozpočet\n\nRozpočet rozpočet rozpočtové opatření rozpočtu hl. m. Prahy.")
+        _md(data / f"vlada/tz/mf/2023/{i}-rozpocet.md",
+            {"zdroj": f"https://mf.gov.cz/cs/x{i}", "nazev": f"Rozpočet rozpočet {i}", "typ": "tiskova-zprava",
+             "datum": "2023-01-01", "autor": "Ministerstvo financí", "ministr": "Zbyněk Stanjura",
+             "resort": "mf", "viditelnost": "verejne", "autorita": "vlada-resort"},
+            "# Rozpočet\n\nRozpočet rozpočet rozpočtu státní rozpočet.")
+    _md(data / "praha/usneseni/rhmp/2019/1-rozpocet-simral.md",
+        {"zdroj": "https://usneseni.praha.eu/ina/tedusndetail.aspx?par=s",
+         "nazev": "Usnesení RHMP č. 7: k rozpočtu školství", "typ": "usneseni", "viditelnost": "verejne",
+         "datum": "2019-01-01", "autorita": "usneseni-rhmp", "organ": "rhmp", "cislo": "7",
+         "autor": "radní Vít Šimral", "predkladatel_pirati": ["Vít Šimral"]},
+        "# Usnesení\n\nŠkolství, okrajově rozpočet.")
+    _md(data / "vlada/tz/mmr/2022/rozpocet-mmr.md",
+        {"zdroj": "https://mmr.gov.cz/cs/rozpocet", "nazev": "Rozpočet MMR na bydlení", "typ": "tiskova-zprava",
+         "datum": "2022-01-01", "autor": "Ministerstvo pro místní rozvoj", "ministr": "Ivan Bartoš",
+         "resort": "mmr", "viditelnost": "verejne", "autorita": "vlada-resort"},
+        "# Bydlení\n\nPodpora bydlení, okrajově rozpočet.")
+    db = tmp_path_factory.mktemp("index_plny") / "kb.sqlite"
+    build_index(data, db, embeddings_provider=None, content_dir=None)
+    kb = KB(db, embeddings_provider=None)
+    yield kb
+    kb.close()
+
+
+def test_resolutions_predkladatel_za_hranici_kandidatu(kb_plny):
+    res = kb_plny.search_resolutions(organ="rhmp", query="rozpočet", predkladatel="Šimral", limit=5)
+    assert [r["cislo"] for r in res] == ["7"]
+
+
+def test_government_record_ministr_za_hranici_kandidatu(kb_plny):
+    res = mcp_server.government_records(kb_plny, ministr="Bartoš", query="rozpočet")
+    assert [r["doc_id"] for r in res["polozky"]] == ["vlada/tz/mmr/2022/rozpocet-mmr"]
+
+
+def test_organy_cache_podle_viditelnosti(kb):
+    from server.analyzy import organy
+    from server.kb.search import zuzit_viditelnost
+    verejny = organy._db_key(kb)
+    with zuzit_viditelnost({"clenske"}):
+        assert organy._db_key(kb) != verejny

@@ -1078,14 +1078,22 @@ class KB:
         cols = "id, nazev, zdroj, datum, autor, autorita, kolekce, meta"
         snippets: dict[str, str] = {}
         if query:
-            hits = self.search(query, typ=["usneseni"], kolekce=kolekce, od=od, do=do,
-                               limit=max(limit * 10, 100), preferuj_nove=False)
-            ids = list(dict.fromkeys(h["doc_id"] for h in hits))
+            # organ/předkladatel se filtrují až nad výsledky fulltextu, proto se okno
+            # kandidátů zvětšuje, dokud nestačí na limit nebo dokud fulltext nedojde
+            cap = max(limit * 10, 100)
+            while True:
+                hits = self.search(query, typ=["usneseni"], kolekce=kolekce, od=od, do=do,
+                                   limit=cap, preferuj_nove=False)
+                ids = list(dict.fromkeys(h["doc_id"] for h in hits))
+                if not ids:
+                    return []
+                rows = self._rows(f"SELECT {cols} FROM documents WHERE id IN ({','.join('?' * len(ids))})", ids)
+                hotovo = len(hits) < cap or not (organ or pred)
+                if hotovo or sum(ok(_loads(r.get("meta"), {}), r.get("autor")) for r in rows) >= limit:
+                    break
+                cap *= 4
             for h in hits:
                 snippets.setdefault(h["doc_id"], h.get("snippet") or "")
-            if not ids:
-                return []
-            rows = self._rows(f"SELECT {cols} FROM documents WHERE id IN ({','.join('?' * len(ids))})", ids)
             order = {d: i for i, d in enumerate(ids)}
             rows.sort(key=lambda r: order[r["id"]])
         else:

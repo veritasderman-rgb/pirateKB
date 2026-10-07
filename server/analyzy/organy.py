@@ -680,7 +680,9 @@ def _db_key(kb: Any) -> Any:
         st = Path(p).stat() if p else None
     except OSError:
         st = None
-    return (id(kb), str(p), st.st_mtime if st else None)
+    # viditelnost patří do klíče: cache naplněná pro člena nesmí posloužit anonymovi
+    from server.kb.search import aktualni_viditelnost
+    return (id(kb), str(p), st.st_mtime if st else None, tuple(sorted(aktualni_viditelnost())))
 
 
 def _typy(kb: Any) -> list[str]:
