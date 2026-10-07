@@ -55,6 +55,8 @@ ALLOWED_TYP = (
     "projev",  # vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (steno.py)
     "tisk",  # sněmovní tisky (návrhy zákonů) předložené Piráty (tisky.py)
     "interpelace",  # interpelace pirátských poslanců na členy vlády (tisky.py)
+    "pozmenovaci-navrh",  # pozměňovací návrhy pirátských poslanců (pozmenovaky.py)
+    "organy-psp",  # výbory, komise a funkce pirátských poslanců (pozmenovaky.py)
     "volby",  # volební výsledky a zvolení zastupitelé (volby.py)
     "usneseni",  # usnesení vlády a zastupitelstev (vlada.py, praha.py)
     "financni-zprava",  # financování strany: výroční zprávy, účty (financovani.py)
