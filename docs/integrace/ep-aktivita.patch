@@ -1,0 +1,309 @@
+--- a/server/kb/search.py
++++ b/server/kb/search.py
+@@ -1247,19 +1247,44 @@
+ 
+     # ------------------------------------------------------------ projevy ve Sněmovně
+ 
+-    def resolve_speaker(self, poslanec: str) -> list[str]:
++    # komora projevu: PSP dokumenty pole `komora` nemají (= "psp"), projevy z EP mají "ep"
++    _SPEECH_KOMORA_SQL = "COALESCE(json_extract(meta, '$.komora'), 'psp')"
++
++    @staticmethod
++    def speech_chamber(komora: str | None) -> str | None:
++        """"psp" | "ep" | None (obě); přijímá i „Sněmovna“, „EP“, „europarlament“, „vse“."""
++        k = fold(komora or "").strip()
++        if not k or k in ("vse", "obe", "all", "*"):
++            return None
++        if k in ("psp", "ps", "snemovna", "poslanecka snemovna"):
++            return "psp"
++        if k in ("ep", "europarlament", "evropsky parlament"):
++            return "ep"
++        raise ValueError(f"Neznámá komora „{komora}“. Povoleno: psp, ep (bez = obě).")
++
++    def _speech_komora_clause(self, komora: str | None, params: list) -> str:
++        if not komora:
++            return ""
++        params.append(komora)
++        return f" AND {self._SPEECH_KOMORA_SQL} = ?"
++
++    def resolve_speaker(self, poslanec: str, komora: str | None = None) -> list[str]:
+         """Jména autorů projevů (typ ``projev``) odpovídající dotazu: celé jméno nebo jen
+-        příjmení, bez diakritiky, i v jiném pádě („Bartoše“), nebo id_osoba z psp.cz."""
++        příjmení, bez diakritiky, i v jiném pádě („Bartoše“), nebo id_osoba z psp.cz / id
++        europoslance (osoba_ep). ``komora`` = "psp" | "ep" | None (obě)."""
+         q = fold(poslanec).strip()
+         if not q:
+             return []
++        kp: list = []
++        kc = self._speech_komora_clause(komora, kp)
+         if q.isdigit():
+             return [r["autor"] for r in self._rows(
+                 "SELECT DISTINCT autor FROM documents WHERE typ = 'projev' "
+-                "AND json_extract(meta, '$.osoba_psp') = ?", (q,)) if r["autor"]]
++                "AND (json_extract(meta, '$.osoba_psp') = ? OR json_extract(meta, '$.osoba_ep') = ?)" + kc,
++                [q, q] + kp) if r["autor"]]
+         names = [r["autor"] for r in self._rows(
+-            "SELECT DISTINCT autor FROM documents WHERE typ = 'projev' AND autor IS NOT NULL "
+-            "ORDER BY autor")]
++            "SELECT DISTINCT autor FROM documents WHERE typ = 'projev' AND autor IS NOT NULL" + kc
++            + " ORDER BY autor", kp)]
+         exact = [n for n in names if fold(n) == q]
+         if exact:
+             return exact
+@@ -1293,6 +1318,7 @@
+         return {
+             "doc_id": doc["id"], "nazev": doc["nazev"], "jmeno": doc["autor"],
+             "osoba_psp": meta.get("osoba_psp"), "obdobi": meta.get("obdobi"),
++            "komora": meta.get("komora") or "psp", "jazyk": v.get("jazyk"),
+             "schuze": meta.get("schuze"), "datum": v.get("datum"), "cas": v.get("cas"),
+             "bod": v.get("bod"), "role": v.get("role"), "url": v.get("url") or doc["zdroj"],
+             "nadpis": v.get("nadpis"), "znaku": v.get("znaku"), "autorita": doc["autorita"],
+@@ -1310,17 +1336,20 @@
+ 
+     def search_speeches(self, query: str | None = None, poslanec: str | None = None,
+                         od: str | None = None, do: str | None = None,
+-                        limit: int = 10) -> list[dict]:
++                        limit: int = 10, komora: str | None = "psp") -> list[dict]:
+         """Vystoupení pirátských poslanců ve Sněmovně (typ ``projev``).
+ 
+         S ``query`` fulltext v textu vystoupení (stejné skóre jako ``search``), bez něj
+         nejnovější vystoupení. ``poslanec`` = jméno, příjmení (i bez diakritiky, i skloněné)
+         nebo id_osoba; nenalezený poslanec -> prázdný seznam. ``od``/``do`` filtrují datum
+-        vystoupení. Každá položka má datum, čas, schůzi, bod, URL na stenozáznam a úryvek."""
++        vystoupení. Každá položka má datum, čas, schůzi, bod, URL na stenozáznam a úryvek.
++        ``komora``: "psp" (výchozí, jen Sněmovna – kvůli volajícím, kteří píší „ve Sněmovně“),
++        "ep" (plénum Evropského parlamentu, ingest/ep_aktivita.py) nebo None (obě)."""
+         limit = max(1, int(limit))
++        komora = self.speech_chamber(komora)
+         autori = None
+         if poslanec and fold(poslanec).strip():
+-            autori = self.resolve_speaker(poslanec)
++            autori = self.resolve_speaker(poslanec, komora)
+             if not autori:
+                 return []
+         docs_cache: dict[str, tuple[dict, dict, dict[str, str]]] = {}
+@@ -1357,6 +1386,8 @@
+             ranked = []
+             for doc_id, dscore in doc_score.items():
+                 doc, meta, sections = load(doc_id)
++                if komora and (meta.get("komora") or "psp") != komora:
++                    continue
+                 for v in meta.get("vystoupeni") or []:
+                     if not self._in_range(v.get("datum"), od, do):
+                         continue
+@@ -1379,7 +1410,7 @@
+             return out
+ 
+         params: list = []
+-        where = "typ = 'projev'" + self._in_clause("autor", autori, params)
++        where = "typ = 'projev'" + self._in_clause("autor", autori, params) + self._speech_komora_clause(komora, params)
+         if do:
+             where += " AND datum <= ?"
+             params.append(do[:10] + "~")
+@@ -1393,14 +1424,17 @@
+         out.sort(key=lambda x: (str(x["datum"] or ""), str(x["cas"] or "")), reverse=True)
+         return out[:limit]
+ 
+-    def speeches_summary(self, poslanec: str) -> dict:
+-        """Počty vystoupení poslance ve Sněmovně: celkem, po obdobích, počet schůzí, od–do."""
+-        autori = self.resolve_speaker(poslanec)
++    def speeches_summary(self, poslanec: str, komora: str | None = "psp") -> dict:
++        """Počty vystoupení poslance: celkem, po obdobích, počet schůzí (v EP dnů s rozpravou),
++        od–do, ``podle_komory``. ``komora`` jako u search_speeches (výchozí jen Sněmovna)."""
++        komora = self.speech_chamber(komora)
++        autori = self.resolve_speaker(poslanec, komora)
+         if not autori:
+             return {"poslanec": poslanec, "nalezen": False, "celkem": 0}
+         params: list = []
+         rows = self._rows("SELECT autor, datum, meta FROM documents WHERE typ = 'projev'"
+-                          + self._in_clause("autor", autori, params), params)
++                          + self._in_clause("autor", autori, params) + self._speech_komora_clause(komora, params), params)
++        po_komore: dict[str, int] = {}
+         po_obdobi: dict[str, int] = {}
+         celkem, datumy = 0, []
+         for r in rows:
+@@ -1409,9 +1443,12 @@
+             celkem += n
+             k = str(meta.get("obdobi") or "?")
+             po_obdobi[k] = po_obdobi.get(k, 0) + n
++            kk = meta.get("komora") or "psp"
++            po_komore[kk] = po_komore.get(kk, 0) + n
+             datumy += [str(v.get("datum")) for v in meta.get("vystoupeni") or [] if v.get("datum")]
+         return {"poslanec": autori[0] if len(autori) == 1 else autori, "nalezen": True,
+                 "celkem": celkem, "schuzi": len(rows), "podle_obdobi": dict(sorted(po_obdobi.items())),
++                "podle_komory": po_komore,
+                 "od": min(datumy, default=None), "do": max(datumy, default=None)}
+ 
+     # ------------------------------------------------------------ brand, program, statistiky
+--- a/server/mcp_server.py
++++ b/server/mcp_server.py
+@@ -53,7 +53,7 @@
+              "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
+              "materialy", "prispevek-socialni-site", "schuzka", "navod", "system",
+              "clanek-media", "prepis-videa", "projev", "slovnik", "sablona", "vysledek", "material",
+-             "tisk", "interpelace", "volby", "financni-zprava", "usneseni"]
++             "tisk", "interpelace", "volby", "financni-zprava", "usneseni", "dotaz-ep", "zprava-ep"]
+ SOCIAL_PLATFORMS = ["x", "bluesky"]
+ # šablony výstupů: texty v server/prompts/<typ>.md, typy z TEMPLATE_CONTENT v content/sablony/<typ>.md
+ TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev", "video-106", "grafika-106",
+@@ -73,7 +73,10 @@
+     "oficialni-styleguide": "oficiální styleguide.pirati.cz",
+     "oficialni-data-psp": "otevřená data Poslanecké sněmovny",
+     "oficialni-data-senat": "veřejná data Senátu (hlasování senátorů)",
+-    "oficialni-data-ep": "data o hlasování v Evropském parlamentu (HowTheyVote.eu)",
++    "oficialni-data-ep": "oficiální data Evropského parlamentu (hlasování přes HowTheyVote.eu; otázky, zprávy "
++                         "a stanoviska z Open Data Portalu EP)",
++    "projev-ep": "projev europoslance v plénu Evropského parlamentu (doslovný záznam CRE; vyjádření "
++                 "jednotlivce, NENÍ stanovisko strany)",
+     "oficialni-data-csu": "oficiální výsledky voleb (Český statistický úřad, volby.gov.cz)",
+     "oficialni-udhpsh": "úřední údaje z výroční finanční zprávy nebo zprávy o kampani podané ÚDH "
+                         "(za správnost odpovídá strana)",
+@@ -104,7 +107,7 @@
+     "brand": "oficialni-styleguide", "hlasovani": "oficialni-data-psp", "materialy": "web",
+     "prispevek-socialni-site": "vyjadreni-politika", "system": "audit", "projev": "vyjadreni-politika",
+     "tisk": "oficialni-data-psp", "interpelace": "oficialni-data-psp", "volby": "oficialni-data-csu",
+-    "financni-zprava": "oficialni-udhpsh",
++    "financni-zprava": "oficialni-udhpsh", "dotaz-ep": "oficialni-data-ep", "zprava-ep": "oficialni-data-ep",
+ }
+ 
+ SERVER_INSTRUCTIONS = """Znalostní báze České pirátské strany (lidé, organizace, program,
+@@ -1435,6 +1438,19 @@
+                      "a usnesení orgánů). Cituj URL stenozáznamu u každého vystoupení a uveď řečníka, datum "
+                      "a bod jednání; text je přepis stenozáznamu psp.cz.")
+ OBDOBI_LABEL = {2017: "2017–2021", 2021: "2021–2025", 2025: "2025–"}
++OBDOBI_EP_LABEL = {2019: "2019–2024", 2024: "2024–2029"}   # volební období EP (rok voleb)
++KOMORA_PROJEVU = {"psp": "Sněmovna", "ep": "Evropský parlament"}
++
++
++def _obdobi_label_any(k: Any) -> str:
++    """2021 -> „2021–2025“ (PSP), 2019 -> „EP 2019–2024“ (rok voleb do EP), jinak beze změny."""
++    try:
++        n = int(k)
++    except (TypeError, ValueError):
++        return _s(k)
++    if n in OBDOBI_LABEL:
++        return OBDOBI_LABEL[n]
++    return f"EP {OBDOBI_EP_LABEL[n]}" if n in OBDOBI_EP_LABEL else _s(k)
+ 
+ 
+ def _fold_safe(text: Any) -> str:
+@@ -1456,7 +1472,15 @@
+         obd = OBDOBI_LABEL.get(int(v.get("obdobi")), _s(v.get("obdobi")))
+     except (TypeError, ValueError):
+         obd = _s(v.get("obdobi"))
+-    if not _blank(v.get("schuze")):
++    if v.get("komora") == "ep":
++        try:
++            obd_ep = OBDOBI_EP_LABEL.get(int(v.get("obdobi")), _s(v.get("obdobi")))
++        except (TypeError, ValueError):
++            obd_ep = _s(v.get("obdobi"))
++        head += " – plénum Evropského parlamentu" + (f" ({obd_ep})" if obd_ep else "")
++        if v.get("jazyk") and v.get("jazyk") != "cs":
++            head += f", originál: {_s(v.get('jazyk'))}"
++    elif not _blank(v.get("schuze")):
+         head += f" – {_s(v.get('schuze'))}. schůze PSP" + (f" ({obd})" if obd else "")
+     lines = [head]
+     if not _blank(v.get("bod")):
+@@ -1485,11 +1509,15 @@
+ @mcp.tool(structured_output=False)
+ @_guard
+ def get_speeches(poslanec: str | None = None, query: str | None = None,
+-                 od: str | None = None, do: str | None = None, limit: int = 10) -> str:
++                 od: str | None = None, do: str | None = None, limit: int = 10,
++                 komora: str | None = None) -> str:
+     """Vystoupení pirátských poslanců v Poslanecké sněmovně ze stenozáznamů psp.cz
+-    (volební období 2017, 2021 a 2025, i projevy v roli člena vlády). Vrací úryvky
+-    s řečníkem, datem a časem, číslem schůze, bodem jednání a URL stenozáznamu (s kotvou
+-    na vystoupení). Projev poslance ve Sněmovně je jeho vyjádření, ne stanovisko strany.
++    (volební období 2017, 2021 a 2025, i projevy v roli člena vlády) a pirátských
++    europoslanců v plénu Evropského parlamentu z doslovných záznamů (M. Gregorová,
++    M. Peksa, M. Kolaja; od 7/2019; text v jazyce originálu, u cizojazyčných i český
++    překlad EP). Vrací úryvky s řečníkem, datem a časem, číslem schůze, bodem jednání
++    a URL záznamu. Projev poslance je jeho vyjádření, ne stanovisko strany.
++    komora = psp | ep (bez = obě).
+ 
+     Argumenty (volitelné, lze kombinovat): poslanec = jméno nebo jen příjmení (diakritika
+     a pád nevadí, např. „Bartoš“, „Hřiba“) nebo id_osoba z psp.cz; query = hledaná slova
+@@ -1503,33 +1531,51 @@
+         return "Index neobsahuje stenozáznamy; spusť `python3 ingest/steno.py` a `python -m server.kb.build`."
+     limit = max(1, min(int(limit or 10), 30))
+     o, q = _clean(poslanec) or None, _clean(query) or None
++    try:
++        kom = kb.speech_chamber(_clean(komora) or None) if hasattr(kb, "speech_chamber") else None
++    except ValueError as exc:
++        return str(exc)
++    kw = {"komora": kom} if hasattr(kb, "speech_chamber") else {}   # starší KB parametr komora nemá
+     out: list[str] = []
+     if o:
+-        summary = (getattr(kb, "speeches_summary", None) or (lambda x: {}))(o) or {}
++        summary = (getattr(kb, "speeches_summary", None) or (lambda x, **k: {}))(o, **kw) or {}
+         if not summary.get("nalezen"):
+-            return (f"Poslanec „{o}“ nemá v bázi žádná vystoupení ve Sněmovně (stenozáznamy pokrývají "
+-                    "pirátské poslance v obdobích 2017, 2021 a 2025). Zkus jen příjmení; seznam poslanců dá "
+-                    "find_people(role=\"poslanec\").")
++            return (f"Poslanec „{o}“ nemá v bázi žádná vystoupení" + (f" ({KOMORA_PROJEVU[kom]})" if kom else "")
++                    + " (stenozáznamy Sněmovny pokrývají pirátské poslance v obdobích 2017, 2021 a 2025, "
++                    "doslovné záznamy EP europoslance Gregorovou, Peksu a Kolaju od 7/2019). Zkus jen příjmení; "
++                    "seznam poslanců dá find_people(role=\"poslanec\").")
+         jm = summary.get("poslanec")
+         jm = ", ".join(jm) if isinstance(jm, list) else _s(jm)
+         po = summary.get("podle_obdobi") or {}
+-        po_txt = ", ".join(f"{OBDOBI_LABEL.get(int(k), k) if str(k).isdigit() else k}: {n}" for k, n in po.items())
++        po_txt = ", ".join(f"{_obdobi_label_any(k)}: {n}" for k, n in po.items())
+         out.append(f"## Souhrn: {jm}")
+-        out.append(f"Celkem {summary.get('celkem', 0)} vystoupení na {summary.get('schuzi', 0)} schůzích"
++        pk = summary.get("podle_komory") or {}
++        pk_txt = ", ".join(f"{KOMORA_PROJEVU.get(k, k)}: {n}" for k, n in pk.items()) if len(pk) > 1 else ""
++        out.append(f"Celkem {summary.get('celkem', 0)} vystoupení"
++                   + (f" na {summary.get('schuzi', 0)} schůzích" if set(pk) <= {"psp"} else "")
+                    + (f" ({_s(summary.get('od'))} – {_s(summary.get('do'))})" if summary.get("od") else "")
++                   + (f"; podle komory: {pk_txt}" if pk_txt else "")
+                    + (f"; podle období: {po_txt}" if po_txt else "") + ".")
+         out.append("")
+-    items = fn(query=q, poslanec=o, od=od or None, do=do or None, limit=limit) or []
++    items = fn(query=q, poslanec=o, od=od or None, do=do or None, limit=limit, **kw) or []
+     if not items:
+         filt = ", ".join(f"{k}={v}" for k, v in (("poslanec", o), ("query", q), ("od", od), ("do", do)) if v)
+         return "\n".join(out) + (f"Žádné vystoupení neodpovídá filtrům ({filt}). " if filt else
+                                  "V bázi zatím nejsou žádná vystoupení ze stenozáznamů. ") + \
+             "Zkus jiná slova, širší období nebo bez filtru; oficiální postoj strany dá get_position."
+-    out.append(f"## Vystoupení ve Sněmovně ({len(items)}" + (f", k „{q}“" if q else ", nejnovější") + ")")
++    komory = {v.get("komora") or "psp" for v in items}
++    kde = "ve Sněmovně" if komory == {"psp"} else ("v Evropském parlamentu" if komory == {"ep"} else
++                                                   "ve Sněmovně a v Evropském parlamentu")
++    out.append(f"## Vystoupení {kde} ({len(items)}" + (f", k „{q}“" if q else ", nejnovější") + ")")
+     out.append("\n\n".join(_fmt_speech(i, v) for i, v in enumerate(items, 1)))
+     out.append("")
+-    out.append(f"Autorita: {AUTORITA_POPIS['vyjadreni-politika']}. {SPEECH_DISCLAIMER} "
+-               "Celé vystoupení: get_document(doc_id); oficiální postoj strany: get_position.")
++    aut = AUTORITA_POPIS["vyjadreni-politika"] if "psp" in komory else ""
++    if "ep" in komory:
++        aut = (aut + "; " if aut else "") + AUTORITA_POPIS["projev-ep"]
++    out.append(f"Autorita: {aut}. {SPEECH_DISCLAIMER} "
++               + ("U projevů v EP cituj text v jazyce originálu (český překlad EP je neautorizovaný). "
++                  if "ep" in komory else "")
++               + "Celé vystoupení: get_document(doc_id); oficiální postoj strany: get_position.")
+     return _cap("\n".join(out), "Sniž limit nebo zúž query/poslanec/od/do.")
+ 
+ 
+--- a/server/analyzy/profil.py
++++ b/server/analyzy/profil.py
+@@ -203,7 +203,7 @@
+     for r in kb._rows("SELECT DISTINCT jmeno FROM vote_members"):
+         add(r["jmeno"], "hlasovani")
+     for r in kb._rows("SELECT DISTINCT autor FROM documents WHERE typ IN ('projev', 'interpelace') "
+-                      "AND autor IS NOT NULL"):
++                      "AND autor IS NOT NULL AND COALESCE(json_extract(meta, '$.komora'), 'psp') = 'psp'"):
+         add(r["autor"], "snemovna")
+     if _has_table(kb, "social_posts"):
+         for r in kb._rows("SELECT DISTINCT jmeno FROM social_posts WHERE jmeno IS NOT NULL"):
+@@ -503,7 +503,8 @@
+         return []
+     temata: Counter = Counter()
+     url_tematu: dict[str, str] = {}
+-    for r in kb._rows("SELECT meta, zdroj FROM documents WHERE typ = 'projev' AND autor = ?", (sm["poslanec"],)):
++    for r in kb._rows("SELECT meta, zdroj FROM documents WHERE typ = 'projev' AND autor = ? "
++                      "AND COALESCE(json_extract(meta, '$.komora'), 'psp') = 'psp'", (sm["poslanec"],)):
+         for v in _loads(r.get("meta"), {}).get("vystoupeni") or []:
+             t = _bod_tema(v.get("bod") or "")
+             if t:

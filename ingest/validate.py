@@ -57,6 +57,8 @@ ALLOWED_TYP = (
     "interpelace",  # interpelace pirátských poslanců na členy vlády (tisky.py)
     "pozmenovaci-navrh",  # pozměňovací návrhy pirátských poslanců (pozmenovaky.py)
     "organy-psp",  # výbory, komise a funkce pirátských poslanců (pozmenovaky.py)
+    "dotaz-ep",  # písemné a ústní otázky pirátských europoslanců (ep_aktivita.py)
+    "zprava-ep",  # zprávy a stanoviska, kde byli Piráti zpravodaji (ep_aktivita.py)
     "volby",  # volební výsledky a zvolení zastupitelé (volby.py)
     "usneseni",  # usnesení vlády a zastupitelstev (vlada.py, praha.py)
     "financni-zprava",  # financování strany: výroční zprávy, účty (financovani.py)
