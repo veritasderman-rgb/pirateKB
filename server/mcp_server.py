@@ -3064,6 +3064,30 @@ def grafika_106(faze: str = "podano", predmet: str = "", urad: str = "", shrnuti
                          obec=obec, datum_podani=datum_podani, datum_odpovedi=datum_odpovedi, zdroj=zdroj)
 
 
+# =============================================================================
+# Skladebné a analytické nástroje (server/analyzy/*): profil politika a obce, ověření
+# tvrzení, kontrola textu, časová osa, novinky, jednota klubu, rozhodnutí orgánů,
+# členské nástroje. Každý modul má register(mcp, s); chybějící modul se přeskočí.
+# =============================================================================
+
+def _register_analyzy() -> None:
+    import importlib
+    import sys as _sys
+    from server.analyzy import MODULY
+    me = _sys.modules[__name__]
+    for name in MODULY:
+        full = f"server.analyzy.{name}"
+        try:
+            mod = importlib.import_module(full)
+        except ModuleNotFoundError as exc:
+            if exc.name == full:
+                continue
+            raise
+        mod.register(mcp, me)
+
+
+_register_analyzy()
+
 _install_telemetry()  # obalí i nově přidané tooly (už obalené přeskočí)
 
 
