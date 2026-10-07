@@ -1,0 +1,30 @@
+---
+zdroj: https://vlada.gov.cz/cz/media-centrum/aktualne/vysledky-jednani-vlady-20--prosince-2023-211139/
+nazev: Analýza možností sjednocení vizuální prezentace ústředních orgánů státní správy
+typ: usneseni
+datum: '2023-12-20'
+jednani: radne
+poradi: 10
+cislo_jednaci: 1102/23
+predkladatel: místopředseda vlády pro digitalizaci a ministr pro místní rozvoj
+ministr: Ivan Bartoš
+autor: Vláda ČR
+vysledek: schváleno
+veklep: null
+odok_jednani: https://odok.gov.cz/portal/zvlady/jednani-detail/2023-12-20
+tagy: []
+vysledky: []
+viditelnost: verejne
+autorita: usneseni-vlady
+stazeno: '2026-10-07'
+---
+
+# Analýza možností sjednocení vizuální prezentace ústředních orgánů státní správy
+
+- Jednání vlády: 2023-12-20
+- Bod programu: 10
+- Čj.: 1102/23
+- Předkládá: místopředseda vlády pro digitalizaci a ministr pro místní rozvoj
+- Výsledek jednání vlády: schváleno
+
+Zdroj: [Výsledky jednání vlády 20. prosince 2023](https://vlada.gov.cz/cz/media-centrum/aktualne/vysledky-jednani-vlady-20--prosince-2023-211139/). Údaje z výsledků jednání mají podle Úřadu vlády informativní charakter; závazné je usnesení vlády zveřejněné v systému ODok (https://odok.gov.cz/portal/zvlady/jednani-detail/2023-12-20).

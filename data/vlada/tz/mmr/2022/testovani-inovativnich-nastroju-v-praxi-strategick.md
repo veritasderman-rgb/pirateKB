@@ -1,0 +1,30 @@
+---
+zdroj: https://mmr.gov.cz/cs/ostatni/web/novinky/testovani-inovativnich-nastroju-v-praxi-strategick
+nazev: Testování inovativních nástrojů v praxi strategického řízení a plánování českých měst
+typ: tiskova-zprava
+datum: '2022-10-14'
+autor: Ministerstvo pro místní rozvoj
+ministr: Ivan Bartoš
+resort: mmr
+tagy: []
+vysledky: []
+viditelnost: verejne
+autorita: vlada-resort
+stazeno: '2026-10-07'
+---
+
+# Testování inovativních nástrojů v praxi strategického řízení a plánování českých měst
+
+*Pod záštitou Ministerstva pro místní rozvoj probíhá projekt Podpora strategického řízení a plánování ve veřejné správě. Součástí projektu jsou aktivity, které mají za cíl podpořit kvalitu strategického plánování na úrovni samospráv. Pilotní část proběhla letos na jaře v pěti městech ve spolupráci s vybraným dodavatelem. Ve vybraných městech tak byly testovány inovativní nástroje strategického řízení, kterými jsou megatrendy, foresight, forecast, tvorba scénářů a systém včasného varování. Výstupem aktivit bude dále vytvoření souvisejícího metodického doporučení a vzdělávacího modulu pro danou problematiku, které usnadní implementaci moderních nástrojů do praxe samospráv.*
+
+Ministerstvo pro místní rozvoj má zájem posílit svou metodickou podporu v oblasti strategického plánování. „*Převážná většina obcí, měst a krajů hospodaří velmi obezřetně a usiluje o dlouhodobou udržitelnost svých rozpočtů. Současná situace však vytváří nové výzvy, kterým je nutné čelit jak z národní, tak z místní úrovně. V takových případech je nezbytné činit správná rozhodnutí, a proto je naší ambicí poskytnout městům návod pro lepší strategické plánování právě prostřednictvím metodického vedení,“* vysvětluje Marie Zezůlková, vedoucí oddělení Urbánní politiky a strategií na Ministerstvu pro místní rozvoj. V blízké době tak lze očekávat dynamickou proměnu strategického plánování, kdy do popředí proniknou nové a vpřed hledící nástroje, které přinesou vyšší připravenost samospráv a zefektivnění rozhodovacích procesů.
+
+Nedostatkem strategického plánování místních samospráv je dnes často přílišný důraz na analytickou část. Samosprávy se tak často mnohem více zabývají minulostí a současnými stavy, než vlastním strategickým rozvojem. Použití nástrojů inovativního strategického plánování může pomoci lépe se připravit se na budoucí vývoj. Klíčovým nástrojem je tzv. foresight, metoda vytváření strukturovaných představ o možných variantách budoucího vývoje. Foresight nepředstavuje jednu metodu, ale soustavu kvalitativních a kvantitativních nástrojů, jejichž jediným cílem je uvědomit si, jakým směrem se může budoucnost vyvíjet tak, aby bylo možné se na ni připravit.
+
+**Pilotní testování inovací ve strategickém řízení českých měst**
+V průběhu dubna a května letošního roku byl v pěti českých městech pilotován systém zmíněných inovativních nástrojů strategického řízení. Nejprve byly ve městech popsány klíčové megatrendy představující významné a dlouhodobé změny ve společnosti, na jejichž základě došlo k aplikaci dalších metod s cílem zpřesnit tendence budoucího vývoje pomocí kvalitativních nebo kvantitativních nástrojů. Na oblasti, ve kterých se některé stavy zdály být vysoce pravděpodobné, byl aplikován nástroj forecast, který pomocí statistických modelů předpovídal budoucí vývoj (např. v oblasti demografického vývoje, dostupnosti podzemních vod aj.). U témat, u nichž panovala vyšší nejistota, byly aplikovány jiné nástroje, jako je například tvorba scénářů, které umožňují strukturovanou představu nad různými kombinacemi událostí a vhodnými reakcemi. „*V našem městě jsme se při tvorbě scénářů zaměřili na události, které jsou nejisté ale mají zásadní dopad na život našich obyvatel, tedy je naší povinností se na ně odpovědně připravit. Například v dopravě byly řešeny reakce města v závislosti na uvažované výstavbě obchvatu a možném obnovování těžby v původních lokalitách. Přestože jsme z počátku nevěděli, co od projektu máme čekat, určitě tato zkušenost změní naší strategickou práci směrem do budoucna,*“ vysvětluje Jiří Rýdl, starosta města Jablonné v Podještědí. Nejčastěji byly inovativní nástroje ve městech využívány k dimenzování občanské vybavenosti (např. ve vztahu ke kapacitám sociálních služeb nebo škol) či technické infrastruktury. Na základě proběhlého testování se ukazuje, že inovativní přístupy jsou efektivní a uplatnitelné ve městech všech velikostí.
+
+V návaznosti na poznatky získané během provedeného pilotního testování vzniká metodické doporučení pro aplikaci inovací ve strategickém plánování určené pro zájemce z řad místních samospráv. Další metodická podpora ze strany Ministerstva pro místní rozvoj bude zajištěna prostřednictvím chystaného výukového programu, zaměřeného na inovativní nástroje strategického plánování – megatrendy, foresight, forecast, tvorba scénářů a systém včasného varování. Výstupy aktivit projektu, metodická doporučení a další informace z oblasti strategického řízení a plánování budou průběžně zveřejňovány na [Portále strategické práce](http://www.verejne-strategie.cz) Ministerstva pro místní rozvoj.
+
+Aktuální výstupy aktivit projektu spolu s metodickými doporučeními budou pro zájemce rovněž představeny na připravovaném workshopu strategické práce, který se uskuteční ve středu 19.10.2022 v čase 10:00 – 13:00 v Praze v prostorech Akademie veřejného investování, Pařížská 4, Praha 1. Akce se uskuteční hybridní formou – akce je možné se zúčastnit online. Více informací k plánovanému workshopu naleznete na [Portále strategické práce](https://www.mmr.cz/cs/microsites/portal-strategicke-prace-v-ceske-republice/nastroje-a-metodicka-podpora/podpora-strategickeho-rizeni-a-planovani-ve-verejn/workshopy-a-seminare/nastroje-pro-strategickou-praci,-inovace,-financni).
+*Pilotní testování inovativních nástrojů je realizováno v rámci projektu „Podpora strategického řízení a plánování ve veřejné správě ČR s důrazem na rozšiřování metod, nástrojů, inovací, znalostí a zkušeností v praxi“, reg. č. CZ.03.4.74/0.0/0.0/15\_025/0016924, financovaného Operačním programem Zaměstnanost.*
