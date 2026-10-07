@@ -8,7 +8,7 @@ tagy:
 - Volby
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Konec spekulacím: Do sněmovních voleb jdou Piráti samostatně.
@@ -28,6 +28,6 @@ V celostátních tématech se programové cíle liší od cílů jiných stran a
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#caa3bcaba4e4a8abb8bea5b98abaa3b8abbea3e4a9b0), předseda Pirátů, 603 415 378
-- [Ing. et Ing. Martin Šmída](https://www.pirati.cz/lide/martin_smida), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#8ae7ebf8fee3e4a4f9e7e3eeebcafae3f8ebfee3a4e9f0), místopředseda Pirátů, 721 661 311
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#076a6e6c726b6674296162756d6269646e6c47776e7566736e29647d), vedoucí mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#bdd4cbdcd393dfdccfc9d2cefdcdd4cfdcc9d493dec7), předseda Pirátů, 603 415 378
+- [Ing. et Ing. Martin Šmída](https://www.pirati.cz/lide/martin_smida), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#bfd2decdcbd6d191ccd2d6dbdeffcfd6cddecbd691dcc5), místopředseda Pirátů, 721 661 311
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#1d70747668717c6e337b786f7778737e74765d6d746f7c6974337e67), vedoucí mediálního odboru Pirátů, 737 943 770

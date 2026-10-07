@@ -8,7 +8,7 @@ tagy:
 - Cenzura
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Novela zákona o Vojenském zpravodajství: Piráti se připojují k iniciativě Přichází rozvědka
@@ -36,5 +36,5 @@ Součástí iniciativy je Výzva Orwellův zákon k veřejné debatě a následn
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#aac3dccbc484c8cbd8dec5d9eadac3d8cbdec384c9d0), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#deb3b7b5abb2bfadf0b8bbacb4bbb0bdb7b59eaeb7acbfaab7f0bda4), šéf mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#204956414e0e424152544f53605049524154490e435a), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#432e2a28362f22306d25263129262d202a2803332a3122372a6d2039), šéf mediálního odboru Pirátů, 737 943 770

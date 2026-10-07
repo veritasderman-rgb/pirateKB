@@ -10,7 +10,7 @@ titulky: zadne
 osoba: Markéta Gregorová
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Prošel můj návrh, kterým de facto končí nebezpečný Chat Control 🥳
@@ -27,4 +27,4 @@ Video na kanálu Markéta Gregorová , zveřejněno 2026-03-11, délka 00:59. <h
 
 ## Přepis
 
-*Video nemá české titulky (ruční ani automatické), uložena jsou jen metadata a popis. Automatické titulky YouTube někdy doplní se zpožděním; skript to u videí mladších 14 dnů zkusí znovu.*
+*Video nemá české titulky (ruční ani automatické), uložena jsou jen metadata a popis. Automatické titulky YouTube někdy doplní se zpožděním nebo je neuvede v každé odpovědi; skript to zkusí znovu v dalším běhu (a u videí mladších 14 dnů opakovaně).*

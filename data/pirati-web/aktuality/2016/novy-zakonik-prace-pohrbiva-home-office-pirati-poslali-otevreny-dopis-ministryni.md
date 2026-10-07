@@ -8,7 +8,7 @@ tagy:
 - Práce a sociální věci
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Nový zákoník práce pohřbívá home office. Piráti poslali otevřený dopis ministryni
@@ -30,4 +30,4 @@ Opatření by vedla ke zbytečné finanční a administrativní zátěži firem 
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#4e2327253b222f3d60282b3c242b202d27250e3e273c2f3a27602d34), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e28f8b89978e8391cc84879088878c818b89a2928b9083968bcc8198), vedoucí mediálního odboru Pirátů, 737 943 770

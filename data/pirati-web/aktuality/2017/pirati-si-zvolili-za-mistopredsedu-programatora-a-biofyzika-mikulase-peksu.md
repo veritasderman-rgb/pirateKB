@@ -9,7 +9,7 @@ tagy:
 - Volby
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti si zvolili za místopředsedu programátora a biofyzika Mikuláše Peksu
@@ -26,5 +26,5 @@ Vedení České pirátské strany je nyní kompletní a skládá se z předsedy 
 
 <h3>Kontakty</h3>
 
-- [Mikuláš Peksa](https://www.pirati.cz/lide/mikulas-peksa/), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#583531332d34392b76283d332b391828312a392c31763b22), místopředseda Pirátů
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#c2afaba9b7aea3b1eca4a7b0a8a7aca1aba982b2abb0a3b6abeca1b8), šéf mediálního odboru Pirátů, 737 943 770
+- [Mikuláš Peksa](https://www.pirati.cz/lide/mikulas-peksa/), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#066b6f6d736a67752876636d756746766f7467726f28657c), místopředseda Pirátů
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#dfb2b6b4aab3beacf1b9baadb5bab1bcb6b49fafb6adbeabb6f1bca5), šéf mediálního odboru Pirátů, 737 943 770

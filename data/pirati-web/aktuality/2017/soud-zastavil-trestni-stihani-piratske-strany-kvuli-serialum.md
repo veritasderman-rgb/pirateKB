@@ -8,7 +8,7 @@ tagy:
 - Autorské právo
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Soud zastavil trestní stíhání Pirátské strany kvůli seriálům
@@ -24,11 +24,11 @@ Z rozhodnutí soudu ze dne 16. ledna 2017, sp. zn. 33 T 54/2016:
 *V projednávané věci sice byla obviněná kontaktována Českou protipirátskou unií a upozorněna na závadný a protiprávní obsah svých stránek, Česká protipirátská unie se ovšem žádným způsobem neprokázala jakožto subjekt oprávněný jednat jménem držitelů autorských práv. Ve vztahu k obviněné tedy Česká protipirátská unie jednala z pozice subjektu, který se ničím neodlišuje od subjektů jiných (ať již fyzických či právnických osob). Na tomto závěru nemůže nic změnit ani skutečnost, že Česká protipirátská unie je známá svou specificky zaměřenou činností, kteréžto může účinně vykonávat pouze na základě plných mocí poskytnutých jí držiteli autorských práv. Na základě izolovaných výzev tohoto subjektu, který plné moci obviněné ani přes její výzvu nedodal, tak nelze dovodit vyvrácení presumpce nevědomosti, kdy osoba danou skutečnost ani vědět nemohla.*
 
 - [Usnesení Městského soudu pro Prahu 4](https://www.pirati.cz/{{ '/assets/pdf/pirati_436871814_0_usnesenizastaveni.pdf' | relative_url}})
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f19c989a849d9082df9794839b949f92989ab1819883908598df928b), vedoucí mediálního odboru Pirátů, 737 943 770
-- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#8de7ece6f8efa3e0e4eee5ece1e8e6cdfde4ffecf9e4a3eef7), místopředseda Pirátů, 775 978 550
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#6e0307051b020f1d40080b1c040b000d07052e1e071c0f1a07400d14), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#4f252e243a2d6122262c272e232a240f3f263d2e3b26612c35), místopředseda Pirátů, 775 978 550
 
 V projednávané věci sice byla obviněná kontaktována Českou protipirátskou unií a upozorněna na závadný a protiprávní obsah svých stránek, Česká protipirátská unie se ovšem žádným způsobem neprokázala jakožto subjekt oprávněný jednat jménem držitelů autorských práv. Ve vztahu k obviněné tedy Česká protipirátská unie jednala z pozice subjektu, který se ničím neodlišuje od subjektů jiných (ať již fyzických či právnických osob). Na tomto závěru nemůže nic změnit ani skutečnost, že Česká protipirátská unie je známá svou specificky zaměřenou činností, kteréžto může účinně vykonávat pouze na základě plných mocí poskytnutých jí držiteli autorských práv. Na základě izolovaných výzev tohoto subjektu, který plné moci obviněné ani přes její výzvu nedodal, tak nelze dovodit vyvrácení presumpce nevědomosti, kdy osoba danou skutečnost ani vědět nemohla.
 
 - [Usnesení Městského soudu pro Prahu 4](https://www.pirati.cz/{{ '/assets/pdf/pirati_436871814_0_usnesenizastaveni.pdf' | relative_url}})
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#107d797b657c71633e7675627a757e73797b506079627164793e736a), vedoucí mediálního odboru Pirátů, 737 943 770
-- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#214b404a54430f4c484249404d444a615148534055480f425b), místopředseda Pirátů, 775 978 550
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#5d30343628313c2e733b382f3738333e34361d2d342f3c2934733e27), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Mgr. et Mgr. Jakub Michálek](https://www.pirati.cz/lide/jakub_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#660c070d1304480b0f050e070a030d26160f1407120f48051c), místopředseda Pirátů, 775 978 550

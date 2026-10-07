@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti slaví dvojitý úspěch v senátních volbách 2016
@@ -26,5 +26,5 @@ Ladislav Kos kandidující v Praze 11 za Hnutí pro Prahu 11 s podporou Pirátů
 
 <h3>Kontakt</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#8fe6f9eee1a1edeefdfbe0fccfffe6fdeefbe6a1ecf5), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#5d30343628313c2e733b382f3738333e34361d2d342f3c2934733e27), šéf mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#7d140b1c13531f1c0f09120e3d0d140f1c0914531e07), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#84e9edeff1e8e5f7aae2e1f6eee1eae7edefc4f4edf6e5f0edaae7fe), šéf mediálního odboru Pirátů, 737 943 770

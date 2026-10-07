@@ -8,7 +8,7 @@ tagy:
 - Cenzura
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti hlásí výsledky rozhodnutí Ústavního soudu ve věci cenzury Internetu. Boj proti plošnému šmírování občanů Vojenskou rozvědkou pokračuje.
@@ -37,5 +37,5 @@ Rozhodování Ústavního soudu v online přenosu sledovali dnes (22. února) ú
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f09986919ede929182849f83b0809982918499de938a), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#4c21252739202d3f622a293e2629222f25270c3c253e2d3825622f36), vedoucí mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#355c43545b1b575447415a4675455c4754415c1b564f), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#54393d3f213835277a3231263e313a373d3f14243d2635203d7a372e), vedoucí mediálního odboru Pirátů, 737 943 770

@@ -8,7 +8,7 @@ tagy:
 - Volby
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti ve volbách 2016: těší nás pět nových zastupitelů v krajích a dva senátorští kandidáti v druhém kole.
@@ -65,5 +65,5 @@ Ladislav Kos (58), podnikatel v oblasti chemie za Prahu 11 Hnutí pro Prahu 11 s
 
 <h2>Kontakty</h2>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#dcb5aabdb2f2bebdaea8b3af9cacb5aebda8b5f2bfa6), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#abc6c2c0dec7cad885cdced9c1cec5c8c2c0ebdbc2d9cadfc285c8d1), šéf mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#026b74636c2c606370766d7142726b7063766b2c6178), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e38e8a88968f8290cd85869189868d808a88a3938a9182978acd8099), šéf mediálního odboru Pirátů, 737 943 770

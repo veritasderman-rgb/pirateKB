@@ -8,7 +8,7 @@ tagy:
 - Cenzura
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Ministerstvo financí stále neřeklo, jakým způsobem přistoupí k cenzurním paragrafům loterijního zákona
@@ -32,4 +32,4 @@ Na pracovní skupině pořádané ČVUT 8. 12. ministerstvo vágně ujišťovalo
 
 <h3>Kontakt</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#b1d8c7d0df9fd3d0c3c5dec2f1c1d8c3d0c5d89fd2cb), předseda Pirátů, 603 415 378
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e58c93848bcb878497918a96a5958c9784918ccb869f), předseda Pirátů, 603 415 378

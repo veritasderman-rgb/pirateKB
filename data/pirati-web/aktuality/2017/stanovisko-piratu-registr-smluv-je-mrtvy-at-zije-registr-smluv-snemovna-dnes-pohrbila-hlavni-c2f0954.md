@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Stanovisko Pirátů: Registr smluv je mrtvý. Ať žije registr smluv! Sněmovna dnes pohřbila hlavní protikorupční zákon
@@ -28,5 +28,5 @@ Před parlamentními volbami v roce 2013 donutila nevládní občanská sdružen
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#600916010e4e020112140f13201009120114094e031a), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#1e7377756b727f6d30787b6c747b707d77755e6e776c7f6a77307d64), vedoucí mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#d4bda2b5bafab6b5a6a0bba794a4bda6b5a0bdfab7ae), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#5c31353729303d2f723a392e3639323f35371c2c352e3d2835723f26), vedoucí mediálního odboru Pirátů, 737 943 770

@@ -8,7 +8,7 @@ tagy:
 - Kampaň
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti hledají koordinátora kampaně pro komunální volby!
@@ -45,4 +45,4 @@ Piráti vyplouvají do komunálních voleb tento podzim! Nepůjde to ale bez dob
 - Věcnost, schopnost prioritizace a odpovědnost za výsledky
 - Účast na jednání Volebního výboru (v období duben-červen 3x do měsíce, v období červenec-říjen 5x do měsíce)
 
-Jedná se o náročnou pozici pro nejlepší politickou stranu v zemi. Hlásit se můžete do 4. května 2018 (včetně), start bude rychlý! Přihlášky posílejte na adresy [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#bed4d7ccd790d6d1cdd5d1c8dbddfeced7ccdfcad790ddc4), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#afddcecbcac481c7c0c3c0c2ccc6c4efdfc6ddcedbc681ccd5) a [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#c2b4bba0a7b0a9a382b2abb0a3b6abeca1b8).
+Jedná se o náročnou pozici pro nejlepší politickou stranu v zemi. Hlásit se můžete do 4. května 2018 (včetně), start bude rychlý! Přihlášky posílejte na adresy [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#42282b302b6c2a2d31292d34272102322b3023362b6c2138), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#c6b4a7a2a3ade8aea9aaa9aba5afad86b6afb4a7b2afe8a5bc) a [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#fc8a859e998e979dbc8c958e9d8895d29f86).

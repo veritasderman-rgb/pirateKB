@@ -8,7 +8,7 @@ tagy:
 - Cenzura
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti ke zřízení útvaru boje proti dezinformacím: Ministerstvo pravdy nechceme.
@@ -30,5 +30,5 @@ Piráti jsou přesvědčeni, že cesta rozhodně nevede přes cenzuru, ke které
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#442d32252a6a262536302b3704342d3625302d6a273e), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#335e5a58465f52401d55564159565d505a5873435a4152475a1d5049), šéf mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#b0d9c6d1de9ed2d1c2c4dfc3f0c0d9c2d1c4d99ed3ca), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#caa7a3a1bfa6abb9e4acafb8a0afa4a9a3a18abaa3b8abbea3e4a9b0), šéf mediálního odboru Pirátů, 737 943 770

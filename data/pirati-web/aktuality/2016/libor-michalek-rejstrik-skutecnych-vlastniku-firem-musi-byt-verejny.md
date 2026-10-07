@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Libor Michálek: Rejstřík skutečných vlastníků firem musí být veřejný
@@ -21,6 +21,6 @@ Zákon ve verzi Poslanecké sněmovny předpokládá existenci rejstříku, do n
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#b0ddd9dbc5dcd1c39ed6d5c2dad5ded3d9dbf0c0d9c2d1c4d99ed3ca), pražský zastupitel a šéf mediálního odboru, 737 943 770
-- [Mgr. Libor Michálek, MPA](https://www.pirati.cz/lide/libor_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#b2dfdbd1dad3ded7d9def2c1d7dcd3c69cd1c8), senátor
-- [Vít Šimral](https://www.pirati.cz/lide/vit_simral), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#e5938c91cb968c88978489a5958c9784918ccb869f), asistent Libora Michálka, 606 220 985
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#5d30343628313c2e733b382f3738333e34361d2d342f3c2934733e27), pražský zastupitel a šéf mediálního odboru, 737 943 770
+- [Mgr. Libor Michálek, MPA](https://www.pirati.cz/lide/libor_michalek), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f994909a9198959c9295b98a9c97988dd79a83), senátor
+- [Vít Šimral](https://www.pirati.cz/lide/vit_simral), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#d4a2bda0faa7bdb9a6b5b894a4bda6b5a0bdfab7ae), asistent Libora Michálka, 606 220 985

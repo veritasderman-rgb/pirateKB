@@ -8,7 +8,7 @@ tagy:
 - Volby
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti konzultují své programové teze napříč politickým spektrem
@@ -32,4 +32,4 @@ Pro volby 2017 Piráti představí svůj aktualizovaný širokospektrý program.
 
 <h3>Kontakt</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#ec859a8d82c28e8d9e98839fac9c859e8d9885c28f96), předseda Pirátů, 603 415 378
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f59c83949bdb979487819a86b5859c8794819cdb968f), předseda Pirátů, 603 415 378

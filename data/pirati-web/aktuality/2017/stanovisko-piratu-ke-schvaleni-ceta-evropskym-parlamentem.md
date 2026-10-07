@@ -8,7 +8,7 @@ tagy:
 - Stanovisko
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Stanovisko Pirátů ke schválení CETA Evropským parlamentem
@@ -44,6 +44,6 @@ Ačkoliv Piráti vždy podporovali volný obchod, proti nevýhodným obchodním 
 
 #### Kontakty
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f9908f9897d79b988b8d968ab989908b988d90d79a83), předseda Pirátů, 603 415 378
-- [Mgr. Mikuláš Peksa](https://www.pirati.cz/lide/mikulas_peksa), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f09d999b859c9183de80959b8391b0809982918499de938a), vedoucí zahraničního odboru Pirátů, 605 101 249
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#80ede9ebf5ece1f3aee6e5f2eae5eee3e9ebc0f0e9f2e1f4e9aee3fa), vedoucí mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#cca5baada2e2aeadbeb8a3bf8cbca5beadb8a5e2afb6), předseda Pirátů, 603 415 378
+- [Mgr. Mikuláš Peksa](https://www.pirati.cz/lide/mikulas_peksa), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#214c484a544d40520f51444a5240615148534055480f425b), vedoucí zahraničního odboru Pirátů, 605 101 249
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#c5a8acaeb0a9a4b6eba3a0b7afa0aba6acae85b5acb7a4b1aceba6bf), vedoucí mediálního odboru Pirátů, 737 943 770

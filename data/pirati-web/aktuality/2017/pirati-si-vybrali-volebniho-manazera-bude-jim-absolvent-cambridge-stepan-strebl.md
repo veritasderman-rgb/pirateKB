@@ -8,7 +8,7 @@ tagy:
 - Volby
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti si vybrali volebního manažera, bude jím absolvent Cambridge Štěpán Štrébl
@@ -27,4 +27,4 @@ Pirátská strana si v otevřeném výběrovém řízení vybrala svého volebn�
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#5c31353729303d2f723a392e3639323f35371c2c352e3d2835723f26), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#660b0f0d130a0715480003140c0308050f0d26160f1407120f48051c), vedoucí mediálního odboru Pirátů, 737 943 770

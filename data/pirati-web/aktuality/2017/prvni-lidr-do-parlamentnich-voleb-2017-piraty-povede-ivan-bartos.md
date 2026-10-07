@@ -10,7 +10,7 @@ tagy:
 - Kampaň
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # První lídr do parlamentních voleb 2017: Piráty povede Ivan Bartoš.
@@ -40,6 +40,6 @@ V prvním kole volby mají zúčastnění dva hlasy, mohou tedy hlasovat pro oba
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#74191d1f011815075a1211061e111a171d1f34041d0615001d5a170e), vedoucí mediálního odboru Pirátů, 737 943 770
-- [PhDr. Ivan Bartoš](https://www.pirati.cz/lide/Ivan_Bartos), Ph.D., [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f39a85929ddd919281879c80b3839a8192879add9089), předseda Pirátů a celostátní lídr pro volby 2017, 603 415 378
-- [Mgr. Mikuláš Peksa](https://www.pirati.cz/lide/mikulas_peksa), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#c1aca8aab4ada0b2efb1a4aab2a081b1a8b3a0b5a8efa2bb), vedoucí Zahraničního odboru Pirátů, 605 101 249
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#fb9692908e979a88d59d9e89919e95989290bb8b92899a8f92d59881), vedoucí mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš](https://www.pirati.cz/lide/Ivan_Bartos), Ph.D., [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#442d32252a6a262536302b3704342d3625302d6a273e), předseda Pirátů a celostátní lídr pro volby 2017, 603 415 378
+- [Mgr. Mikuláš Peksa](https://www.pirati.cz/lide/mikulas_peksa), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#7b1612100e171a08550b1e10081a3b0b12091a0f12551801), vedoucí Zahraničního odboru Pirátů, 605 101 249

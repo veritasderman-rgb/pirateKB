@@ -9,7 +9,7 @@ tagy:
 - Kampaň
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Na Celorepublikovém fóru Pirátů se představují lídři krajských kandidátek pro parlamentní volby 2017
@@ -100,4 +100,4 @@ Chceme voličům našeho kraje ukázat, že lze být v dnešní době kritický,
 
 <h2>Kontakt</h2>
 
-[Mikulas Ferjenčik](https://www.pirati.cz/{{ 'lide/mikulas-ferjencik' | relative_url}}), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#2f4246445a434e5c01494a5d454a414c46446f5f465d4e5b46014c55), vedoucí mediálního odboru Pirátů, 737 943 770\
+[Mikulas Ferjenčik](https://www.pirati.cz/{{ 'lide/mikulas-ferjencik' | relative_url}}), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#7c11151709101d0f521a190e1619121f15173c0c150e1d0815521f06), vedoucí mediálního odboru Pirátů, 737 943 770\

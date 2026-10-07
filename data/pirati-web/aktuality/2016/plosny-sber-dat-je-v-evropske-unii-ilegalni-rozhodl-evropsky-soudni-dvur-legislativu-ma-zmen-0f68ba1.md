@@ -10,7 +10,7 @@ tagy:
 - Celostátní
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Plošný sběr dat je v Evropské unii ilegální, rozhodl Evropský soudní dvůr. Legislativu má změnit Švédsko, Velká Británie i Česká republika
@@ -33,5 +33,5 @@ Původní vyhláška vycházela právě z evropské směrnice z roku 2006, proti
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#15787c7e607974663b7370677f707b767c7e55657c6774617c3b766f), šéf mediálního odboru Pirátů, 737 943 770
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#056c73646b2b676477716a7645756c7764716c2b667f), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#aec3c7c5dbc2cfdd80c8cbdcc4cbc0cdc7c5eedec7dccfdac780cdd4), šéf mediálního odboru Pirátů, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#335a45525d1d515241475c4073435a4152475a1d5049), předseda Pirátů, 603 415 378

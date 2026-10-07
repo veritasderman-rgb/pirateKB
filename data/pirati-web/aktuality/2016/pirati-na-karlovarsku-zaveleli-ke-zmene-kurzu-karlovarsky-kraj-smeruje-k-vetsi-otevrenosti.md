@@ -8,7 +8,7 @@ tagy:
 - Regiony
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Piráti na Karlovarsku zaveleli ke změně kurzu. Karlovarský kraj směřuje k větší otevřenosti
@@ -42,6 +42,6 @@ Pirátská strana bude mít také své zástupce ve všech výborech a komisích
 
 <h3>Kontakty</h3>
 
-- [Ing. Josef Janů](https://www.pirati.cz/lide/josef_janu), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#f59f9a869093db9f949b80b5859c8794819cdb968f), lídr pirátské kandidátky a zvolený krajský zastupitel za Piráty v KV kraji 606 183 864
-- [Ing. Petr Třešňák](https://www.pirati.cz/lide/petr_tresnak), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#8afaeffef8a4fef8eff9e4ebe1cafae3f8ebfee3a4e9f0), předseda Krajského sdružení Karlovarský kraj a starosta města Mariánské lázně, 606 675 294
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#7a1713110f161b09541c1f08101f141913113a0a13081b0e13541900), vedoucí mediálního odboru Pirátů a pražský zastupitel, 737 943 770
+- [Ing. Josef Janů](https://www.pirati.cz/lide/josef_janu), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#4e24213d2b2860242f203b0e3e273c2f3a27602d34), lídr pirátské kandidátky a zvolený krajský zastupitel za Piráty v KV kraji 606 183 864
+- [Ing. Petr Třešňák](https://www.pirati.cz/lide/petr_tresnak), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#acdcc9d8de82d8dec9dfc2cdc7ecdcc5decdd8c582cfd6), předseda Krajského sdružení Karlovarský kraj a starosta města Mariánské lázně, 606 675 294
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#86ebefedf3eae7f5a8e0e3f4ece3e8e5efedc6f6eff4e7f2efa8e5fc), vedoucí mediálního odboru Pirátů a pražský zastupitel, 737 943 770

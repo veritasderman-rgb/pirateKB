@@ -8,7 +8,7 @@ tagy:
 - Zahraničí
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Island dnes volí poslance, Piráti mohou zvítězit.
@@ -37,5 +37,5 @@ Na druhém místě se v průzkumech umisťuje Strana nezávislosti, která již 
 
 <h3>Kontakty</h3>
 
-- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#b1d8c7d0df9fd3d0c3c5dec2f1c1d8c3d0c5d89fd2cb), předseda Pirátů, 603 415 378
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#86ebefedf3eae7f5a8e0e3f4ece3e8e5efedc6f6eff4e7f2efa8e5fc), šéf mediálního odboru, 737 943 770
+- [PhDr. Ivan Bartoš, Ph.D.](https://www.pirati.cz/lide/ivan_bartos), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#d2bba4b3bcfcb0b3a0a6bda192a2bba0b3a6bbfcb1a8), předseda Pirátů, 603 415 378
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#d4b9bdbfa1b8b5a7fab2b1a6beb1bab7bdbf94a4bda6b5a0bdfab7ae), šéf mediálního odboru, 737 943 770

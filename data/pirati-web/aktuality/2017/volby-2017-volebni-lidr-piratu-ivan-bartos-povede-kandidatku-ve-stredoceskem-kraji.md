@@ -9,7 +9,7 @@ tagy:
 - Kampaň
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-06'
+stazeno: '2026-10-07'
 ---
 
 # Volby 2017: volební lídr Pirátů Ivan Bartoš povede kandidátku ve Středočeském kraji.
@@ -35,4 +35,4 @@ Celostátního volebního lídra si Piráti vybrali 16. ledna. Volba se uskuteč
 
 <h3>Kontakt</h3>
 
-- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#0c61656779606d7f226a697e6669626f65674c7c657e6d7865226f76), vedoucí mediálního odboru Pirátů, 737 943 770
+- [Mikuláš Ferjenčík](https://www.pirati.cz/lide/mikulas_ferjencik), [[email protected]](https://www.pirati.cz/cdn-cgi/l/email-protection#761b1f1d031a1705581013041c1318151f1d36061f0417021f58150c), vedoucí mediálního odboru Pirátů, 737 943 770
