@@ -1,0 +1,15 @@
+{
+  "_poznamka": "FIKTIVNÍ UKÁZKA. Osoba, obec a úřad jsou smyšlené.",
+  "sablona": "stiznost",
+  "fiktivni": true,
+  "predmet": "Smlouvy na rekonstrukci náměstí",
+  "urad": "Městský úřad Příklad",
+  "datum_podani": "1. 9. 2026",
+  "lhuta_do": "16. 9. 2026",
+  "datum_stiznosti": "22. 9. 2026",
+  "dni_bez_odpovedi": 21,
+  "text": "Zákonná lhůta 15 dní uplynula bez odpovědi. O stížnosti rozhodne nadřízený orgán, tedy krajský úřad.",
+  "autor": {"jmeno": "Jana Nováková", "funkce": "zastupitelka", "strana": "Piráti", "obec": "Město Příklad"},
+  "zdroj": "Stížnost podle § 16a zákona č. 106/1999 Sb. ze dne 22. 9. 2026 (fiktivní)",
+  "datum": "22. 9. 2026"
+}

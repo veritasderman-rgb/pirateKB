@@ -1,0 +1,81 @@
+{
+  "_poznamka": "FIKTIVNÍ UKÁZKA. Zastupitelka Jana Nováková, Město Příklad, úřad, data i čísla jsou smyšlené a slouží jen k předvedení šablony. Neuveřejňovat jako skutečnou informaci.",
+  "verze": 1,
+  "nazev": "Smlouvy na rekonstrukci náměstí – odpověď úřadu",
+  "faze": "odpoved",
+  "fiktivni": true,
+  "format": "1080x1920",
+  "fps": 30,
+  "stitek": "Zákon 106/1999 Sb.",
+  "autor": {
+    "jmeno": "Jana Nováková",
+    "funkce": "zastupitelka",
+    "strana": "Piráti",
+    "obec": "Město Příklad"
+  },
+  "zdroj": "Odpověď MěÚ Příklad na žádost podle zákona č. 106/1999 Sb. ze dne 17. 3. 2026 (fiktivní)",
+  "sceny": [
+    {
+      "typ": "titulek",
+      "delka": 4,
+      "kicker": "Žádost o informace",
+      "nadpis": "Kolik stála *rekonstrukce náměstí*?",
+      "podnadpis": "Zastupitelka Jana Nováková požádala o smlouvy.",
+      "titulky": "Kolik stála rekonstrukce náměstí? Zastupitelka Jana Nováková požádala město o smlouvy."
+    },
+    {
+      "typ": "casova-osa",
+      "delka": 4,
+      "kicker": "Průběh žádosti",
+      "body": [
+        {
+          "datum": "2. 3. 2026",
+          "popis": "Žádost podána"
+        },
+        {
+          "datum": "17. 3. 2026",
+          "popis": "Úřad odpověděl",
+          "poznamka": "Po 15 dnech",
+          "zvyraznit": true
+        },
+        {
+          "datum": "18. 3. 2026",
+          "popis": "Zveřejňujeme zjištění"
+        }
+      ],
+      "titulky": "Žádost podala 2. března. Úřad odpověděl po 15 dnech, v poslední den lhůty."
+    },
+    {
+      "typ": "fakt",
+      "delka": 3.5,
+      "kicker": "Cena díla",
+      "cislo": "48,2",
+      "jednotka": "mil. Kč",
+      "popis": "podle smlouvy o dílo na rekonstrukci náměstí",
+      "zdroj": "Odpověď MěÚ Příklad ze dne 17. 3. 2026 (fiktivní)",
+      "titulky": "Cena díla podle smlouvy je 48,2 milionu korun."
+    },
+    {
+      "typ": "citace",
+      "delka": 4.5,
+      "kicker": "Z odpovědi úřadu",
+      "text": "Ke smlouvě byly uzavřeny *tři dodatky*. Upravují cenu i termín dokončení.",
+      "zdroj": "Odpověď MěÚ Příklad ze dne 17. 3. 2026 (fiktivní)",
+      "titulky": "Ke smlouvě jsou podle úřadu tři dodatky. Upravují cenu i termín dokončení."
+    },
+    {
+      "typ": "vyzva",
+      "delka": 3.5,
+      "kicker": "Co dál",
+      "nadpis": "Dodatky zveřejníme",
+      "text": "Celá odpověď úřadu je na webu.",
+      "odkaz": "priklad.example/106",
+      "titulky": "Všechny dodatky zveřejníme. Celou odpověď úřadu najdete na webu."
+    },
+    {
+      "typ": "zaver",
+      "delka": 2.5,
+      "text": "Kontrolujeme, *kam jdou peníze města*."
+    }
+  ]
+}

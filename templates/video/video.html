@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video 106 – Piráti</title>
+  <!--
+    Animační šablona krátkého videa k žádostem podle zákona 106/1999 Sb. a dotazům zastupitelů.
+    Řídí ji scénář (scenar.json, schéma scenar.schema.json, ukázka priklady/namesti-106.json).
+    Render do MP4: python3 scripts/render_video.py --scenar scenar.json --format 1080x1920 --out video.mp4
+    Náhled v prohlížeči: video.html?prehrat=1&scenar=<URL-kódovaný JSON>
+    Písma: Bebas Neue, Roboto, Roboto Condensed (Google Fonts). Barvy: Pirati Yellow #fec934, černá, bílá, šedé.
+    Logo: oficiální Logotyp – Bílý (inverzní) z https://www.pirati.cz/download/; fallback textová značka PIRÁTI.
+    Animace: GSAP 3 (zdarma i pro komerční užití, standardní licence GSAP), řízené přes window.seek(t).
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@500;700&family=Roboto:wght@400;500;700&display=block">
+  <link rel="stylesheet" href="video.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+</head>
+<body>
+  <div id="video" class="video"></div>
+  <script src="video.js"></script>
+</body>
+</html>

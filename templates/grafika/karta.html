@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Karta 106 – Piráti</title>
+  <!--
+    Šablona karty na sociální sítě k žádostem podle zákona 106/1999 Sb. a dotazům zastupitelů.
+    Šablony (?sablona=): podano | odpoved | stiznost | dotaz
+    Formáty (?format=):  1080x1080 | 1080x1350 | 1080x1920 | 1920x1080
+    Render do PNG:       python3 scripts/render_grafika.py --sablona odpoved --data data.json --format 1080x1350 --out karta.png
+    Ruční náhled:        otevřít v prohlížeči s ?data=<URL-kódovaný JSON> nebo s jednotlivými parametry,
+                         např. karta.html?sablona=podano&predmet=Smlouvy%20na%20opravu%20školy&jmeno=Jana%20Nováková&obec=Město%20Příklad
+    Písma: Bebas Neue (nadpisy), Roboto a Roboto Condensed (text) z Google Fonts.
+    Barvy: Pirati Yellow #fec934, černá #000000, bílá #ffffff a šedé ze styleguide.pirati.cz.
+    Logo: oficiální Logotyp – Bílý (inverzní) z https://www.pirati.cz/download/ (načítá se z pirati.cz);
+          když se nenačte, zobrazí se textová značka PIRÁTI. Vlastní pirátské logo nekreslíme.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@500;700&family=Roboto:wght@400;500;700&display=block">
+  <link rel="stylesheet" href="karta.css">
+</head>
+<body>
+  <article id="karta" class="karta"></article>
+  <script src="karta.js"></script>
+</body>
+</html>

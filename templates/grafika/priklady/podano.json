@@ -1,0 +1,18 @@
+{
+  "_poznamka": "FIKTIVNÍ UKÁZKA. Osoba, obec a úřad jsou smyšlené.",
+  "sablona": "podano",
+  "fiktivni": true,
+  "predmet": "Smlouvy na rekonstrukci náměstí",
+  "urad": "Městský úřad Příklad",
+  "datum_podani": "2. 3. 2026",
+  "lhuta": "15 dní",
+  "lhuta_do": "17. 3. 2026",
+  "otazky": [
+    "Smlouva o dílo na rekonstrukci náměstí včetně všech dodatků",
+    "Přehled faktur zaplacených zhotoviteli do 28. 2. 2026",
+    "Zápis z hodnocení nabídek ve výběrovém řízení"
+  ],
+  "autor": {"jmeno": "Jana Nováková", "funkce": "zastupitelka", "strana": "Piráti", "obec": "Město Příklad"},
+  "zdroj": "Žádost podle zákona č. 106/1999 Sb., podaná datovou schránkou (fiktivní)",
+  "datum": "2. 3. 2026"
+}
