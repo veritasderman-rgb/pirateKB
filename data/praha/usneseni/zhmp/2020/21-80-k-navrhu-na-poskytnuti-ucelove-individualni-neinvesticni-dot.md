@@ -1,0 +1,29 @@
+---
+zdroj: https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054049051048050048
+nazev: 'Usnesení ZHMP č. 21/80: k návrhu na poskytnutí účelové individuální neinvestiční dotace městské části Praha 15 na realizaci projektu "Svět v Hostivaři - Multikulturní sousedský festival" a úpravu rozpočtu kap. 06'
+typ: usneseni
+viditelnost: verejne
+stazeno: '2026-10-07'
+datum: '2020-11-12'
+autorita: usneseni-zhmp
+organ: zhmp
+cislo: 21/80
+tisk: Z-8884
+autor: zastupitel Bílek
+hlasovani:
+- 3180210108
+---
+
+# Usnesení ZHMP č. 21/80: k návrhu na poskytnutí účelové individuální neinvestiční dotace městské části Praha 15 na realizaci projektu "Svět v Hostivaři - Multikulturní sousedský festival" a úpravu rozpočtu kap. 06
+
+- Orgán: Zastupitelstvo hl. m. Prahy
+- Číslo usnesení: 21/80 ze dne 2020-11-12
+- Číslo tisku: Z-8884
+- Předkladatel: zastupitel Bílek
+
+Detail a plný text (PDF): https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054049051048050048 – funguje po otevření archivu https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-ZHMP-1.
+
+## Hlasování ZHMP 2020-11-12 21:27
+Výsledek: prijato (pro 54, proti 0, zdrželo se 5, nehlasovalo 2, přítomno 61).
+Předmět: usnesení k Z-8884
+Piráti: ano 9, zdrzel 4 (Eva Horáková zdrzel, Zdeněk Hřib zdrzel, Adam Zábranský zdrzel, Vít Šimral zdrzel)

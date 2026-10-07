@@ -1,0 +1,25 @@
+---
+zdroj: https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054054051048056055
+nazev: 'Usnesení RHMP č. 1029: k návrhu na nové znění vzorových podmínek výběrového řízení na nebytové prostory'
+typ: usneseni
+viditelnost: verejne
+stazeno: '2026-10-07'
+datum: '2023-05-22'
+autorita: usneseni-rhmp
+organ: rhmp
+cislo: '1029'
+tisk: R-47943
+autor: radní Mgr. Adam Zábranský
+predkladatel_pirati:
+- Adam Zábranský
+---
+
+# Usnesení RHMP č. 1029: k návrhu na nové znění vzorových podmínek výběrového řízení na nebytové prostory
+
+- Orgán: Rada hl. m. Prahy
+- Číslo usnesení: 1029 ze dne 2023-05-22
+- Číslo tisku: R-47943
+- Předkladatel: radní Mgr. Adam Zábranský
+- Pirátský předkladatel: Adam Zábranský
+
+Detail a plný text (PDF): https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054054051048056055 – funguje po otevření archivu https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-RHMP-1.

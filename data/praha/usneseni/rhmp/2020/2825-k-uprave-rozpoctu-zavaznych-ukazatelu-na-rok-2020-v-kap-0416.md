@@ -1,0 +1,26 @@
+---
+zdroj: https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054049051053050050
+nazev: 'Usnesení RHMP č. 2825: k úpravě rozpočtu závazných ukazatelů na rok 2020 v kap. 0416 na základě "Výkazu o změnách v poskytovaných podpůrných opatřeních a jejich finanční náročnosti R 44 - 99 k 31.10. 2020"'
+typ: usneseni
+viditelnost: verejne
+stazeno: '2026-10-07'
+datum: '2020-12-07'
+autorita: usneseni-rhmp
+organ: rhmp
+cislo: '2825'
+tisk: R-38783
+autor: radní PhDr. Mgr. Vít Šimral, Ph.D. et Ph.D.
+predkladatel_pirati:
+- Vít Šimral
+---
+
+# Usnesení RHMP č. 2825: k úpravě rozpočtu závazných ukazatelů na rok 2020 v kap. 0416 na základě "Výkazu o změnách v poskytovaných podpůrných opatřeních a jejich finanční náročnosti R 44 - 99 k 31.10. 2020"
+
+- Orgán: Rada hl. m. Prahy
+- Číslo usnesení: 2825 ze dne 2020-12-07
+- Číslo tisku: R-38783
+- Předkladatel: radní PhDr. Mgr. Vít Šimral, Ph.D. et Ph.D.
+- Pirátský předkladatel: Vít Šimral
+- Zpracoval útvar: ROZ MHMP
+
+Detail a plný text (PDF): https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054049051053050050 – funguje po otevření archivu https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-RHMP-1.

@@ -1,0 +1,26 @@
+---
+zdroj: https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054053052048056057
+nazev: 'Usnesení RHMP č. 3003: k návrhu na poskytnutí technicko-materiální pomoci ukrajinským městům formou daru v souvislosti s ruskou invazí na Ukrajinu'
+typ: usneseni
+viditelnost: verejne
+stazeno: '2026-10-07'
+datum: '2022-11-22'
+autorita: usneseni-rhmp
+organ: rhmp
+cislo: '3003'
+tisk: R-46316
+autor: primátor hl.m. Prahy
+predkladatel_pirati:
+- Zdeněk Hřib
+---
+
+# Usnesení RHMP č. 3003: k návrhu na poskytnutí technicko-materiální pomoci ukrajinským městům formou daru v souvislosti s ruskou invazí na Ukrajinu
+
+- Orgán: Rada hl. m. Prahy
+- Číslo usnesení: 3003 ze dne 2022-11-22
+- Číslo tisku: R-46316
+- Předkladatel: primátor hl.m. Prahy
+- Pirátský předkladatel: Zdeněk Hřib
+- Zpracoval útvar: BEZ MHMP
+
+Detail a plný text (PDF): https://usneseni.praha.eu/ina/tedusndetail.aspx?par=000038105100061054053052048056057 – funguje po otevření archivu https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-RHMP-1.
