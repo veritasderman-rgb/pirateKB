@@ -1,5 +1,6 @@
 ---
-zdroj: "Program resortního týmu pro zdravotnictví, soubor „Zdravotnictví pro 21. století: Program na příští čtyři roky“ (docx) předaný vedoucím resortního týmu kurátorovi báze 2026-10-07"
+zdroj: "https://github.com/veritasderman-rgb/pirateKB/blob/main/content/program/zdravotnictvi-pro-21-stoleti.md"
+puvod: "Program resortního týmu pro zdravotnictví, soubor „Zdravotnictví pro 21. století: Program na příští čtyři roky“ (docx) předaný vedoucím resortního týmu kurátorovi báze 2026-10-07"
 nazev: "Zdravotnictví pro 21. století: Program na příští čtyři roky"
 typ: programovy-dokument
 autorita: program-resortniho-tymu
