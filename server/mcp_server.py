@@ -2603,13 +2603,16 @@ def http_app(host: str = "0.0.0.0", stateless: bool | None = None,
     Aplikace je zabalená middlewary (zvenku dovnitř): omezení počtu požadavků na ``/mcp``
     (``server/ratelimit.py``, env ``PIRATEKB_RATE_PER_MIN`` / ``PIRATEKB_RATE_PER_DAY``)
     a volitelná autentizace Bearer tokeny z Keycloaku (``server/auth.py``, zapíná
-    ``PIRATEKB_AUTH=keycloak``). ``/health`` a ``/`` nejsou omezené ani chráněné.
+    ``PIRATEKB_AUTH=keycloak``). Nejvnitřnější je trvalá statistika (``server/statistika.py``,
+    jen s ``PIRATEKB_STATS_DB``): počítá připojení (``initialize``) a rodinu klienta až u
+    požadavků, které prošly limitem i autentizací. ``/health`` a ``/`` nejsou omezené ani chráněné.
     """
     try:
-        from server import auth as _auth, ratelimit as _ratelimit
+        from server import auth as _auth, ratelimit as _ratelimit, statistika as _statistika
     except ImportError:  # pragma: no cover - spuštěno jako skript server/mcp_server.py
         import auth as _auth  # type: ignore[no-redef]
         import ratelimit as _ratelimit  # type: ignore[no-redef]
+        import statistika as _statistika  # type: ignore[no-redef]
 
     if stateless is None:
         stateless = _env_flag("PIRATEKB_STATELESS", True)
@@ -2621,6 +2624,7 @@ def http_app(host: str = "0.0.0.0", stateless: bool | None = None,
         json_response=json_response,
         host=host,
     )
+    app = _statistika.wrap(app)
     app = _auth.wrap(app)
     return _ratelimit.wrap(app)
 
@@ -2654,6 +2658,7 @@ def run(transport: str = "stdio", host: str = "127.0.0.1", port: int = 8765,
 if str(REPO_ROOT) not in sys.path:  # i pro `python server/mcp_server.py` (bez balíčku server)
     sys.path.insert(0, str(REPO_ROOT))
 from server import gaps as _gaps  # noqa: E402
+from server import statistika as _statistika  # noqa: E402
 from server import telemetry as _telemetry  # noqa: E402
 
 REPORT_GAP_VETA = ("Odpověz uživateli, že báze odpověď nemá a hlášení bylo zaznamenáno; "
@@ -2699,16 +2704,23 @@ def resource_gaps_posledni() -> str:
 
 
 def _with_telemetry_summary(fn: Callable[..., str]) -> Callable[..., str]:
-    """kb_stats + souhrn telemetrie od startu (tělo kb_stats zůstává beze změny)."""
+    """kb_stats + souhrn telemetrie od startu + (s ``PIRATEKB_STATS_DB``) trvalá statistika
+    za 30 dní (tělo kb_stats zůstává beze změny; chyba souhrnu kb_stats nerozbije)."""
 
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> str:
         out = fn(*args, **kwargs)
         try:
-            return out + "\n\n" + _telemetry.summary_markdown()
+            out = out + "\n\n" + _telemetry.summary_markdown()
         except Exception as exc:  # noqa: BLE001
             log.warning("souhrn telemetrie selhal: %s", exc)
-            return out
+        try:
+            trvala = _statistika.souhrn_markdown()
+            if trvala:
+                out = out + "\n\n" + trvala
+        except Exception as exc:  # noqa: BLE001
+            log.warning("souhrn trvalé statistiky selhal: %s", exc)
+        return out
 
     return wrapper
 

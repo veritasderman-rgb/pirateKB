@@ -134,7 +134,9 @@ nahlásí.
   všechny tooly. Členské tooly `hledat_interni` a `navrhnout_do_baze` (návrh doplnění z chatu
   → GitHub issue `kb-navrh` ke schválení kurátorem). Čeká na klienta v Keycloaku. Viz
   [docs/auth-keycloak.md](docs/auth-keycloak.md).
-- **Telemetrie:** anonymní, bez textu dotazů.
+- **Telemetrie a statistika používání:** anonymní, bez textu dotazů, IP adres a identity;
+  volitelně trvale v Postgresu (počty volání toolů a připojení konektoru), aby šlo po
+  měsících vyhodnotit, jestli server dává smysl. Viz [docs/statistika.md](docs/statistika.md).
 - **Evals:** 96 testovacích otázek běží v CI při každém pull requestu.
 - **Skills pro Claude** ve složce [`skills/`](skills/README.md): tisková zpráva, brief a
   sociální sítě, včetně toho, kdy přibrat MCP Hlídače státu.

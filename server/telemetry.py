@@ -9,6 +9,8 @@ Události se drží v paměti (souhrn od startu je v ``kb_stats``), připojují 
 JSONL souboru ``TELEMETRY_FILE`` (výchozí ``data/telemetry/udalosti.jsonl``; na
 Vercelu je souborový systém dočasný, to nevadí) a vypisují se jako jeden řádek
 JSON na stderr, aby byly vidět v logu hostingu. Vypnout lze ``PIRATEKB_TELEMETRY=0``.
+Je-li nastaveno ``PIRATEKB_STATS_DB``, každá zaznamenaná událost se navíc zařadí do trvalé
+statistiky v Postgresu (``server/statistika.py``, ``docs/statistika.md``).
 
 Napojení: :func:`wrap` obalí funkci toolu a zachová její podpis i docstring
 (``functools.wraps``), takže JSON schéma toolu zůstane stejné. Server ho volá po
@@ -28,6 +30,11 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
+
+try:
+    from server import statistika as _statistika
+except ImportError:  # pragma: no cover - spuštěno mimo balíček server
+    _statistika = None  # type: ignore[assignment]
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_FILE = REPO_ROOT / "data" / "telemetry" / "udalosti.jsonl"
@@ -122,7 +129,8 @@ def is_error(output: Any) -> bool:
 
 def record(tool: str, delka_dotazu: int = 0, pocet_vysledku: int = 0, trvani_ms: float = 0.0,
            fallback: bool = False, chyba: bool = False) -> dict | None:
-    """Zapíše jednu událost (paměť + soubor + stderr). Nikdy nevyhazuje výjimku."""
+    """Zapíše jednu událost (paměť + soubor + stderr, případně fronta trvalé statistiky).
+    Nikdy nevyhazuje výjimku."""
     if not enabled():
         return None
     event = {
@@ -151,6 +159,11 @@ def record(tool: str, delka_dotazu: int = 0, pocet_vysledku: int = 0, trvani_ms:
     except Exception:  # noqa: BLE001
         pass
     _append_file(event)
+    if _statistika is not None:
+        try:
+            _statistika.zaznamenej_volani(event)  # trvalá statistika (jen s PIRATEKB_STATS_DB)
+        except Exception:  # noqa: BLE001
+            pass
     return event
 
 

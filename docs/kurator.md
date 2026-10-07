@@ -52,6 +52,9 @@ příspěvek do `inbox/`) a issue zavřít s odkazem. Neexistuje (např. strana 
 stanovisko)? → zavřít s vysvětlením, případně předat resortnímu týmu. **Stanovisko nikdy
 nevymýšlet.**
 
+Které tooly končí „nenašel jsem“ nejčastěji, ukáže trvalá statistika (pohled `neuspesne`
+v Neonu nebo `python3 scripts/statistika.py`, viz [`statistika.md`](statistika.md)).
+
 ### 3. Stav automatických zdrojů
 
 Otevřít [`data/AKTUALIZACE.md`](../data/AKTUALIZACE.md) (tabulka po zdrojích: poslední
@@ -88,6 +91,9 @@ a výsledky při každé změně vlády nebo programu, organizace 6 měsíců.
 
 Krátká poznámka do issue „Kurátor týden RRRR-TT“: kolik příspěvků přesunuto, kolik
 mezer zavřeno, co čeká na koho.
+Pro čísla o používání serveru (připojení, volání, nejpoužívanější tooly) stačí
+`python3 scripts/statistika.py --od <pondělí> --do <neděle>`; jak je číst, popisuje
+[`statistika.md`](statistika.md).
 
 ## Jak schválit dokument
 
@@ -139,6 +145,7 @@ namístě u chybných nebo duplicitních dokumentů a při žádosti o výmaz os
 - Co patří do které složky: [`content/README.md`](../content/README.md)
 - Jak přispívá hejno: [`CONTRIBUTING.md`](../CONTRIBUTING.md), [`inbox/README.md`](../inbox/README.md)
 - Vlastníci složek: [`.github/CODEOWNERS`](../.github/CODEOWNERS)
+- Statistika používání MCP serveru: [`statistika.md`](statistika.md)
 
 ## Co doplnit jako první (stav k 2026-10-06)
 
