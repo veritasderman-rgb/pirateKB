@@ -6,7 +6,7 @@
 #   id               jedinečný identifikátor (prefix = kategorie)
 #   kategorie        lide | organy | program | stanoviska | tiskove-zpravy | hlasovani | brand |
 #                    sablony | schuzky | systemy | media | socialni-site | projevy | tisky |
-#                    interpelace | volby | financovani
+#                    interpelace | volby | financovani | prehledy | overeni | vlada | usneseni
 #   otazka           jak by se zeptal člověk (pro čtenáře a reporty)
 #   tool, argumenty  který tool MCP serveru má AI zavolat a s čím
 #   ocekavane        aspoň jeden z řetězců musí být ve výstupu (bez ohledu na diakritiku a velikost)
@@ -229,7 +229,7 @@ otazky:
     kategorie: hlasovani
     otazka: Jak hlasuje poslanec Zdeněk Hřib?
     tool: get_voting_record
-    argumenty: {poslanec: Hřib, limit: 5}
+    argumenty: {poslanec: Hřib, komora: psp, limit: 5}
     ocekavane: ["Souhrn hlasování: Zdeněk Hřib"]
     zdroj_musi_byt: psp.cz
 
@@ -681,3 +681,154 @@ otazky:
     argumenty: {query: stížnost na nečinnost 106, limit: 5}
     ocekavane: [Šablona stížnosti na postup při vyřizování žádosti o informace]
     zdroj_musi_byt: zakonyprolidi.cz
+
+  # ------------------------------------------------------------------ profily (profil_politika, profil_obce)
+  - id: lide-profil-01
+    kategorie: lide
+    otazka: Co všechno víte o Zdeňku Hřibovi?
+    tool: profil_politika
+    argumenty: {jmeno: Hřiba}
+    ocekavane: [zdenek.hrib@pirati.cz]
+    nesmi_obsahovat: [báze nic nemá, odpovídá v bázi více osob]
+    zdroj_musi_byt: lide.pirati.cz
+
+  - id: organy-profil-01
+    kategorie: organy
+    otazka: Jak jsou na tom Piráti v Liberci?
+    tool: profil_obce
+    argumenty: {obec: Liberec}
+    ocekavane: [liberec@pirati.cz]
+    nesmi_obsahovat: [báze nic nemá]
+    zdroj_musi_byt: volby.gov.cz
+
+  # ------------------------------------------------------------------ přehledy (casova_osa, novinky, jednota_klubu)
+  - id: prehledy-01
+    kategorie: prehledy
+    otazka: Jak se u Pirátů vyvíjelo téma stavebního zákona a které novely prošly?
+    tool: casova_osa
+    argumenty: {tema: stavební zákon}
+    ocekavane: [195/2022 Sb., 152/2023 Sb.]
+    nesmi_obsahovat: [nenašla žádné dostatečně relevantní položky]
+    zdroj_musi_byt: psp.cz
+
+  - id: prehledy-02
+    kategorie: prehledy
+    otazka: Co nového se u Pirátů dělo od 1. září 2026? Připrav podklad pro newsletter.
+    tool: novinky
+    argumenty: {od: "2026-09-01"}
+    ocekavane: ["## Hlasování a jak hlasovali Piráti"]
+    nesmi_obsahovat: [nic nového neobsahuje]
+    zdroj_musi_byt: psp.cz
+
+  - id: prehledy-03
+    kategorie: hlasovani
+    otazka: Kde pirátští poslanci v letech 2017–2021 nehlasovali jednotně a kdo se nejčastěji odchyloval od klubu?
+    tool: jednota_klubu
+    argumenty: {komora: psp, obdobi: 2017}
+    ocekavane: [Vojtěch Pikal]
+    nesmi_obsahovat: [V bázi nejsou žádná hlasování]
+    zdroj_musi_byt: psp.cz
+
+  # ------------------------------------------------------------------ rozhodnutí orgánů strany (rozhodnuti_organu)
+  - id: organy-06
+    kategorie: organy
+    otazka: Na základě jakého usnesení RP se jednalo se Stranou zelených o eurovolbách 2019?
+    tool: rozhodnuti_organu
+    argumenty: {organ: RP, query: evropské volby}
+    ocekavane: [16. 10. 2018]
+    nesmi_obsahovat: [Rozpoznaná usnesení a rozhodnutí (0)]
+    zdroj_musi_byt: evidence.pirati.cz
+
+  - id: organy-07
+    kategorie: organy
+    otazka: Jaký rozpočet schválilo republikové předsednictvo?
+    tool: rozhodnuti_organu
+    argumenty: {organ: RP, query: rozpočet}
+    ocekavane: [báze usnesení nemá]
+    nesmi_obsahovat: ["→ PŘIJATO"]
+    zdroj_musi_byt: rp.pirati.cz
+
+  # ------------------------------------------------------------------ ověření (over_tvrzeni, zkontroluj_text)
+  - id: overeni-01
+    kategorie: overeni
+    otazka: Je pravda, že Piráti hlasovali pro nový stavební zákon?
+    tool: over_tvrzeni
+    argumenty: {tvrzeni: Piráti hlasovali pro nový stavební zákon}
+    ocekavane: [152/2023 Sb.]
+    nesmi_obsahovat: ["V datech hlasování (PSP, Senát, EP) nic odpovídajícího"]
+    zdroj_musi_byt: psp.cz
+
+  - id: overeni-02
+    kategorie: overeni
+    otazka: Zkontroluj mi tiskovou zprávu s citací předsedy před odesláním.
+    tool: zkontroluj_text
+    argumenty:
+      text: "# Piráti chtějí víc peněz na dostupné bydlení, říká předseda Hřib\n\n„Na Měsíci postavíme sto tisíc obecních bytů a každý dostane jeden zdarma,“ uvedl předseda Pirátů Zdeněk Hřib."
+      druh: tiskova-zprava
+    ocekavane: [Neověřená citace]
+    zdroj_musi_byt: lide.pirati.cz
+
+  # ------------------------------------------------------------------ Piráti ve vládě (2021–2024)
+  - id: vlada-01
+    kategorie: vlada
+    otazka: Co předložil ministr pro legislativu Michal Šalomoun vládě ke snižování byrokracie?
+    tool: get_government_record
+    argumenty: {ministr: Šalomoun, query: antibyrokratický balíček, limit: 5}
+    ocekavane: [Antibyrokratický balíček II]
+    nesmi_obsahovat: [není pirátský člen vlády, Žádný záznam z působení Pirátů]
+    zdroj_musi_byt: vlada.gov.cz
+
+  - id: vlada-02
+    kategorie: vlada
+    otazka: Kdy za vicepremiéra Bartoše spustila DIA aplikaci eDoklady?
+    tool: get_government_record
+    argumenty: {ministr: Bartoše, query: eDoklady, druh: tz, limit: 5}
+    ocekavane: [Aplikace eDoklady je tady]
+    nesmi_obsahovat: [Žádný záznam z působení Pirátů]
+    zdroj_musi_byt: dia.gov.cz
+
+  - id: vlada-03
+    kategorie: vlada
+    otazka: Co MMR za Ivana Bartoše oznamovalo k digitalizaci stavebního řízení?
+    tool: get_government_record
+    argumenty: {ministr: MMR, query: digitalizace stavebního řízení, limit: 5}
+    ocekavane: [dodavatele klíčové součásti digitalizace stavebního řízení]
+    nesmi_obsahovat: [Žádný záznam z působení Pirátů]
+    zdroj_musi_byt: mmr.gov.cz
+
+  - id: vlada-04
+    kategorie: vlada
+    otazka: Do kdy byl Jan Lipavský ministrem za Piráty a co předkládal vládě?
+    tool: get_government_record
+    argumenty: {ministr: Lipavský, druh: usneseni, limit: 3}
+    ocekavane: [nominant Pirátů do 30. 9. 2024]
+    nesmi_obsahovat: [není pirátský člen vlády]
+    zdroj_musi_byt: vlada.gov.cz
+
+  # ------------------------------------------------------------------ Praha
+  - id: praha-01
+    kategorie: hlasovani
+    otazka: Jak hlasoval Zdeněk Hřib v pražském zastupitelstvu o tramvaji do Holešovic?
+    tool: get_voting_record
+    argumenty: {poslanec: Hřib, query: tramvaje Holešovic, komora: zhmp, limit: 3}
+    ocekavane: [Petici za návrat tramvaje 14]
+    nesmi_obsahovat: [Žádné hlasování neodpovídá]
+    zdroj_musi_byt: usneseni.praha.eu
+
+  - id: praha-02
+    kategorie: usneseni
+    otazka: Která usnesení Rady hl. m. Prahy předložil Vít Šimral?
+    tool: get_resolutions
+    argumenty: {organ: rhmp, predkladatel: Šimral, limit: 5}
+    ocekavane: [radní PhDr. Mgr. Vít Šimral]
+    nesmi_obsahovat: [Žádné usnesení neodpovídá]
+    zdroj_musi_byt: usneseni.praha.eu
+
+  - id: praha-03
+    kategorie: usneseni
+    otazka: Kdy pražské zastupitelstvo zvolilo Radu, ve které jsou Komrsková, Mazur a Zábranský?
+    tool: get_resolutions
+    argumenty: {organ: zhmp, query: volbu primátora náměstků členů Rady, od: "2023-01-01", do: "2023-03-31", limit: 3}
+    ocekavane: ["1/83"]
+    nesmi_obsahovat: [Žádné usnesení neodpovídá]
+    zdroj_musi_byt: usneseni.praha.eu

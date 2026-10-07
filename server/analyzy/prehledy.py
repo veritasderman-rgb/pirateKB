@@ -28,7 +28,7 @@ KOMORA_NAZEV = {"psp": "Poslanecká sněmovna", "senat": "Senát", "ep": "Evrops
                 "zhmp": "Zastupitelstvo hl. m. Prahy"}
 KOMORA_KRATCE = {"psp": "PSP", "senat": "Senát", "ep": "EP", "zhmp": "ZHMP"}
 KOMORA_AUTORITA = {"psp": "oficialni-data-psp", "senat": "oficialni-data-senat",
-                   "ep": "oficialni-data-ep", "zhmp": "oficialni-data-zhmp"}
+                   "ep": "oficialni-data-ep", "zhmp": "oficialni-data-praha"}
 _KOMORA_ALIAS = {"ps": "psp", "snemovna": "psp", "poslanecka snemovna": "psp", "sněmovna": "psp",
                  "senát": "senat", "europarlament": "ep", "evropsky parlament": "ep",
                  "praha": "zhmp", "zastupitelstvo prahy": "zhmp", "zastupitelstvo": "zhmp",
@@ -38,7 +38,7 @@ _KOMORA_ALIAS = {"ps": "psp", "snemovna": "psp", "poslanecka snemovna": "psp", "
 _AUTORITA_NAVIC = {
     "usneseni-vlady": "usnesení vlády ČR (oficiální dokument vlády, ne usnesení strany)",
     "vlada-resort": "výstup ministerstva / člena vlády (oficiální výstup resortu, ne usnesení strany)",
-    "oficialni-data-zhmp": "data o hlasování Zastupitelstva hl. m. Prahy",
+    "oficialni-data-praha": "data o hlasování Zastupitelstva hl. m. Prahy",
 }
 
 HLASY_PRITOMEN = ("ano", "ne", "zdrzel")

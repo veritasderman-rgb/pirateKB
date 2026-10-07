@@ -257,6 +257,13 @@ class KB:
         return f" AND {column} IN ({','.join('?' * len(values))})"
 
     @staticmethod
+    def _not_in_clause(column: str, values: list[str] | None, params: list) -> str:
+        if not values:
+            return ""
+        params.extend(values)
+        return f" AND coalesce({column}, '') NOT IN ({','.join('?' * len(values))})"
+
+    @staticmethod
     def _date_clause(column: str, od: str | None, do: str | None, params: list) -> str:
         sql = ""
         if od:
@@ -274,7 +281,8 @@ class KB:
     def search(self, query: str, typ: list[str] | None = None,
                kolekce: list[str] | None = None, od: str | None = None,
                do: str | None = None, limit: int = 10,
-               preferuj_nove: bool = True, autor: list[str] | None = None) -> list[dict]:
+               preferuj_nove: bool = True, autor: list[str] | None = None,
+               bez_kolekce: list[str] | None = None) -> list[dict]:
         """Plnotextové hledání v chuncích; vrací max. 2 chunky z jednoho dokumentu.
 
         Dotaz -> pojmy (kmeny + přesné tvary + aliasy, viz ``server/kb/query.py``) -> FTS5
@@ -283,7 +291,8 @@ class KB:
         ``RECENT_TYPES``) + oficiální pozice. U programu/stanovisek zůstane jen nejnovější
         verze dokumentu se stejným názvem. Se zapnutými embeddingy se pořadí BM25 a
         kosinové podobnosti spojí přes reciprocal rank fusion (pole ``rrf``, ``podobnost``).
-        ``autor`` = přesná jména v poli ``autor`` (např. z ``resolve_speaker``).
+        ``autor`` = přesná jména v poli ``autor`` (např. z ``resolve_speaker``);
+        ``bez_kolekce`` = kolekce, které se vynechají (např. ``["vlada"]`` u TZ strany).
         """
         plan = self._plan(query)
         if not plan:
@@ -292,6 +301,7 @@ class KB:
         where = ""
         where += self._in_clause("d.typ", typ, params)
         where += self._in_clause("d.kolekce", kolekce, params)
+        where += self._not_in_clause("d.kolekce", bez_kolekce, params)
         where += self._in_clause("d.autor", autor, params)
         where += self._date_clause("d.datum", od, do, params)
         candidates = max(limit * 12, 150)
@@ -315,7 +325,7 @@ class KB:
         vec = self._vector_index()
         if vec is not None:
             fused = self._fuse_vectors(vec, query, scored, plan, today, preferuj_nove,
-                                       typ, kolekce, od, do, candidates, autor)
+                                       typ, kolekce, od, do, candidates, autor, bez_kolekce)
             if fused is not None:
                 scored, hybrid = fused, True
 
@@ -497,13 +507,14 @@ class KB:
 
     def _fuse_vectors(self, vec: emb_mod.VectorIndex, query: str, scored: list[dict],
                       plan: QueryPlan, today: dt.date, preferuj_nove: bool, typ, kolekce,
-                      od, do, candidates: int, autor=None) -> list[dict] | None:
+                      od, do, candidates: int, autor=None, bez_kolekce=None) -> list[dict] | None:
         allowed = None
-        if typ or kolekce or od or do or autor:
+        if typ or kolekce or od or do or autor or bez_kolekce:
             params: list = []
             where = ""
             where += self._in_clause("d.typ", typ, params)
             where += self._in_clause("d.kolekce", kolekce, params)
+            where += self._not_in_clause("d.kolekce", bez_kolekce, params)
             where += self._in_clause("d.autor", autor, params)
             where += self._date_clause("d.datum", od, do, params)
             allowed = {r[0] for r in self.con.execute(
@@ -1040,6 +1051,67 @@ class KB:
             "od": min((r["od"] for r in rows), default=None),
             "do": max((r["do"] for r in rows), default=None),
         }
+
+    # ------------------------------------------------------------ usnesení (ZHMP, RHMP, vláda)
+
+    def search_resolutions(self, organ: str | None = None, query: str | None = None,
+                           predkladatel: str | None = None, od: str | None = None,
+                           do: str | None = None, limit: int = 20,
+                           kolekce: list[str] | None = None) -> list[dict]:
+        """Usnesení (dokumenty typu `usneseni`: ZHMP a RHMP z `data/praha`, vláda z `data/vlada`).
+
+        organ = zhmp | rhmp (pole `organ` ve frontmatteru); query = fulltext (stejné hledání jako
+        search_kb, omezené na typ usneseni); predkladatel = jméno/příjmení (bez ohledu na diakritiku),
+        hledá se v `autor` (předkladatel podle archivu) a `predkladatel_pirati`; od/do = YYYY-MM-DD;
+        kolekce = omezení na kolekce (např. ``["praha"]``). Bez query řadí od nejnovějších."""
+        pred = fold(predkladatel or "").split()
+
+        def ok(meta: dict, autor: str | None) -> bool:
+            if organ and (meta.get("organ") or "") != organ:
+                return False
+            if pred:
+                hay = fold(" ".join([str(autor or "")]
+                                    + [str(x) for x in meta.get("predkladatel_pirati") or []]))
+                return all(t in hay for t in pred)
+            return True
+
+        cols = "id, nazev, zdroj, datum, autor, autorita, kolekce, meta"
+        snippets: dict[str, str] = {}
+        if query:
+            hits = self.search(query, typ=["usneseni"], kolekce=kolekce, od=od, do=do,
+                               limit=max(limit * 10, 100), preferuj_nove=False)
+            ids = list(dict.fromkeys(h["doc_id"] for h in hits))
+            for h in hits:
+                snippets.setdefault(h["doc_id"], h.get("snippet") or "")
+            if not ids:
+                return []
+            rows = self._rows(f"SELECT {cols} FROM documents WHERE id IN ({','.join('?' * len(ids))})", ids)
+            order = {d: i for i, d in enumerate(ids)}
+            rows.sort(key=lambda r: order[r["id"]])
+        else:
+            params: list = []
+            where = "typ = 'usneseni'" + self._in_clause("kolekce", kolekce, params)
+            where += self._date_clause("datum", od, do, params)
+            if organ:
+                where += " AND json_extract(meta, '$.organ') = ?"
+                params.append(organ)
+            rows = self._rows(f"SELECT {cols} FROM documents WHERE {where} ORDER BY datum DESC, id DESC", params)
+        out = []
+        for r in rows:
+            meta = _loads(r.get("meta"), {})
+            if not ok(meta, r.get("autor")):
+                continue
+            out.append({
+                "doc_id": r["id"], "nazev": r["nazev"], "datum": r["datum"], "zdroj": r["zdroj"],
+                "autorita": r["autorita"], "kolekce": r["kolekce"], "organ": meta.get("organ"),
+                "cislo": meta.get("cislo"), "tisk": meta.get("tisk"), "predkladatel": r["autor"],
+                "predkladatel_pirati": meta.get("predkladatel_pirati") or [],
+                "hlasovani": meta.get("hlasovani") or [], "url_archiv": meta.get("url_archiv"),
+                "snippet": snippets.get(r["id"]),
+            })
+            if len(out) >= limit:
+                break
+        return out
 
     # ------------------------------------------------------------ sociální sítě
 

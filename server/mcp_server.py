@@ -53,7 +53,7 @@ DOC_TYPES = ["tiskova-zprava", "aktualita", "stanovisko", "program", "programovy
              "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
              "materialy", "prispevek-socialni-site", "schuzka", "navod", "system",
              "clanek-media", "prepis-videa", "projev", "slovnik", "sablona", "vysledek", "material",
-             "tisk", "interpelace", "volby", "financni-zprava"]
+             "tisk", "interpelace", "volby", "financni-zprava", "usneseni"]
 SOCIAL_PLATFORMS = ["x", "bluesky"]
 # šablony výstupů: texty v server/prompts/<typ>.md, typy z TEMPLATE_CONTENT v content/sablony/<typ>.md
 TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev", "video-106", "grafika-106",
@@ -85,6 +85,15 @@ AUTORITA_POPIS = {
     "nazor-jednotlivce": "názor jednotlivce (NENÍ stanovisko strany)",
     "vyjadreni-politika": "vyjádření politika (příspěvek na sociální síti nebo projev ve Sněmovně; "
                           "názor jednotlivce, NENÍ stanovisko strany)",
+    "vlada-resort": "tisková zpráva / aktualita ministerstva nebo úřadu vedeného pirátským ministrem "
+                    "(oficiální výstup resortu, NE stanovisko strany)",
+    "usneseni-vlady": "usnesení vlády ČR (rozhodnutí vlády jako celku podle Výsledků jednání vlády; "
+                      "závazné znění v ODok; NE stanovisko strany)",
+    "usneseni-zhmp": "usnesení Zastupitelstva hl. m. Prahy (rozhodnutí orgánu města, NE stanovisko strany)",
+    "usneseni-rhmp": "usnesení Rady hl. m. Prahy předložené pirátským radním (rozhodnutí Rady jako celku, "
+                     "NE stanovisko strany)",
+    "oficialni-data-praha": "otevřená data hl. m. Prahy (hlasování ZHMP)",
+    "oficialni-data-zhmp": "otevřená data hl. m. Prahy o hlasování Zastupitelstva hl. m. Prahy",
 }
 AUTORITA_PODLE_TYPU = {
     "program": "program", "programovy-dokument": "program", "stanovisko": "stanovisko",
@@ -97,26 +106,40 @@ AUTORITA_PODLE_TYPU = {
 }
 
 SERVER_INSTRUCTIONS = """Znalostní báze České pirátské strany (lidé, organizace, program,
-stanoviska, tiskové zprávy, hlasování v PSP, Senátu a Evropském parlamentu, vystoupení
-pirátských poslanců ve Sněmovně ze stenozáznamů (2017–dnes), návrhy zákonů a interpelace
-pirátských poslanců, výsledky voleb a zvolení Piráti (ČSÚ), financování strany (ÚDH,
-transparentní účty), příspěvky poslanců na X a Bluesky, přepisy videí z YouTube, weby
-krajských a místních sdružení, brand, šablony).
+stanoviska, tiskové zprávy, hlasování v PSP, Senátu, Evropském parlamentu a Zastupitelstvu
+hl. m. Prahy, vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (2017–dnes), návrhy
+zákonů a interpelace pirátských poslanců, působení Pirátů ve vládě Petra Fialy (2021–2024),
+usnesení Zastupitelstva a Rady hl. m. Prahy, výsledky voleb a zvolení Piráti (ČSÚ),
+financování strany (ÚDH, transparentní účty), příspěvky poslanců na X a Bluesky, přepisy videí
+z YouTube, weby krajských a místních sdružení, brand, šablony).
 Většina dat je automaticky vytěžená z veřejných zdrojů (pirati.cz a weby sdružení,
-lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, volby.gov.cz, udh.gov.cz, ib.fio.cz,
-styleguide.pirati.cz, X, Bluesky, YouTube) a není kurátorovaná; dokumenty s autoritou „kurator-schvaleno“ schválil kurátor báze,
+lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, vlada.gov.cz a weby resortů, opendata.praha.eu,
+usneseni.praha.eu, volby.gov.cz, udh.gov.cz, ib.fio.cz, styleguide.pirati.cz, X, Bluesky,
+YouTube) a není kurátorovaná; dokumenty s autoritou „kurator-schvaleno“ schválil kurátor báze,
 „kurator-navrh“ je zatím jen návrh. Pravidla pro odpovědi:
 1. U každého tvrzení cituj URL ze pole „Zdroj“.
-2. Rozlišuj autoritu: program a usnesení = oficiální postoj strany; tisková zpráva =
-   oficiální výstup, ale ne usnesení; článek na webu, profil, názor jednotlivce, projev
-   poslance ve Sněmovně nebo příspěvek poslance na sociální síti ≠ stanovisko strany.
+2. Rozlišuj autoritu: program a usnesení orgánů strany = oficiální postoj strany; tisková
+   zpráva = oficiální výstup, ale ne usnesení; článek na webu, profil, názor jednotlivce, projev
+   poslance ve Sněmovně nebo příspěvek poslance na sociální síti ≠ stanovisko strany. TZ
+   ministerstva, usnesení vlády nebo usnesení orgánů hl. m. Prahy jsou rozhodnutí a výstupy
+   státu či města, ne stanovisko strany.
 3. Nikdy nevymýšlej stanoviska. Pokud báze nic nemá, řekni to a navrhni, u koho to ověřit.
 4. Začni toolem search_kb nebo get_position; pro lidi find_people, pro brand get_brand,
    pro šablony get_template, pro vyjádření poslanců na sítích get_social_posts, pro to,
    co poslanci řekli ve Sněmovně (stenozáznamy), get_speeches; pro návrhy zákonů Pirátů
    get_bills, interpelace přes search_kb(typ=["interpelace"]); pro volební výsledky
    get_election_results, pro zvolené poslance, senátory a zastupitele find_elected; pro
-   financování strany (příjmy, dary, státní příspěvky, kampaně, účty) get_party_finances.
+   financování strany (příjmy, dary, státní příspěvky, kampaně, účty) get_party_finances;
+   pro působení Pirátů ve vládě 2021–2024 (TZ MMR, MZV, DIA, digitalizace, legislativa;
+   usnesení vlády předložená pirátskými ministry) get_government_record; pro to, co Piráti
+   prosadili v Praze nebo co předložil pražský radní (usnesení ZHMP a Rady HMP)
+   get_resolutions, pro hlasování pražských zastupitelů get_voting_record(komora="zhmp");
+   pro usnesení orgánů strany rozhodnuti_organu.
+   Skladebné nástroje: o člověku profil_politika, o obci nebo kraji profil_obce, vývoj tématu
+   v čase casova_osa, co v bázi přibylo (podklad pro newsletter) novinky, nejednotná
+   hlasování klubu jednota_klubu, ověření tvrzení o Pirátech over_tvrzeni, kontrola textu
+   před zveřejněním zkontroluj_text; pro ověřené členy hledat_interni (neveřejná data)
+   a navrhnout_do_baze (návrh doplnění ke schválení kurátorem).
 5. Když báze nemá přesnou odpověď, řekni to a doporuč konkrétní osobu s kontaktem
    (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu.
 6. Když nenajdeš odpověď ani po find_expert, zavolej report_gap s původní otázkou.
@@ -284,8 +307,8 @@ def _citace_veta(results: list[dict]) -> str:
             keys.append(k)
     popis = "; ".join(f"{k} = {AUTORITA_POPIS.get(k, k)}" for k in keys) or "neuvedena"
     return ("Cituj zdroj URL. Autorita: " + popis +
-            ". Jen program a usnesení jsou oficiální postoj strany; tisková zpráva je oficiální"
-            " výstup, článek na webu nebo profil nejsou stanovisko.")
+            ". Jen program a usnesení (usnesení orgánů strany, ne usnesení vlády nebo města) jsou oficiální"
+            " postoj strany; tisková zpráva je oficiální výstup, článek na webu nebo profil nejsou stanovisko.")
 
 
 def _full_matches(results: list[dict], query: str) -> tuple[list[dict], bool]:
@@ -638,7 +661,8 @@ def search_kb(query: str, typ: list[str] | None = None, od: str | None = None,
     Argumenty: query = hledaný text (česky, diakritika nevadí); typ = seznam typů
     dokumentů (tiskova-zprava, aktualita, stanovisko, program, programovy-dokument,
     predpis, rozcestnik, osoba, organizacni-jednotka, brand, hlasovani, materialy, projev,
-    tisk, interpelace, volby, financni-zprava, navod, sablona);
+    tisk, interpelace, volby, financni-zprava, usneseni, navod, sablona; usneseni = usnesení
+    vlády předložená pirátskými ministry a usnesení Zastupitelstva a Rady hl. m. Prahy);
     od/do = rozmezí data YYYY-MM-DD; limit = počet výsledků (výchozí 10, max 50).
     Použij jako první krok, když nevíš, kde informace je."""
     q = _nonempty(query)
@@ -1062,12 +1086,14 @@ def search_press_releases(query: str, od: str | None = None, do: str | None = No
                           limit: int = 10) -> str:
     """Hledá v tiskových zprávách Pirátů (pirati.cz, 2015–dnes). Vrací název, datum,
     úryvek a URL. od/do = rozmezí data YYYY-MM-DD, limit výchozí 10 (max 50).
-    Hodí se pro „co jsme k tomu řekli“, citace mluvčích a vzory formulací."""
+    Hodí se pro „co jsme k tomu řekli“, citace mluvčích a vzory formulací.
+    TZ ministerstev za pirátských ministrů hledej v get_government_record."""
     q = _nonempty(query)
     if not q:
         return "Dotaz je prázdný. Zadej téma, např. `search_press_releases(\"chat control\")`."
     limit = max(1, min(int(limit or 10), 50))
-    results = get_kb().search(q, typ=["tiskova-zprava"], od=od or None, do=do or None, limit=limit)
+    results = get_kb().search(q, typ=["tiskova-zprava"], od=od or None, do=do or None, limit=limit,
+                              bez_kolekce=["vlada"])
     if not results:
         return f"Žádná tisková zpráva k „{q}“" + (f" v rozmezí {od or '…'}–{do or '…'}" if od or do else "") + \
             ". Zkus jiná slova nebo search_kb (typ aktualita) – starší texty na webu mohou být označeny jako článek." + \
@@ -1086,6 +1112,11 @@ KOMORY = {
               "zdroj": "https://www.senat.cz/ (RSS hlasování senátorů; celkové počty hlasů nejsou k dispozici)"},
     "ep": {"nazev": "Evropský parlament", "vysledek": "Výsledek v EP",
            "zdroj": "https://howtheyvote.eu/ (HowTheyVote.eu, licence ODbL; jen závěrečná hlasování)"},
+    "zhmp": {"nazev": "Zastupitelstvo hl. m. Prahy", "vysledek": "Výsledek v ZHMP",
+             "zdroj": "https://opendata.praha.eu/ (otevřená data MHMP „Výsledky hlasování ZHMP“; jen hlasování "
+                      "k přijatým usnesením, od 11/2018) a https://usneseni.praha.eu/ (odkaz na detail usnesení "
+                      "funguje po otevření archivu https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-ZHMP-1 "
+                      "ve stejném prohlížeči)"},
 }
 
 
@@ -1160,24 +1191,28 @@ def get_voting_record(poslanec: str | None = None, query: str | None = None,
                       obdobi: int | None = None, limit: int = 20,
                       komora: str | None = None) -> str:
     """Hlasování pirátských zástupců: Poslanecká sněmovna (psp.cz, období 2017, 2021,
-    2025), Senát (senat.cz, pirátští senátoři od 2012) a Evropský parlament
-    (HowTheyVote.eu, europoslanci od 2019; názvy hlasování anglicky). Vrací název
-    hlasování, datum, výsledek, jak hlasovali Piráti a odkaz na zdroj. Při zadání
-    `poslanec` (jméno nebo příjmení poslance, senátora či europoslance) přidá jeho hlas
-    u každého hlasování a celkový souhrn (ano/ne/zdržel/nehlasoval/nepřítomen).
-    query = slova z názvu hlasování (zákon, tisk; u EP anglicky); od/do = YYYY-MM-DD;
-    obdobi = rok začátku období (PSP 2017/2021/2025, Senát rok funkčního období,
-    EP 2019/2024); komora = psp | senat | ep (výchozí všechny); limit výchozí 20 (max 100)."""
+    2025), Senát (senat.cz, pirátští senátoři od 2012), Evropský parlament
+    (HowTheyVote.eu, europoslanci od 2019; názvy hlasování anglicky) a Zastupitelstvo
+    hl. m. Prahy (otevřená data MHMP, od 11/2018; jen hlasování o přijatých usneseních).
+    Vrací název hlasování, datum, výsledek, jak hlasovali Piráti a odkaz na zdroj. Při
+    zadání `poslanec` (jméno nebo příjmení poslance, senátora, europoslance či pražského
+    zastupitele) přidá jeho hlas u každého hlasování a celkový souhrn (ano/ne/zdržel/
+    nehlasoval/nepřítomen). query = slova z názvu hlasování (zákon, tisk, název usnesení;
+    u EP anglicky); od/do = YYYY-MM-DD; obdobi = rok začátku období (PSP 2017/2021/2025,
+    Senát rok funkčního období, EP 2019/2024, ZHMP 2018/2022); komora = psp | senat | ep |
+    zhmp (výchozí všechny); limit výchozí 20 (max 100)."""
     if all(_blank(x) for x in (poslanec, query, od, do, obdobi, komora)):
         return ("Zadej aspoň jeden filtr: poslanec (jméno), query (název hlasování), od/do, obdobi "
-                "nebo komora (psp, senat, ep). Např. `get_voting_record(poslanec=\"Hřib\", query=\"rozpočet\")`.")
+                "nebo komora (psp, senat, ep, zhmp). Např. `get_voting_record(poslanec=\"Hřib\", query=\"rozpočet\")`.")
     k = _clean(komora).lower() if not _blank(komora) else None
     if k in ("sněmovna", "snemovna", "ps"):
         k = "psp"
     if k in ("senát",):
         k = "senat"
+    if k in ("praha", "zastupitelstvo", "magistrát", "magistrat"):
+        k = "zhmp"
     if k is not None and k not in KOMORY:
-        return "Neznámá komora „" + _s(komora) + "“. Povolené hodnoty: psp, senat, ep."
+        return "Neznámá komora „" + _s(komora) + "“. Povolené hodnoty: psp, senat, ep, zhmp."
     kb = get_kb()
     limit = max(1, min(int(limit or 20), 100))
     votes = kb.search_votes(query=_clean(query) or None, poslanec=_clean(poslanec) or None,
@@ -1198,10 +1233,21 @@ def get_voting_record(poslanec: str | None = None, query: str | None = None,
             out.append(f"- ano {summary.get('ano', 0)}, ne {summary.get('ne', 0)}, zdržel se "
                        f"{summary.get('zdrzel', 0)}, nehlasoval {summary.get('nehlasoval', 0)}, "
                        f"nepřítomen/omluven {summary.get('nepritomen', 0)}")
+            if k is None:
+                # jedno jméno může hlasovat ve více komorách (např. Hřib v ZHMP a v PSP)
+                po_komorach = []
+                for kk in KOMORY:
+                    sk = kb.vote_summary(_clean(poslanec), od=od or None, do=do or None, komora=kk) or {}
+                    if sk.get("nalezen") and sk.get("celkem"):
+                        po_komorach.append(f"{KOMORY[kk]['nazev']} {sk['celkem']}"
+                                           + (f" ({_s(sk.get('od'))} – {_s(sk.get('do'))})" if sk.get("od") else ""))
+                if len(po_komorach) > 1:
+                    out.append("- podle komory: " + "; ".join(po_komorach)
+                               + " (pro jednu komoru zadej `komora`)")
             out.append("")
         else:
-            out.append(f"„{poslanec}“ v datech hlasování (pirátští poslanci, senátoři a europoslanci) "
-                       "nenalezen; zkus jen příjmení.\n")
+            out.append(f"„{poslanec}“ v datech hlasování (pirátští poslanci, senátoři, europoslanci a zastupitelé "
+                       "hl. m. Prahy) nenalezen; zkus jen příjmení.\n")
     if votes:
         out.append(f"## Hlasování ({len(votes)}" + (f", filtr „{query}“" if not _blank(query) else "") + ")")
         out.append("\n\n".join(_fmt_vote(i, v) for i, v in enumerate(votes, 1)))
@@ -1212,6 +1258,87 @@ def get_voting_record(poslanec: str | None = None, query: str | None = None,
                + ". U každého hlasování cituj jeho URL. Autorita: oficiální data o hlasování "
                "(hlas zástupce, ne stanovisko strany).")
     return _cap("\n".join(out), "Sniž limit nebo zúž query/od/do.")
+
+
+# ----------------------------------------------------------------------------- usnesení hl. m. Prahy (praha.py)
+# Specifikace: docs/integrace/praha.md. Data: data/praha/usneseni/{zhmp,rhmp}/ (typ usneseni,
+# autorita usneseni-zhmp / usneseni-rhmp), hledání v KB.search_resolutions.
+
+ORGANY = {"zhmp": "Zastupitelstvo hl. m. Prahy", "rhmp": "Rada hl. m. Prahy"}
+ORGAN_ALIASY = {"zastupitelstvo": "zhmp", "rada": "rhmp", "zhmp": "zhmp", "rhmp": "rhmp",
+                "zastupitelstvo hl. m. prahy": "zhmp", "rada hl. m. prahy": "rhmp", "rada hmp": "rhmp"}
+ARCHIV_USNESENI = {"zhmp": "https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-ZHMP-1",
+                   "rhmp": "https://usneseni.praha.eu/ina/seznamlist.aspx?evidence=usneseni-RHMP-1"}
+
+
+def _organ_usneseni(organ: Any) -> str | None:
+    """'zhmp', 'Zastupitelstvo', 'Rada HMP' -> zhmp | rhmp (None = neznámý)."""
+    f = _fold_safe(organ)
+    if f in ORGAN_ALIASY:
+        return ORGAN_ALIASY[f]
+    if f.startswith("zastup"):
+        return "zhmp"
+    if f.startswith("rad"):
+        return "rhmp"
+    return None
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_resolutions(organ: str | None = None, query: str | None = None,
+                    predkladatel: str | None = None, od: str | None = None,
+                    do: str | None = None, limit: int = 20) -> str:
+    """Usnesení Zastupitelstva hl. m. Prahy (organ=zhmp, všechna od 11/2018, s tím, jak
+    hlasovali pirátští zastupitelé) a Rady hl. m. Prahy (organ=rhmp, jen usnesení, která
+    předložil pirátský radní: Hřib, Šimral, Zábranský, Komrsková, Mazur, Beránek). Vrací
+    číslo usnesení, datum, název, předkladatele a odkaz do archivu usneseni.praha.eu.
+    query = slova z názvu (např. „tramvaj“, „územní plán“); predkladatel = jméno nebo
+    příjmení předkladatele; od/do = YYYY-MM-DD; limit výchozí 20 (max 100). Použij pro „co
+    Piráti prosadili v Praze“ nebo „co předložil radní X“; usnesení je rozhodnutí orgánu
+    města, ne stanovisko strany. Usnesení vlády jsou v get_government_record."""
+    o = _organ_usneseni(organ) if not _blank(organ) else None
+    if not _blank(organ) and o is None:
+        return "Neznámý orgán „" + _s(organ) + "“. Povolené hodnoty: zhmp (zastupitelstvo), rhmp (rada)."
+    if all(_blank(x) for x in (organ, query, predkladatel, od, do)):
+        return ("Zadej aspoň jeden filtr: organ (zhmp, rhmp), query (slova z názvu), predkladatel, od/do. "
+                "Např. `get_resolutions(organ=\"rhmp\", predkladatel=\"Zábranský\", query=\"byty\")`.")
+    kb = get_kb()
+    fn = getattr(kb, "search_resolutions", None)
+    if fn is None:
+        return "Index neobsahuje usnesení; spusť `python3 ingest/praha.py` a `python -m server.kb.build`."
+    limit = max(1, min(int(limit or 20), 100))
+    res = fn(organ=o, query=_clean(query) or None, predkladatel=_clean(predkladatel) or None,
+             od=od or None, do=do or None, limit=limit, kolekce=["praha"])
+    if not res:
+        return ("Žádné usnesení neodpovídá filtrům. RHMP obsahuje jen usnesení s pirátským předkladatelem; "
+                "zkus jiná slova nebo celý archiv " + ARCHIV_USNESENI.get(o or "zhmp", ARCHIV_USNESENI["zhmp"]) + ".")
+    lines = [f"## Usnesení ({len(res)})"]
+    for i, r in enumerate(res, 1):
+        lines.append(f"{i}. **{_clean(r['nazev'])}** ({_s(r['datum'])})")
+        lines.append(f"   Orgán: {ORGANY.get(r.get('organ'), _s(r.get('organ')))} | č. {_s(r.get('cislo'))}"
+                     + (f" | tisk {_s(r.get('tisk'))}" if r.get("tisk") else ""))
+        if r.get("predkladatel"):
+            lines.append(f"   Předkladatel: {_clean(r['predkladatel'])}"
+                         + (f" (Pirát: {', '.join(r['predkladatel_pirati'])})" if r.get("predkladatel_pirati") else ""))
+        for vid in (r.get("hlasovani") or [])[:2]:
+            try:
+                v = kb.get_vote(int(vid))
+            except (TypeError, ValueError):
+                v = None
+            if v:
+                souhrn = ", ".join(f"{k} {n}" for k, n in (v.get("pirati_souhrn") or {}).items())
+                lines.append(f"   Hlasování ZHMP: {_s(v.get('vysledek'))} (pro {_s(v.get('pro'))}, proti "
+                             f"{_s(v.get('proti'))}, zdrželo se {_s(v.get('zdrzel'))}); Piráti: {souhrn or '—'}")
+        lines.append(f"   Autorita: {_autorita(r)}")
+        if r.get("snippet"):
+            lines.append(f"   > {_snippet(r['snippet'], 200)}")
+        lines.append(f"   Zdroj: {_s(r.get('zdroj'))} | doc_id: `{r['doc_id']}`")
+    tail = ("Odkaz na detail v usneseni.praha.eu funguje po otevření archivu ve stejném prohlížeči ("
+            + ARCHIV_USNESENI["zhmp"] + ", " + ARCHIV_USNESENI["rhmp"] + "); jinak v archivu vyhledej číslo "
+            "usnesení. Autorita: oficiální rozhodnutí orgánu hl. m. Prahy (usnesení), ne stanovisko strany; "
+            "předkladatel je radní/zastupitel, který materiál předložil. Hlasování jednotlivých zastupitelů: "
+            "get_voting_record(komora=\"zhmp\").")
+    return _cap_with_tail("\n".join(lines), tail, "Sniž limit nebo zúž query/od/do.")
 
 
 SOCIAL_DISCLAIMER = ("Jde o vyjádření jednotlivce (poslance), ne stanovisko strany; vždy cituj URL "
@@ -1402,6 +1529,135 @@ def get_speeches(poslanec: str | None = None, query: str | None = None,
     out.append(f"Autorita: {AUTORITA_POPIS['vyjadreni-politika']}. {SPEECH_DISCLAIMER} "
                "Celé vystoupení: get_document(doc_id); oficiální postoj strany: get_position.")
     return _cap("\n".join(out), "Sniž limit nebo zúž query/poslanec/od/do.")
+
+
+# ----------------------------------------------------------------------------- Piráti ve vládě (vlada.py)
+# Specifikace: docs/integrace/vlada.md. Data: data/vlada/ (TZ resortů, autorita vlada-resort;
+# body jednání vlády předložené pirátskými ministry, typ usneseni, autorita usneseni-vlady).
+
+VLADA_TYPY = ["tiskova-zprava", "aktualita", "usneseni"]
+VLADA_MINISTRI = {
+    # klíč (bez diakritiky, podřetězec) -> (jméno v poli `ministr`, funkce, období jako nominant Pirátů)
+    "bartos": ("Ivan Bartoš", "místopředseda vlády pro digitalizaci a ministr pro místní rozvoj",
+               "17. 12. 2021 – 30. 9. 2024"),
+    "lipavsk": ("Jan Lipavský", "ministr zahraničních věcí (nominant Pirátů do 30. 9. 2024; 1. 10. 2024 "
+                "vystoupil ze strany a ve vládě zůstal jako nezávislý)", "17. 12. 2021 – 30. 9. 2024"),
+    "salomoun": ("Michal Šalomoun", "ministr pro legislativu a předseda Legislativní rady vlády",
+                 "17. 12. 2021 – 11. 10. 2024"),
+}
+VLADA_RESORT_KLIC = {"mmr": "bartos", "mistni rozvoj": "bartos", "digitaliz": "bartos", "dia": "bartos",
+                     "mzv": "lipavsk", "zahranic": "lipavsk", "legislativ": "salomoun"}
+VLADA_RESORT_LABEL = {"mmr": "MMR", "digitalizace": "Úřad vlády – vicepremiér pro digitalizaci",
+                      "dia": "Digitální a informační agentura", "legislativa": "Úřad vlády – ministr pro legislativu",
+                      "mzv": "MZV"}
+
+
+def _vladni_ministr(ministr: Any) -> str | None:
+    """'Bartoš', 'Bartoše', 'Ivan Bartoš', 'MMR', 'legislativa' -> klíč VLADA_MINISTRI (None = neznámý)."""
+    f = _fold_safe(ministr)
+    if not f:
+        return None
+    for key in VLADA_MINISTRI:
+        if key in f:
+            return key
+    return next((key for res, key in VLADA_RESORT_KLIC.items() if re.search(rf"\b{res}", f)), None)
+
+
+def government_records(kb: Any, ministr: str | None = None, query: str | None = None,
+                       od: str | None = None, do: str | None = None, limit: int = 10,
+                       druh: str | None = None) -> dict:
+    """Čistá funkce nad KB: dokumenty kolekce `vlada`. Vrací {"ministr": klíč|None,
+    "nenalezen": bool, "polozky": [...]}; položky jsou řádky KB.search (s query) nebo
+    KB.list_documents (bez query) doplněné o ministr, resort, predkladatel, cislo_jednaci, vysledek."""
+    limit = max(1, min(int(limit or 10), 30))
+    typ = {"tz": ["tiskova-zprava", "aktualita"], "usneseni": ["usneseni"]}.get(
+        _fold_safe(druh).replace("usnesení", "usneseni"), VLADA_TYPY)
+    key = _vladni_ministr(ministr) if not _blank(ministr) else None
+    if not _blank(ministr) and key is None:
+        return {"ministr": None, "nenalezen": True, "polozky": []}
+    allowed: set[str] | None = None
+    if key:
+        allowed = {r[0] for r in kb.con.execute(
+            "SELECT id FROM documents WHERE kolekce = 'vlada' AND json_extract(meta, '$.ministr') LIKE ?",
+            (f"%{VLADA_MINISTRI[key][0]}%",))}
+    q = _clean(query)
+    if q:
+        items = kb.search(q, typ=typ, kolekce=["vlada"], od=od or None, do=do or None,
+                          limit=200 if allowed is not None else limit, preferuj_nove=False)
+    else:
+        items = kb.list_documents(typ=typ, kolekce=["vlada"], od=od or None, do=do or None,
+                                  limit=5000 if allowed is not None else limit)
+    if allowed is not None:
+        items = [r for r in items if r["doc_id"] in allowed]
+    # search vrací až 2 chunky z dokumentu; ve výpisu stačí jeden
+    seen: set[str] = set()
+    items = [r for r in items if not (r["doc_id"] in seen or seen.add(r["doc_id"]))][:limit]
+    if items:
+        ids = [r["doc_id"] for r in items]
+        extra = {r[0]: r[1:] for r in kb.con.execute(
+            "SELECT id, json_extract(meta, '$.ministr'), json_extract(meta, '$.resort'), "
+            "json_extract(meta, '$.predkladatel'), json_extract(meta, '$.cislo_jednaci'), "
+            f"json_extract(meta, '$.vysledek') FROM documents WHERE id IN ({','.join('?' * len(ids))})", ids)}
+        for r in items:
+            (r["ministr"], r["resort"], r["predkladatel"], r["cislo_jednaci"],
+             r["vysledek"]) = extra.get(r["doc_id"], (None,) * 5)
+    return {"ministr": key, "nenalezen": False, "polozky": items}
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_government_record(ministr: str | None = None, query: str | None = None,
+                          od: str | None = None, do: str | None = None, limit: int = 10,
+                          druh: str | None = None) -> str:
+    """Působení Pirátů ve vládě Petra Fialy (12/2021 – 10/2024): tiskové zprávy a aktuality
+    resortů vedených pirátskými ministry (MMR, Úřad vlády – digitalizace, Digitální a informační
+    agentura, ministr pro legislativu, MZV) a usnesení vlády, která tito ministři předložili
+    (název bodu, čj., předkladatel, výsledek jednání vlády). Ministři: Ivan Bartoš (vicepremiér
+    pro digitalizaci a ministr pro místní rozvoj, do 30. 9. 2024), Jan Lipavský (ministr
+    zahraničí, za Piráty do 30. 9. 2024, pak nezávislý), Michal Šalomoun (ministr pro legislativu,
+    do 11. 10. 2024).
+
+    Argumenty (volitelné, lze kombinovat): ministr = jméno nebo příjmení (pád a diakritika
+    nevadí, např. „Bartoše“) nebo resort (MMR, MZV, DIA, digitalizace, legislativa); query =
+    hledaná slova (např. „stavební zákon“, „eDoklady“); od/do = rozmezí data YYYY-MM-DD;
+    druh = „tz“ (jen tiskové zprávy a aktuality) nebo „usneseni“; limit = počet (výchozí 10,
+    max 30). Bez query vrací nejnovější záznamy. Použij pro „co Piráti udělali ve vládě“,
+    „co předložil ministr X“, výsledky jako digitalizace stavebního řízení, eDoklady, Portál
+    občana nebo nový stavební zákon. TZ resortu ani usnesení vlády nejsou stanovisko strany."""
+    res = government_records(get_kb(), ministr, query, od, do, limit, druh)
+    if res["nenalezen"]:
+        return (f"„{_clean(ministr)}“ není pirátský člen vlády Petra Fialy. Báze má Ivana Bartoše (MMR, "
+                "digitalizace, DIA), Jana Lipavského (MZV, jako nominanta Pirátů do 30. 9. 2024) a Michala "
+                "Šalomouna (ministr pro legislativu). Ostatní členy vlády báze nesleduje.")
+    out: list[str] = []
+    if res["ministr"]:
+        jm, funkce, obdobi = VLADA_MINISTRI[res["ministr"]]
+        out.append(f"## {jm}: {funkce}, {obdobi}\n")
+    items = res["polozky"]
+    q = _clean(query)
+    if not items:
+        filt = ", ".join(f"{k}={v}" for k, v in (("ministr", _clean(ministr)), ("query", q), ("od", od),
+                                                  ("do", do), ("druh", druh)) if v)
+        return "".join(out) + (f"Žádný záznam z působení Pirátů ve vládě neodpovídá filtrům ({filt}). "
+                               "Zkus jiná slova, širší období, bez druhu, nebo search_kb.")
+    out.append(f"Záznamy z vlády ({len(items)}" + (f", k „{q}“" if q else ", nejnovější") + "):\n")
+    for i, r in enumerate(items, 1):
+        lines = [f"{i}. **{_clean(r.get('nazev'))}** ({r.get('typ')}, {r.get('datum') or 'bez data'})"]
+        if r.get("typ") == "usneseni":
+            lines.append(f"   Předkládá: {_clean(r.get('predkladatel'))} ({_s(r.get('ministr'))}); "
+                         f"čj. {_s(r.get('cislo_jednaci')) or 'neuvedeno'}; výsledek: {_s(r.get('vysledek'))}")
+        else:
+            lines.append(f"   Resort: {VLADA_RESORT_LABEL.get(r.get('resort'), _s(r.get('resort')))}; "
+                         f"ministr: {_s(r.get('ministr'))}")
+        lines.append(f"   Autorita: {_autorita(r)}")
+        if not _blank(r.get("snippet")):
+            lines.append(f"   > {_snippet(r.get('snippet'), 300)}")
+        lines.append(f"   Zdroj: {_s(r.get('zdroj'))} | doc_id: `{_s(r.get('doc_id'))}`")
+        out.append("\n".join(lines) + "\n")
+    tail = ("Cituj zdroj URL. TZ resortu je oficiální výstup ministerstva či úřadu za pirátského ministra, "
+            "usnesení vlády je rozhodnutí vlády jako celku (z „Výsledků jednání vlády“, závazné znění v ODok); "
+            "ani jedno není stanovisko strany. Celý text: get_document(doc_id).")
+    return _cap_with_tail("\n".join(out), tail, "Sniž limit nebo zúž ministr/query/od/do.")
 
 
 # ----------------------------------------------------------------------------- sněmovní tisky (tisky.py)
@@ -2116,6 +2372,7 @@ def kb_stats() -> str:
         out.extend(f"- {k}: {v}" for k, v in rest.items())
     out.append("\nData jsou převážně automaticky vytěžená a nekurátorovaná (viz data/README.md); zdroje: "
                "pirati.cz a weby sdružení, lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, "
+               "vlada.gov.cz a weby resortů, opendata.praha.eu, usneseni.praha.eu, volby.gov.cz, "
                "styleguide.pirati.cz, X, Bluesky a YouTube. Kurátorovaná vrstva je v content/.")
     return _cap("\n".join(out))
 
@@ -3084,6 +3341,12 @@ def _register_analyzy() -> None:
                 continue
             raise
         mod.register(mcp, me)
+    # tooly z modulů i jako atributy tohoto modulu (jako ostatní tooly), aby je evals/run.py
+    # a testy volaly stejně: server.mcp_server.profil_politika(...)
+    manager = getattr(mcp, "_tool_manager", None)
+    for t in manager.list_tools() if manager is not None else []:
+        if not hasattr(me, t.name):
+            setattr(me, t.name, t.fn)
 
 
 _register_analyzy()

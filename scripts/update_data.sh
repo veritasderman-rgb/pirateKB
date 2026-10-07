@@ -139,6 +139,9 @@ case "$MODE" in
       run_src senat       senat --jen-rss
     fi
     run_src ep            ep
+    # Praha: aktuální období hlasování ZHMP, seznamy usnesení za 60 dní a nové detaily RHMP;
+    # starší data bere skript z vlastních výstupů v data/praha (cache se v Actions nedrží).
+    run_src praha         praha --aktualni --max-detailu 1500
     run_src dokumenty     dokumenty
     run_src systemy       systemy
     ;;

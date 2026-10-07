@@ -6,15 +6,18 @@ Jeden zdroj pravdy o Pirátské straně, ke kterému se každý pirát připojí
 - lidi a organizační strukturu,
 - program a stanoviska,
 - tiskové zprávy a články,
-- hlasování v Poslanecké sněmovně, Senátu a Evropském parlamentu,
+- hlasování v Poslanecké sněmovně, Senátu, Evropském parlamentu a Zastupitelstvu hl. m. Prahy,
 - návrhy zákonů a interpelace pirátských poslanců,
+- působení Pirátů ve vládě Petra Fialy (2021–2024) a usnesení Zastupitelstva a Rady hl. m. Prahy,
 - výsledky voleb a zvolení Piráti (ČSÚ),
 - financování strany (výroční zprávy, kampaně, transparentní účty),
 - průvodce žádostí podle zákona 106 a dotazem zastupitele (lhůty, šablony, grafika a video),
 - příspěvky politiků na sítích a přepisy videí,
 - weby krajských a místních sdružení,
 - brand a šablony,
-- rozcestník pirátských systémů, aby člen věděl, kam s problémem.
+- rozcestník pirátských systémů, aby člen věděl, kam s problémem,
+- skladebné nástroje: profil politika a obce, časová osa tématu, novinky, ověření tvrzení
+  a kontrola textu před zveřejněním.
 
 Stav: **běžící prototyp**. Server je veřejně nasazený na Vercelu a data se obnovují
 automaticky každý den. Kurátorovaná vrstva (`content/`) je založená, zatím obsahuje
@@ -27,7 +30,9 @@ https://piratekb-veritasderman-3065s-projects.vercel.app/mcp
 ```
 
 - **claude.ai, Claude Desktop, mobilní Claude:** Settings → Connectors → *Add custom
-  connector* → vložit adresu výše. Přihlášení zatím není, server obsahuje jen veřejná data.
+  connector* → vložit adresu výše. Veřejný konektor je bez přihlášení a vrací jen veřejná
+  data. Členská data (viditelnost: clenske) vidí jen ověření členové na instanci
+  s přihlášením přes auth.pirati.cz, viz [docs/auth-keycloak.md](docs/auth-keycloak.md).
 - **Claude Code:**
   `claude mcp add --transport http piratekb https://piratekb-veritasderman-3065s-projects.vercel.app/mcp`
 - **ChatGPT a další klienti s podporou MCP přes HTTP:** stejná adresa.
@@ -63,7 +68,7 @@ jsou v [docs/ukazky](docs/ukazky/README.md).
 
 ## Co server umí
 
-**22 toolů:**
+**34 toolů:**
 
 | Tool | K čemu |
 |---|---|
@@ -73,15 +78,27 @@ jsou v [docs/ukazky](docs/ukazky/README.md).
 | `get_org_unit`, `get_org_tree` | orgány, týmy, odbory, krajská a místní sdružení, jejich vedení a struktura |
 | `get_program`, `get_position` | program a postoj strany k tématu (program, stanoviska, tiskové zprávy, vyjádření politiků zvlášť) |
 | `search_press_releases` | tiskové zprávy a aktuality |
-| `get_voting_record` | hlasování pirátských poslanců, senátorů a europoslanců (`komora`: psp, senat, ep) |
+| `get_voting_record` | hlasování pirátských poslanců, senátorů, europoslanců a zastupitelů hl. m. Prahy (`komora`: psp, senat, ep, zhmp) |
 | `get_social_posts` | příspěvky politiků na X a Bluesky |
 | `get_speeches` | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (2017–dnes), s odkazem na stenozáznam |
 | `get_bills` | návrhy zákonů předložené Piráty (i vládní návrhy pirátských ministrů): výsledek, Sbírka, závěrečné hlasování, odkaz na psp.cz |
 | `get_election_results` | výsledky Pirátů ve volbách: hlasy, %, mandáty, koalice; celostátně, po krajích, v obci |
 | `find_elected` | zvolení Piráti (poslanci, europoslanci, senátoři, krajští a obecní zastupitelé) podle jména, obce, kraje |
+| `get_government_record` | Piráti ve vládě Petra Fialy 2021–2024: tiskové zprávy resortů (MMR, MZV, digitalizace, DIA, legislativa) a usnesení vlády předložená Bartošem, Lipavským a Šalomounem |
+| `get_resolutions` | usnesení Zastupitelstva a Rady hl. m. Prahy (předkladatel, hlasování Pirátů, odkaz do archivu usnesení) |
 | `get_party_finances` | financování strany: příjmy, státní příspěvky, dary, kampaně, rozpočet a transparentní účty po letech (dárci FO jen souhrnně) |
 | `pruvodce_zadosti`, `lhuty_zadosti` | žádost podle zákona 106 a dotaz zastupitele krok za krokem: šablony, lhůty do kalendáře (Google, Microsoft 365, ICS), stížnost a odvolání |
 | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec s kontaktem |
+| `profil_politika` | přehled o člověku z celé báze: funkce, kontakt, zvolení, období v PSP/Senátu/EP/vládě, hlasování, návrhy zákonů, interpelace, vystoupení, sítě, média; u každé sekce zdroj a tool pro detail |
+| `profil_obce` | pirátský pohled na obec nebo kraj: místní a krajské sdružení, weby a aktuality, zvolení Piráti, výsledky voleb, poslanci a senátoři z kraje, média; instrukce pro doplnění z Hlídače státu |
+| `casova_osa` | téma v čase napříč zdroji (program, návrhy zákonů, hlasování, projevy, TZ, vláda, sítě, média, schůzky): shrnutí, milníky a chronologická osa s autoritou a URL |
+| `novinky` | co v bázi přibylo za období (výchozí 7 dní) po kategoriích s počty, jak hlasovali Piráti, nejvíc sdílené příspěvky; podklad pro newsletter |
+| `jednota_klubu` | nejednotná hlasování Pirátů (PSP/Senát/EP) seřazená podle významu a míra odchylky poslanců od většiny klubu; s metodikou, vnitřní analýza, ne hodnocení |
+| `over_tvrzeni` | ověření tvrzení o Pirátech nebo politikovi: důkazy podle autority (program, TZ, hlasování s hlasem osoby, návrhy zákonů se závěrečným hlasováním, projevy, sítě, média), kontrola jmen, funkcí, čísel a dat; verdikt dělá AI |
+| `zkontroluj_text` | kontrola návrhu TZ, příspěvku, projevu nebo dopisu před zveřejněním: citace a funkce mluvčích, opora „Piráti prosazují…“ v programu, čísla bez zdroje, brand a tón, povinné části TZ; nálezy blokující / doporučené |
+| `rozhodnuti_organu` | usnesení a rozhodnutí orgánů strany (RP, RV, CF, KS, MS, fóra) ze zápisů: orgán, datum, doslovný text, výsledek, odkaz; dnes jen zmínky z Evidence kontaktů a schůzek (formální zápisy orgánů v bázi zatím nejsou), ověřit v originále |
+| `hledat_interni` | jen pro ověřené členy: hledání v neveřejných (členských) dokumentech |
+| `navrhnout_do_baze` | jen pro ověřené členy: návrh doplnění z chatu jako GitHub issue `kb-navrh` ke schválení kurátorem |
 | `get_brand`, `get_template` | barvy, písma, loga, šablony tiskové zprávy, postu, reels, briefu a projevu, žádosti, stížnosti a odvolání podle 106, dotazu zastupitele, zadání videa a grafiky |
 | `kb_stats` | co báze obsahuje, kdy se aktualizovala, souhrn použití |
 | `report_gap` | nahlásí otázku, na kterou báze nemá odpověď (podklad pro kurátora) |
@@ -97,8 +114,10 @@ vzorové prompty (`kb://navod/prompty`).
 **Pravidla odpovědí:** AI u každého tvrzení cituje zdrojovou URL a rozlišuje autoritu
 zdroje. Platí toto rozlišení:
 
-- program a usnesení jsou oficiální postoj strany;
+- program a usnesení orgánů strany jsou oficiální postoj strany;
 - tisková zpráva je oficiální výstup strany;
+- tisková zpráva ministerstva, usnesení vlády a usnesení orgánů hl. m. Prahy jsou výstupy
+  státu a města, ne stanovisko strany;
 - příspěvek politika na sítích i projev poslance ve Sněmovně je jeho názor;
 - kurátorem schválený obsah má nejvyšší spolehlivost.
 
@@ -111,17 +130,19 @@ nahlásí.
   jmen, tematická synonyma) a vyšší váha novějších zpráv.
 - **Hledání podle významu:** volitelně přes embeddingy Voyage, zapíná se klíčem.
 - **Ochrana proti zahlcení:** limit 60 požadavků za minutu a 2 000 za den na IP adresu.
-- **Přihlášení přes auth.pirati.cz:** kód je připravený (Keycloak, jen pro členy), čeká
-  na klienta v Keycloaku. Viz [docs/auth-keycloak.md](docs/auth-keycloak.md).
+- **Přihlášení přes auth.pirati.cz a členská vrstva:** Keycloak, filtr viditelnosti platí pro
+  všechny tooly. Členské tooly `hledat_interni` a `navrhnout_do_baze` (návrh doplnění z chatu
+  → GitHub issue `kb-navrh` ke schválení kurátorem). Čeká na klienta v Keycloaku. Viz
+  [docs/auth-keycloak.md](docs/auth-keycloak.md).
 - **Telemetrie:** anonymní, bez textu dotazů.
-- **Evals:** 80 testovacích otázek běží v CI při každém pull requestu.
+- **Evals:** 96 testovacích otázek běží v CI při každém pull requestu.
 - **Skills pro Claude** ve složce [`skills/`](skills/README.md): tisková zpráva, brief a
   sociální sítě, včetně toho, kdy přibrat MCP Hlídače státu.
 
 ## Zdroje dat
 
 Všechna data jsou z veřejných zdrojů a vytěžují se automaticky do [`data/`](data/README.md).
-Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky, volby a financování k 7. 10. 2026).
+Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky, volby, financování, vláda a Praha k 7. 10. 2026).
 
 | Zdroj | Obsah | Počet | Obnova |
 |---|---|---|---|
@@ -131,7 +152,7 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky
 | [lide.pirati.cz](https://lide.pirati.cz) | týmy, odbory a orgány | 202 | týdně |
 | lide.pirati.cz | krajská a místní sdružení | 91 | týdně |
 | lide.pirati.cz | lidé s funkcí (role, jednotka, oficiální kontakt) | 458 | týdně |
-| [evidence.pirati.cz](https://evidence.pirati.cz) | zápisy ze schůzí orgánů a týmů | 7 260 | denně |
+| [evidence.pirati.cz](https://evidence.pirati.cz) | Evidence kontaktů a schůzek (registr lobbistických schůzek pirátských politiků, Open Lobby) | 7 260 | denně |
 | [psp.cz](https://www.psp.cz) | pirátští poslanci | 41 | denně |
 | psp.cz | hlasování ve Sněmovně (období 2017, 2021, 2025) | 21 541 | denně |
 | psp.cz | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (období 2017, 2021, 2025; bez řízení schůze) | 7 827 vystoupení (40 poslanců, 1 342 souborů) | týdně |
@@ -141,6 +162,10 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky
 | senat.cz | hlasování v Senátu (od 2012) | 6 794 | týdně |
 | [HowTheyVote.eu](https://howtheyvote.eu) | pirátští europoslanci | 3 | týdně |
 | HowTheyVote.eu | závěrečná hlasování v Evropském parlamentu (od 2019, názvy anglicky) | 2 470 | týdně |
+| [mmr.gov.cz](https://mmr.gov.cz), [vlada.gov.cz](https://vlada.gov.cz), [dia.gov.cz](https://www.dia.gov.cz), [mzv.gov.cz](https://mzv.gov.cz) | Piráti ve vládě Petra Fialy 2021–2024: tiskové zprávy resortů pirátských ministrů (MMR, digitalizace, DIA, legislativa, MZV) a usnesení vlády, která předložili | 828 TZ (MMR 435, MZV 252, legislativa 78, DIA 33, digitalizace 30) + 786 usnesení | jednorázově (uzavřená historie), MZV ručně po dávkách |
+| [opendata.praha.eu](https://opendata.praha.eu/) + [volby.cz](https://www.volby.cz) | pirátští zastupitelé hl. m. Prahy (2018–2022, 2022–2026) a jejich funkce v Radě HMP | 25 | týdně |
+| opendata.praha.eu | hlasování Zastupitelstva hl. m. Prahy o usneseních (od 11/2018) | 5 590 | týdně |
+| [usneseni.praha.eu](https://usneseni.praha.eu/) | usnesení ZHMP a Rady HMP od 11/2018 (Markdown: všechna ZHMP, RHMP jen předložená pirátskými radními) | 5 619 ZHMP + 24 109 RHMP (1 639 s pirátským předkladatelem; doplňuje se) | týdně |
 | [volby.gov.cz](https://volby.gov.cz/opendata/opendata.htm) (ČSÚ) | výsledky Pirátů ve volbách (Sněmovna, EP, Senát, kraje, obce 2010–2025) a zvolení Piráti | 27 voleb, 878 zvolených (PS 44, EP 4, Senát 9, kraje 107, obce 714) | měsíčně |
 | [ÚDH](https://udh.gov.cz/vyrocni-financni-zpravy-stran-a-hnuti), [Fio](https://ib.fio.cz/ib/transparent?a=2100048174), [Piroplácení](https://piroplaceni.pirati.cz) | financování strany: výroční finanční zprávy (2017–2025), zprávy o kampaních, rozpočty, měsíční souhrny transparentních účtů | 9 zpráv, 12 kampaní, 9 rozpočtů, 7 účtů (174 měsíců) | měsíčně (účty), ročně (zprávy) |
 | X (Twitter) | příspěvky poslanců a politiků | 1 000 | denně |
@@ -165,7 +190,8 @@ dokázali“ ke kontrole kurátorem. Postup kurátora popisuje [docs/kurator.md]
 - **wiki.pirati.cz:** web blokuje automatický přístup.
 - **mrak.pirati.cz:** potřebuje aplikační heslo.
 - **Google Drive:** zatím není napojený.
-- **Členská vrstva s neveřejnými daty:** čeká na přihlášení přes auth.pirati.cz.
+- **Členská vrstva:** filtr hotový, chybí klient v Keycloaku a indexovaná interní data
+  (mrak, fórum, Zulip, Redmine).
 
 ## Automatické aktualizace
 

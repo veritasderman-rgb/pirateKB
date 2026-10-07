@@ -1126,7 +1126,8 @@ _PRIVLASTKY = re.compile(r"(?i)\b(?:nov(?!el)|chystan|pripravovan|aktualn|soucas
 
 def _dotaz_zakon(zakon: str) -> str:
     """Dotaz na hlasování a tisky: bez obecných přívlastků, „novele/zákona“ v základním tvaru
-    (stemmer dává „novele“ -> novl, ale „Novela“ -> novel)."""
+    (kvůli přesné shodě tvaru v názvech hlasování „Novela z. - …“; kmen je stejný, stemmer
+    dává „novela“, „novele“ i „novelizace“ -> novl)."""
     slova = []
     for w in _PRIVLASTKY.sub(" ", fold(_tema(zakon))).split():
         if w.startswith("novel"):
