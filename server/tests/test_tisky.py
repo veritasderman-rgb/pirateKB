@@ -308,8 +308,10 @@ def test_end_to_end_outputs(tmp_path, monkeypatch, ctx):
 
 
 def _get_bills_ns() -> dict:
-    """Blok `# >>> get_bills … # <<< get_bills` z integrační specifikace, spuštěný v kontextu
-    modulu mcp_server (s atrapou dekorátoru @mcp.tool)."""
+    """Tool get_bills a bills_query: zapojené v server/mcp_server.py, jinak blok
+    `# >>> get_bills … # <<< get_bills` z integrační specifikace spuštěný v kontextu modulu."""
+    if hasattr(mcp_server, "bills_query"):
+        return vars(mcp_server)
     doc = (ROOT / "docs/integrace/tisky.md").read_text(encoding="utf-8")
     m = re.search(r"```python\n(# >>> get_bills.*?# <<< get_bills)\n```", doc, re.S)
     assert m, "ve specifikaci chybí blok get_bills"

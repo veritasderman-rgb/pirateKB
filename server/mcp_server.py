@@ -15,11 +15,14 @@ from __future__ import annotations
 
 import contextlib
 import functools
+import json
 import logging
 import os
 import re
 import sys
 import threading
+import unicodedata
+from collections import Counter
 from pathlib import Path
 from typing import Any, Callable
 
@@ -39,7 +42,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SERVER_DIR = Path(__file__).resolve().parent
 PROMPTS_DIR = SERVER_DIR / "prompts"
 DATA_DIR = REPO_ROOT / "data"
+CONTENT_DIR = REPO_ROOT / "content"
 DEFAULT_DB = REPO_ROOT / "index" / "kb.sqlite"
+PROMPTY_MD = REPO_ROOT / "docs" / "prompty.md"   # vzorové prompty (resource kb://navod/prompty)
 
 MAX_CHARS = 8000          # strop délky výstupu jednoho toolu
 DOC_PAGE_CHARS = 7000     # velikost stránky pro get_document
@@ -47,9 +52,13 @@ DOC_PAGE_CHARS = 7000     # velikost stránky pro get_document
 DOC_TYPES = ["tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument",
              "predpis", "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani",
              "materialy", "prispevek-socialni-site", "schuzka", "navod", "system",
-             "clanek-media", "prepis-videa", "projev", "slovnik", "sablona", "vysledek", "material"]
+             "clanek-media", "prepis-videa", "projev", "slovnik", "sablona", "vysledek", "material",
+             "tisk", "interpelace", "volby", "financni-zprava"]
 SOCIAL_PLATFORMS = ["x", "bluesky"]
-TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev"]
+# šablony výstupů: texty v server/prompts/<typ>.md, typy z TEMPLATE_CONTENT v content/sablony/<typ>.md
+TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev", "video-106", "grafika-106",
+                  "zadost-106", "stiznost-106", "odvolani-106", "dotaz-zastupitele"]
+TEMPLATE_CONTENT = {"zadost-106", "stiznost-106", "odvolani-106", "dotaz-zastupitele"}
 BRAND_PARTS = ["vse", "barvy", "fonty", "loga", "pravidla"]
 
 AUTORITA_POPIS = {
@@ -65,6 +74,11 @@ AUTORITA_POPIS = {
     "oficialni-data-psp": "otevřená data Poslanecké sněmovny",
     "oficialni-data-senat": "veřejná data Senátu (hlasování senátorů)",
     "oficialni-data-ep": "data o hlasování v Evropském parlamentu (HowTheyVote.eu)",
+    "oficialni-data-csu": "oficiální výsledky voleb (Český statistický úřad, volby.gov.cz)",
+    "oficialni-udhpsh": "úřední údaje z výroční finanční zprávy nebo zprávy o kampani podané ÚDH "
+                        "(za správnost odpovídá strana)",
+    "oficialni-transparentni-ucet": "souhrn transparentního účtu strany podle výpisu banky "
+                                    "(kategorie odvozené heuristikou)",
     "kurator-schvaleno": "kurátorovaný obsah schválený kurátorem báze (nejvyšší spolehlivost v bázi)",
     "kurator-navrh": "kurátorovaný obsah – NÁVRH, kurátor ho zatím neschválil",
     "kurator": "kurátorovaný obsah sestavený z více zdrojů",
@@ -78,15 +92,19 @@ AUTORITA_PODLE_TYPU = {
     "osoba": "oficialni-evidence", "organizacni-jednotka": "oficialni-evidence",
     "brand": "oficialni-styleguide", "hlasovani": "oficialni-data-psp", "materialy": "web",
     "prispevek-socialni-site": "vyjadreni-politika", "system": "audit", "projev": "vyjadreni-politika",
+    "tisk": "oficialni-data-psp", "interpelace": "oficialni-data-psp", "volby": "oficialni-data-csu",
+    "financni-zprava": "oficialni-udhpsh",
 }
 
 SERVER_INSTRUCTIONS = """Znalostní báze České pirátské strany (lidé, organizace, program,
 stanoviska, tiskové zprávy, hlasování v PSP, Senátu a Evropském parlamentu, vystoupení
-pirátských poslanců ve Sněmovně ze stenozáznamů (2017–dnes), příspěvky poslanců na X a
-Bluesky, přepisy videí z YouTube, weby krajských a místních sdružení, brand, šablony).
+pirátských poslanců ve Sněmovně ze stenozáznamů (2017–dnes), návrhy zákonů a interpelace
+pirátských poslanců, výsledky voleb a zvolení Piráti (ČSÚ), financování strany (ÚDH,
+transparentní účty), příspěvky poslanců na X a Bluesky, přepisy videí z YouTube, weby
+krajských a místních sdružení, brand, šablony).
 Většina dat je automaticky vytěžená z veřejných zdrojů (pirati.cz a weby sdružení,
-lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, styleguide.pirati.cz, X, Bluesky, YouTube)
-a není kurátorovaná; dokumenty s autoritou „kurator-schvaleno“ schválil kurátor báze,
+lide.pirati.cz, psp.cz, senat.cz, howtheyvote.eu, volby.gov.cz, udh.gov.cz, ib.fio.cz,
+styleguide.pirati.cz, X, Bluesky, YouTube) a není kurátorovaná; dokumenty s autoritou „kurator-schvaleno“ schválil kurátor báze,
 „kurator-navrh“ je zatím jen návrh. Pravidla pro odpovědi:
 1. U každého tvrzení cituj URL ze pole „Zdroj“.
 2. Rozlišuj autoritu: program a usnesení = oficiální postoj strany; tisková zpráva =
@@ -95,10 +113,14 @@ a není kurátorovaná; dokumenty s autoritou „kurator-schvaleno“ schválil 
 3. Nikdy nevymýšlej stanoviska. Pokud báze nic nemá, řekni to a navrhni, u koho to ověřit.
 4. Začni toolem search_kb nebo get_position; pro lidi find_people, pro brand get_brand,
    pro šablony get_template, pro vyjádření poslanců na sítích get_social_posts, pro to,
-   co poslanci řekli ve Sněmovně (stenozáznamy), get_speeches.
+   co poslanci řekli ve Sněmovně (stenozáznamy), get_speeches; pro návrhy zákonů Pirátů
+   get_bills, interpelace přes search_kb(typ=["interpelace"]); pro volební výsledky
+   get_election_results, pro zvolené poslance, senátory a zastupitele find_elected; pro
+   financování strany (příjmy, dary, státní příspěvky, kampaně, účty) get_party_finances.
 5. Když báze nemá přesnou odpověď, řekni to a doporuč konkrétní osobu s kontaktem
    (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu.
 6. Když nenajdeš odpověď ani po find_expert, zavolej report_gap s původní otázkou.
+   Když se uživatel ptá, co s bází umí, nabídni vzorové prompty z resource kb://navod/prompty.
 7. Pro žádosti podle zákona č. 106/1999 Sb. a dotazy zastupitelů použij pruvodce_zadosti /
    lhuty_zadosti a lhůty zapiš uživateli do kalendáře přes jeho kalendářový konektor
    (Google Calendar, Microsoft 365); bez konektoru nabídni ICS z výstupu lhuty_zadosti."""
@@ -407,13 +429,53 @@ def _nonempty(query: Any) -> str:
     return q
 
 
+_TEMPLATE_ALIASES = {
+    "tz": "tiskova-zprava", "tiskovka": "tiskova-zprava", "social": "social-post", "post": "social-post",
+    "reel": "reels", "video": "reels", "speech": "projev",
+    "video106": "video-106", "grafika": "grafika-106", "grafika106": "grafika-106", "karta": "grafika-106",
+    "106": "zadost-106", "zadost": "zadost-106", "zadost106": "zadost-106", "zadost-o-informace": "zadost-106",
+    "stiznost": "stiznost-106", "stiznost106": "stiznost-106", "odvolani": "odvolani-106",
+    "odvolani106": "odvolani-106", "dotaz": "dotaz-zastupitele", "zastupitel": "dotaz-zastupitele",
+}
+
+
+def _content_template(typ: str) -> str | None:
+    """Šablona z kurátorované vrstvy content/sablony/<typ>.md: hlavička se zdrojem a stavem schválení + tělo."""
+    path = CONTENT_DIR / "sablony" / f"{typ}.md"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    fm: dict = {}
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        if end != -1:
+            try:
+                import yaml  # type: ignore
+                fm = yaml.safe_load(text[3:end]) or {}
+            except Exception:  # noqa: BLE001
+                fm = {}
+            text = text[end + 4:]
+    stav = _s(fm.get("stav"))
+    autorita = f"kurator-{stav}" if stav in ("navrh", "schvaleno") else _s(fm.get("autorita")) or "kurator"
+    head = [f"# {_clean(fm.get('nazev')) or typ}", "",
+            f"Zdroj: {_s(fm.get('zdroj')) or f'content/sablony/{typ}.md'} · Autorita: "
+            f"{AUTORITA_POPIS.get(autorita, autorita)}"]
+    dalsi = [z for z in fm.get("zdroje") or [] if _s(z) and _s(z) != _s(fm.get("zdroj"))]
+    if dalsi:
+        head.append("Další zdroje: " + ", ".join(_s(z) for z in dalsi))
+    if not _blank(fm.get("poznamka")):
+        head.append(f"Poznámka: {_clean(fm.get('poznamka'))}")
+    return "\n".join(head) + "\n\n" + text.strip() + "\n"
+
+
 def _read_template(typ: str) -> str | None:
-    typ = _clean(typ).lower().replace("_", "-").replace(" ", "-")
-    aliases = {"tz": "tiskova-zprava", "tiskovka": "tiskova-zprava", "social": "social-post",
-               "post": "social-post", "reel": "reels", "video": "reels", "speech": "projev"}
-    typ = aliases.get(typ, typ)
+    typ = re.sub(r"[\s_]+", "-", _fold_safe(typ).strip())
+    typ = _TEMPLATE_ALIASES.get(typ, typ)
     if typ not in TEMPLATE_TYPES:
         return None
+    if typ in TEMPLATE_CONTENT:
+        return _content_template(typ)
     path = PROMPTS_DIR / f"{typ}.md"
     if not path.exists():
         return None
@@ -575,7 +637,8 @@ def search_kb(query: str, typ: list[str] | None = None, od: str | None = None,
 
     Argumenty: query = hledaný text (česky, diakritika nevadí); typ = seznam typů
     dokumentů (tiskova-zprava, aktualita, stanovisko, program, programovy-dokument,
-    predpis, rozcestnik, osoba, organizacni-jednotka, brand, hlasovani, materialy);
+    predpis, rozcestnik, osoba, organizacni-jednotka, brand, hlasovani, materialy, projev,
+    tisk, interpelace, volby, financni-zprava, navod, sablona);
     od/do = rozmezí data YYYY-MM-DD; limit = počet výsledků (výchozí 10, max 50).
     Použij jako první krok, když nevíš, kde informace je."""
     q = _nonempty(query)
@@ -1341,6 +1404,633 @@ def get_speeches(poslanec: str | None = None, query: str | None = None,
     return _cap("\n".join(out), "Sniž limit nebo zúž query/poslanec/od/do.")
 
 
+# ----------------------------------------------------------------------------- sněmovní tisky (tisky.py)
+# Specifikace: docs/integrace/tisky.md. Logika je v čisté funkci bills_query(kb, …) nad tabulkou
+# documents (typ ``tisk``), tool get_bills jen formátuje. Interpelace samostatný tool nemají:
+# search_kb(query, typ=["interpelace"]).
+
+BILL_VYSLEDEK = {
+    "schvalen": "schválen", "zamitnut": "zamítnut", "vzat-zpet": "vzat zpět",
+    "vracen": "vrácen předkladateli", "nedokoncen": "nedokončen (zanikl koncem volebního období)",
+    "projednava-se": "projednává se", "jiny": "ukončen (jiný výsledek)",
+}
+_NEUSPESNE = {"zamitnut", "vzat-zpet", "vracen", "nedokoncen", "jiny"}
+# vstup parametru `stav` (bez diakritiky, mezery -> pomlčky) -> hodnoty pole `vysledek`
+BILL_STAV = {
+    "schvalen": {"schvalen"}, "schvaleny": {"schvalen"}, "schvalene": {"schvalen"}, "prijat": {"schvalen"},
+    "prijaty": {"schvalen"}, "prosel": {"schvalen"}, "zamitnut": {"zamitnut"}, "zamitnuty": {"zamitnut"},
+    "vzat-zpet": {"vzat-zpet"}, "stazen": {"vzat-zpet"}, "vracen": {"vracen"},
+    "nedokoncen": {"nedokoncen"}, "nedokonceny": {"nedokoncen"},
+    "projednava-se": {"projednava-se"}, "rozpracovany": {"projednava-se"}, "v-projednavani": {"projednava-se"},
+    "neuspesny": _NEUSPESNE, "neprijat": _NEUSPESNE, "neprosel": _NEUSPESNE,
+    "ukonceny": _NEUSPESNE | {"schvalen"},
+    # další tvary („schváleno“, „zamítnuté“, „neúspěšné“ …)
+    "schvaleno": {"schvalen"}, "schvalena": {"schvalen"}, "prijato": {"schvalen"}, "prijate": {"schvalen"},
+    "zamitnuto": {"zamitnut"}, "zamitnute": {"zamitnut"}, "zamitnuta": {"zamitnut"},
+    "stazeno": {"vzat-zpet"}, "stazene": {"vzat-zpet"}, "vraceno": {"vracen"}, "vracene": {"vracen"},
+    "nedokonceno": {"nedokoncen"}, "nedokoncene": {"nedokoncen"}, "projednavany": {"projednava-se"},
+    "neuspesne": _NEUSPESNE, "neprijato": _NEUSPESNE, "neprijate": _NEUSPESNE, "ukoncene": _NEUSPESNE | {"schvalen"},
+}
+
+
+def bills_query(kb: Any, poslanec: str | None = None, query: str | None = None,
+                stav: str | None = None, obdobi: Any = None, limit: int = 10) -> dict:
+    """Sněmovní tisky (typ ``tisk``) s filtrem na pirátského navrhovatele, téma, výsledek a období.
+
+    Vrací ``{"prazdny_index", "nalezen", "poslanec", "celkem", "souhrn", "items"}``; ``items`` jsou
+    dokumenty (doc_id, nazev, zdroj, datum, meta = frontmatter, snippet) seřazené podle relevance
+    (s ``query``) nebo od nejnovějšího. Neznámý ``stav`` -> ValueError."""
+    from server.kb.stem import stem
+    from server.kb.text import fold
+
+    docs: dict[str, dict] = {}
+    for r in kb._rows("SELECT id, nazev, zdroj, datum, meta FROM documents WHERE typ = 'tisk'"):
+        docs[r["id"]] = {"doc_id": r["id"], "nazev": r["nazev"], "zdroj": r["zdroj"],
+                         "datum": r["datum"], "meta": json.loads(r["meta"] or "{}"), "snippet": None}
+    out = {"prazdny_index": not docs, "nalezen": True, "poslanec": None, "celkem": 0, "souhrn": {}, "items": []}
+    if not docs:
+        return out
+
+    vysledky = None
+    if stav and fold(stav).strip():
+        key = re.sub(r"[\s_]+", "-", fold(stav).strip())
+        vysledky = BILL_STAV.get(key) or ({key} if key in BILL_VYSLEDEK else None)
+        if vysledky is None:
+            raise ValueError(f"Neznámý stav „{stav}“. Povoleno: schválen, zamítnut, vzat zpět, vrácen, "
+                             "nedokončen, projednává se, neúspěšný.")
+    rok = None
+    if obdobi not in (None, ""):
+        m = re.search(r"\d{4}", str(obdobi))
+        rok = int(m.group(0)) if m else None
+
+    jmena = None
+    if poslanec and fold(poslanec).strip():
+        q = fold(poslanec).strip()
+        pary = [(n, str(o)) for d in docs.values()
+                for n, o in zip(d["meta"].get("navrhovatele_pirati") or [],
+                                (d["meta"].get("osoby_psp") or []) + [None] * 200)]
+        vsechna = sorted({n for n, _ in pary})
+        if q.isdigit():
+            jmena = sorted({n for n, o in pary if o == q})
+        else:
+            toks = [t for t in re.findall(r"\w+", q) if len(t) > 1]
+
+            def tok_ok(t: str, name: str, fuzzy: bool) -> bool:
+                for nt in re.findall(r"\w+", fold(name)):
+                    if nt == t or (not fuzzy and len(t) >= 3 and nt.startswith(t)):
+                        return True
+                    if fuzzy and len(t) >= 4 and stem(t) in (stem(nt), nt):   # „Bartoše“, „Michálka“
+                        return True
+                return False
+
+            jmena = ([n for n in vsechna if fold(n) == q]
+                     or [n for n in vsechna if toks and all(tok_ok(t, n, False) for t in toks)]
+                     or [n for n in vsechna if toks and all(tok_ok(t, n, True) for t in toks)])
+        if not jmena:
+            out.update(nalezen=False)
+            return out
+        out["poslanec"] = jmena
+
+    if query and fold(query).strip():
+        cand, seen = [], set()
+        for h in kb.search(query, typ=["tisk"], limit=200, preferuj_nove=False):
+            if h["doc_id"] in docs and h["doc_id"] not in seen:
+                seen.add(h["doc_id"])
+                cand.append({**docs[h["doc_id"]], "snippet": h.get("snippet")})
+    else:
+        cand = sorted(docs.values(), key=lambda d: (d["datum"] or "", d["doc_id"]), reverse=True)
+
+    def keep(d: dict) -> bool:
+        m = d["meta"]
+        if jmena is not None and not set(jmena) & set(m.get("navrhovatele_pirati") or []):
+            return False
+        if vysledky is not None and m.get("vysledek") not in vysledky:
+            return False
+        return rok is None or str(m.get("obdobi")) == str(rok)
+
+    sel = [d for d in cand if keep(d)]
+    out.update(celkem=len(sel), souhrn=dict(Counter(d["meta"].get("vysledek") for d in sel)),
+               items=sel[:max(1, int(limit))])
+    return out
+
+
+def _fmt_bill(i: int, d: dict) -> str:
+    m = d["meta"]
+    try:
+        obd = OBDOBI_LABEL.get(int(m.get("obdobi")), _s(m.get("obdobi")))
+    except (TypeError, ValueError):
+        obd = _s(m.get("obdobi"))
+    pir = ", ".join(m.get("navrhovatele_pirati") or [])
+    if m.get("pirati_role") == "vlada":
+        kdo = f"vládní návrh, za vládu předložil {pir} (pirátský člen vlády; {_clean(m.get('navrhovatel'))})"
+    else:
+        n = m.get("pocet_ostatnich_navrhovatelu") or 0
+        kdo = f"Piráti: {pir}" + (f" + {n} dalších navrhovatelů" if n else " (jen Piráti)")
+    lines = [f"{i}. **{_clean(d.get('nazev'))}**",
+             f"   Sněmovní tisk {_s(m.get('cislo_tisku'))}, období {obd}, předloženo {_s(d.get('datum'))}; {kdo}"]
+    vys = BILL_VYSLEDEK.get(m.get("vysledek"), _s(m.get("vysledek")))
+    if m.get("sbirka"):
+        vys += f", vyhlášen jako {m['sbirka']}"
+    if m.get("vysledek") == "projednava-se" and m.get("faze"):
+        vys += f" (fáze: {m['faze']})"
+    line = f"   Výsledek: {vys}"
+    if m.get("hlasovani_zaverecne"):
+        line += f"; závěrečné hlasování: https://www.psp.cz/sqw/hlasy.sqw?g={m['hlasovani_zaverecne']}"
+    lines.append(line)
+    if d.get("snippet"):
+        lines.append(f"   > {_snippet(d['snippet'], 300)}")
+    lines.append(f"   Zdroj: {_s(d.get('zdroj'))} | doc_id: `{d['doc_id']}`")
+    return "\n".join(lines)
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_bills(poslanec: str | None = None, query: str | None = None, stav: str | None = None,
+              obdobi: str | None = None, limit: int = 10) -> str:
+    """Sněmovní tisky (návrhy zákonů), které předložili pirátští poslanci (sami nebo jako
+    spolupředkladatelé s jinými kluby), a vládní návrhy zákonů, které za vládu předložil
+    pirátský člen vlády (I. Bartoš, J. Lipavský, 2021–2025). Období 2017, 2021 a 2025,
+    otevřená data psp.cz. Vrací název, číslo tisku, pirátské navrhovatele a počet ostatních,
+    datum předložení, výsledek (schválen / zamítnut / vzat zpět / vrácen / nedokončen /
+    projednává se), číslo ve Sbírce zákonů, odkaz na závěrečné hlasování a URL tisku na psp.cz.
+
+    Argumenty (volitelné, lze kombinovat): poslanec = jméno nebo příjmení (diakritika a pád
+    nevadí) nebo id_osoba z psp.cz; query = téma nebo slova z názvu („střet zájmů“, „stavební
+    zákon“); stav = schválen | zamítnut | vzat zpět | vrácen | nedokončen | projednává se |
+    neúspěšný; obdobi = 2017 | 2021 | 2025 (rok voleb); limit = počet (výchozí 10, max 50).
+    Bez query vrací nejnovější tisky. Při zadání poslance nejdřív souhrn podle výsledku.
+    Použij pro „jaké zákony navrhli Piráti“, „prošel návrh X“, „co předložil poslanec Y“;
+    průběh projednávání a hlasy Pirátů dá get_document(doc_id). Interpelace pirátských
+    poslanců hledej přes search_kb(query, typ=["interpelace"])."""
+    kb = get_kb()
+    limit = max(1, min(int(limit or 10), 50))
+    o, q = _clean(poslanec) or None, _clean(query) or None
+    try:
+        res = bills_query(kb, poslanec=o, query=q, stav=_clean(stav) or None,
+                          obdobi=_clean(obdobi) or None, limit=limit)
+    except ValueError as exc:
+        return str(exc)
+    if res["prazdny_index"]:
+        return "Index neobsahuje sněmovní tisky; spusť `python3 ingest/tisky.py` a `python -m server.kb.build`."
+    if not res["nalezen"]:
+        return (f"Poslanec „{o}“ v bázi nepředložil žádný návrh zákona (tisky pokrývají pirátské poslance "
+                "v obdobích 2017, 2021 a 2025). Zkus jen příjmení; seznam poslanců dá find_people(role=\"poslanec\").")
+    out: list[str] = []
+    if res["poslanec"]:
+        souhrn = ", ".join(f"{BILL_VYSLEDEK.get(k, k)} {n}" for k, n in
+                           sorted(res["souhrn"].items(), key=lambda x: -x[1]))
+        out.append(f"## Souhrn: {', '.join(res['poslanec'])}")
+        out.append(f"Návrhů zákonů odpovídajících filtrům: {res['celkem']}" + (f" ({souhrn})" if souhrn else "") + ".")
+        out.append("")
+    if not res["items"]:
+        filt = ", ".join(f"{k}={v}" for k, v in (("poslanec", o), ("query", q), ("stav", stav), ("obdobi", obdobi)) if v)
+        return "\n".join(out) + f"Žádný sněmovní tisk neodpovídá filtrům ({filt}). Zkus jiná slova nebo bez filtru stav/obdobi."
+    out.append(f"## Návrhy zákonů ({len(res['items'])} z {res['celkem']}"
+               + (f", k „{q}“" if q else ", nejnovější") + ")")
+    out.append("\n\n".join(_fmt_bill(i, d) for i, d in enumerate(res["items"], 1)))
+    out.append("")
+    out.append(f"Autorita: {AUTORITA_POPIS['oficialni-data-psp']}. Návrh zákona je dokument navrhovatelů "
+               "(poslanců, u vládních návrhů vlády), ne usnesení strany; program a stanoviska dá get_position. "
+               "Průběh projednávání a jak hlasovali Piráti: get_document(doc_id).")
+    return _cap("\n".join(out), "Sniž limit nebo zúž poslanec/query/stav/obdobi.")
+
+
+# ----------------------------------------------------------------------------- volby ČSÚ (volby.py)
+# Specifikace: docs/integrace/volby.md. Tooly čtou přímo JSONL z data/volby (zvolení a řádky výsledků
+# jsou strukturované záznamy, ne dokumenty); Markdown souhrny se navíc indexují (typ ``volby``)
+# pro search_kb. Cache podle mtime souborů: nový běh volby.py se projeví bez restartu serveru.
+
+VOLBY_DIR = DATA_DIR / "volby"     # v testech se přepisuje (monkeypatch)
+VOLBY_NAZEV = {"ps": "Poslanecká sněmovna", "ep": "Evropský parlament",
+               "kz": "zastupitelstva krajů", "kv": "zastupitelstva obcí", "se": "Senát"}
+VOLBY_KRATCE = {"ps": "sněmovní volby", "ep": "evropské volby", "kz": "krajské volby",
+                "kv": "obecní volby", "se": "senátní volby"}
+_VOLBY_ALIASY = {
+    "ps": "ps", "psp": "ps", "snemovna": "ps", "snemovni": "ps", "poslanecka snemovna": "ps",
+    "parlamentni": "ps", "ep": "ep", "evropsky parlament": "ep", "evropske": "ep", "euro": "ep",
+    "eurovolby": "ep", "kz": "kz", "kraj": "kz", "kraje": "kz", "krajske": "kz",
+    "zastupitelstva kraju": "kz", "kv": "kv", "obec": "kv", "obce": "kv", "obecni": "kv",
+    "komunalni": "kv", "zastupitelstva obci": "kv", "se": "se", "senat": "se", "senatni": "se",
+}
+_VOLBY_PORADI = {"ps": 0, "ep": 1, "se": 2, "kz": 3, "kv": 4}
+
+
+def _fold_words(value: Any) -> str:
+    """Malá písmena bez diakritiky, interpunkce -> mezery („Jablonec n. N.“ -> „jablonec n n“)."""
+    t = unicodedata.normalize("NFKD", _s(value)).encode("ascii", "ignore").decode().lower()
+    return " ".join(re.sub(r"[^a-z0-9 ]+", " ", t).split())
+
+
+def _volby_druh(value: Any) -> str | None:
+    """'sněmovní', 'PS', 'komunální' … -> kód druhu; None = bez filtru; '?' = neznámý."""
+    if _blank(value):
+        return None
+    f = _fold_words(value)
+    if f in _VOLBY_ALIASY:
+        return _VOLBY_ALIASY[f]
+    for alias, kod in _VOLBY_ALIASY.items():
+        if len(alias) > 2 and (f.startswith(alias) or alias.startswith(f)):
+            return kod
+    return "?"
+
+
+@functools.lru_cache(maxsize=2)
+def _volby_load(path: str, signature: tuple) -> dict:
+    d = Path(path)
+
+    def rows(p: Path) -> list[dict]:
+        return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+    vys = rows(d / "vysledky.jsonl") if (d / "vysledky.jsonl").exists() else []
+    zv: list[dict] = []
+    for p in sorted((d / "zvoleni").glob("*.jsonl")) if (d / "zvoleni").is_dir() else []:
+        zv.extend(rows(p))
+    return {"vysledky": vys, "zvoleni": zv}
+
+
+def _volby_data() -> dict:
+    """JSONL z data/volby (cache podle mtime souborů; nový běh volby.py se projeví bez restartu)."""
+    d = Path(VOLBY_DIR)
+    files = [d / "vysledky.jsonl"] + (sorted((d / "zvoleni").glob("*.jsonl")) if (d / "zvoleni").is_dir() else [])
+    sig = tuple((p.name, p.stat().st_mtime_ns) for p in files if p.exists())
+    if not sig:
+        raise RuntimeError(f"data voleb chybí ({d}); spusť python3 ingest/volby.py")
+    return _volby_load(str(d), sig)
+
+
+def _cz(n: Any) -> str:
+    if n is None or n == "":
+        return "–"
+    if isinstance(n, float):
+        return f"{n:.2f}".replace(".", ",")
+    if isinstance(n, int):
+        return f"{n:,}".replace(",", " ")
+    return str(n)
+
+
+def _volby_hlavicka(r: dict) -> str:
+    return f"{VOLBY_NAZEV.get(r.get('volby'), r.get('volby'))} {r.get('rok')}"
+
+
+def _fmt_vysledek(i: int, r: dict) -> str:
+    uroven = r.get("uroven")
+    misto = {"cr": "celostátně", "kraj": r.get("kraj"), "obvod": f"obvod {r.get('obvod_cislo')} {_s(r.get('obvod'))}",
+             "obec": f"{r.get('obec')} ({r.get('kraj')})" + (f", obvod {r['obvod']}" if r.get("obvod") else "")
+             }.get(uroven, uroven)
+    head = f"{i}. **{_volby_hlavicka(r)}** (od {r.get('datum')}), {misto}: "
+    if r.get("volby") == "se":
+        txt = (f"{r.get('kandidatka')} (vazba na Piráty: {', '.join(r.get('pirat_podle') or [])}); "
+               f"1. kolo {_cz(r.get('hlasy_1_kolo'))} hlasů ({_cz(r.get('proc_1_kolo'))} %)"
+               + (f", 2. kolo {_cz(r.get('hlasy_2_kolo'))} ({_cz(r.get('proc_2_kolo'))} %)" if r.get("hlasy_2_kolo") else "")
+               + (f"; zvolen/a {r['jmeno']}" if r.get("zvolen") else "; nezvolen/a"))
+    elif r.get("kandidatka") == "kandidátky s Piráty celkem":
+        txt = (f"{_cz(r.get('pocet_kandidatek'))} kandidátek s Piráty v {_cz(r.get('pocet_obci'))} "
+               f"zastupitelstvech ({', '.join(f'{k} {v}' for k, v in (r.get('pocet_kandidatek_podle_typu') or {}).items())}), "
+               f"mandátů {_cz(r.get('mandaty'))}, zvolených Pirátů {_cz(r.get('zvoleno_piratu_celkem'))}")
+    else:
+        typ = r.get("kandidatka_typ") or ""
+        if r.get("partneri") and typ in ("koalice", "samostatně i v koalici"):
+            typ = f"{typ} s {', '.join(r.get('partneri'))}"
+        mand = _cz(r.get("mandaty")) + (f" z {r['mandaty_celkem']}" if r.get("mandaty_celkem") and uroven == "obec" else "")
+        txt = (f"{r.get('kandidatka')} ({typ}); {_cz(r.get('hlasy'))} hlasů"
+               + (f" ({_cz(r.get('proc'))} %)" if r.get("proc") is not None else "")
+               + f", mandátů {mand}"
+               + (f", z toho Pirátů {r['zvoleno_piratu']}" if r.get("zvoleno_piratu") is not None else ""))
+    return head + txt + f"\n   Zdroj: {r.get('zdroj')}"
+
+
+def _se_souhrn(rows: list[dict]) -> list[dict]:
+    """Senát: řádky po obvodech -> jeden řádek za rok (pro přehled bez filtru kraje/obce)."""
+    po_letech: dict[int, list[dict]] = {}
+    for r in rows:
+        po_letech.setdefault(r["rok"], []).append(r)
+    out = []
+    for rok, rs in po_letech.items():
+        zv = [r.get("jmeno") for r in rs if r.get("zvolen")]
+        out.append({"volby": "se", "rok": rok, "datum": min(r["datum"] for r in rs), "uroven": "souhrn",
+                    "text": (f"{len(rs)} kandidátů s vazbou na Piráty, do 2. kola {sum(bool(r.get('postup_2_kolo')) for r in rs)}, "
+                             f"zvoleno {len(zv)}" + (f" ({', '.join(zv)})" if zv else "")),
+                    "zdroj": rs[0].get("zdroj")})
+    return out
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_election_results(volby: str | None = None, rok: int | None = None, kraj: str | None = None,
+                         obec: str | None = None, limit: int = 30) -> str:
+    """Výsledky Pirátů ve volbách podle oficiálních dat ČSÚ (volby.gov.cz), 2010–dnes:
+    Sněmovna (ps), Evropský parlament (ep), Senát (se), zastupitelstva krajů (kz) a obcí (kv).
+    Vrací hlasy, procenta, mandáty, zda Piráti kandidovali samostatně nebo v koalici (a s kým),
+    kolik z mandátů připadlo Pirátům, a URL zdroje.
+
+    Argumenty: volby = druh voleb (ps | ep | se | kz | kv, nebo česky „sněmovní“,
+    „krajské“, „komunální“…); rok = rok voleb; kraj = název kraje (např. „Liberecký“);
+    obec = obec nebo městská část (jen obecní volby; u Senátu název obvodu); limit = počet
+    řádků (výchozí 30, max 200). Bez kraje a obce vrací celostátní souhrn, s krajem výsledky
+    v kraji, s obcí výsledky kandidátek v obci. Jmenovitý seznam zvolených dá find_elected."""
+    druh = _volby_druh(volby)
+    if druh == "?":
+        return f"Neznámý druh voleb „{volby}“. Použij ps, ep, se, kz nebo kv."
+    data = _volby_data()["vysledky"]
+    rows = [r for r in data if (druh is None or r.get("volby") == druh) and (not rok or r.get("rok") == int(rok))]
+    kf, of = _fold_words(kraj), _fold_words(obec)
+    if of:
+        rows = [r for r in rows if r.get("uroven") in ("obec", "obvod")
+                and (of in _fold_words(r.get("obec")) or of in _fold_words(r.get("obvod")))]
+        exact = [r for r in rows if of in (_fold_words(r.get("obec")), _fold_words(r.get("obvod")))]
+        rows = exact or rows
+    elif kf:
+        rows = [r for r in rows if kf in _fold_words(r.get("kraj")) and (
+            r.get("uroven") in ("kraj", "obvod") or (r.get("uroven") == "obec" and r.get("mandaty")))]
+    else:
+        se = [r for r in rows if r.get("volby") == "se"]
+        rows = [r for r in rows if r.get("uroven") == "cr"] + _se_souhrn(se)
+    if kf and of:
+        rows = [r for r in rows if kf in _fold_words(r.get("kraj"))]
+    filtr = ", ".join(f"{k}={v}" for k, v in (("volby", volby), ("rok", rok), ("kraj", kraj), ("obec", obec)) if v)
+    if not rows:
+        return (f"Pro filtr {filtr or '(žádný)'} báze nic nenašla. Data pokrývají Sněmovnu 2010–2025, "
+                "EP 2014–2024, kraje 2012–2024, obce 2010–2022 a Senát 2010–2025; v obcích jen tam, "
+                "kde kandidovala kandidátka s Piráty ve složení. Zkus jiný rok nebo bez filtru.")
+    rows.sort(key=lambda r: (-int(r.get("rok") or 0), _VOLBY_PORADI.get(r.get("volby"), 9),
+                             {"cr": 0, "souhrn": 0, "kraj": 1, "obvod": 2, "obec": 3}.get(r.get("uroven"), 9),
+                             _fold_words(r.get("kraj")), _fold_words(r.get("obec"))))
+    limit = max(1, min(int(limit or 30), 200))
+    lines = []
+    for i, r in enumerate(rows[:limit], 1):
+        if r.get("uroven") == "souhrn":
+            lines.append(f"{i}. **{_volby_hlavicka(r)}** (od {r['datum']}): {r['text']}\n   Zdroj: {r['zdroj']}")
+        else:
+            lines.append(_fmt_vysledek(i, r))
+    head = f"Výsledky Pirátů ve volbách ({filtr or 'přehled'}), {len(rows)} řádků" + (
+        f", zobrazeno {limit}" if len(rows) > limit else "") + ":\n\n"
+    tail = (f"Autorita: {AUTORITA_POPIS['oficialni-data-csu']}. "
+            "Mandáty kandidátky zahrnují u koalic i partnery; „z toho Pirátů“ = zvolení s příslušností "
+            "Piráti nebo navržení Piráty. Detail: get_document(\"volby/vysledky/<druh>-<rok>\"), "
+            "jmenovitě find_elected.")
+    return _cap_with_tail(head + "\n\n".join(lines), tail, "Zúž dotaz (volby, rok, kraj, obec).")
+
+
+def _fmt_zvoleny(i: int, z: dict) -> str:
+    misto = z.get("organ") or VOLBY_NAZEV.get(z.get("volby"))
+    if z.get("volby") == "se":
+        misto = f"Senát, obvod {z.get('obvod_cislo')} {z.get('obvod')}"
+    if z.get("kraj") and z.get("volby") != "ep":
+        misto += f", {z['kraj']}"
+    parts = [f"{i}. **{z.get('jmeno_s_tituly') or z.get('jmeno')}** – {z.get('funkce')} ({misto}), "
+             f"{VOLBY_KRATCE.get(z.get('volby'), z.get('volby'))} {z.get('rok')}"]
+    kand = f"kandidátka „{z.get('kandidatka')}“"
+    if z.get("kandidatka_typ") and z.get("kandidatka_typ") != "samostatně":
+        kand += f" ({z['kandidatka_typ']}"
+        kand += f": {', '.join(z['kandidatka_slozeni'])})" if z.get("kandidatka_slozeni") else ")"
+    if z.get("poradi"):
+        kand += f", pořadí {z['poradi']}"
+    if z.get("prednostni_hlasy") is not None:
+        kand += f", přednostní hlasy {_cz(z['prednostni_hlasy'])}"
+    if z.get("zvolen_v_kole"):
+        kand += f", zvolen/a v {z['zvolen_v_kole']}. kole"
+    parts.append(kand)
+    parts.append(f"příslušnost {z.get('prislusnost')}, navrhla {z.get('navrhujici_strana')}"
+                 f" (vazba na Piráty: {', '.join(z.get('pirat_podle') or [])})")
+    if z.get("vek"):
+        parts.append(f"věk v den voleb {z['vek']}")
+    if z.get("lide_url"):
+        parts.append(f"profil: {z['lide_url']}")
+    elif z.get("ms"):
+        parts.append(f"místní sdružení: {z['ms']} {_s(z.get('ms_url'))}".strip())
+    return " · ".join(parts) + f"\n   Zdroj: {z.get('zdroj')}"
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def find_elected(jmeno: str | None = None, obec: str | None = None, kraj: str | None = None,
+                 druh: str | None = None, rok: int | None = None, limit: int = 30) -> str:
+    """Zvolení Piráti podle oficiálních výsledků voleb (ČSÚ, volby.gov.cz): poslanci,
+    europoslanci, senátoři, krajští a obecní zastupitelé od roku 2010. Pirát = politická
+    příslušnost Piráti nebo navržen/a Piráty (u Senátu i kandidát koalice s Piráty).
+
+    Argumenty: jmeno = jméno nebo příjmení (diakritika nevadí); obec = obec nebo městská
+    část, kde byl zvolen (u Senátu obvod); kraj = kraj („Liberecký“, „Praha“); druh = ps |
+    ep | se | kz | kv (nebo česky „komunální“, „krajské“…); rok = rok voleb; limit = počet
+    (výchozí 30, max 200). Vrací jméno s tituly, orgán, kandidátku (a koalici), pořadí,
+    přednostní hlasy, příslušnost, odkaz na profil na lide.pirati.cz (pokud se spároval) a URL
+    zdroje. Jde o výsledek voleb, ne o aktuální stav mandátu (rezignace a náhradníci se
+    nepromítají); aktuální funkce ve straně dá find_people."""
+    d = _volby_druh(druh)
+    if d == "?":
+        return f"Neznámý druh voleb „{druh}“. Použij ps, ep, se, kz nebo kv."
+    zv = _volby_data()["zvoleni"]
+    if not any(not _blank(x) for x in (jmeno, obec, kraj, druh, rok)):
+        c = Counter((z.get("volby"), z.get("rok")) for z in zv)
+        lines = [f"- {VOLBY_KRATCE.get(k[0], k[0])} {k[1]}: {n}" for k, n in
+                 sorted(c.items(), key=lambda kv: (_VOLBY_PORADI.get(kv[0][0], 9), kv[0][1]))]
+        return ("Zadej aspoň jeden filtr (jmeno, obec, kraj, druh, rok). Počty zvolených Pirátů v bázi "
+                "(zdroj: https://volby.gov.cz/opendata/opendata.htm):\n" + "\n".join(lines))
+    rows = [z for z in zv if (d is None or z.get("volby") == d) and (not rok or z.get("rok") == int(rok))]
+    if not _blank(jmeno):
+        toks = _fold_words(jmeno).split()
+        rows = [z for z in rows if all(t in _fold_words(f"{z.get('jmeno')} {z.get('jmeno_s_tituly')}").split()
+                                       or t in _fold_words(z.get("jmeno")) for t in toks)]
+    if not _blank(kraj):
+        kf = _fold_words(kraj)
+        rows = [z for z in rows if kf in _fold_words(z.get("kraj"))]
+    if not _blank(obec):
+        of = _fold_words(obec)
+        cand = [z for z in rows if of in _fold_words(z.get("obec")) or of in _fold_words(z.get("obvod"))]
+        exact = [z for z in cand if of in (_fold_words(z.get("obec")), _fold_words(z.get("obvod")))]
+        rows = exact or cand
+    filtr = ", ".join(f"{k}={v}" for k, v in (("jmeno", jmeno), ("obec", obec), ("kraj", kraj),
+                                                ("druh", druh), ("rok", rok)) if not _blank(v))
+    if not rows:
+        return (f"Žádný zvolený Pirát pro {filtr}. Báze má jen zvolené (ne nezvolené kandidáty) a jen "
+                "Piráty podle příslušnosti nebo návrhu. Zkus bez roku, jen příjmení, nebo find_people "
+                "(funkce ve straně) či get_election_results (výsledky kandidátek).")
+    rows.sort(key=lambda z: (-int(z.get("rok") or 0), _VOLBY_PORADI.get(z.get("volby"), 9),
+                             _fold_words(z.get("kraj")), _fold_words(z.get("obec")), z.get("poradi") or 0))
+    limit = max(1, min(int(limit or 30), 200))
+    head = f"Zvolení Piráti ({filtr}): {len(rows)}" + (f", zobrazeno {limit}" if len(rows) > limit else "") + "\n\n"
+    body = "\n\n".join(_fmt_zvoleny(i, z) for i, z in enumerate(rows[:limit], 1))
+    tail = (f"Autorita: {AUTORITA_POPIS['oficialni-data-csu']}. "
+            "Zvolení = výsledek voleb; mandát mohl během období zaniknout (rezignace, náhradník, změna "
+            "příslušnosti). Aktuální funkce ve straně ověř přes find_people.")
+    return _cap_with_tail(head + body, tail, "Zúž dotaz (druh, rok, kraj, obec) nebo sniž limit.")
+
+
+# ----------------------------------------------------------------------------- financování (financovani.py)
+# Specifikace: docs/integrace/financovani.md. Čte dokumenty typu ``financni-zprava`` (frontmatter
+# z documents.meta, sekce z těla); JSONL v data/financovani tool nepotřebuje.
+
+FINANCE_DISCLAIMER = (
+    "Výroční zprávy a zprávy o kampaních jsou úřední údaje, které strana podala ÚDH; dárce – "
+    "fyzické osoby báze záměrně uvádí jen souhrnně (GDPR), jmenovitě jsou jen právnické osoby. "
+    "Transparentní účty jsou jen měsíční souhrny (jednotlivé transakce jsou na stránce banky)."
+)
+
+
+def _fin_kc(x: Any) -> str:
+    if x is None or x == "":
+        return "–"
+    try:
+        return f"{round(float(x)):,}".replace(",", " ") + " Kč"
+    except (TypeError, ValueError):
+        return str(x)
+
+
+def _fin_section(body: str, heading: str, max_chars: int = 2500) -> str:
+    """Vrátí sekci `## heading` z těla dokumentu (bez nadpisu), oříznutou na max_chars."""
+    m = re.search(r"^## " + re.escape(heading) + r"[^\n]*\n(.*?)(?=^## |\Z)", body or "", re.S | re.M)
+    if not m:
+        return ""
+    text = m.group(1).strip()
+    if len(text) > max_chars:
+        cut = text[:max_chars]
+        text = cut[:cut.rfind("\n")] + "\n…"
+    return text
+
+
+def _fin_docs(kb: Any) -> list[dict]:
+    rows = kb._rows("SELECT id, nazev, zdroj, datum, autorita, meta, body FROM documents "
+                    "WHERE typ = 'financni-zprava'")
+    out = []
+    for r in rows:
+        try:
+            meta = json.loads(r.get("meta") or "{}")
+        except ValueError:
+            meta = {}
+        out.append({**r, "m": meta})
+    return out
+
+
+def _fin_autorita(d: dict) -> str:
+    return AUTORITA_POPIS.get(_s(d.get("autorita")), _s(d.get("autorita")))
+
+
+def _party_finances(kb: Any, rok: int | None = None, ucet: str | None = None) -> str:
+    docs = _fin_docs(kb)
+    if not docs:
+        return ("Index neobsahuje data o financování strany; spusť `python3 ingest/financovani.py` "
+                "a `python -m server.kb.build`.")
+
+    def druh(d: dict) -> Any:
+        return d["m"].get("druh")
+
+    vfz = sorted((d for d in docs if druh(d) == "vyrocni-zprava"), key=lambda d: d["m"].get("rok") or 0)
+    kampane = sorted((d for d in docs if druh(d) == "kampan"), key=lambda d: (d["m"].get("rok") or 0, d["id"]))
+    rozpocty = {d["m"].get("rok"): d for d in docs if druh(d) == "rozpocet"}
+    ucty = [d for d in docs if druh(d) == "transparentni-ucet"]
+    out: list[str] = []
+
+    if ucet:
+        q = _fold_words(ucet)
+        digits = re.sub(r"\D", "", _s(ucet).split("/")[0])
+        hit = [d for d in ucty if (digits and _s(d["m"].get("cislo_uctu")).startswith(digits))
+               or q == _fold_words(d["m"].get("ucet")) or (not digits and q in _fold_words(d["nazev"]))]
+        if not hit:
+            seznam = "; ".join(f"{d['m'].get('ucet')} ({d['m'].get('cislo_uctu')})" for d in ucty)
+            return f"Účet „{ucet}“ v bázi není. Dostupné transparentní účty: {seznam}."
+        for d in hit[:2]:
+            m = d["m"]
+            out += [f"## {d['nazev']}", f"Zdroj: {d['zdroj']} · Autorita: {_fin_autorita(d)}",
+                    f"Období v bázi: {m.get('obdobi_od')} – {m.get('obdobi_do')}; kategorie účtu: {m.get('kategorie_uctu')}", ""]
+            souhrn = _fin_section(d["body"], "Souhrn po letech", 1500)
+            if souhrn:
+                out += ["### Souhrn po letech", souhrn, ""]
+            mesice = _fin_section(d["body"], "Po měsících", 100000).splitlines()
+            if rok:
+                mesice = mesice[:2] + [r for r in mesice[2:] if r.startswith(f"| {int(rok)}-")]
+            else:
+                mesice = mesice[:14]  # hlavička + posledních 12 měsíců
+            if len(mesice) > 2:
+                out += ["### Po měsících" + (f" ({rok})" if rok else " (posledních 12)"), "\n".join(mesice), ""]
+            out.append(f"Celý dokument: get_document(\"{d['id']}\").")
+            out.append("")
+        out.append(FINANCE_DISCLAIMER)
+        return _cap("\n".join(out), "Zadej rok, nebo použij get_document(doc_id) účtu.")
+
+    if rok:
+        rok = int(rok)
+        d = next((x for x in vfz if x["m"].get("rok") == rok), None)
+        if d:
+            m = d["m"]
+            out += [f"## Výroční finanční zpráva {rok}", f"Zdroj: {d['zdroj']} · Autorita: {_fin_autorita(d)}", "",
+                    f"- Příjmy celkem: {_fin_kc(m.get('prijmy_celkem'))}",
+                    f"- Státní příspěvky celkem: {_fin_kc(m.get('statni_prispevky_celkem'))} (na činnost "
+                    f"{_fin_kc(m.get('statni_prispevek_cinnost'))}, volební {_fin_kc(m.get('statni_prispevek_volby'))}, "
+                    f"na institut {_fin_kc(m.get('statni_prispevek_institut'))})",
+                    f"- Dary, dědictví a bezúplatná plnění: {_fin_kc(m.get('dary_celkem'))} (peněžité dary fyzických "
+                    f"osob {_fin_kc(m.get('dary_fo_penezni'))} od {m.get('dary_fo_darcu')} dárců, právnických osob "
+                    f"{_fin_kc(m.get('dary_po_penezni'))})",
+                    f"- Členské příspěvky: {_fin_kc(m.get('clenske_prispevky'))}",
+                    f"- Výdaje na volby: {_fin_kc(m.get('vydaje_volby_celkem'))}; mzdové výdaje: "
+                    f"{_fin_kc(m.get('mzdove_vydaje'))}; zaměstnanců: {m.get('zamestnanci_celkem')}",
+                    f"- Dluhy (úvěry, zápůjčky): {_fin_kc(m.get('dluhy_celkem'))}", ""]
+            darci = _fin_section(d["body"], "Dary od právnických osob", 2000)
+            if darci:
+                out += ["### Dárci – právnické osoby", darci, ""]
+            out += [f"Celá zpráva v bázi: get_document(\"{d['id']}\").", ""]
+        else:
+            roky = ", ".join(str(x["m"].get("rok")) for x in vfz)
+            out += [f"Výroční zpráva za rok {rok} v bázi není (dostupné roky: {roky}).", ""]
+        kk = [k for k in kampane if k["m"].get("rok") == rok]
+        if kk:
+            out.append(f"## Volební kampaně {rok}")
+            out += [f"- {k['m'].get('volby')} ({k['m'].get('subjekt')}): výdaje {_fin_kc(k['m'].get('vydaje_celkem'))}, "
+                    f"peněžité dary FO {_fin_kc(k['m'].get('dary_fo_penezni'))}, PO {_fin_kc(k['m'].get('dary_po_penezni'))}"
+                    f" – {k['zdroj']} (get_document(\"{k['id']}\"))" for k in kk]
+            out.append("")
+        r = rozpocty.get(rok)
+        if r:
+            m = r["m"]
+            out += [f"## Rozpočet centrály {rok} (Piroplácení, plán)",
+                    f"Plánované příjmy {_fin_kc(m.get('prijmy_limit'))}, výdaje (limit) {_fin_kc(m.get('vydaje_limit'))}, "
+                    f"proplaceno {_fin_kc(m.get('vydaje_proplaceno'))} – {r['zdroj']} (get_document(\"{r['id']}\"))", ""]
+        out.append(FINANCE_DISCLAIMER)
+        return _cap("\n".join(out), "Podrobnosti přes get_document(doc_id).")
+
+    # bez argumentů: časová řada
+    out += ["## Financování Pirátů po letech (výroční finanční zprávy ÚDH)", "",
+            "| Rok | Příjmy celkem | Státní příspěvky | Dary a BUP | Peněžité dary FO (dárců) | Peněžité dary PO | Členské příspěvky | Výdaje na volby |",
+            "|---|---|---|---|---|---|---|---|"]
+    for d in vfz:
+        m = d["m"]
+        out.append(f"| {m.get('rok')} | {_fin_kc(m.get('prijmy_celkem'))} | {_fin_kc(m.get('statni_prispevky_celkem'))} | "
+                   f"{_fin_kc(m.get('dary_celkem'))} | {_fin_kc(m.get('dary_fo_penezni'))} ({m.get('dary_fo_darcu')}) | "
+                   f"{_fin_kc(m.get('dary_po_penezni'))} | {_fin_kc(m.get('clenske_prispevky'))} | "
+                   f"{_fin_kc(m.get('vydaje_volby_celkem'))} |")
+    out += ["", "Zdroje: " + ", ".join(f"{d['m'].get('rok')}: {d['zdroj']}" for d in vfz),
+            f"Autorita: {AUTORITA_POPIS['oficialni-udhpsh']}.", ""]
+    if kampane:
+        out.append("## Volební kampaně")
+        out += [f"- {k['m'].get('volby')}: výdaje {_fin_kc(k['m'].get('vydaje_celkem'))} – {k['zdroj']}" for k in kampane]
+        out.append("")
+    if ucty:
+        out.append("## Transparentní účty (měsíční souhrny)")
+        out += [f"- {d['m'].get('cislo_uctu')} – {d['nazev']} ({d['m'].get('obdobi_od')} – {d['m'].get('obdobi_do')}); "
+                f"ucet=\"{d['m'].get('ucet')}\" – {d['zdroj']}" for d in ucty]
+        out.append("")
+    out.append("Detail roku: get_party_finances(rok=2024); účet: get_party_finances(ucet=\"dary-a-statni-prispevky\").")
+    out.append(FINANCE_DISCLAIMER)
+    return _cap("\n".join(out), "Zadej rok nebo účet.")
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_party_finances(rok: int | None = None, ucet: str | None = None) -> str:
+    """Financování České pirátské strany z veřejných zdrojů: výroční finanční zprávy podané
+    Úřadu pro dohled nad hospodařením politických stran (ÚDH) za roky 2017–2025 (příjmy podle
+    kategorií, státní příspěvky, dary od fyzických a právnických osob, členské příspěvky,
+    výdaje na volby, zaměstnanci, dluhy), zprávy o financování volebních kampaní, rozpočty
+    z Piroplácení a měsíční souhrny transparentních účtů u Fio banky.
+
+    Argumenty (volitelné): rok = rok výroční zprávy (např. 2024) – vrátí hlavní čísla, dárce
+    – právnické osoby, kampaně a rozpočet toho roku; ucet = transparentní účet: klíč
+    (dary-a-statni-prispevky, provozni, clenske-prispevky, volebni-ps-2025 …), číslo účtu
+    (2100048174) nebo slovo z názvu („členské“); s rokem filtruje měsíce. Bez argumentů vrátí
+    časovou řadu po letech a seznam kampaní a účtů. Dárce – fyzické osoby báze uvádí jen
+    souhrnně (počty, součty), jmenovitě jen právnické osoby. Cituj URL zdroje (ÚDH, Fio)."""
+    return _party_finances(get_kb(), rok=rok, ucet=_clean(ucet) or None)
+
+
 @mcp.tool(structured_output=False)
 @_guard
 def get_brand(cast: str = "vse") -> str:
@@ -1375,12 +2065,16 @@ def get_brand(cast: str = "vse") -> str:
 @_guard
 def get_template(typ: str) -> str:
     """Šablona výstupu s pokyny a (u tiskové zprávy) skutečným příkladem z pirati.cz.
-    typ = tiskova-zprava | social-post | reels | brief | projev. Šablony jsou v
-    server/prompts/<typ>.md; všechny kromě tiskové zprávy jsou návrh ke schválení kurátorem."""
+    typ = tiskova-zprava | social-post | reels | brief | projev (komunikace, server/prompts/)
+    | video-106 | grafika-106 (zadání videa a grafiky k žádosti 106 / dotazu zastupitele,
+    s proměnnými {{…}}; vyplněné vrátí prompty video_106 a grafika_106) | zadost-106 |
+    stiznost-106 | odvolani-106 | dotaz-zastupitele (texty podání z kurátorované vrstvy
+    content/sablony/ s proměnnými {{…}} a zdroji; předvyplní je i pruvodce_zadosti).
+    Všechny kromě tiskové zprávy jsou návrh ke schválení kurátorem."""
     text = _read_template(typ)
     if text is None:
         return f"Šablona „{typ}“ neexistuje. Dostupné: {', '.join(TEMPLATE_TYPES)}."
-    return _cap(text, "Celá šablona je v souboru server/prompts/.")
+    return _cap(text, "Celá šablona je v souboru server/prompts/ nebo content/sablony/.")
 
 
 @mcp.tool(structured_output=False)
@@ -1599,6 +2293,17 @@ def resource_stats() -> str:
     return kb_stats()
 
 
+@mcp.resource("kb://navod/prompty", name="vzorove_prompty", title="Vzorové prompty",
+              description="Vzorové prompty podle účelu (postoj strany, lidé, hlasování a zákony, volby, "
+                          "tiskové zprávy a video, žádosti podle zákona 106, financování); docs/prompty.md.",
+              mime_type="text/markdown")
+def resource_vzorove_prompty() -> str:
+    try:
+        return PROMPTY_MD.read_text(encoding="utf-8")
+    except OSError:
+        return "Vzorové prompty nejsou na serveru k dispozici (chybí docs/prompty.md)."
+
+
 # =============================================================================
 # Spuštění
 # =============================================================================
@@ -1775,7 +2480,6 @@ _install_telemetry()
 
 from server import lhuty as _lhuty  # noqa: E402
 
-CONTENT_DIR = REPO_ROOT / "content"
 TYPY_ZADOSTI = ("106", "zastupitel-obec", "zastupitel-kraj", "zastupitel-praha", "zastupitel-mestska-cast")
 FAZE_ZADOSTI = ("pripravuji", "odeslano", "odpoved", "problem")
 
@@ -1873,26 +2577,26 @@ def _vypln(text: str, pole: dict[str, str]) -> str:
 
 
 def _media_odkazy() -> tuple[str, str]:
-    """Odkazy na prompty pro video a grafiku (připravuje je jiná část projektu; mohou chybět)."""
+    """Odkazy na prompty pro video a grafiku (video_106, grafika_106; text v server/prompts/)."""
     try:
         prompts = {p.name for p in mcp._prompt_manager.list_prompts()}  # type: ignore[attr-defined]
     except Exception:  # noqa: BLE001
         prompts = set()
-    video_md = (PROMPTS_DIR / "video-106.md").exists()
-    graf_md = (PROMPTS_DIR / "grafika-106.md").exists()
-    if "video_106" in prompts or video_md:
-        video = ("Video: použij prompt `video_106`" + (" (text v server/prompts/video-106.md)" if video_md else "")
-                 + " – krátké vertikální video „podali jsme žádost“ / „co jsme zjistili“.")
+    args = "faze, predmet, urad, shrnuti, zastupitel, funkce, obec, datum_podani, datum_odpovedi, zdroj, format"
+    if "video_106" in prompts:
+        video = (f"Video: použij prompt `video_106` ({args}; faze = podano | odpoved | zjisteni | stiznost | dotaz) "
+                 "– scénář krátkého vertikálního videa „podali jsme žádost“ / „co jsme zjistili“ pro šablonu "
+                 "templates/video/; nevyplněné zadání: `get_template(\"video-106\")`.")
     else:
-        video = ("Video: prompt `video_106` (server/prompts/video-106.md) zatím na serveru není; "
-                 "navrhni krátký scénář podle `get_template(\"reels\")` / promptu `reels_scenar` "
+        video = ("Video: navrhni krátký scénář podle `get_template(\"reels\")` / promptu `reels_scenar` "
                  "(hook = co chceme zjistit, 3 věcné body, CTA „výsledek zveřejníme“).")
-    if "grafika_106" in prompts or graf_md:
-        grafika = ("Grafika: použij " + ("prompt `grafika_106`" if "grafika_106" in prompts else "zadání")
-                   + (" ze server/prompts/grafika-106.md" if graf_md else "") + " (brand podle `get_brand`).")
+    if "grafika_106" in prompts:
+        grafika = (f"Grafika: použij prompt `grafika_106` ({args}; faze = podano | odpoved | stiznost | dotaz) "
+                   "– data karty pro templates/grafika/, brand podle `get_brand`; nevyplněné zadání: "
+                   "`get_template(\"grafika-106\")`.")
     else:
-        grafika = ("Grafika: zadání `server/prompts/grafika-106.md` zatím na serveru není; navrhni jednoduchou "
-                   "kartu (titulek Bebas Neue, jedno sdělení, datum lhůty, logo) podle `get_brand`.")
+        grafika = ("Grafika: navrhni jednoduchou kartu (titulek Bebas Neue, jedno sdělení, datum lhůty, logo) "
+                   "podle `get_brand`.")
     return video, grafika
 
 
@@ -2282,6 +2986,82 @@ def odpoved_prisla(typ: str = "106", shrnuti_odpovedi: str = "") -> str:
         t = "106"
     video, grafika = _media_odkazy()
     return _prompt_text("odpoved-prisla", typ=t, shrnuti_odpovedi=shrnuti_odpovedi, video=video, grafika=grafika)
+
+
+# Prompty pro video a grafiku k žádosti / dotazu: texty server/prompts/video-106.md a grafika-106.md
+# (proměnné {{…}} se nahradí prostým nahrazením textu; úvodní HTML komentář je poznámka pro server).
+
+_MEDIA_FAZE = {
+    "podano": "podano", "podana": "podano", "podani": "podano", "odeslano": "podano", "zadost": "podano",
+    "pripravuji": "podano", "odpoved": "odpoved", "prisla-odpoved": "odpoved", "odpovedel": "odpoved",
+    "zjisteni": "zjisteni", "co-jsme-zjistili": "zjisteni", "stiznost": "stiznost", "problem": "stiznost",
+    "mlci": "stiznost", "necinnost": "stiznost", "odvolani": "stiznost", "dotaz": "dotaz", "zastupitel": "dotaz",
+}
+_MEDIA_NEVYPLNENO = {
+    "predmet": "<předmět žádosti – zeptej se uživatele>",
+    "urad": "<úřad / adresát – zeptej se uživatele>",
+    "shrnuti": "(Text podání ani odpovědi úřadu uživatel zatím nedodal. Vyžádej si ho – bez něj nepiš "
+               "žádná čísla, data ani citace.)",
+    "zastupitel": "<jméno zastupitele – zeptej se uživatele>",
+    "funkce": "zastupitel/ka",
+    "obec": "<obec – zeptej se uživatele>",
+    "datum_podani": "<datum podání – zeptej se uživatele>",
+    "datum_odpovedi": "zatím bez odpovědi",
+    "zdroj": "<zdroj: dokument s datem (a č. j.) nebo URL – zeptej se uživatele>",
+}
+
+
+def _media_prompt(nazev: str, faze: str, format_: str, vychozi_format: str, povolene_faze: tuple[str, ...],
+                  **pole: str) -> str:
+    path = PROMPTS_DIR / f"{nazev}.md"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return (f"(Text promptu {path.name} na serveru chybí.) Použij `pruvodce_zadosti` a "
+                "`get_template(\"reels\")`.\n\n" + _PRAVIDLA_106)
+    text = re.sub(r"\A\s*<!--.*?-->\s*", "", text, flags=re.S)
+    f = re.sub(r"[\s_]+", "-", _fold_safe(faze).strip()) or "podano"
+    f = _MEDIA_FAZE.get(f, f)
+    if f == "zjisteni" and "zjisteni" not in povolene_faze:
+        f = "odpoved"
+    if f not in povolene_faze:
+        f = "podano"
+    hodnoty = {"faze": f, "format": _clean(format_) or vychozi_format}
+    for k, v in pole.items():
+        v = _clean(v)
+        if v and k.startswith("datum_"):
+            try:
+                d = _lhuty.parse_datum(v)
+            except ValueError:
+                d = None     # nečitelné datum se předá tak, jak ho uživatel napsal
+            v = _datum_cz(d) if d else v
+        hodnoty[k] = v or _MEDIA_NEVYPLNENO.get(k, f"<{k}>")
+    return _vypln(text, hodnoty) + "\n\n" + _PRAVIDLA_106
+
+
+@mcp.prompt(title="Video k žádosti 106 / dotazu zastupitele")
+def video_106(faze: str = "podano", predmet: str = "", urad: str = "", shrnuti: str = "", zastupitel: str = "",
+              funkce: str = "", obec: str = "", datum_podani: str = "", datum_odpovedi: str = "",
+              zdroj: str = "", format: str = "1080x1920") -> str:  # noqa: A002 (název proměnné šablony)
+    """Scénář krátkého videa (scenar.json pro templates/video/, render scripts/render_video.py) k žádosti
+    podle zákona 106/1999 Sb. nebo dotazu zastupitele. faze = podano | odpoved | zjisteni | stiznost |
+    dotaz; shrnuti = text podání nebo odpovědi úřadu (jediný zdroj faktů); data YYYY-MM-DD nebo D. M. RRRR;
+    format = 1080x1920 (Reels) | 1920x1080. Fakta jen ze zdroje, bez jmen úředníků."""
+    return _media_prompt("video-106", faze, format, "1080x1920", ("podano", "odpoved", "zjisteni", "stiznost", "dotaz"),
+                         predmet=predmet, urad=urad, shrnuti=shrnuti, zastupitel=zastupitel, funkce=funkce,
+                         obec=obec, datum_podani=datum_podani, datum_odpovedi=datum_odpovedi, zdroj=zdroj)
+
+
+@mcp.prompt(title="Grafika k žádosti 106 / dotazu zastupitele")
+def grafika_106(faze: str = "podano", predmet: str = "", urad: str = "", shrnuti: str = "", zastupitel: str = "",
+                funkce: str = "", obec: str = "", datum_podani: str = "", datum_odpovedi: str = "",
+                zdroj: str = "", format: str = "1080x1350") -> str:  # noqa: A002
+    """Data karty na sítě (JSON pro templates/grafika/karta.html, render scripts/render_grafika.py) k žádosti
+    podle zákona 106/1999 Sb. nebo dotazu zastupitele. faze = podano | odpoved | stiznost | dotaz;
+    shrnuti = text podání nebo odpovědi úřadu; format = 1080x1080 | 1080x1350 | 1080x1920 | 1920x1080 | vse."""
+    return _media_prompt("grafika-106", faze, format, "1080x1350", ("podano", "odpoved", "stiznost", "dotaz"),
+                         predmet=predmet, urad=urad, shrnuti=shrnuti, zastupitel=zastupitel, funkce=funkce,
+                         obec=obec, datum_podani=datum_podani, datum_odpovedi=datum_odpovedi, zdroj=zdroj)
 
 
 _install_telemetry()  # obalí i nově přidané tooly (už obalené přeskočí)

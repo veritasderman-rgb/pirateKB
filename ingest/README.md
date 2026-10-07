@@ -13,12 +13,15 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 | [styleguide.pirati.cz](https://styleguide.pirati.cz) (Pattern Lab) | `styleguide.py` | `data/brand/barvy.yaml`, `fonty.yaml`, `styleguide.md` | značkové, neutrální a cizí barvy (hex), rodiny písem, shrnutí s odkazem na verzi styleguide | při vydání nové verze styleguide, jinak cca měsíčně |
 | [psp.cz otevřená data](https://www.psp.cz/sqw/hp.sqw?k=1300) | `psp.py` | `data/psp/poslanci.jsonl`, `hlasovani-2017.jsonl`, `hlasovani-2021.jsonl`, `hlasovani-2025.jsonl`, `README.md` | pirátští poslanci (členství v klubu, funkce) a každé sněmovní hlasování s tím, jak hlasovali Piráti | týdně (po jednacích týdnech), před volbami zkontrolovat seznam období v `TERMS` |
 | [psp.cz stenoprotokoly](https://www.psp.cz/eknih/2021ps/stenprot/zip/index.htm) (zipy schůzí, online stránky `sNNNTTT.htm`, otevřená data `steno.zip`/`schuze.zip`) | `steno.py` | `data/psp/steno/<obdobi>/<schuze>-<poslanec>.md`, `vystoupeni.jsonl`, `stav.json` | všechna vystoupení pirátských poslanců ve Sněmovně (období 2017, 2021, 2025, i v roli člena vlády): text, datum a čas, schůze, bod jednání, odkaz na stenozáznam s kotvou `#rN`; typ `projev`, autorita `vyjadreni-politika`; bez řízení schůze (předsedající) a procedurálních vět pod 120 znaků | týdně `--obdobi 2025 --max-stranek 600` (nové schůze + poslední 2 znovu); celé naplnění jednorázově bez parametrů (~1–2 h, ~300 zipů) |
+| [psp.cz otevřená data](https://www.psp.cz/sqw/hp.sqw?k=1300) (`tisky.zip`, `sbirka.zip`, `interp.zip`, `poslanci.zip`; ústní interpelace období 2025 z veřejných stránek `interp.sqw?o=10`) | `tisky.py` | `data/psp/tisky/<obdobi>/<cislo>-<slug>.md`, `tisky.jsonl`; `data/psp/interpelace/<obdobi>/pisemna-<cislo>-<slug>.md`, `ustni-<poslanec>.md`, `interpelace.jsonl` | návrhy zákonů, které spolupředložil pirátský poslanec (člen klubu k datu předložení), a vládní návrhy předložené pirátským členem vlády (`pirati_role: vlada`): navrhovatelé, výsledek (schválen, zamítnut, vzat zpět, vrácen, nedokončen, projednává se), číslo ve Sbírce, průběh projednávání s hlasováními a hlasy Pirátů; písemné a ústní interpelace pirátských poslanců (na koho, ve věci, výsledek, odkaz na stenozáznam); typy `tisk` a `interpelace`, autorita `oficialni-data-psp` | týdně `--obdobi 2025` po `psp.py` (potřebuje `data/psp/hlasovani-*.jsonl`); ~1–3 min bez cache, s cache sekundy |
 | [senat.cz](https://www.senat.cz/senatori/) (RSS „Jak jsem hlasoval/a“ `hlasovani_rss.php?pid=<id>`, seznamy a profily senátorů) | `senat.py` | `data/senat/senatori.jsonl`, `hlasovani-<rok>.jsonl` (rok začátku funkčního období), `README.md` | pirátští senátoři (příslušnost Piráti nebo zvoleni za Piráty) s mandáty a obvody; každé hlasování, kde hlasoval pirátský senátor, ve schématu `data/psp` + `komora: senat`; celkové počty hlasů chybí (detail hlasování na senat.cz je za WAF, otevřená data hlasování Senát nevydává) | týdně `--jen-rss` (jen RSS známých senátorů); první týden v měsíci `--aktualni` (kontrola nových mandátů v aktuálním funkčním období, sloučí se s uloženým seznamem); bez parametru projde všechna období od 2012 |
 | [HowTheyVote.eu API](https://howtheyvote.eu/api/) (jmenovitá hlasování EP, ODbL) | `ep.py` | `data/ep/europoslanci.jsonl`, `hlasovani-2019.jsonl`, `hlasovani-2024.jsonl`, `README.md` | pirátští europoslanci (Gregorová, Peksa, Kolaja; další se najdou podle národní strany) a každé hlavní hlasování EP od 7/2019 s jejich hlasy a celkovými počty, ve schématu `data/psp` + `komora: ep`; názvy anglicky | týdně; interval ≥ 1 s, první běh ~45 min (countries.csv pro každé hlasování), další běhy jen nová hlasování (`--bez-souctu` bez celkových počtů za ~1 min) |
+| [volby.gov.cz otevřená data ČSÚ](https://volby.gov.cz/opendata/opendata.htm) (registry kandidátů a kandidátních listin, číselníky stran `cvs`/`cpp`/`cns`, souhrnné XML `vysledky`) | `volby.py` | `data/volby/vysledky/<druh>-<rok>.md`, `vysledky.jsonl`, `zvoleni/<druh>-<rok>.jsonl`, `zvoleni/<druh>-<rok>[-<kraj>].md`, `README.md` | výsledky Pirátů (kód strany 720, samostatně i v koalicích podle `SLOZENI`) ve volbách do Sněmovny (2010–2025), EP (2014–2024), krajů (2012–2024), obcí (2010–2022) a Senátu (2010–2025): hlasy, %, mandáty, partneři; zvolení Piráti (příslušnost nebo navržení Piráty) jmenovitě s kandidátkou, pořadím a přednostními hlasy; nezvolení jen počty; typ `volby`, autorita `oficialni-data-csu` | měsíčně (první týden v měsíci) a ručně po volbách; ~35 s z cache, první běh 53 MB / 2–3 min. `--volby ps-2021 kv-2022 se` jen vybrané volby, `--seznam` konfigurace; nové volby = řádek v `VOLBY` |
 | [pirati.cz](https://www.pirati.cz) | `pirati_web.py` | `data/pirati-web/aktuality/<rok>/*.md`, `program/*.md`, `lide/*.md`, `materialy.md`, `index.jsonl` | tiskové zprávy a články, programové dokumenty, stanoviska a kodexy, profily lidí na webu, odkazy na loga a soubory ke stažení | aktuality denně (`--only aktuality`), celý web měsíčně |
 | [lide.pirati.cz](https://lide.pirati.cz) | `lide_pirati.py` | `data/lide/tymy/*.md`, `regiony/*.md`, `osoby.jsonl`, `struktura.jsonl` | orgány, odbory a týmy, krajská a místní sdružení, lidé s funkcí (ne seznamy členů), hrany nadřízenosti | týdně, po celostátním fóru a volbách orgánů hned |
 | [Flickr Pirátů](https://www.flickr.com/photos/pirati/albums/) | `flickr.py` | `data/flickr/alba.jsonl`, `alba.md` | seznam fotoalb (název, počet fotek, odkaz, náhled, datum a licence tam, kde je Flickr bez klíče vydá; s API klíčem i popis a data všech alb), jen metadata, ne samotné fotky | měsíčně |
 | [evidence.pirati.cz](https://evidence.pirati.cz) (Evidence kontaktů a schůzek, Open Lobby) | `evidence.py` | `data/evidence/<rok>/*.md`, `schuzky.jsonl`, `autori.jsonl` | registr lobbistických schůzek pirátských politiků z veřejného GraphQL API (`evidence-api.pirati.cz/graphql`): datum, název, popis, přijaté a poskytnuté výhody, naši a ostatní účastníci, autor, permalink; seznam autorů s počtem zpráv | denně (bez parametrů stáhne jen zprávy publikované od posledního běhu), týdně `--plne` (zachytí úpravy a smazání; celý registr je jen ~15 požadavků) |
+| [ÚDH](https://udh.gov.cz/vyrocni-financni-zpravy-stran-a-hnuti) (JSON exporty výročních zpráv a zpráv o kampaních na `zpravy.udh.gov.cz`), [transparentní účty Fio](https://ib.fio.cz/ib/transparent?a=2100048174), [Piroplácení](https://piroplaceni.pirati.cz/rozpocet/) (rozpočty, seznam účtů) | `financovani.py` | `data/financovani/vyrocni-zpravy/<rok>.md`, `kampane/<volby>.md`, `rozpocty/<rok>.md`, `ucty/<ucet>.md`, `ucty.jsonl`, `financovani.jsonl`, `prehled.md` | výroční finanční zprávy 2017–dnes (příjmy podle kategorií, státní příspěvky, dary, členské příspěvky, výdaje na volby, zaměstnanci, dluhy), zprávy o financování kampaní, rozpočty centrály, měsíční souhrny 7 transparentních účtů; typ `financni-zprava`, autorita `oficialni-udhpsh` / `oficialni-transparentni-ucet` / `oficialni-evidence`; **dárci – fyzické osoby jen souhrnně, jmenovitě jen právnické osoby, z účtů jen agregace** | měsíčně `--jen ucty rozpocty` (~30 s); v lednu, dubnu až červnu a prosinci úplný běh (zprávy a kampaně, ~1 min s cache, ~3 min poprvé) |
 | X/Twitter a Bluesky poslanců (účty v `socialni_site_ucty.yaml`) | `socialni_site.py` | `data/social/x/<ucet>.jsonl`, `x/<ucet>/<RRRR-MM>.md`, totéž v `bluesky/` | veřejné příspěvky pirátských poslanců: text, datum, odkaz, počty reakcí, označení repostů a odpovědí (autorita `vyjadreni-politika`, ne stanovisko strany) | denně (`--platforma vse`); X bez API tokenu vrací jen nejnovější dávku, takže častý běh = úplnější historie |
 | [Pirátská hospodářská strategie](https://majak.pirati.cz/documents/647/Piratska_Hospodarska_strategie.pdf) (PDF, PEER) | `dokumenty.py` | `data/dokumenty/hospodarska-strategie/00-cely-dokument.md`, `NN-<kapitola>.md` | obecný převod PDF -> Markdown (pdfplumber): nadpisy podle velikosti písma, tabulky, popisky grafů jako `> Graf:`; celý text a 7 kapitol s rozsahem stran; profily dokumentů v `DOKUMENTY` | při vydání nového dokumentu (přidat profil) |
 | [peer.pirati.cz](https://peer.pirati.cz) | `subweby.py` | `data/subweby/peer/*.md` | úvodní stránka s členy PEER (rozcestník), stránka strategie (programový dokument), články „Co si o tom myslíme“ (aktuality); konfigurace `WEBY` je připravená pro další weby z Majáku | týdně |
@@ -30,6 +33,19 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 | kontrola výstupů | `validate.py` | jen výpis na stdout | ověří frontmatter `.md` a validitu `.jsonl`, souhrn podle složek a typů | po každém běhu ingestu a v CI |
 
 **Evidence schůzek a třetí osoby.** Registr je veřejný záměrně (transparentnost lobbingu) a jména ostatních, nepirátských účastníků v něm strana zveřejňuje oficiálně. Přesto jde o údaje třetích osob: kurátor by měl rozhodnout, zda je indexovat celé, nebo jen naše účastníky. Výchozí stav ukládá vše tak, jak je na webu; `python3 evidence.py --bez-tretich-osob --plne` pole `ostatni_ucastnici` / `ucastnici_ostatni` vynechá (popis schůzky může jména obsahovat i tak). Autoři se ukládají jen jako id, jméno, počet zpráv a odkaz (ne login ani odkaz na fórum).
+
+**Financování strany (`financovani.py`).** Výroční finanční zprávy a zprávy o kampaních bere
+ze strojově čitelných JSON exportů ÚDH (`https://zpravy.udh.gov.cz/zpravy/vfz<rok>.json` →
+soubory `export/vfz<rok>-pirati-<tabulka>.json`; od 2017). Účetní závěrka a audit jsou jen
+skenovaná PDF, proto se rozvaha (majetek, závazky, celkové náklady) neparsuje, jen odkazuje.
+Transparentní účty (seznam `UCTY` ve skriptu, podle Piroplácení `/banka/ucet/`) stahuje po
+měsících z `ib.fio.cz/ib/transparent?a=…&f=…&t=…`; Fio ukazuje jen poslední 3 roky, starší
+měsíce se zachovají z `ucty.jsonl`. Každý měsíc se ověřuje proti součtům banky
+(`kontrola_fio`). Nové volby: doplnit řádek do `KAMPANE` (klíč ÚDH zjistíš na stránce voleb na
+udh.gov.cz, odkaz `zpravy.udh.gov.cz/zpravy/<klic>`) a nový volební účet do `UCTY`.
+**GDPR:** fyzické osoby (dárci, plátci) jen souhrnně, žádná jména, data narození ani obce;
+jmenovitě jen právnické osoby (právní forma v názvu nebo strana z rejstříku ÚDH); mzdový účet
+se nezpracovává.
 
 **Flickr a API klíč.** Bez klíče `flickr.py` načte z HTML jen zhruba čtvrtinu alb (Flickr
 renderuje 25 z každých 100) a popisy ani data vytvoření neuvádí; licence a data se doplní
@@ -53,6 +69,28 @@ záznamu v `rec` celé schůze a řečníka určí odkaz `detail.sqw?id=`). Bod 
 `bod_schuze.unl` (otevřená data `schuze.zip`), u bodů mimo číselník (sloučená rozprava) z nadpisu
 na stránce; bez známého bodu nadpis vystoupení bod neuvádí. Volby: `--obdobi`, `--schuze`,
 `--znovu`, `--bez-zipu` (jen online stránky, kontrola), `--max-stranek N`.
+
+**Sněmovní tisky a interpelace (`tisky.py`).** Kdo je Pirát, určuje členství v pirátském
+poslaneckém klubu k datu předložení (`zarazeni.unl` z `poslanci.zip`). Navrhovatelé jsou
+`tisky.id_osoba` + tabulka `predkladatel`; u vládních návrhů je v `predkladatel` člen vlády,
+který návrh za vládu předložil (`pirati_role: vlada`, jen ministři s poslaneckým mandátem).
+Výsledek se odvozuje ze stavového automatu (`tisky.id_stav` -> `stavy` -> `typ_stavu`, poslední
+přechod `hist` -> `prechody` -> `typ_akce`) a ze `sbirka.unl` (vazba tisk -> číslo ve Sbírce);
+tisky skončených období, které nedošly do stavu KONEC, jsou `nedokoncen`. Ústní interpelace
+jsou v `interp.zip` jen do dubna 2025; novější dny skript bere z veřejných stránek
+`interp.sqw?o=10&s=<schůze>&dx=<datum>` (stav podle legendy stránky: přednesená, nepřednesená,
+zrušená). Každý běh přepíše výstupy zpracovaných období a smaže soubory, které už neodpovídají
+žádnému tisku (`--obdobi 2025` nechá starší období beze změny).
+
+**Volby (`volby.py`).** Ze stránky otevřených dat ČSÚ pro každé volby najde ZIPy registrů a
+číselníků (nejnovější verze podle data v názvu) a souhrnné XML `vysledky`. Kód Pirátů v
+číselnících je **720** (1217 = Moravská a Slezská pirátská strana, jiná strana); kandidátka je
+s Piráty, když je 720 v jejím `SLOZENI`, kandidát je Pirát podle `PSTRANA` nebo `NSTRANA`
+(pole `pirat_podle`). U obcí se berou řádné volby a soudní opravy výsledků, dodatečné a
+opakované volby ne. Jmenovitě se ukládají **jen zvolení Piráti** a jen údaje zveřejněné ČSÚ
+(povolání ne); `lide_id` je heuristické párování jménem a krajským sdružením s
+`data/lide/osoby.jsonl`. Obecní a senátní volby 2026 jsou v konfiguraci a zpracují se, jakmile
+ČSÚ zveřejní registr s mandáty (`--volby kv-2026 se`, u Senátu znovu po 2. kole).
 
 **Sociální sítě (X/Twitter, Bluesky).** `socialni_site.py` čte seznam účtů z
 `socialni_site_ucty.yaml` (jméno poslance, handle na X a Bluesky, příznak `overit`, odkud odkaz
@@ -180,6 +218,9 @@ cd ingest
 python3 styleguide.py          # sekundy
 python3 psp.py                 # desítky sekund, stahuje ~20 MB zipů
 python3 steno.py               # 1–2 hodiny poprvé (~300 zipů stenoprotokolů); pak týdně --obdobi 2025
+python3 tisky.py               # ~1–3 min (4 zipy ~6 MB + ~10 stránek interpelací); po psp.py
+python3 volby.py               # ~35 s z cache, první běh 2–3 min (53 MB ZIPů ČSÚ)
+python3 financovani.py         # ~3 min poprvé (ÚDH, Fio, Piroplácení), s cache ~10 s
 python3 lide_pirati.py         # minuty (stovky stránek)
 python3 pirati_web.py          # desítky minut (tisíce článků, 4 vlákna)
 python3 subweby.py             # sekundy (peer.pirati.cz, majak.pirati.cz)

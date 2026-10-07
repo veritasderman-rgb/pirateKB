@@ -36,13 +36,17 @@ def i(s: str) -> int | None:
 
 
 def d(s: str) -> str | None:
+    """Datum z otevřených dat PSP -> YYYY-MM-DD. Hlasování mají ``DD.MM.YYYY``, ``zarazeni.unl``
+    a další tabulky poslanců ``YYYY-MM-DD HH`` (s hodinou); prázdné nebo nečitelné -> None."""
     s = s.strip()
     if not s:
         return None
-    try:
-        return datetime.strptime(s[:10], "%d.%m.%Y").strftime("%Y-%m-%d")
-    except ValueError:
-        return None
+    for fmt in ("%d.%m.%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(s[:10], fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
 
 
 def main() -> None:

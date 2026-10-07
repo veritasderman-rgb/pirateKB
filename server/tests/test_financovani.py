@@ -246,3 +246,34 @@ def test_parse_rozpocet():
     assert set(kap) == {"100000000", "110000200", "200000000"}  # položky (__item) se neukládají
     assert kap["110000200"]["uroven"] == 1 and kap["110000200"]["nazev"] == "Státní příspěvky"
     assert kap["200000000"]["proplaceno"] == -27893130.25 and kap["200000000"]["k_proplaceni"] == -1289480.42
+
+
+def test_tool_get_party_finances(tmp_path):
+    """Tool nad mini indexem postaveným z kopie data/financovani (bez sítě)."""
+    import shutil
+
+    import pytest
+
+    src = ROOT / "data" / "financovani"
+    if not (src / "vyrocni-zpravy" / "2024.md").exists():
+        pytest.skip("data/financovani chybí")
+    sys.path.insert(0, str(ROOT))
+    from server import mcp_server
+    from server.kb.build import build_index
+    from server.kb.search import KB
+
+    data = tmp_path / "data"
+    shutil.copytree(src, data / "financovani")
+    db = tmp_path / "kb.sqlite"
+    build_index(data, db, embeddings_provider=None, content_dir=None)
+    kb = KB(db, embeddings_provider=None)
+    try:
+        out = mcp_server._party_finances(kb, rok=2024)
+        assert "79 280 965" in out and "STAROSTOVÉ A NEZÁVISLÍ" in out and "Adamec" not in out
+        assert "https://zpravy.udh.gov.cz/" in out
+        assert "2100048174" in mcp_server._party_finances(kb, ucet="dary")
+        assert "2100048174" in mcp_server._party_finances(kb, ucet="2100048174/2010", rok=2025)
+        assert "v bázi není" in mcp_server._party_finances(kb, ucet="neexistuje")
+        assert "122 038 962" in mcp_server._party_finances(kb)
+    finally:
+        kb.close()

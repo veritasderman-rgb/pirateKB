@@ -5,7 +5,8 @@
 # Každá otázka:
 #   id               jedinečný identifikátor (prefix = kategorie)
 #   kategorie        lide | organy | program | stanoviska | tiskove-zpravy | hlasovani | brand |
-#                    sablony | schuzky | systemy | media | socialni-site | projevy
+#                    sablony | schuzky | systemy | media | socialni-site | projevy | tisky |
+#                    interpelace | volby | financovani
 #   otazka           jak by se zeptal člověk (pro čtenáře a reporty)
 #   tool, argumenty  který tool MCP serveru má AI zavolat a s čím
 #   ocekavane        aspoň jeden z řetězců musí být ve výstupu (bez ohledu na diakritiku a velikost)
@@ -553,3 +554,130 @@ otazky:
     argumenty: {tema: registr smluv}
     ocekavane: [Vystoupení ve Sněmovně (stenozáznamy)]
     zdroj_musi_byt: psp.cz
+
+  # ------------------------------------------------------------------ sněmovní tisky a interpelace
+  - id: tisky-01
+    kategorie: tisky
+    otazka: Které novely stavebního zákona prosadil Ivan Bartoš jako ministr?
+    tool: get_bills
+    argumenty: {poslanec: Bartoš, query: stavební zákon, stav: schválen}
+    ocekavane: [195/2022 Sb., 152/2023 Sb.]
+    nesmi_obsahovat: [Lukáš Bartoň, Žádný sněmovní tisk neodpovídá]
+    zdroj_musi_byt: psp.cz
+
+  - id: tisky-02
+    kategorie: tisky
+    otazka: Navrhl Jakub Michálek zákon o úřadu pro střet zájmů a jak dopadl?
+    tool: get_bills
+    argumenty: {poslanec: Michálka, query: střet zájmů}
+    ocekavane: [Úřadu pro prevenci korupce a střetu zájmů]
+    nesmi_obsahovat: [v bázi nepředložil, Žádný sněmovní tisk neodpovídá]
+    zdroj_musi_byt: psp.cz
+
+  - id: tisky-03
+    kategorie: tisky
+    otazka: Které návrhy zákonů Jakuba Michálka byly schváleny?
+    tool: get_bills
+    argumenty: {poslanec: Michálek, stav: schváleno, limit: 3}
+    ocekavane: ["Souhrn: Jakub Michálek"]
+    nesmi_obsahovat: [Neznámý stav, Žádný sněmovní tisk neodpovídá]
+    zdroj_musi_byt: psp.cz
+
+  - id: interpelace-01
+    kategorie: interpelace
+    otazka: Na co se Olga Richterová ptala vlády v ústních interpelacích k rodičovskému příspěvku?
+    tool: search_kb
+    argumenty: {query: rodičovský příspěvek, typ: [interpelace], limit: 5}
+    ocekavane: ["Ústní interpelace: Olga Richterová"]
+    zdroj_musi_byt: psp.cz
+
+  # ------------------------------------------------------------------ volby (ČSÚ)
+  - id: volby-01
+    kategorie: volby
+    otazka: Kolik procent a mandátů získali Piráti ve sněmovních volbách 2017?
+    tool: get_election_results
+    argumenty: {volby: ps, rok: 2017}
+    ocekavane: ["10,79"]
+    nesmi_obsahovat: [báze nic nenašla]
+    zdroj_musi_byt: volby.gov.cz
+
+  - id: volby-02
+    kategorie: volby
+    otazka: Kdo za Piráty zasedá v zastupitelstvu Jablonce nad Nisou po volbách 2022?
+    tool: find_elected
+    argumenty: {obec: Jablonec nad Nisou, rok: 2022}
+    ocekavane: [Jaroslav Šída]
+    nesmi_obsahovat: [Žádný zvolený Pirát]
+    zdroj_musi_byt: volby.gov.cz
+
+  - id: volby-03
+    kategorie: volby
+    otazka: Kteří Piráti byli zvoleni do Evropského parlamentu v roce 2019?
+    tool: find_elected
+    argumenty: {druh: ep, rok: 2019}
+    ocekavane: [Markéta Gregorová]
+    nesmi_obsahovat: [Žádný zvolený Pirát]
+    zdroj_musi_byt: volby.gov.cz
+
+  - id: volby-04
+    kategorie: volby
+    otazka: Kde najdu pirátské zastupitele v Libereckém kraji?
+    tool: search_kb
+    argumenty: {query: pirátský zastupitel Liberec, typ: [volby]}
+    ocekavane: [Zastupitelé za Piráty v obcích]
+    zdroj_musi_byt: volby.gov.cz
+
+  # ------------------------------------------------------------------ financování
+  - id: financovani-01
+    kategorie: financovani
+    otazka: Kolik měla Česká pirátská strana příjmů v roce 2024?
+    tool: get_party_finances
+    argumenty: {rok: 2024}
+    ocekavane: [79 280 965]
+    nesmi_obsahovat: [v bázi není]
+    zdroj_musi_byt: zpravy.udh.gov.cz
+
+  - id: financovani-02
+    kategorie: financovani
+    otazka: Kdo byl největším dárcem Pirátů mezi právnickými osobami v roce 2024?
+    tool: get_party_finances
+    argumenty: {rok: 2024}
+    ocekavane: [STAROSTOVÉ A NEZÁVISLÍ]
+    nesmi_obsahovat: [Adamec, v bázi není]   # Adamec = dárce FO ve VFZ 2024, nesmí se objevit (GDPR)
+    zdroj_musi_byt: zpravy.udh.gov.cz
+
+  - id: financovani-03
+    kategorie: financovani
+    otazka: Jaké číslo má transparentní účet Pirátů pro dary?
+    tool: get_party_finances
+    argumenty: {ucet: dary}
+    ocekavane: [2100048174]
+    nesmi_obsahovat: [v bázi není]
+    zdroj_musi_byt: ib.fio.cz
+
+  - id: financovani-04
+    kategorie: financovani
+    otazka: Jak se vyvíjely příjmy strany od roku 2017?
+    tool: get_party_finances
+    argumenty: {}
+    ocekavane: [122 038 962]
+    nesmi_obsahovat: [Index neobsahuje]
+    zdroj_musi_byt: zpravy.udh.gov.cz
+
+  # ------------------------------------------------------------------ žádosti podle zákona 106
+  - id: sablony-106-01
+    kategorie: sablony
+    otazka: Úřad mi neodpověděl na žádost podle 106. Máte šablonu stížnosti?
+    tool: get_template
+    argumenty: {typ: stiznost-106}
+    ocekavane: [§ 16a odst. 1 písm. b)]
+    nesmi_obsahovat: [neexistuje]
+    zdroj_musi_byt: zakonyprolidi.cz
+
+  - id: sablony-106-02
+    kategorie: sablony
+    otazka: Jak podat stížnost na nečinnost úřadu podle zákona 106?
+    tool: search_kb
+    argumenty: {query: stížnost na nečinnost 106, limit: 5}
+    ocekavane: [Šablona stížnosti na postup při vyřizování žádosti o informace]
+    zdroj_musi_byt: zakonyprolidi.cz

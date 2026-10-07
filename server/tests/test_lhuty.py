@@ -320,3 +320,34 @@ def test_telemetrie_obaluje_nove_tooly():
     manager = mcp_server.mcp._tool_manager
     tool = {t.name: t for t in manager.list_tools()}["lhuty_zadosti"]
     assert getattr(tool.fn, "__telemetry__", False)
+
+
+def test_telemetrie_obaluje_vsechny_tooly():
+    manager = mcp_server.mcp._tool_manager
+    nezabalene = [t.name for t in manager.list_tools() if not getattr(t.fn, "__telemetry__", False)]
+    assert nezabalene == []
+
+
+def test_prompty_video_a_grafika_106():
+    async def main():
+        return {p.name for p in await mcp_server.mcp.list_prompts()}
+
+    assert {"video_106", "grafika_106"} <= anyio.run(main)
+    v = mcp_server.video_106(faze="odeslano", predmet="Smlouvy na rekonstrukci náměstí", urad="MěÚ Příklad",
+                             datum_podani="2026-03-02")
+    assert "Fáze: **podano**" in v and "Smlouvy na rekonstrukci náměstí" in v and "2. 3. 2026" in v
+    assert "<!--" not in v and "{{predmet}}" not in v and "{{shrnuti}}" not in v
+    assert "zatím bez odpovědi" in v and "1080x1920" in v and "Necituj neověřené" in v
+    g = mcp_server.grafika_106(faze="zjisteni", format="vse")
+    assert "Fáze: **odpoved**" in g and "--format vse" in g and "zeptej se uživatele" in g
+    b = mcp_server.pruvodce_zadosti(faze="odeslano", typ="106", predmet="Smlouvy")
+    assert "použij prompt `video_106`" in b and "použij prompt `grafika_106`" in b
+
+
+def test_get_template_sablony_106():
+    for typ, cast in (("zadost-106", "106/1999"), ("stížnost", "§ 16a"), ("odvolani-106", "§ 16"),
+                      ("dotaz-zastupitele", "zastupitel"), ("video-106", "{{faze}}"), ("grafika", "{{format}}")):
+        out = mcp_server.get_template(typ)
+        assert "neexistuje" not in out and cast in out, typ
+    assert "Autorita: kurátorovaný obsah" in mcp_server.get_template("stiznost-106")
+    assert "zakonyprolidi.cz" in mcp_server.get_template("stiznost-106")

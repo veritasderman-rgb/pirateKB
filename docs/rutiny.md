@@ -8,7 +8,7 @@ stahovat ručně, a kdokoli si může kdykoli ověřit, co a kdy se aktualizoval
 | Plán | Kdy | Co běží | Orientační doba |
 |---|---|---|---|
 | `denni` | každý den 04:17 UTC (06:17 letního času v Praze) | `evidence` (nové schůzky), `media --denne`, `socialni_site` (X a Bluesky), `psp`, `pirati_web --only aktuality` (nové články ze sitemapy) | minuty až desítky minut |
-| `tydenni` | neděle 03:23 UTC | všechno: `styleguide`, `psp`, `steno --obdobi 2025` (stenozáznamy, jen nové a poslední 2 schůze), `lide_pirati`, `pirati_web`, `flickr`, `evidence --plne`, `socialni_site`, `subweby`, `dokumenty`, `systemy` | desítky minut (limit jobu je 60 minut) |
+| `tydenni` | neděle 03:23 UTC | všechno: `styleguide`, `psp`, `steno --obdobi 2025` (stenozáznamy, jen nové a poslední 2 schůze), `tisky --obdobi 2025` (sněmovní tisky a interpelace), `lide_pirati`, `pirati_web`, `flickr`, `evidence --plne`, první týden v měsíci `volby` (ČSÚ) a `financovani` (účty a rozpočty; v lednu, dubnu–červnu a prosinci i výroční zprávy a kampaně), `socialni_site`, `subweby`, `dokumenty`, `systemy` | desítky minut (limit jobu je 60 minut) |
 
 Workflow [`.github/workflows/update-data.yml`](../.github/workflows/update-data.yml) spouští
 [`scripts/update_data.sh`](../scripts/update_data.sh). Postup každého běhu:
@@ -27,7 +27,7 @@ Workflow [`.github/workflows/update-data.yml`](../.github/workflows/update-data.
 
 Druhý workflow, [`ci.yml`](../.github/workflows/ci.yml), na každém pull requestu a pushi do `main`
 spouští `ingest/validate.py`, `pytest server/tests` a nakonec **evals**: `python3 evals/run.py`
-položí 60 typických otázek z [`evals/otazky.yaml`](../evals/otazky.yaml) přímo toolům serveru
+položí 80 typických otázek z [`evals/otazky.yaml`](../evals/otazky.yaml) přímo toolům serveru
 (nad indexem postaveným z `data/`) a ověří, že odpověď obsahuje očekávaný údaj a citaci zdroje.
 Pod 85 % prošlých otázek CI selže; tabulka výsledků je v logu a `evals/vysledky.json` jako
 artefakt `evals-vysledky`. `scripts/update_data.sh` pouští evals na konci každé aktualizace

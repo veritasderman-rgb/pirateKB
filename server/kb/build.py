@@ -406,6 +406,39 @@ def _load_people(data_dir: Path, con: sqlite3.Connection) -> dict:
             }
             n_psp += 1
 
+    # zvolení Piráti z voleb ČSÚ (data/volby/zvoleni/*.jsonl, ingest/volby.py). Nezakládají se
+    # nové osoby (stovky obecních zastupitelů bez kontaktu by zahltily find_people): doplní
+    # se jen osoby, které už v tabulce jsou – podle `lide_id` (volby.py páruje jméno + krajské
+    # sdružení), u Sněmovny, EP a Senátu i podle jména. Mandát z posledních voleb daného druhu
+    # (Senát: zvolení v posledních 6 letech) přibude jako role, celá historie do meta["volby"].
+    n_volby = 0
+    zvoleni_dir = data_dir / "volby" / "zvoleni"
+    if zvoleni_dir.is_dir():
+        zaznamy = [rec for path in sorted(zvoleni_dir.glob("*.jsonl")) for rec in _read_jsonl(path)]
+        posledni: dict[str, int] = {}
+        for rec in zaznamy:
+            posledni[rec["volby"]] = max(posledni.get(rec["volby"], 0), int(rec["rok"]))
+        rok_ted = dt.date.today().year
+        for rec in sorted(zaznamy, key=lambda r: (r["rok"], r["volby"])):
+            pid = f"lide:{rec['lide_id']}" if rec.get("lide_id") else None
+            if pid not in people and rec.get("volby") in ("ps", "ep", "se"):
+                pid = by_key.get(_person_key(rec.get("jmeno") or ""))
+            if pid is None or pid not in people:
+                continue
+            p = people[pid]
+            p["meta"].setdefault("volby", []).append({
+                k: rec.get(k) for k in ("volby", "rok", "funkce", "organ", "obec", "kraj", "kandidatka",
+                                        "poradi", "prednostni_hlasy", "pirat_podle", "zdroj")})
+            aktualni = (rec["rok"] >= rok_ted - 6 if rec["volby"] == "se"
+                        else rec["rok"] == posledni.get(rec["volby"]))
+            if aktualni and rec["volby"] != "ps":     # poslance už přidal blok psp výše
+                p["role"].append({
+                    "role": f"{rec.get('funkce')} (zvolen/a {rec['rok']})", "sekce": "volby (ČSÚ)",
+                    "jednotka": rec.get("organ") or rec.get("obec"), "jednotka_url": rec.get("zdroj"),
+                    "obdobi": [str(rec["rok"])],
+                })
+            n_volby += 1
+
     rows = []
     for p in people.values():
         role_bits = []
@@ -424,7 +457,7 @@ def _load_people(data_dir: Path, con: sqlite3.Connection) -> dict:
     con.executemany("INSERT INTO people VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
     con.execute("INSERT INTO people_fts(people_fts) VALUES ('rebuild')")
     return {"people": len(rows), "people_web_profiles": n_web, "people_web_new": n_web_new,
-            "people_psp": n_psp, "people_psp_new": n_psp_new}
+            "people_psp": n_psp, "people_psp_new": n_psp_new, "people_volby": n_volby}
 
 
 # ---------------------------------------------------------------- organizační jednotky

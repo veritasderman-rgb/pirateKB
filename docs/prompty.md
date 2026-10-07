@@ -40,7 +40,8 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 > Co říkal Ivan Bartoš ve Sněmovně k digitalizaci stavebního řízení? Dej mi tři
 > nejrelevantnější citace s odkazem na stenozáznam.
 
-> Jak hlasovala Markéta Gregorová v Evropském parlamentu o podpoře Ukrajiny?
+> Jak hlasovala Markéta Gregorová v Evropském parlamentu o podpoře Ukrajiny? Názvy
+> hlasování v EP jsou anglicky, hledej tedy i „Ukraine“.
 
 > Na co se interpelovali pirátští poslanci ministra zdravotnictví?
 

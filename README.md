@@ -7,6 +7,10 @@ Jeden zdroj pravdy o Pirátské straně, ke kterému se každý pirát připojí
 - program a stanoviska,
 - tiskové zprávy a články,
 - hlasování v Poslanecké sněmovně, Senátu a Evropském parlamentu,
+- návrhy zákonů a interpelace pirátských poslanců,
+- výsledky voleb a zvolení Piráti (ČSÚ),
+- financování strany (výroční zprávy, kampaně, transparentní účty),
+- průvodce žádostí podle zákona 106 a dotazem zastupitele (lhůty, šablony, grafika a video),
 - příspěvky politiků na sítích a přepisy videí,
 - weby krajských a místních sdružení,
 - brand a šablony,
@@ -32,9 +36,34 @@ https://piratekb-veritasderman-3065s-projects.vercel.app/mcp
 Podrobný návod, včetně lokálního běhu přes Docker, je v
 [docs/pripojeni/README.md](docs/pripojeni/README.md).
 
+## Vzorové prompty
+
+Stačí AI napsat, co potřebujete, pro koho to je a v jaké formě; nástroje báze si vybere sama
+a u tvrzení uvede zdroj. Celý přehled podle účelu je v [docs/prompty.md](docs/prompty.md)
+(server ho nabízí i jako resource `kb://navod/prompty`). Například:
+
+> Jaký je oficiální postoj Pirátů k dostupnému bydlení? Odliš, co je v programu, co
+> v tiskových zprávách a co jsou jen vyjádření jednotlivých politiků.
+
+> Jaké návrhy zákonů předložil Jakub Michálek a které z nich prošly?
+
+> Kdo jsou pirátští zastupitelé v Liberci a za jaké volby byli zvoleni?
+
+> Žádost jsem poslal dnes datovou schránkou. Zapiš mi lhůty do kalendáře a připrav
+> příspěvek „podali jsme žádost“ a scénář krátkého videa.
+
+## Ukázky: grafika a video k žádostem podle 106
+
+<img src="docs/ukazky/namesti-106-nahled.gif" alt="Náhled animovaného videa k žádosti podle zákona 106" width="270">
+
+Ukázky jsou na fiktivních datech a vznikly ze šablon v repozitáři bez placených služeb
+(prompty `video_106` a `grafika_106`). Celá videa ve formátu [9:16](docs/ukazky/namesti-106-9x16.mp4)
+a [16:9](docs/ukazky/namesti-106-16x9.mp4), všechny čtyři karty a návod, jak si udělat vlastní,
+jsou v [docs/ukazky](docs/ukazky/README.md).
+
 ## Co server umí
 
-**16 toolů:**
+**22 toolů:**
 
 | Tool | K čemu |
 |---|---|
@@ -47,15 +76,23 @@ Podrobný návod, včetně lokálního běhu přes Docker, je v
 | `get_voting_record` | hlasování pirátských poslanců, senátorů a europoslanců (`komora`: psp, senat, ep) |
 | `get_social_posts` | příspěvky politiků na X a Bluesky |
 | `get_speeches` | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (2017–dnes), s odkazem na stenozáznam |
+| `get_bills` | návrhy zákonů předložené Piráty (i vládní návrhy pirátských ministrů): výsledek, Sbírka, závěrečné hlasování, odkaz na psp.cz |
+| `get_election_results` | výsledky Pirátů ve volbách: hlasy, %, mandáty, koalice; celostátně, po krajích, v obci |
+| `find_elected` | zvolení Piráti (poslanci, europoslanci, senátoři, krajští a obecní zastupitelé) podle jména, obce, kraje |
+| `get_party_finances` | financování strany: příjmy, státní příspěvky, dary, kampaně, rozpočet a transparentní účty po letech (dárci FO jen souhrnně) |
+| `pruvodce_zadosti`, `lhuty_zadosti` | žádost podle zákona 106 a dotaz zastupitele krok za krokem: šablony, lhůty do kalendáře (Google, Microsoft 365, ICS), stížnost a odvolání |
 | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec s kontaktem |
-| `get_brand`, `get_template` | barvy, písma, loga, šablony tiskové zprávy, postu, reels, briefu a projevu |
+| `get_brand`, `get_template` | barvy, písma, loga, šablony tiskové zprávy, postu, reels, briefu a projevu, žádosti, stížnosti a odvolání podle 106, dotazu zastupitele, zadání videa a grafiky |
 | `kb_stats` | co báze obsahuje, kdy se aktualizovala, souhrn použití |
 | `report_gap` | nahlásí otázku, na kterou báze nemá odpověď (podklad pro kurátora) |
 
-**5 promptů:** tisková zpráva, scénář reels, příspěvek na sítě, brief k tématu,
-odpověď občanovi.
+**11 promptů:** tisková zpráva, scénář reels, příspěvek na sítě, brief k tématu,
+odpověď občanovi; k žádostem podle 106 a dotazům zastupitele `zadost_106`,
+`dotaz_zastupitele`, `po_odeslani`, `odpoved_prisla`, `video_106` (scénář videa) a
+`grafika_106` (karta na sítě).
 
-**Resources:** barvy, písma, seznam programů, statistika, přehled hlášení chybějících odpovědí.
+**Resources:** barvy, písma, seznam programů, statistika, přehled hlášení chybějících odpovědí,
+vzorové prompty (`kb://navod/prompty`).
 
 **Pravidla odpovědí:** AI u každého tvrzení cituje zdrojovou URL a rozlišuje autoritu
 zdroje. Platí toto rozlišení:
@@ -77,14 +114,14 @@ nahlásí.
 - **Přihlášení přes auth.pirati.cz:** kód je připravený (Keycloak, jen pro členy), čeká
   na klienta v Keycloaku. Viz [docs/auth-keycloak.md](docs/auth-keycloak.md).
 - **Telemetrie:** anonymní, bez textu dotazů.
-- **Evals:** 66 testovacích otázek běží v CI při každém pull requestu.
+- **Evals:** 80 testovacích otázek běží v CI při každém pull requestu.
 - **Skills pro Claude** ve složce [`skills/`](skills/README.md): tisková zpráva, brief a
   sociální sítě, včetně toho, kdy přibrat MCP Hlídače státu.
 
 ## Zdroje dat
 
 Všechna data jsou z veřejných zdrojů a vytěžují se automaticky do [`data/`](data/README.md).
-Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026.
+Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky, volby a financování k 7. 10. 2026).
 
 | Zdroj | Obsah | Počet | Obnova |
 |---|---|---|---|
@@ -98,10 +135,14 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026.
 | [psp.cz](https://www.psp.cz) | pirátští poslanci | 41 | denně |
 | psp.cz | hlasování ve Sněmovně (období 2017, 2021, 2025) | 21 541 | denně |
 | psp.cz | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů (období 2017, 2021, 2025; bez řízení schůze) | 7 827 vystoupení (40 poslanců, 1 342 souborů) | týdně |
+| psp.cz | sněmovní tisky (návrhy zákonů) předložené Piráty a pirátskými ministry, s výsledkem a hlasováním (období 2017, 2021, 2025) | 191 tisků (85 ve Sbírce) | týdně |
+| psp.cz | interpelace pirátských poslanců na členy vlády (písemné i ústní) | 997 interpelací (113 písemných, 884 ústních) | týdně |
 | [senat.cz](https://www.senat.cz) | pirátští senátoři | 3 | měsíčně |
 | senat.cz | hlasování v Senátu (od 2012) | 6 794 | týdně |
 | [HowTheyVote.eu](https://howtheyvote.eu) | pirátští europoslanci | 3 | týdně |
 | HowTheyVote.eu | závěrečná hlasování v Evropském parlamentu (od 2019, názvy anglicky) | 2 470 | týdně |
+| [volby.gov.cz](https://volby.gov.cz/opendata/opendata.htm) (ČSÚ) | výsledky Pirátů ve volbách (Sněmovna, EP, Senát, kraje, obce 2010–2025) a zvolení Piráti | 27 voleb, 878 zvolených (PS 44, EP 4, Senát 9, kraje 107, obce 714) | měsíčně |
+| [ÚDH](https://udh.gov.cz/vyrocni-financni-zpravy-stran-a-hnuti), [Fio](https://ib.fio.cz/ib/transparent?a=2100048174), [Piroplácení](https://piroplaceni.pirati.cz) | financování strany: výroční finanční zprávy (2017–2025), zprávy o kampaních, rozpočty, měsíční souhrny transparentních účtů | 9 zpráv, 12 kampaní, 9 rozpočtů, 7 účtů (174 měsíců) | měsíčně (účty), ročně (zprávy) |
 | X (Twitter) | příspěvky poslanců a politiků | 1 000 | denně |
 | Bluesky | příspěvky politiků | 130 | denně |
 | [YouTube](https://www.youtube.com/@CeskaPiratskaStrana) | přepisy videí z titulků (kanál strany, M. Gregorová) | 42 videí, 29 přepisů | denně po dávkách |
