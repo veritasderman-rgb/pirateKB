@@ -25,7 +25,9 @@ výhradou, že nejsou ověřené; uživatele odkaž na <https://www.zakonyprolid
 
 - Zjisti **typ**: žádost podle InfZ (`typ="106"`) nebo dotaz zastupitele (`zastupitel-obec`,
   `zastupitel-kraj`, `zastupitel-praha`, `zastupitel-mestska-cast`). Když je uživatel
-  zastupitel a jde o důležité dokumenty, nabídni **obojí** (viz „106 vs. § 82“).
+  zastupitel, rozliš **dotaz** (písm. b), i názor a záměr) a **žádost o informace**
+  (písm. c), existující dokumenty – `podani="informace"`); u důležitých dokumentů nabídni
+  žádost „podle písm. c) a zároveň podle InfZ“ (viz „106 vs. § 82“).
 - Zavolej `pruvodce_zadosti(faze="pripravuji", typ=…, predmet=…, urad=…)` – vrátí
   náležitosti, tipy a předvyplněnou šablonu. Prompty `zadost_106` a `dotaz_zastupitele`
   dělají totéž jako řízený postup.
@@ -100,8 +102,11 @@ zapiš do kalendáře.
 | úhrada | zkontrolovat výpočet a poučení (§ 17 odst. 3, 4); zaplatit, nebo stížnost (§ 16a odst. 1 písm. d)) | zaplatit do 60, stížnost do 30 dnů |
 | výzva k upřesnění | upřesnit; 15 dní běží znovu | 30 dnů od doručení výzvy |
 
-U dotazu zastupitele: zákon nedává stížnost ani odvolání – urgence, zastupitelstvo,
-podnět ke kontrole (MV, u městských částí Magistrát), souběžná žádost podle InfZ.
+U dotazu zastupitele (písm. b)): zákon nedává stížnost ani odvolání – urgence,
+zastupitelstvo, podnět ke kontrole (MV, u městských částí Magistrát), souběžná žádost podle
+InfZ. U žádosti zastupitele o informace (písm. c)) se podle NSS (8 Aps 5/2012-47)
+subsidiárně použije procesní úprava InfZ: odepření rozhodnutím → odvolání, nečinnost →
+stížnost, pak žaloba proti nečinnosti (`pruvodce_zadosti(faze="problem", typ="zastupitel-…")`).
 
 ### 8a. Komunikace výsledku
 
@@ -122,12 +127,15 @@ text ze šablony s doplněnými daty. Po podání zapiš novou lhůtu:
 
 ## 106 vs. § 82 (dotaz zastupitele)
 
-| | dotaz zastupitele | žádost podle InfZ |
-|---|---|---|
-| lhůta | 30 dní (Praha a MČ u informací od zaměstnanců bez lhůty) | 15 dní (+ max. 10) |
-| když neodpoví | urgence, zastupitelstvo, podnět ke kontrole | stížnost, nadřízený může přikázat poskytnutí |
-| odmítnutí | bez opravného prostředku | rozhodnutí → odvolání |
-| rozsah | i vysvětlení a stav věci | jen existující informace |
+| | dotaz zastupitele (písm. b)) | žádost zastupitele o informace (písm. c)) | žádost podle InfZ |
+|---|---|---|---|
+| lhůta | 30 dní (obdržet) | obec, kraj 30 dní; Praha a MČ 15 dní (výklad MV – zákon lhůtu nestanoví) | 15 dní (+ max. 10) |
+| když neodpoví | urgence, zastupitelstvo, podnět ke kontrole | stížnost (InfZ subsidiárně), pak žaloba proti nečinnosti | stížnost, nadřízený může přikázat poskytnutí |
+| odmítnutí | bez opravného prostředku | rozhodnutí → odvolání (výklad MV) | rozhodnutí → odvolání |
+| rozsah | i názor, záměr, vysvětlení; ne nová informace | existující informace ze samostatné působnosti, bez anonymizace u věcí pro zastupitelstvo; bezplatně | jen existující informace, omezení § 7–11 |
+
+Zdroje: NSS 8 Aps 5/2012-47 (Sbírka NSS č. 2844/2013), stanovisko MV č. 1/2016 (aktualizace
+2022), přehled v `docs/revize-zakon-o-obcich.md`.
 
 ## Pravidla
 

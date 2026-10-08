@@ -3,7 +3,8 @@
 a export do kalendáře (iCalendar / ICS podle RFC 5545).
 
 Čistý Python bez závislostí. Pravidla jsou ověřena proti zněním na zakonyprolidi.cz
-(stav k 2026-10-07, verze uvedené v ``ZNENI``):
+(stav k 2026-10-08, verze uvedené v ``ZNENI``) a u zákonů o územní samosprávě i proti
+e-Sbírce (znění od 1. 1. 2026 a od 1. 1. 2027):
 
 - počátek lhůty: den, kdy nastala rozhodná skutečnost, se nezapočítává
   (§ 40 odst. 1 písm. a) správního řádu),
@@ -11,8 +12,13 @@ a export do kalendáře (iCalendar / ICS podle RFC 5545).
   (§ 40 odst. 1 písm. c) SŘ); svátky podle zákona č. 245/2000 Sb. (§ 1 a § 2),
 - ustanovení SŘ o počítání lhůt se na postup podle InfZ použijí podle § 20 odst. 4 InfZ.
 
-U dotazů zastupitelů zákony o územních samosprávách počítání lhůt výslovně neupravují;
-počítá se obdobně podle § 40 SŘ a výstup to uvádí.
+Dotazy zastupitelů (§ 82 písm. b) z. o obcích a obdoby): zákony o územní samosprávě počítání
+lhůt neupravují a správní řád se podle § 1 odst. 3 SŘ nevztahuje na vztahy mezi orgány téhož
+územního samosprávného celku v samostatné působnosti (výklad: dotaz zastupitele na radu je
+takovým vztahem). Počítá se proto podle obecného pravidla, které je v § 40 odst. 1 písm. a), c)
+SŘ i v § 605 odst. 1 a § 607 občanského zákoníku shodné – výsledné datum je stejné.
+Žádosti zastupitelů o informace (§ 82 písm. c) a obdoby): podle NSS (8 Aps 5/2012-47,
+č. 2844/2013 Sb. NSS) se subsidiárně použije procesní úprava InfZ, tedy i § 20 odst. 4 InfZ.
 """
 from __future__ import annotations
 
@@ -28,13 +34,21 @@ URL_PRAHA = ZPL + "2000-131"
 URL_SR = ZPL + "2004-500"
 URL_ISDS = ZPL + "2008-300"
 URL_SVATKY = ZPL + "2000-245"
+URL_OZ = ZPL + "2012-89"
+# Judikatura a metodika k právům zastupitelů (ověřeno 2026-10-08, viz docs/revize-zakon-o-obcich.md).
+URL_NSS_8APS5_2012 = ("https://sbirka.nssoud.cz/cz/"
+                      "pravo-na-informace-poskytovani-informaci-clenum-zastupitelstva-obce.p2837.html")
+URL_MV_ODK_1_2016 = ("https://mv.gov.cz/soubor/"
+                     "stanovisko-odk-c-1-2016-pravo-clena-zastupitelstva-obce-na-informace.aspx")
 
-# Znění, proti kterým byla pravidla ověřena (zakonyprolidi.cz, staženo 2026-10-07).
+# Znění, proti kterým byla pravidla ověřena (zakonyprolidi.cz, staženo 2026-10-08; zákony
+# o územní samosprávě i e-Sbírka – znění od 1. 1. 2027 mění jen ustanovení o finanční kontrole).
 ZNENI = {
     "106/1999 Sb.": "aktuální znění od 19. 8. 2025 (verze 30)",
-    "128/2000 Sb.": "aktuální znění 1. 1. 2026 – 31. 12. 2026 (verze 50)",
-    "129/2000 Sb.": "aktuální znění 1. 1. 2026 – 31. 12. 2026 (verze 43)",
-    "131/2000 Sb.": "aktuální znění 1. 1. 2026 – 31. 12. 2026 (verze 48)",
+    "128/2000 Sb.": "aktuální znění 1. 1. 2026 – 31. 12. 2026 (verze 50); znění od 1. 1. 2027 § 82 nemění",
+    "129/2000 Sb.": "aktuální znění 1. 1. 2026 – 31. 12. 2026 (verze 43); znění od 1. 1. 2027 § 34 nemění",
+    "131/2000 Sb.": "aktuální znění 1. 1. 2026 – 31. 12. 2026 (verze 48); znění od 1. 1. 2027 § 51 a § 87 nemění",
+    "89/2012 Sb.": "aktuální znění 1. 1. 2026 – 31. 12. 2026 (verze 18)",
     "500/2004 Sb.": "aktuální znění od 1. 7. 2025 (verze 16)",
     "300/2008 Sb.": "aktuální znění od 1. 1. 2026 (verze 23)",
     "245/2000 Sb.": "aktuální znění od 13. 5. 2026 (verze 12)",
@@ -139,11 +153,17 @@ class Konec:
         return self.datum != self.vypocteny
 
 
-def konec_lhuty(start: date, dny: int) -> Konec:
-    """Konec lhůty ve dnech podle § 40 odst. 1 písm. a) a c) SŘ.
+POSUN_SR = "§ 40 odst. 1 písm. c) SŘ"
+# Dotaz zastupitele: SŘ se nepoužije (§ 1 odst. 3 SŘ), obecné pravidlo je ale v SŘ i OZ shodné.
+POSUN_OBECNE = "obecné pravidlo, shodně § 40 odst. 1 písm. c) SŘ a § 607 OZ"
+
+
+def konec_lhuty(start: date, dny: int, pravidlo: str = POSUN_SR) -> Konec:
+    """Konec lhůty ve dnech podle § 40 odst. 1 písm. a) a c) SŘ (shodně § 605 odst. 1 a § 607 OZ).
 
     ``start`` = den skutečnosti určující počátek lhůty (ten se nezapočítává); konec připadající
-    na sobotu, neděli nebo svátek se posouvá na nejbližší příští pracovní den."""
+    na sobotu, neděli nebo svátek se posouvá na nejbližší příští pracovní den. ``pravidlo`` je
+    jen popisek právního základu posunu ve vysvětlení."""
     vyp = start + timedelta(days=dny)
     kon = nejblizsi_pracovni_den(vyp)
     duvod = ""
@@ -154,7 +174,7 @@ def konec_lhuty(start: date, dny: int) -> Konec:
             volna.append(f"{fmt_datum(d)} ({nazev_dne_volna(d)})")
             d += timedelta(days=1)
         duvod = ("vypočtený konec připadl na " + ", ".join(volna)
-                 + f" → posun na nejbližší pracovní den {fmt_datum(kon)} (§ 40 odst. 1 písm. c) SŘ)")
+                 + f" → posun na nejbližší pracovní den {fmt_datum(kon)} ({pravidlo})")
     return Konec(kon, vyp, duvod)
 
 
@@ -387,12 +407,20 @@ def lhuty_106(datum_podani: date, zpusob: str = "datova-schranka", prodlouzeno: 
     return sorted(out, key=lambda x: (x.datum, x.kdo != "info"))
 
 
+PRAHA_INFORMACE_VYKLAD = (
+    "Zákon o hl. m. Praze (§ 51 odst. 2 písm. c)) lhůtu pro poskytnutí informace zastupiteli nestanoví. "
+    "Podle stanoviska MV č. 1/2016 (bod 7, aktualizace 1. 6. 2022) a judikatury NSS o subsidiárním použití "
+    "InfZ platí 15denní lhůta podle § 14 odst. 5 písm. d) zákona č. 106/1999 Sb. – výklad, stanovisko MV "
+    "není závazné.")
+
 _ZASTUPITEL = {
     "obec": {
         "nazev": "člen zastupitelstva obce",
         "dotaz": ("§ 82 písm. b) zákona č. 128/2000 Sb., o obcích", u(URL_OBCE, "p82")),
         "informace": ("§ 82 písm. c) zákona č. 128/2000 Sb., o obcích", u(URL_OBCE, "p82")),
         "lhuta_informace": 30,
+        "lhuta_informace_vyklad": "",
+        "nadrizeny": "krajský úřad (§ 178 odst. 2 SŘ; stanovisko MV č. 1/2016, bod 5)",
         "kontrola": ("Ministerstvo vnitra (odbor veřejné správy, dozoru a kontroly) – kontrola výkonu "
                      "samostatné působnosti", "§ 129 odst. 1 zákona č. 128/2000 Sb.", u(URL_OBCE, "p129")),
     },
@@ -401,6 +429,8 @@ _ZASTUPITEL = {
         "dotaz": ("§ 34 odst. 1 písm. b) zákona č. 129/2000 Sb., o krajích", u(URL_KRAJE, "p34-1-b")),
         "informace": ("§ 34 odst. 1 písm. c) zákona č. 129/2000 Sb., o krajích", u(URL_KRAJE, "p34-1-c")),
         "lhuta_informace": 30,
+        "lhuta_informace_vyklad": "",
+        "nadrizeny": "Ministerstvo vnitra (§ 178 odst. 2 SŘ, samostatná působnost kraje)",
         "kontrola": ("Ministerstvo vnitra (odbor veřejné správy, dozoru a kontroly) – kontrola výkonu "
                      "samostatné působnosti kraje", "§ 86 odst. 1 zákona č. 129/2000 Sb.", u(URL_KRAJE, "p86")),
     },
@@ -410,7 +440,10 @@ _ZASTUPITEL = {
                   u(URL_PRAHA, "p51-2-b")),
         "informace": ("§ 51 odst. 2 písm. c) zákona č. 131/2000 Sb., o hlavním městě Praze",
                       u(URL_PRAHA, "p51-2-c")),
-        "lhuta_informace": None,
+        "lhuta_informace": 15,
+        "lhuta_informace_vyklad": PRAHA_INFORMACE_VYKLAD,
+        "nadrizeny": ("nadřízený orgán podle § 178 SŘ; nelze-li ho určit, Úřad pro ochranu osobních údajů "
+                      "(§ 20 odst. 5 InfZ) – u hl. m. Prahy neověřeno"),
         "kontrola": ("Ministerstvo vnitra (odbor veřejné správy, dozoru a kontroly) – kontrola výkonu "
                      "samostatné působnosti hl. m. Prahy", "§ 113 odst. 1 zákona č. 131/2000 Sb.",
                      u(URL_PRAHA, "p113")),
@@ -421,11 +454,17 @@ _ZASTUPITEL = {
                   u(URL_PRAHA, "p87-3")),
         "informace": ("§ 87 odst. 3 ve spojení s § 51 odst. 2 písm. c) zákona č. 131/2000 Sb.",
                       u(URL_PRAHA, "p87-3")),
-        "lhuta_informace": None,
+        "lhuta_informace": 15,
+        "lhuta_informace_vyklad": PRAHA_INFORMACE_VYKLAD,
+        "nadrizeny": ("nadřízený orgán podle § 178 SŘ; nelze-li ho určit, Úřad pro ochranu osobních údajů "
+                      "(§ 20 odst. 5 InfZ) – u městských částí neověřeno"),
         "kontrola": ("Magistrát hl. m. Prahy – kontrola výkonu samostatné působnosti městských částí",
                      "§ 113 odst. 2 zákona č. 131/2000 Sb.", u(URL_PRAHA, "p113-2")),
     },
 }
+
+ZAKLAD_INFZ_SUBSIDIARNE = ("podle NSS (rozsudek 8 Aps 5/2012-47, č. 2844/2013 Sb. NSS) se na vyřízení žádosti "
+                           "zastupitele o informace subsidiárně použije procesní úprava zákona č. 106/1999 Sb.")
 
 
 def normalizuj_druh(druh: str | None) -> str:
@@ -440,17 +479,33 @@ def normalizuj_druh(druh: str | None) -> str:
     return d
 
 
+def normalizuj_podani(podani: str | None) -> str:
+    """dotaz = dotaz, připomínka, podnět (písm. b)); informace = žádost o informace (písm. c))."""
+    p = (podani or "dotaz").strip().lower()
+    p = {"b": "dotaz", "pism-b": "dotaz", "pripominka": "dotaz", "podnet": "dotaz", "interpelace": "dotaz",
+         "c": "informace", "pism-c": "informace", "info": "informace", "zadost": "informace"}.get(p, p)
+    if p not in ("dotaz", "informace"):
+        raise ValueError("podani musí být „dotaz“ (písm. b)) nebo „informace“ (písm. c))")
+    return p
+
+
 def lhuty_zastupitel(datum_podani: date, druh: str = "obec", zpusob: str = "datova-schranka",
                      podani: str = "dotaz", datum_doruceni_odpovedi: date | None = None) -> list[Lhuta]:
-    """Lhůty dotazu, připomínky nebo podnětu zastupitele (podani="dotaz") nebo žádosti o informace
-    od zaměstnanců úřadu (podani="informace") podle zákonů o obcích, krajích a hl. m. Praze.
+    """Lhůty dotazu, připomínky nebo podnětu zastupitele (podani="dotaz", písm. b)) nebo žádosti
+    o informace od zaměstnanců úřadu a právnických osob (podani="informace", písm. c)) podle zákonů
+    o obcích, krajích a hl. m. Praze.
 
-    druh = obec | kraj | praha | mestska-cast."""
+    druh = obec | kraj | praha | mestska-cast.
+
+    - dotaz: 30 dní na obdržení písemné odpovědi (všechny úrovně); bez stížnosti a odvolání –
+      po lhůtě urgence, zastupitelstvo, podnět ke kontrole. SŘ se nepoužije (§ 1 odst. 3 SŘ),
+      počítá se obecným pravidlem (shodný výsledek s § 40 SŘ i § 605 a 607 OZ).
+    - informace: obec a kraj 30 dní přímo ze zákona; hl. m. Praha a městská část zákon lhůtu
+      nestanoví → 15 dní podle InfZ (výklad MV a NSS, ``PRAHA_INFORMACE_VYKLAD``). Po marném
+      uplynutí lhůty stížnost podle § 16a InfZ použitého subsidiárně (NSS 8 Aps 5/2012-47)."""
     druh = normalizuj_druh(druh)
     zpusob = normalizuj_zpusob(zpusob)
-    podani = (podani or "dotaz").strip().lower()
-    if podani not in ("dotaz", "informace"):
-        raise ValueError("podani musí být „dotaz“ nebo „informace“")
+    podani = normalizuj_podani(podani)
     cfg = _ZASTUPITEL[druh]
     paragraf, url = cfg[podani]
     prijeti, info = _prijeti(datum_podani, zpusob, "zastupitel")
@@ -459,40 +514,84 @@ def lhuty_zastupitel(datum_podani: date, druh: str = "obec", zpusob: str = "dato
                           "odpověď na e-mail).", odhad=info.odhad)
     out = [info]
     odhad = info.odhad
-    pocitani = ("Zákon o územní samosprávě počítání lhůty výslovně neupravuje; počítáno obdobně podle "
-                "§ 40 odst. 1 SŘ (den podání se nezapočítává, konec o víkendu/svátku se posouvá).")
     k_kontrola = cfg["kontrola"]
-    dalsi_krok = (f"Pokud odpověď nepřišla: 1) písemná urgence s odkazem na {paragraf}; 2) vznést "
-                  "dotaz znovu na nejbližším zasedání zastupitelstva a nechat ho zapsat do zápisu; "
-                  f"3) podnět ke kontrole: {k_kontrola[0]} ({k_kontrola[1]}); 4) souběžně žádost podle "
-                  "zákona č. 106/1999 Sb. – ta má vymahatelné lhůty, stížnost a odvolání.")
-    lhuta = 30 if podani == "dotaz" else cfg["lhuta_informace"]
-    if lhuta:
-        k = konec_lhuty(prijeti, lhuta)
-        if podani == "dotaz":
-            popis = (f"Do tohoto dne musíte jako {cfg['nazev']} obdržet písemnou odpověď na dotaz, "
-                     "připomínku nebo podnět (30 dní)")
-        else:
-            popis = f"Do tohoto dne vám musí být poskytnuta požadovaná informace (30 dní)"
-        out.append(Lhuta("odpoved_do", popis, k.datum, paragraf, url,
-                         "Zkontrolujte, zda odpověď přišla a odpovídá na všechny otázky.",
-                         kdo="úřad", posun=k.duvod_posunu, poznamka=pocitani, odhad=odhad))
-        out.append(Lhuta("urgence_od", "Odpověď nepřišla včas – urgence a další kroky (první pracovní den "
-                         "po lhůtě)", nejblizsi_pracovni_den(k.datum + timedelta(days=1)), paragraf, url,
-                         dalsi_krok, kdo="vy", odhad=odhad))
-    else:
-        kontrola = konec_lhuty(prijeti, 30)
+
+    if podani == "dotaz":
+        pocitani = ("Zákon o územní samosprávě počítání lhůty neupravuje a správní řád se na vztahy mezi "
+                    "orgány téhož územního samosprávného celku v samostatné působnosti nevztahuje (§ 1 odst. 3 "
+                    "SŘ – výklad). Počítáno obecným pravidlem: den doručení dotazu se nezapočítává, konec "
+                    "o víkendu/svátku se posouvá na příští pracovní den (shodně § 40 odst. 1 písm. a), c) SŘ "
+                    "i § 605 odst. 1 a § 607 OZ). Konzervativně: urgujte až po tomto dni.")
+        k = konec_lhuty(prijeti, 30, POSUN_OBECNE)
         out.append(Lhuta(
-            "kontrolni_termin", "Kontrolní termín (zákon pro informace od zaměstnanců hl. m. Prahy / "
-            "městské části lhůtu NESTANOVÍ; 30 dní je jen doporučený termín pro urgenci)",
-            kontrola.datum, paragraf, url,
-            "Pokud informace nepřišla, urgujte a zvažte žádost podle zákona č. 106/1999 Sb., která má "
-            "zákonnou 15denní lhůtu. " + dalsi_krok, kdo="vy", posun=kontrola.duvod_posunu, odhad=True))
+            "odpoved_do", f"Do tohoto dne musíte jako {cfg['nazev']} obdržet písemnou odpověď na dotaz, "
+            "připomínku nebo podnět (30 dní)", k.datum, paragraf, url,
+            "Zkontrolujte, zda odpověď přišla a odpovídá na všechny otázky. Nestačí, že ji adresát "
+            "v poslední den odeslal – zákon říká „musí obdržet“.",
+            kdo="úřad", posun=k.duvod_posunu, poznamka=pocitani, odhad=odhad))
+        dalsi_krok = (f"Pokud odpověď nepřišla: 1) písemná urgence s odkazem na {paragraf}; 2) vznést "
+                      "dotaz znovu na nejbližším zasedání zastupitelstva a nechat ho zapsat do zápisu; "
+                      f"3) podnět ke kontrole: {k_kontrola[0]} ({k_kontrola[1]}); 4) pokud jste ve "
+                      "skutečnosti žádali existující dokumenty nebo údaje, jde o žádost o informace "
+                      "(písm. c)) – pak lze podat stížnost podle § 16a zákona č. 106/1999 Sb. (stanovisko "
+                      "MV č. 1/2016, bod 6; spočítejte s podani=\"informace\"); 5) souběžně žádost podle "
+                      "zákona č. 106/1999 Sb.")
+        out.append(Lhuta(
+            "urgence_od", "Odpověď nepřišla včas – urgence a další kroky (první pracovní den po lhůtě)",
+            nejblizsi_pracovni_den(k.datum + timedelta(days=1)), paragraf, url, dalsi_krok, kdo="vy",
+            poznamka=("Zákon o územní samosprávě u dotazů, připomínek a podnětů neupravuje stížnost ani "
+                      "odvolání a procesní postup podle InfZ se na ně nepoužije (NSS 3 As 70/2015-29 "
+                      "podle stanoviska MV č. 1/2016, bod 6)."), odhad=odhad))
+    else:
+        lhuta = cfg["lhuta_informace"]
+        vyklad = cfg["lhuta_informace_vyklad"]
+        pocitani = ("Počítání lhůt podle § 40 SŘ, který se použije přes § 20 odst. 4 InfZ, protože "
+                    + ZAKLAD_INFZ_SUBSIDIARNE + " (výklad navazující na judikaturu).")
+        k = konec_lhuty(prijeti, lhuta)
+        par_lhuta = paragraf if not vyklad else (
+            paragraf + "; lhůta: § 14 odst. 5 písm. d) zákona č. 106/1999 Sb. (subsidiárně – výklad)")
+        out.append(Lhuta(
+            "odpoved_do", f"Do tohoto dne vám musí být poskytnuta požadovaná informace ({lhuta} dní)"
+            + (" – VÝKLAD: zákon o hl. m. Praze lhůtu nestanoví" if vyklad else ""),
+            k.datum, par_lhuta, url,
+            "Zkontrolujte, zda informace přišla úplně. Pokud vám ji úřad (i jen zčásti) odepřel, má podle "
+            "judikatury vydat rozhodnutí o odmítnutí (§ 15 InfZ), proti kterému se lze odvolat do 15 dnů.",
+            kdo="úřad", posun=k.duvod_posunu, poznamka=(vyklad + " " if vyklad else "") + pocitani,
+            odhad=odhad))
+        if vyklad:
+            k25 = konec_lhuty(prijeti, lhuta + 10)
+            out.append(Lhuta(
+                "prodlouzeni_max", "Nejzazší termín, pokud úřad lhůtu ze závažných důvodů prodlouží o 10 dní "
+                "a včas vám to oznámí (výklad – subsidiárně InfZ)", k25.datum,
+                "§ 14 odst. 6 zákona č. 106/1999 Sb.", u(URL_INFZ, "p14-6"),
+                "Platí jen při včasném oznámení prodloužení; pak se stížnost podává až po tomto dni.",
+                kdo="úřad", posun=k25.duvod_posunu, odhad=odhad))
+        stiz_do = konec_lhuty(k.datum, 30)
+        out.append(Lhuta(
+            "stiznost_od", "Nejdříve lze podat stížnost na nečinnost (den po uplynutí lhůty)",
+            k.datum + timedelta(days=1),
+            "§ 16a odst. 1 písm. b) zákona č. 106/1999 Sb. (subsidiárně – výklad)", u(URL_INFZ, "p16a-1-b"),
+            "Pokud informace nepřišla ani nepřišlo rozhodnutí o odmítnutí: stížnost u toho, komu jste "
+            f"žádost poslali (o ní rozhoduje nadřízený orgán – {cfg['nadrizeny']}). Text: šablona "
+            "stiznost-106 (varianta A) s odkazem na " + paragraf + ". Po marné stížnosti lze podat žalobu "
+            "na ochranu proti nečinnosti (§ 79 s. ř. s.) – doporučte právníka.",
+            kdo="vy", poznamka=ZAKLAD_INFZ_SUBSIDIARNE[0].upper() + ZAKLAD_INFZ_SUBSIDIARNE[1:]
+            + "; proti neposkytnutí informace se zastupitel brání stížností a poté žalobou proti "
+            "nečinnosti, ne zásahovou žalobou.", odhad=odhad))
+        out.append(Lhuta(
+            "stiznost_do", "Nejpozději lze podat stížnost na nečinnost (30 dní od uplynutí lhůty)",
+            stiz_do.datum, "§ 16a odst. 3 písm. b) zákona č. 106/1999 Sb. (subsidiárně – výklad)",
+            u(URL_INFZ, "p16a-3-b"),
+            "Poslední den pro stížnost. Souběžně můžete urgovat, vznést věc na zasedání zastupitelstva "
+            f"nebo podat podnět ke kontrole ({k_kontrola[0]}, {k_kontrola[1]}).",
+            kdo="vy", posun=stiz_do.duvod_posunu, odhad=odhad))
     if datum_doruceni_odpovedi:
         out.append(Lhuta(
             "odpoved_dorucena", "Odpověď doručena", datum_doruceni_odpovedi, paragraf, url,
             "Vyhodnoťte, zda odpověď odpovídá na všechny body; nejasnosti vzneste jako doplňující dotaz "
-            "nebo na zasedání zastupitelstva.", kdo="info"))
+            "nebo na zasedání zastupitelstva."
+            + (" Pokud vám byla informace rozhodnutím odepřena, odvolání do 15 dnů od doručení rozhodnutí "
+               "(§ 16 InfZ subsidiárně – výklad)." if podani == "informace" else ""), kdo="info"))
     return sorted(out, key=lambda x: (x.datum, x.kdo != "info"))
 
 
@@ -558,7 +657,6 @@ KRATKE = {
     "rozhodnuti_o_odvolani_do": "Nadřízený rozhodne o odvolání",
     "odpoved_do": "Musí přijít odpověď zastupiteli",
     "urgence_od": "Odpověď nepřišla: urgence",
-    "kontrolni_termin": "Kontrolní termín: informace",
 }
 
 

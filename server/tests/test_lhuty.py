@@ -175,12 +175,67 @@ def test_zastupitel_druhy(druh, par):
     assert lh["odpoved_do"].datum == date(2026, 11, 6)
 
 
-def test_zastupitel_praha_informace_bez_zakonne_lhuty():
-    lh = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), "praha", podani="informace"))
-    assert "odpoved_do" not in lh
-    assert "NESTANOVÍ" in lh["kontrolni_termin"].popis
-    lh_obec = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), "obec", podani="informace"))
-    assert "§ 82 písm. c)" in lh_obec["odpoved_do"].paragraf
+@pytest.mark.parametrize("druh", ["praha", "mestska-cast"])
+def test_zastupitel_praha_informace_15_dni_jako_vyklad(druh):
+    # § 51 odst. 2 písm. c) z. 131/2000 lhůtu nestanoví; stanovisko MV č. 1/2016 (bod 7): 15 dní podle InfZ.
+    lh = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), druh, podani="informace"))
+    assert lh["odpoved_do"].datum == date(2026, 10, 22)
+    assert "VÝKLAD" in lh["odpoved_do"].popis
+    assert "§ 14 odst. 5 písm. d) zákona č. 106/1999" in lh["odpoved_do"].paragraf
+    assert "stanoviska MV č. 1/2016" in lh["odpoved_do"].poznamka
+    assert lh["prodlouzeni_max"].datum == date(2026, 11, 2)       # 1. 11. 2026 je neděle
+    assert lh["stiznost_od"].datum == date(2026, 10, 23)
+    assert lh["stiznost_do"].datum == date(2026, 11, 23)          # 21.–22. 11. víkend
+    assert "kontrolni_termin" not in lh
+
+
+def test_zastupitel_obec_informace_stiznost_podle_infz():
+    # NSS 8 Aps 5/2012-47: na žádost podle § 82 písm. c) se subsidiárně použije procesní úprava InfZ.
+    lh = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), "obec", podani="informace"))
+    assert "§ 82 písm. c)" in lh["odpoved_do"].paragraf
+    assert lh["odpoved_do"].datum == date(2026, 11, 6)
+    assert "VÝKLAD" not in lh["odpoved_do"].popis
+    assert lh["stiznost_od"].datum == date(2026, 11, 7)
+    assert lh["stiznost_do"].datum == date(2026, 12, 7)           # 6. 12. 2026 je neděle
+    assert "8 Aps 5/2012-47" in lh["stiznost_od"].poznamka
+    assert "krajský úřad" in lh["stiznost_od"].co_udelat
+    assert "§ 16a odst. 3 písm. b)" in lh["stiznost_do"].paragraf
+    assert "urgence_od" not in lh
+    kraj = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), "kraj", podani="informace"))
+    assert kraj["odpoved_do"].datum == date(2026, 11, 6) and "Ministerstvo vnitra" in kraj["stiznost_od"].co_udelat
+
+
+def test_zastupitel_dotaz_bez_spravniho_radu():
+    # § 1 odst. 3 SŘ: SŘ se na dotaz zastupitele nepoužije; obecné pravidlo (§ 605, 607 OZ) dává stejné datum.
+    lh = _by_kod(L.lhuty_zastupitel(date(2026, 11, 27), "obec"))
+    assert lh["odpoved_do"].datum == date(2026, 12, 28)           # 27. 12. 2026 neděle po svátcích
+    assert "§ 1 odst. 3" in lh["odpoved_do"].poznamka and "§ 607 OZ" in lh["odpoved_do"].poznamka
+    assert "obecné pravidlo" in lh["odpoved_do"].posun
+    assert "3 As 70/2015-29" in lh["urgence_od"].poznamka
+    assert "podani=\"informace\"" in lh["urgence_od"].co_udelat
+    assert "stiznost_od" not in lh
+
+
+def test_zastupitel_podani_aliasy_a_chyby():
+    assert L.normalizuj_podani("c") == "informace" and L.normalizuj_podani(None) == "dotaz"
+    assert L.normalizuj_podani("podnet") == "dotaz"
+    with pytest.raises(ValueError):
+        L.lhuty_zastupitel(date(2026, 10, 7), "obec", podani="odvolani")
+
+
+def test_zastupitel_odvolani_po_doruceni_informace():
+    lh = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), "obec", podani="informace",
+                                    datum_doruceni_odpovedi=date(2026, 10, 20)))
+    assert "odvolání do 15 dnů" in lh["odpoved_dorucena"].co_udelat
+    lh_d = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), "obec", datum_doruceni_odpovedi=date(2026, 10, 20)))
+    assert "odvolání" not in lh_d["odpoved_dorucena"].co_udelat
+
+
+def test_zneni_zakonu_o_samosprave_2027():
+    # e-Sbírka: znění od 1. 1. 2027 mění jen ustanovení o finanční kontrole.
+    assert "§ 82 nemění" in L.ZNENI["128/2000 Sb."]
+    assert "§ 34 nemění" in L.ZNENI["129/2000 Sb."]
+    assert "§ 51 a § 87 nemění" in L.ZNENI["131/2000 Sb."]
 
 
 def test_zastupitel_neznamy_druh():
@@ -261,6 +316,12 @@ def test_tool_lhuty_zadosti_106():
 def test_tool_lhuty_zadosti_zastupitel_a_chyby():
     out = mcp_server.lhuty_zadosti(typ="zastupitel-obec", datum_podani="2026-10-07")
     assert "pá 6. 11. 2026" in out and "§ 82 písm. b)" in out
+    assert "§ 1 odst. 3 SŘ" in out and "podani=\"informace\"" in out
+    info = mcp_server.lhuty_zadosti(typ="zastupitel-praha", datum_podani="2026-10-07", podani="informace")
+    assert "čt 22. 10. 2026" in info and "§ 51 odst. 2 písm. c)" in info and "VÝKLAD" in info
+    assert "8 Aps 5/2012-47" in info and "BEGIN:VCALENDAR" in info
+    assert "Neplatné zadání" in mcp_server.lhuty_zadosti(typ="zastupitel-obec", datum_podani="2026-10-07",
+                                                         podani="xyz")
     assert "Neplatné zadání" in mcp_server.lhuty_zadosti(typ="xyz", datum_podani="2026-10-07")
     assert "Neplatné zadání" in mcp_server.lhuty_zadosti(datum_podani="31. 2. 2026")
     assert "počítám s dneškem" in mcp_server.lhuty_zadosti()
@@ -285,6 +346,14 @@ def test_tool_pruvodce_faze():
     assert "Varianta C" in f
     g = mcp_server.pruvodce_zadosti(faze="problem", typ="zastupitel-mestska-cast")
     assert "Magistrát" in g
+    h = mcp_server.pruvodce_zadosti(faze="problem", typ="zastupitel-obec")
+    assert "8 Aps 5/2012-47" in h and "§ 79 s. ř. s." in h and "3 As 70/2015-29" in h
+    assert "krajský úřad" in h and "zákon nedává stížnost ani odvolání" not in h
+    a3 = mcp_server.pruvodce_zadosti(faze="pripravuji", typ="zastupitel-obec", predmet="Smlouvy", urad="Obec X")
+    assert "Varianta A" in a3 and "Varianta B" in a3 and "§ 82 písm. c) zákona č. 128/2000 Sb." in a3
+    assert "{{paragraf_c}}" not in a3 and "§ 99 odst. 2" in a3
+    c2 = mcp_server.pruvodce_zadosti(faze="odpoved", typ="zastupitel-kraj")
+    assert "odvolání do 15 dnů" in c2
     assert "Neplatné zadání" in mcp_server.pruvodce_zadosti(faze="nevim")
 
 
@@ -351,3 +420,26 @@ def test_get_template_sablony_106():
         assert "neexistuje" not in out and cast in out, typ
     assert "Autorita: kurátorovaný obsah" in mcp_server.get_template("stiznost-106")
     assert "zakonyprolidi.cz" in mcp_server.get_template("stiznost-106")
+
+
+# ----------------------------------------------------------------------------- revize textů o zastupitelích
+
+@pytest.mark.parametrize("rel", [
+    "content/navody/dotaz-zastupitele.md", "content/sablony/dotaz-zastupitele.md",
+    "server/prompts/dotaz-zastupitele.md", "skills/piratekb-106/SKILL.md",
+])
+def test_texty_zastupitele_bez_opravenych_omylu(rel):
+    # docs/revize-zakon-o-obcich.md: u Prahy a MČ platí pro informace 15 dní (výklad), ne „bez lhůty“;
+    # u žádosti o informace (písm. c)) se subsidiárně použije InfZ (NSS 8 Aps 5/2012-47).
+    text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+    assert "bez zákonné lhůty" not in text and "bez lhůty)" not in text
+    assert "8 Aps 5/2012-47" in text
+
+
+def test_navod_zastupitele_klicova_tvrzeni():
+    text = (REPO_ROOT / "content/navody/dotaz-zastupitele.md").read_text(encoding="utf-8")
+    for fragment in ("§ 1 odst. 3 SŘ", "§ 607 občanského zákoníku", "§ 99 odst. 2", "§ 101 odst. 4",
+                     "stanoviska MV č. 1/2016", "15 dní podle InfZ (výklad)", "jen zastupitelstvu",
+                     "e-Sbírce"):
+        assert fragment in text, fragment
+    assert "Judikatura ani metodiky MV k § 82 nebyly ověřeny" not in text
