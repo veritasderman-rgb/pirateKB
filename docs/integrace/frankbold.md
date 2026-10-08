@@ -49,6 +49,12 @@ Přepínače: `--aktualni` (jen porovná katalog s `publikace.jsonl` a vypíše 
 KATALOGU:`; zapíše `kontrola_katalogu` do `stav.json`, nic nestahuje ani nepřepisuje),
 `--jen-stahnout`, `--offline`, `--slug <slug…>`, `--vse`.
 
+Návratový kód (`run_src` v `scripts/update_data.sh` ho zapíše jako `chyba:<kód>`): **0** v pořádku;
+**1** některou *novou* publikaci se nepodařilo stáhnout – do rejstříku se nezapíše (žádná karta
+„nestazeno“, zkusí se příštím během), známá publikace se selhaným stažením si ponechá předchozí stav;
+**2** katalog se nepodařilo načíst (i jen jednu stránku, např. `--offline` bez cache), je prázdný nebo
+má méně než polovinu položek dosavadního `publikace.jsonl` – nic se nezapíše ani nesmaže.
+
 ## 2. Licence: postup a rozhodnutí
 
 1. Web: žádná otevřená licence (© Frank Bold) → rozhoduje jen licence uvedená v publikaci.
@@ -197,7 +203,7 @@ data/frankbold/
                               u licencovaných i seznam kapitol (druh_dokumentu: karta-publikace)
   <slug>/NN-<kapitola>.md     kapitoly – JEN u publikací s licencí CC (doslovný text, záhlaví s atribucí)
   publikace.jsonl             jedna publikace na řádek: nazev, kategorie, kategorie_dalsi, url, velikost,
-                              format, slug, soubor, stav (ok|bez-textu|nestazeno), rok, rok_zdroj, druh,
+                              format, slug, soubor, stav (ok|bez-textu), rok, rok_zdroj, druh,
                               temata, temata_nazev (jen z názvu – pro řazení), autor, jazyk, licence, licence_kod, licence_url, licence_doklad,
                               text_ulozen, varovani (počet), strany_pdf, kapitoly
   stav.json                   souhrn běhu, počty podle licence, chyby, crawl_delay_s, kontrola_katalogu

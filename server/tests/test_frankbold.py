@@ -177,11 +177,11 @@ def test_rok_temata_varovani():
 # ----------------------------------------------------------------------------- celý běh
 
 def test_beh_offline(prostredi):
-    fb.main()
+    assert fb.main() == 1                     # natura.doc je nová a v cache není -> chyba, bez karty
     out = prostredi / "data" / "frankbold"
     rows = {json.loads(ln)["soubor"]: json.loads(ln)
             for ln in (out / "publikace.jsonl").read_text(encoding="utf-8").splitlines()}
-    assert set(rows) == {"prirucka_test.pdf", "analyza_test.pdf", "natura.doc"}
+    assert set(rows) == {"prirucka_test.pdf", "analyza_test.pdf"}
 
     # licencovaná publikace: karta + kapitoly s atribucí a doslovným textem
     cc = rows["prirucka_test.pdf"]
@@ -217,15 +217,16 @@ def test_beh_offline(prostredi):
     assert "Korupce v obcich" not in kb and "Zastupitel obce ma pravo" not in kb
     assert km["kategorie"] == "Občanské právní minimum"
 
-    # soubor, který v cache není (offline): karta s licencí „neověřeno“
-    assert rows["natura.doc"]["stav"] == "nestazeno" and not rows["natura.doc"]["text_ulozen"]
+    # nová publikace, která v cache není (offline): žádná karta, jen záznam v chybách
+    assert not [d for d in out.iterdir() if d.is_dir() and "natura" in d.name]
 
     stav = json.loads((out / "stav.json").read_text(encoding="utf-8"))
-    assert stav["s_textem"] == 1 and stav["jen_karta"] == 2 and stav["crawl_delay_s"] == 10.0
+    assert stav["s_textem"] == 1 and stav["jen_karta"] == 1 and stav["crawl_delay_s"] == 10.0
+    assert list(stav["chyby"]) == ["https://frankbold.org/sites/default/files/publikace/natura.doc"]
 
     # idempotence: druhý běh nic nepřepíše
     mtimes = {p: p.stat().st_mtime_ns for p in out.rglob("*.md")}
-    fb.main()
+    assert fb.main() == 1
     assert {p: p.stat().st_mtime_ns for p in out.rglob("*.md")} == mtimes
 
 
@@ -240,7 +241,8 @@ def test_aktualni_hlasi_nove(prostredi, monkeypatch, capsys):
     printed = capsys.readouterr().out
     assert "NOVÁ: Testovaci prirucka pro zastupitele" in printed
     stav = json.loads((out / "stav.json").read_text(encoding="utf-8"))
-    assert len(stav["kontrola_katalogu"]["nove"]) == 1
+    # nová je i natura.doc, kterou offline běh nestáhl, a proto ji do rejstříku nezapsal
+    assert len(stav["kontrola_katalogu"]["nove"]) == 2
 
 
 def test_znama_publikace_bez_cache_se_ponecha(prostredi):
@@ -256,3 +258,69 @@ def test_znama_publikace_bez_cache_se_ponecha(prostredi):
     assert cc["text_ulozen"] and cc["kapitoly"] >= 2
     stav = json.loads((out / "stav.json").read_text(encoding="utf-8"))
     assert "https://frankbold.org/sites/default/files/publikace/prirucka_test.pdf" not in stav["chyby"]
+
+
+# ----------------------------------------------------------------------------- nedostupný katalog, selhaná stažení
+
+def _stav_dat(out: Path) -> dict[str, str]:
+    return {str(p.relative_to(out)): p.read_text(encoding="utf-8") for p in out.rglob("*") if p.is_file()}
+
+
+@pytest.mark.parametrize("chybi", [("publikace.html", "archiv.html"), ("archiv.html",)])
+def test_nedostupny_katalog_nic_nesmaze(prostredi, chybi):
+    """Offline bez stránek katalogu v cache (i jen části): skončit chybou, rejstřík ani složky nemazat."""
+    fb.main()
+    out = prostredi / "data" / "frankbold"
+    pred = _stav_dat(out)
+    assert any(k.endswith("00-karta.md") for k in pred)
+    for name in chybi:
+        (prostredi / "cache" / "katalog" / name).unlink()
+    assert fb.main() not in (None, 0)
+    assert _stav_dat(out) == pred
+
+
+def test_nepravdepodobne_maly_katalog_nic_nesmaze(prostredi):
+    """Katalog výrazně menší než dosavadní rejstřík (např. rozbitá stránka): skončit chybou, nic nemazat."""
+    fb.main()
+    out = prostredi / "data" / "frankbold"
+    rejstrik = out / "publikace.jsonl"
+    rows = [json.loads(ln) for ln in rejstrik.read_text(encoding="utf-8").splitlines()]
+    falesne = [dict(rows[0], url=f"https://frankbold.org/x/{i}.pdf", slug=f"x-{i}") for i in range(8)]
+    rejstrik.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows + falesne), encoding="utf-8")
+    pred = _stav_dat(out)
+    assert fb.main() not in (None, 0)
+    assert _stav_dat(out) == pred
+
+
+def test_selhane_stazeni_nove_publikace(prostredi, monkeypatch):
+    """Nová publikace, kterou se nepodařilo stáhnout: nenechat po ní kartu „nestazeno“, skončit chybou.
+    Známá publikace, jejíž nové stažení selhalo, si ponechá předchozí stav."""
+    puvodni_get = fb.Stahovac.get
+
+    def get(self, url, cache_path, max_age=None):
+        if "/soubory/" in str(cache_path) and not cache_path.exists():
+            raise RuntimeError(f"stažení selhalo: {url}: 503")
+        return puvodni_get(self, url, cache_path, max_age)
+
+    monkeypatch.setattr(fb.Stahovac, "get", get)
+    monkeypatch.setattr(sys, "argv", ["frankbold.py"])
+    assert fb.main() == 1                                             # natura.doc je nová a nestáhla se
+    out = prostredi / "data" / "frankbold"
+    rows = {json.loads(ln)["soubor"]: json.loads(ln)
+            for ln in (out / "publikace.jsonl").read_text(encoding="utf-8").splitlines()}
+    assert "natura.doc" not in rows and all(r["stav"] != "nestazeno" for r in rows.values())
+    assert not [d for d in out.iterdir() if d.is_dir() and "natura" in d.name]
+    stav = json.loads((out / "stav.json").read_text(encoding="utf-8"))
+    assert "https://frankbold.org/sites/default/files/publikace/natura.doc" in stav["chyby"]
+
+    # známá publikace se změněnou velikostí, stažení selže -> předchozí řádek i soubory zůstanou
+    cc = rows["prirucka_test.pdf"]
+    pred = _stav_dat(out / cc["slug"])
+    (prostredi / "cache" / "soubory" / "prirucka_test.pdf").unlink()
+    (prostredi / "cache" / "katalog" / "publikace.html").write_text(
+        KATALOG_HTML.replace("(12 KB)", "(13 KB)"), encoding="utf-8")
+    fb.main()
+    assert _stav_dat(out / cc["slug"]) == pred
+    rows2 = {json.loads(ln)["soubor"]: json.loads(ln)
+             for ln in (out / "publikace.jsonl").read_text(encoding="utf-8").splitlines()}
+    assert rows2["prirucka_test.pdf"]["text_ulozen"] and rows2["prirucka_test.pdf"]["velikost"] == "12 KB"

@@ -32,11 +32,19 @@ Použití:
   python3 ingest/frankbold.py                 # katalog, stažení (cache), extrakce, zápis
   python3 ingest/frankbold.py --aktualni      # jen zkontroluje katalog a vypíše nové / zmizelé položky
   python3 ingest/frankbold.py --jen-stahnout  # katalog + stažení souborů do cache, nic nezapisuje do data/
-  python3 ingest/frankbold.py --offline       # jen z cache (bez sítě); chybějící soubory přeskočí
+  python3 ingest/frankbold.py --offline       # jen z cache (bez sítě); nové publikace bez souboru přeskočí
   python3 ingest/frankbold.py --vse           # znovu stáhnout a zpracovat i známé publikace bez cache
                                               # (bez --vse se známé publikace se stejnou URL a velikostí
                                               # ponechají beze změny – v CI bez cache se stahují jen nové)
   python3 ingest/frankbold.py --slug pruvodce-pravem-na-informace   # jen vybraná publikace
+
+Návratový kód (scripts/update_data.sh ho zapíše do data/AKTUALIZACE.md):
+  0  vše v pořádku
+  1  některou NOVOU publikaci se nepodařilo stáhnout – do rejstříku se nezapíše (žádná karta
+     „nestazeno“), ostatní se zpracují; známá publikace, jejíž nové stažení selhalo, si ponechá
+     předchozí stav
+  2  katalog se nepodařilo načíst (i jen jednu jeho stránku), je prázdný nebo výrazně menší než
+     dosavadní rejstřík – nic se nezapíše ani nesmaže
 """
 from __future__ import annotations
 
@@ -65,6 +73,13 @@ OUT = DATA / "frankbold"
 CACHE = ROOT / ".cache" / "frankbold"
 VYDAVATEL = "Frank Bold"
 DEFAULT_DELAY = 10.0  # s; frankbold.org/robots.txt: Crawl-delay: 10
+# Katalog s méně než polovinou položek dosavadního rejstříku je nejspíš rozbitá nebo změněná stránka,
+# ne skutečné stažení publikací z webu: běh skončí chybou a nic nesmaže.
+MIN_PODIL_KATALOGU = 0.5
+
+
+class KatalogNedostupny(RuntimeError):
+    """Stránku katalogu se nepodařilo načíst (offline a není v cache)."""
 
 
 # ---------------------------------------------------------------------------
@@ -179,8 +194,8 @@ def nacti_katalog(st: Stahovac, max_age: float | None = 86400) -> list[dict]:
     seen: dict[str, dict] = {}
     for url, sekce in KATALOG:
         html = st.get(url, CACHE / "katalog" / f"{sekce}.html", max_age=max_age)
-        if html is None:
-            continue
+        if html is None:  # bez celé stránky katalogu by úklid smazal publikace, které na ní jsou
+            raise KatalogNedostupny(f"stránka katalogu {url} není dostupná (offline a není v cache)")
         for p in parse_katalog(html.decode("utf-8", "replace"), url, sekce):
             if p["url"] in seen:  # stejný soubor ve dvou kategoriích
                 k = seen[p["url"]]
@@ -191,6 +206,25 @@ def nacti_katalog(st: Stahovac, max_age: float | None = 86400) -> list[dict]:
             seen[p["url"]] = p
             polozky.append(p)
     return polozky
+
+
+def katalog_neuplny(n: int, n_predchozi: int) -> str:
+    """Důvod, proč katalog nevypadá úplně (prázdný, výrazně menší než dosavadní rejstřík), jinak ""."""
+    if n == 0:
+        return "katalog neobsahuje žádné položky"
+    if n_predchozi and n < n_predchozi * MIN_PODIL_KATALOGU:
+        return (f"katalog má jen {n} položek, dosavadní rejstřík {n_predchozi} "
+                f"(méně než {MIN_PODIL_KATALOGU:.0%})")
+    return ""
+
+
+def _kod_chyb(nove_chyby: list[str]) -> int:
+    """Návratový kód podle nových publikací, které se nepodařilo stáhnout (1), jinak 0."""
+    if nove_chyby:
+        print(f"CHYBA: {len(nove_chyby)} nových publikací se nepodařilo stáhnout (do rejstříku nezapsány): "
+              + ", ".join(nove_chyby), file=sys.stderr)
+        return 1
+    return 0
 
 
 # ---------------------------------------------------------------------------
@@ -920,7 +954,7 @@ def zpracuj(p: dict, slug: str, path: Path | None, today_s: str) -> dict:
     return row
 
 
-def main() -> None:
+def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--aktualni", action="store_true", help="jen kontrola katalogu: nové a zmizelé položky")
     ap.add_argument("--jen-stahnout", action="store_true", help="stáhnout soubory do cache, nic nezapisovat")
@@ -930,14 +964,27 @@ def main() -> None:
                     help="zpracovat znovu i známé publikace, které nejsou v cache (stáhne je); jinak se ponechají")
     args = ap.parse_args()
     st = Stahovac(offline=args.offline)
-    polozky = nacti_katalog(st, max_age=0 if args.aktualni else 7 * 86400)
-    print(f"katalog: {len(polozky)} položek", file=sys.stderr)
     rejstrik = OUT / "publikace.jsonl"
     stav_path = OUT / "stav.json"
+    predchozi: dict[str, dict] = {}
+    if rejstrik.exists():
+        for ln in rejstrik.read_text(encoding="utf-8").splitlines():
+            if ln.strip():
+                r = json.loads(ln)
+                predchozi[r["url"]] = r
+    try:
+        polozky = nacti_katalog(st, max_age=0 if args.aktualni else 7 * 86400)
+    except (RuntimeError, OSError) as e:  # KatalogNedostupny, stažení selhalo, 404, robots.txt
+        print(f"CHYBA: katalog se nepodařilo načíst ({e}); rejstřík a publikace ponechány beze změny.",
+              file=sys.stderr)
+        return 2
+    print(f"katalog: {len(polozky)} položek", file=sys.stderr)
+    duvod = katalog_neuplny(len(polozky), len(predchozi))
+    if duvod:
+        print(f"CHYBA: {duvod}; rejstřík a publikace ponechány beze změny.", file=sys.stderr)
+        return 2
     if args.aktualni:
-        known = set()
-        if rejstrik.exists():
-            known = {json.loads(ln)["url"] for ln in rejstrik.read_text(encoding="utf-8").splitlines() if ln.strip()}
+        known = set(predchozi)
         urls = {p["url"] for p in polozky}
         nove = [p for p in polozky if p["url"] not in known]
         zmizele = sorted(known - urls)
@@ -952,13 +999,7 @@ def main() -> None:
                                      "nove": [p["url"] for p in nove], "zmizele": zmizele}
         OUT.mkdir(parents=True, exist_ok=True)
         stav_path.write_text(json.dumps(stav, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        return
-    predchozi: dict[str, dict] = {}
-    if rejstrik.exists():
-        for ln in rejstrik.read_text(encoding="utf-8").splitlines():
-            if ln.strip():
-                r = json.loads(ln)
-                predchozi[r["url"]] = r
+        return 0
 
     def ponechat(p: dict) -> bool:
         """Známá publikace (stejná URL a velikost), soubor není v cache: bez --vse se nestahuje znovu."""
@@ -983,8 +1024,9 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001
             chyby[p["url"]] = str(e)
             print(f"[{i}/{len(polozky)}] CHYBA {p['url']}: {e}", file=sys.stderr, flush=True)
+    nove_chyby = [u for u in chyby if u not in predchozi]
     if args.jen_stahnout:
-        return
+        return _kod_chyb(nove_chyby)
     today_s = today()
     pouzite: set[str] = set()
     rows = []
@@ -992,23 +1034,28 @@ def main() -> None:
         if p["url"] in predchozi:
             pouzite.add(predchozi[p["url"]]["slug"])
     for p in polozky:
+        path = soubor_cache(p["url"])
+        selhalo = p["url"] in chyby and not path.exists()
+        if selhalo and p["url"] not in predchozi:
+            # nová publikace bez souboru: nezapisovat kartu „nestazeno“, zkusí se znovu příštím během
+            print(f"přeskočeno (stažení selhalo, nová publikace): {p['url']}", file=sys.stderr)
+            continue
         slug = predchozi[p["url"]]["slug"] if p["url"] in predchozi else slug_publikace(p, pouzite)
         if args.slug and slug not in args.slug:
             continue
-        if ponechat(p):
+        if ponechat(p) or selhalo:  # selhalo u známé publikace: ponechat předchozí stav
             row = dict(predchozi[p["url"]])
             row.update({k: p[k] for k in ("nazev", "kategorie", "kategorie_dalsi", "katalog")})
             rows.append(row)
+            if selhalo:
+                print(f"{slug}: stažení selhalo, ponechán předchozí stav ({chyby[p['url']]})", file=sys.stderr)
             continue
-        path = soubor_cache(p["url"])
         row = zpracuj(p, slug, path if path.exists() else None, today_s)
-        if p["url"] in chyby and not path.exists():
-            row["chyba"] = chyby[p["url"]]
         rows.append(row)
         print(f"{slug}: {row['licence']} -> {'text, ' + str(row['kapitoly']) + ' kapitol' if row['text_ulozen'] else 'karta'}",
               file=sys.stderr)
     if args.slug:
-        return
+        return _kod_chyb(nove_chyby)
     # odstranit složky publikací, které z katalogu zmizely
     slugs = {r["slug"] for r in rows}
     for d in OUT.iterdir() if OUT.exists() else []:
@@ -1027,7 +1074,8 @@ def main() -> None:
     }
     stav_path.write_text(json.dumps(stav, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(json.dumps({k: v for k, v in stav.items() if k != "chyby"}, ensure_ascii=False), file=sys.stderr)
+    return _kod_chyb(nove_chyby)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -231,6 +231,40 @@ def test_zastupitel_odvolani_po_doruceni_informace():
     assert "odvolání" not in lh_d["odpoved_dorucena"].co_udelat
 
 
+@pytest.mark.parametrize("druh", ["praha", "mestska-cast"])
+def test_zastupitel_praha_informace_prodlouzeni_posune_stiznost(druh):
+    # § 14 odst. 6 InfZ (subsidiárně): po oznámeném prodloužení se stížnost podává až po prodloužené lhůtě.
+    lh = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), druh, podani="informace", prodlouzeno=True))
+    assert lh["odpoved_do"].datum == date(2026, 11, 2)            # 15 + 10 dní, 1. 11. 2026 je neděle
+    assert "§ 14 odst. 6" in lh["odpoved_do"].paragraf and "prodlouzeni_max" not in lh
+    assert lh["stiznost_od"].datum == date(2026, 11, 3)
+    assert lh["stiznost_do"].datum == date(2026, 12, 2)
+    # bez prodloužení beze změny, ale s upozorněním, že po prodloužení se okno stížnosti posouvá
+    bez = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), druh, podani="informace"))
+    assert bez["stiznost_od"].datum == date(2026, 10, 23) and bez["stiznost_do"].datum == date(2026, 11, 23)
+    assert "po 2. 11. 2026" in bez["stiznost_od"].poznamka and "prodlouzeno=true" in bez["stiznost_od"].poznamka
+    # prodloužení podle InfZ: jen u 15denní lhůty Prahy a městské části, ne u dotazu ani u obce/kraje
+    with pytest.raises(ValueError):
+        L.lhuty_zastupitel(date(2026, 10, 7), "obec", podani="informace", prodlouzeno=True)
+    with pytest.raises(ValueError):
+        L.lhuty_zastupitel(date(2026, 10, 7), druh, prodlouzeno=True)
+
+
+def test_zastupitel_informace_odvolani_do_v_tabulce_a_ics():
+    # § 16 odst. 1 InfZ (subsidiárně): odvolání do 15 dnů od doručení rozhodnutí – jako vypočtená lhůta.
+    lh = L.lhuty_zastupitel(date(2026, 10, 7), "obec", podani="informace",
+                            datum_doruceni_odpovedi=date(2026, 10, 20))
+    k = _by_kod(lh)
+    assert k["odvolani_do"].datum == date(2026, 11, 4)
+    assert k["odvolani_do"].kdo == "vy" and "§ 16 odst. 1" in k["odvolani_do"].paragraf
+    assert "st 4. 11. 2026" in L.tabulka_md(lh)
+    lines = _unfold(L.ics(lh, "Smlouvy", "Obec X", dtstamp=STAMP))
+    assert "DTSTART;VALUE=DATE:20261104" in lines
+    assert any(x.startswith("SUMMARY:POSLEDNÍ DEN pro odvolání") for x in lines)
+    dotaz = _by_kod(L.lhuty_zastupitel(date(2026, 10, 7), "obec", datum_doruceni_odpovedi=date(2026, 10, 20)))
+    assert "odvolani_do" not in dotaz
+
+
 def test_zneni_zakonu_o_samosprave_2027():
     # e-Sbírka: znění od 1. 1. 2027 mění jen ustanovení o finanční kontrole.
     assert "§ 82 nemění" in L.ZNENI["128/2000 Sb."]
@@ -355,6 +389,37 @@ def test_tool_pruvodce_faze():
     c2 = mcp_server.pruvodce_zadosti(faze="odpoved", typ="zastupitel-kraj")
     assert "odvolání do 15 dnů" in c2
     assert "Neplatné zadání" in mcp_server.pruvodce_zadosti(faze="nevim")
+
+
+def test_tool_lhuty_zadosti_praha_informace_prodlouzeno():
+    out = mcp_server.lhuty_zadosti(typ="zastupitel-praha", datum_podani="2026-10-07", podani="informace",
+                                   prodlouzeno=True)
+    assert "lhůta prodloužena" in out and "út 3. 11. 2026" in out and "st 2. 12. 2026" in out
+    assert "Neplatné zadání" in mcp_server.lhuty_zadosti(typ="zastupitel-obec", datum_podani="2026-10-07",
+                                                         podani="informace", prodlouzeno=True)
+
+
+def test_tool_pruvodce_zastupitel_podani_informace():
+    # Průvodce musí předat podani do všech fází i do příkazů, které vypisuje.
+    a = mcp_server.pruvodce_zadosti(faze="pripravuji", typ="zastupitel-praha", podani="informace")
+    assert 'pruvodce_zadosti(faze="odeslano", typ="zastupitel-praha", podani="informace"' in a
+    a_d = mcp_server.pruvodce_zadosti(faze="pripravuji", typ="zastupitel-praha")
+    assert 'pruvodce_zadosti(faze="odeslano", typ="zastupitel-praha", podani="dotaz"' in a_d
+    b = mcp_server.pruvodce_zadosti(faze="odeslano", typ="zastupitel-praha", podani="informace",
+                                    datum_podani="2026-10-07")
+    assert "čt 22. 10. 2026" in b and "§ 51 odst. 2 písm. c)" in b and "pá 6. 11. 2026" not in b
+    assert 'pruvodce_zadosti(faze="odpoved", typ="zastupitel-praha", podani="informace")' in b
+    b2 = mcp_server.pruvodce_zadosti(faze="odeslano", typ="zastupitel-praha", podani="informace")
+    assert 'lhuty_zadosti(typ="zastupitel-praha", podani="informace"' in b2
+    c = mcp_server.pruvodce_zadosti(faze="odpoved", typ="zastupitel-praha", podani="informace")
+    assert 'lhuty_zadosti(typ="zastupitel-praha", podani="informace"' in c and "datum_doruceni_odpovedi" in c
+    d = mcp_server.pruvodce_zadosti(faze="problem", typ="zastupitel-praha", podani="informace",
+                                    datum_podani="2026-10-07")
+    assert "pá 23. 10. 2026" in d and "po 23. 11. 2026" in d
+    d2 = mcp_server.pruvodce_zadosti(faze="problem", typ="zastupitel-obec", podani="dotaz",
+                                     datum_podani="2026-10-07")
+    assert "pá 6. 11. 2026" in d2 and "pá 23. 10. 2026" not in d2
+    assert "Neplatné zadání" in mcp_server.pruvodce_zadosti(faze="odeslano", typ="zastupitel-obec", podani="xyz")
 
 
 def test_prompty_obsahuji_pravidla():

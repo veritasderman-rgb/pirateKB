@@ -3390,7 +3390,13 @@ def _lhuty_pro(typ: str, datum_podani: Any, zpusob: str, prodlouzeno: bool = Fal
                                 datum_oznameni_uhrady=datum_oznameni_uhrady,
                                 datum_stiznosti=datum_stiznosti, datum_odvolani=datum_odvolani)
     return _lhuty.lhuty_zastupitel(datum_podani, druh=typ.split("-", 1)[1], zpusob=zpusob, podani=podani,
-                                   datum_doruceni_odpovedi=datum_doruceni_odpovedi)
+                                   datum_doruceni_odpovedi=datum_doruceni_odpovedi,
+                                   prodlouzeno=bool(prodlouzeno))
+
+
+def _podani_arg(t: str, podani: str) -> str:
+    """Argument podani do příkazů, které průvodce a lhůty vypisují (jen u zastupitele)."""
+    return "" if t == "106" else f", podani=\"{podani}\""
 
 
 def _typ_popis(t: str, podani: str = "dotaz") -> str:
@@ -3425,7 +3431,7 @@ def _lhuty_vystup(typ: str, datum_podani: str, zpusob: str, prodlouzeno: bool, d
     u_ = _clean(urad)
     head = [f"# Lhůty: {nazev}" + (f" ({u_})" if u_ else ""),
             f"{_typ_popis(t, druh_podani)} · podáno {_lhuty.fmt_datum(podani)} ({_lhuty.ZPUSOBY[z]})"
-            + (" · lhůta prodloužena" if prodlouzeno and t == "106" else ""), pozn_datum,
+            + (" · lhůta prodloužena" if prodlouzeno else ""), pozn_datum,
             "## Přehled", _lhuty.tabulka_md(lh), "",
             "## Jak se počítá",
             "- Den skutečnosti (přijetí, doručení) se nezapočítává; konec o sobotě, neděli nebo svátku se "
@@ -3456,12 +3462,17 @@ def _lhuty_vystup(typ: str, datum_podani: str, zpusob: str, prodlouzeno: bool, d
     if not s_ics:
         return main
     cal = _lhuty.ics(lh, nazev_zadosti=nazev, urad=u_)
+    pp = _podani_arg(t, druh_podani)
     dalsi = ("## Další krok\n- Zapiš lhůty do kalendáře (instrukce výše).\n"
              + ("- Žádáte-li jako zastupitel existující dokumenty či údaje, spočítejte lhůty s "
                 "`podani=\"informace\"` (písm. c), stížnost podle InfZ).\n" if t != "106" and druh_podani == "dotaz" else "")
-             + f"- Až přijde odpověď: `pruvodce_zadosti(faze=\"odpoved\", typ=\"{t}\")` a "
-             f"`lhuty_zadosti(..., datum_doruceni_odpovedi=\"YYYY-MM-DD\")`.\n"
-             f"- Když úřad mlčí nebo odmítne: `pruvodce_zadosti(faze=\"problem\", typ=\"{t}\", ...)`.")
+             + ("- Oznámí-li úřad prodloužení lhůty o 10 dní, přepočítejte s `prodlouzeno=true` – stížnost se pak "
+                "podává až po prodloužené lhůtě.\n"
+                if t in ("zastupitel-praha", "zastupitel-mestska-cast") and druh_podani == "informace"
+                and not prodlouzeno else "")
+             + f"- Až přijde odpověď: `pruvodce_zadosti(faze=\"odpoved\", typ=\"{t}\"{pp})` a "
+             f"`lhuty_zadosti(typ=\"{t}\"{pp}, ..., datum_doruceni_odpovedi=\"YYYY-MM-DD\")`.\n"
+             f"- Když úřad mlčí nebo odmítne: `pruvodce_zadosti(faze=\"problem\", typ=\"{t}\"{pp}, ...)`.")
     return (main + "\n## Kalendář\n" + KALENDAR_INSTRUKCE + "\n\n```ics\n" + cal.replace("\r\n", "\n")
             + "```\n\n*(V souboru .ics použij konce řádků CRLF; většina kalendářů přijme i LF.)*\n\n" + dalsi)
 
@@ -3486,7 +3497,9 @@ def lhuty_zadosti(typ: str = "106", datum_podani: str = "", zpusob: str = "datov
     Argumenty: typ = 106 | zastupitel-obec | zastupitel-kraj | zastupitel-praha |
     zastupitel-mestska-cast; datum_podani = YYYY-MM-DD (den odeslání; prázdné = dnes);
     zpusob = datova-schranka | email | posta | osobne (u pošty se doručení odhadne na další
-    pracovní den); prodlouzeno = úřad oznámil prodloužení o 10 dní (§ 14 odst. 6 InfZ);
+    pracovní den); prodlouzeno = úřad oznámil prodloužení o 10 dní (§ 14 odst. 6 InfZ; u 106
+    a u žádosti zastupitele hl. m. Prahy nebo městské části o informace – stížnost se pak počítá
+    od prodloužené lhůty);
     datum_doruceni_odpovedi = kdy vám byla doručena odpověď/rozhodnutí (→ lhůta pro odvolání a
     stížnost); urad, predmet = do názvů událostí. Volitelně (jen 106): datum_oznameni_uhrady
     (§ 17), datum_stiznosti, datum_odvolani (kdy je úřad obdržel), datum_upresneni (upřesnění
@@ -3503,7 +3516,7 @@ def lhuty_zadosti(typ: str = "106", datum_podani: str = "", zpusob: str = "datov
                 f"zpusob=\"datova-schranka\", urad=\"Městský úřad X\", predmet=\"smlouvy na opravu školy\")`.")
 
 
-def _pruvodce_pripravuji(t: str, predmet: str, urad: str) -> str:
+def _pruvodce_pripravuji(t: str, predmet: str, urad: str, podani: str = "dotaz") -> str:
     out = []
     if t == "106":
         out += [
@@ -3573,19 +3586,26 @@ def _pruvodce_pripravuji(t: str, predmet: str, urad: str) -> str:
             out += ["```text", _vypln(text, pole), "```"]
     else:
         out.append("*(Šablona v content/sablony/ není na serveru k dispozici.)*")
-    out += ["", "Po odeslání: `pruvodce_zadosti(faze=\"odeslano\", typ=\"" + t + "\", datum_podani=\"YYYY-MM-DD\", ...)`"
-            " – lhůty do kalendáře a návrh komunikace."]
+    out += ["", "Po odeslání: `pruvodce_zadosti(faze=\"odeslano\", typ=\"" + t + "\"" + _podani_arg(t, podani)
+            + ", datum_podani=\"YYYY-MM-DD\", ...)` – lhůty do kalendáře a návrh komunikace."]
+    if t != "106":
+        jina = "informace" if podani == "dotaz" else "dotaz"
+        out.append(f"Zvolená varianta: `podani=\"{podani}\"` ("
+                   + ("dotaz, připomínka, podnět – písm. b)" if podani == "dotaz" else "žádost o informace – písm. c)")
+                   + f"); poslali-li jste druhou variantu, použijte `podani=\"{jina}\"` – lhůty a opravné "
+                   "prostředky se liší.")
     out += _dalsi_zdroje(t) + ["", _PRAVIDLA_106]
     return "\n".join(out)
 
 
-def _pruvodce_odeslano(t: str, predmet: str, urad: str, datum_podani: str, zpusob: str) -> str:
+def _pruvodce_odeslano(t: str, predmet: str, urad: str, datum_podani: str, zpusob: str,
+                       podani: str = "dotaz") -> str:
     video, grafika = _media_odkazy()
     out = ["# Odesláno: lhůty, kalendář a komunikace", ""]
     if _clean(datum_podani):
-        out.append(_lhuty_vystup(t, datum_podani, zpusob, False, "", urad, predmet))
+        out.append(_lhuty_vystup(t, datum_podani, zpusob, False, "", urad, predmet, podani=podani))
     else:
-        out.append(f"1. Zeptej se na datum a způsob podání a zavolej `lhuty_zadosti(typ=\"{t}\", "
+        out.append(f"1. Zeptej se na datum a způsob podání a zavolej `lhuty_zadosti(typ=\"{t}\"{_podani_arg(t, podani)}, "
                    "datum_podani=\"YYYY-MM-DD\", zpusob=..., urad=..., predmet=...)`; lhůty zapiš do kalendáře.")
         out.append(KALENDAR_INSTRUKCE)
     out += ["", "## Komunikace (jen pokud to uživatel chce zveřejnit)",
@@ -3602,7 +3622,7 @@ def _pruvodce_odeslano(t: str, predmet: str, urad: str, datum_podani: str, zpuso
     return "\n".join(out)
 
 
-def _pruvodce_odpoved(t: str, shrnuti: str) -> str:
+def _pruvodce_odpoved(t: str, shrnuti: str, podani: str = "dotaz") -> str:
     video, grafika = _media_odkazy()
     out = ["# Přišla odpověď: vyhodnocení a komunikace", ""]
     if _clean(shrnuti):
@@ -3637,6 +3657,11 @@ def _pruvodce_odpoved(t: str, shrnuti: str) -> str:
             "zastupitelský paragraf.",
             "- Pokud odpověď odkazuje na dokumenty, které nedostanete, podejte žádost podle InfZ (`pruvodce_zadosti(faze=\"pripravuji\", typ=\"106\")`).",
         ]
+        if podani == "informace":
+            out += ["", f"Nové lhůty: `lhuty_zadosti(typ=\"{t}\", podani=\"informace\", datum_podani=..., "
+                    "datum_doruceni_odpovedi=\"YYYY-MM-DD\")` – termín odvolání (odvolani_do) a zápis do kalendáře. "
+                    "Datum doručení datovou schránkou = přihlášení, nejpozději 10. den po dodání (§ 17 odst. 3, 4 "
+                    "z. 300/2008 Sb.)."]
     out += [
         "", "## Co sdělit veřejnosti a jak",
         "- Jen to, co odpověď skutečně obsahuje: fakta citovat s číslem jednacím a datem; hodnocení označit jako "
@@ -3650,7 +3675,7 @@ def _pruvodce_odpoved(t: str, shrnuti: str) -> str:
 
 
 def _pruvodce_problem(t: str, predmet: str, urad: str, datum_podani: str, zpusob: str, problem: str,
-                      prodlouzeno: bool, datum_doruceni_odpovedi: str) -> str:
+                      prodlouzeno: bool, datum_doruceni_odpovedi: str, podani: str = "dotaz") -> str:
     p = _clean(problem).lower()
     out = ["# Úřad mlčí, odmítl nebo chce peníze", ""]
     if t != "106":
@@ -3659,6 +3684,10 @@ def _pruvodce_problem(t: str, predmet: str, urad: str, datum_podani: str, zpusob
         out += [
             "Zákony o územní samosprávě opravné prostředky výslovně neupravují. Postup záleží na tom, **co** jste "
             "žádali (stanovisko MV č. 1/2016, bod 6):",
+            "",
+            ("**Vaše podání: žádost o informace (`podani=\"informace\"`) → postup A.**" if podani == "informace" else
+             "**Vaše podání: dotaz, připomínka nebo podnět (`podani=\"dotaz\"`) → postup B**; žádali-li jste "
+             "fakticky existující dokumenty či údaje, platí postup A."),
             "",
             f"### A) Žádost o informace – existující dokumenty a údaje ({cfg['informace'][0]})",
             f"Podle NSS ([8 Aps 5/2012-47]({_lhuty.URL_NSS_8APS5_2012}), č. 2844/2013 Sb. NSS) se subsidiárně "
@@ -3682,6 +3711,18 @@ def _pruvodce_problem(t: str, predmet: str, urad: str, datum_podani: str, zpusob
             f"3. Podnět ke kontrole: {cfg['kontrola'][0]} – {cfg['kontrola'][1]} ({cfg['kontrola'][2]}). Podnět není "
             "opravný prostředek; MV podle svého stanoviska nemůže věcně posoudit, jak měla být žádost vyřízena.",
             "4. Souběžně žádost podle zákona č. 106/1999 Sb. (`pruvodce_zadosti(faze=\"pripravuji\", typ=\"106\")`)."]
+        try:
+            dp = _lhuty.parse_datum(datum_podani)
+            if dp:
+                lz = _lhuty.lhuty_zastupitel(dp, druh=druh, zpusob=zpusob, podani=podani,
+                                             datum_doruceni_odpovedi=_lhuty.parse_datum(datum_doruceni_odpovedi),
+                                             prodlouzeno=bool(prodlouzeno))
+                dulezite = [x for x in lz if x.kod in ("odpoved_do", "prodlouzeni_max", "urgence_od", "stiznost_od",
+                                                       "stiznost_do", "odvolani_do")]
+                out += ["", f"## Termíny (`podani=\"{podani}\"`)"]
+                out.extend(f"- {_lhuty.fmt_datum(x.datum)}: {x.popis} – {x.paragraf}" for x in dulezite)
+        except ValueError as exc:
+            out.append(f"*(Lhůty se nepodařilo spočítat: {exc})*")
         out += _dalsi_zdroje(t) + ["", _PRAVIDLA_106]
         return "\n".join(out)
     if any(k in p for k in ("odmit", "rozhodnut", "odvol")):
@@ -3748,7 +3789,8 @@ def _pruvodce_problem(t: str, predmet: str, urad: str, datum_podani: str, zpusob
 @_guard
 def pruvodce_zadosti(faze: str, typ: str = "106", predmet: str = "", urad: str = "",
                      datum_podani: str = "", zpusob: str = "datova-schranka", shrnuti_odpovedi: str = "",
-                     problem: str = "", prodlouzeno: bool = False, datum_doruceni_odpovedi: str = "") -> str:
+                     problem: str = "", prodlouzeno: bool = False, datum_doruceni_odpovedi: str = "",
+                     podani: str = "dotaz") -> str:
     """Průvodce žádostí o informace podle zákona č. 106/1999 Sb. a dotazem zastupitele (obec,
     kraj, Praha, městská část) krok za krokem, s odkazy na paragrafy a šablonami z content/.
 
@@ -3758,20 +3800,23 @@ def pruvodce_zadosti(faze: str, typ: str = "106", predmet: str = "", urad: str =
     a video „co jsme zjistili“) | problem (úřad mlčí/odmítl/chce peníze: stížnost nebo odvolání ze
     šablony s vyplněnými daty a nová lhůta). typ = 106 | zastupitel-obec | zastupitel-kraj |
     zastupitel-praha | zastupitel-mestska-cast. problem = mlci | castecne | odmitli | uhrada | odkaz.
+    Jen u zastupitele: podani = dotaz (dotaz, připomínka, podnět – písm. b)) | informace (žádost
+    o informace – písm. c)); platí pro všechny fáze a vypsané navazující příkazy.
     Ostatní argumenty jsou volitelné (datum YYYY-MM-DD). Lhůty zapisuj do kalendáře přes
     kalendářový konektor uživatele; server sám do kalendáře nezapisuje."""
     try:
         f = _faze(faze)
         t = _typ_zadosti(typ)
         z = _lhuty.normalizuj_zpusob(zpusob)
+        p = _lhuty.normalizuj_podani(podani)
         if f == "pripravuji":
-            return _pruvodce_pripravuji(t, _clean(predmet), _clean(urad))
+            return _pruvodce_pripravuji(t, _clean(predmet), _clean(urad), p)
         if f == "odeslano":
-            return _pruvodce_odeslano(t, _clean(predmet), _clean(urad), datum_podani, z)
+            return _pruvodce_odeslano(t, _clean(predmet), _clean(urad), datum_podani, z, p)
         if f == "odpoved":
-            return _pruvodce_odpoved(t, shrnuti_odpovedi)
+            return _pruvodce_odpoved(t, shrnuti_odpovedi, p)
         return _pruvodce_problem(t, _clean(predmet), _clean(urad), datum_podani, z, problem, prodlouzeno,
-                                 datum_doruceni_odpovedi)
+                                 datum_doruceni_odpovedi, p)
     except ValueError as exc:
         return (f"Neplatné zadání: {exc}. Příklad: `pruvodce_zadosti(faze=\"pripravuji\", typ=\"106\", "
                 f"predmet=\"smlouvy na opravu školy\", urad=\"Městský úřad X\")`.")

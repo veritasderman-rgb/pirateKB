@@ -29,7 +29,8 @@ výhradou, že nejsou ověřené; uživatele odkaž na <https://www.zakonyprolid
   (písm. c), existující dokumenty – `podani="informace"`); u důležitých dokumentů nabídni
   žádost „podle písm. c) a zároveň podle InfZ“ (viz „106 vs. § 82“).
 - Zavolej `pruvodce_zadosti(faze="pripravuji", typ=…, predmet=…, urad=…)` – vrátí
-  náležitosti, tipy a předvyplněnou šablonu. Prompty `zadost_106` a `dotaz_zastupitele`
+  náležitosti, tipy a předvyplněnou šablonu. U zastupitele předávej `podani` (dotaz |
+  informace) ve všech fázích průvodce i v `lhuty_zadosti` – lhůty a opravné prostředky se liší. Prompty `zadost_106` a `dotaz_zastupitele`
   dělají totéž jako řízený postup.
 - Převeď otázky „proč / jak to, že“ na **existující dokumenty a data** (smlouvy, dodatky,
   faktury, zápisy, usnesení, e-maily, tabulky) – úřad podle InfZ nemusí odpovídat na
@@ -106,7 +107,9 @@ U dotazu zastupitele (písm. b)): zákon nedává stížnost ani odvolání – 
 zastupitelstvo, podnět ke kontrole (MV, u městských částí Magistrát), souběžná žádost podle
 InfZ. U žádosti zastupitele o informace (písm. c)) se podle NSS (8 Aps 5/2012-47)
 subsidiárně použije procesní úprava InfZ: odepření rozhodnutím → odvolání, nečinnost →
-stížnost, pak žaloba proti nečinnosti (`pruvodce_zadosti(faze="problem", typ="zastupitel-…")`).
+stížnost, pak žaloba proti nečinnosti (`pruvodce_zadosti(faze="problem", typ="zastupitel-…",
+podani="informace")`). V Praze a městské části: oznámí-li úřad prodloužení o 10 dní, přepočítej
+lhůty s `prodlouzeno=true` – stížnost se podává až po prodloužené lhůtě.
 
 ### 8a. Komunikace výsledku
 

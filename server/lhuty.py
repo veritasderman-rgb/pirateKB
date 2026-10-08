@@ -237,6 +237,26 @@ def _prijeti(datum_podani: date, zpusob: str, zakon: str) -> tuple[date, Lhuta]:
         kdo="info", poznamka=pozn)
 
 
+def _prodlouzeni(zaklad: date, k15: Konec) -> tuple[Konec, Konec, date, date, str]:
+    """Prodloužení 15denní lhůty o 10 dní (§ 14 odst. 6 InfZ).
+
+    Vrací (konec 15 + 10 dní od ``zaklad``, konec 10 dní od posunutého konce původní lhůty,
+    pozdější a dřívější z obou konců, poznámku). Zákon neříká, zda se 10 dní připočítává
+    k vypočtenému, nebo k posunutému konci původní lhůty; stížnost se proto podává až po pozdějším
+    a nejpozději 30 dní po dřívějším konci."""
+    k25 = konec_lhuty(zaklad, 25)               # 15 + 10 dní od přijetí/upřesnění
+    k25_alt = konec_lhuty(k15.datum, 10)         # 10 dní od (posunutého) konce původní lhůty
+    pozdejsi = max(k25.datum, k25_alt.datum)
+    drivejsi = min(k25.datum, k25_alt.datum)
+    pozn = ""
+    if k25.datum != k25_alt.datum:
+        pozn = (f"Zákon neříká, zda se 10 dní připočítává k vypočtenému, nebo k posunutému konci "
+                f"původní lhůty ({fmt_datum(k15.datum)}). Při druhém výkladu by lhůta skončila "
+                f"{fmt_datum(k25_alt.datum)}. Stížnost proto podejte až po {fmt_datum(pozdejsi)} "
+                f"a nejpozději 30 dní po {fmt_datum(drivejsi)}.")
+    return k25, k25_alt, pozdejsi, drivejsi, pozn
+
+
 def lhuty_106(datum_podani: date, zpusob: str = "datova-schranka", prodlouzeno: bool = False,
               datum_doruceni_odpovedi: date | None = None, datum_upresneni: date | None = None,
               datum_oznameni_uhrady: date | None = None, datum_stiznosti: date | None = None,
@@ -268,18 +288,9 @@ def lhuty_106(datum_podani: date, zpusob: str = "datova-schranka", prodlouzeno: 
 
     zaklad = datum_upresneni or prijeti
     k15 = konec_lhuty(zaklad, 15)
-    k25 = konec_lhuty(zaklad, 25)               # 15 + 10 dní od přijetí/upřesnění
-    k25_alt = konec_lhuty(k15.datum, 10)         # 10 dní od (posunutého) konce původní lhůty
+    k25, k25_alt, pozdejsi, drivejsi, pozn = _prodlouzeni(zaklad, k15)
     od_upr = " od upřesnění žádosti" if datum_upresneni else ""
     if prodlouzeno:
-        pozdejsi = max(k25.datum, k25_alt.datum)
-        drivejsi = min(k25.datum, k25_alt.datum)
-        pozn = ""
-        if k25.datum != k25_alt.datum:
-            pozn = (f"Zákon neříká, zda se 10 dní připočítává k vypočtenému, nebo k posunutému konci "
-                    f"původní lhůty ({fmt_datum(k15.datum)}). Při druhém výkladu by lhůta skončila "
-                    f"{fmt_datum(k25_alt.datum)}. Stížnost proto podejte až po {fmt_datum(pozdejsi)} "
-                    f"a nejpozději 30 dní po {fmt_datum(drivejsi)}.")
         out.append(Lhuta(
             "odpoved_uradu", f"Prodloužená lhůta: úřad musí poskytnout informaci nebo rozhodnout o odmítnutí "
             f"(15 + 10 dní{od_upr})", k25.datum,
@@ -490,12 +501,15 @@ def normalizuj_podani(podani: str | None) -> str:
 
 
 def lhuty_zastupitel(datum_podani: date, druh: str = "obec", zpusob: str = "datova-schranka",
-                     podani: str = "dotaz", datum_doruceni_odpovedi: date | None = None) -> list[Lhuta]:
+                     podani: str = "dotaz", datum_doruceni_odpovedi: date | None = None,
+                     prodlouzeno: bool = False) -> list[Lhuta]:
     """Lhůty dotazu, připomínky nebo podnětu zastupitele (podani="dotaz", písm. b)) nebo žádosti
     o informace od zaměstnanců úřadu a právnických osob (podani="informace", písm. c)) podle zákonů
     o obcích, krajích a hl. m. Praze.
 
-    druh = obec | kraj | praha | mestska-cast.
+    druh = obec | kraj | praha | mestska-cast; prodlouzeno = úřad oznámil prodloužení o 10 dní
+    (§ 14 odst. 6 InfZ, stejně jako u ``lhuty_106``) – jen u žádosti o informace v Praze a městské
+    části, kde se lhůta 15 dní bere z InfZ; stížnost na nečinnost se pak počítá od prodloužené lhůty.
 
     - dotaz: 30 dní na obdržení písemné odpovědi (všechny úrovně); bez stížnosti a odvolání –
       po lhůtě urgence, zastupitelstvo, podnět ke kontrole. SŘ se nepoužije (§ 1 odst. 3 SŘ),
@@ -507,6 +521,10 @@ def lhuty_zastupitel(datum_podani: date, druh: str = "obec", zpusob: str = "dato
     zpusob = normalizuj_zpusob(zpusob)
     podani = normalizuj_podani(podani)
     cfg = _ZASTUPITEL[druh]
+    if prodlouzeno and (podani != "informace" or not cfg["lhuta_informace_vyklad"]):
+        raise ValueError("prodlouzeno (§ 14 odst. 6 InfZ) platí jen pro žádost o informace zastupitele "
+                         "hl. m. Prahy nebo městské části (podani=\"informace\", lhůta 15 dní podle InfZ); "
+                         "u obce a kraje je lhůta 30 dní přímo ze zákona a dotaz se neprodlužuje")
     paragraf, url = cfg[podani]
     prijeti, info = _prijeti(datum_podani, zpusob, "zastupitel")
     info = Lhuta(info.kod, info.popis, info.datum, paragraf, url, info.co_udelat, kdo="info",
@@ -550,26 +568,50 @@ def lhuty_zastupitel(datum_podani: date, druh: str = "obec", zpusob: str = "dato
         k = konec_lhuty(prijeti, lhuta)
         par_lhuta = paragraf if not vyklad else (
             paragraf + "; lhůta: § 14 odst. 5 písm. d) zákona č. 106/1999 Sb. (subsidiárně – výklad)")
-        out.append(Lhuta(
-            "odpoved_do", f"Do tohoto dne vám musí být poskytnuta požadovaná informace ({lhuta} dní)"
-            + (" – VÝKLAD: zákon o hl. m. Praze lhůtu nestanoví" if vyklad else ""),
-            k.datum, par_lhuta, url,
-            "Zkontrolujte, zda informace přišla úplně. Pokud vám ji úřad (i jen zčásti) odepřel, má podle "
-            "judikatury vydat rozhodnutí o odmítnutí (§ 15 InfZ), proti kterému se lze odvolat do 15 dnů.",
-            kdo="úřad", posun=k.duvod_posunu, poznamka=(vyklad + " " if vyklad else "") + pocitani,
-            odhad=odhad))
-        if vyklad:
-            k25 = konec_lhuty(prijeti, lhuta + 10)
+        co_odpoved = ("Zkontrolujte, zda informace přišla úplně. Pokud vám ji úřad (i jen zčásti) odepřel, má "
+                      "podle judikatury vydat rozhodnutí o odmítnutí (§ 15 InfZ), proti kterému se lze odvolat "
+                      "do 15 dnů.")
+        pozn_prodl = ""
+        if vyklad:  # Praha a městská část: 15 dní podle InfZ, lze prodloužit podle § 14 odst. 6 InfZ
+            k25, k25_alt, pozdejsi, drivejsi, pozn_prodl = _prodlouzeni(prijeti, k)
+        if prodlouzeno:
             out.append(Lhuta(
-                "prodlouzeni_max", "Nejzazší termín, pokud úřad lhůtu ze závažných důvodů prodlouží o 10 dní "
-                "a včas vám to oznámí (výklad – subsidiárně InfZ)", k25.datum,
-                "§ 14 odst. 6 zákona č. 106/1999 Sb.", u(URL_INFZ, "p14-6"),
-                "Platí jen při včasném oznámení prodloužení; pak se stížnost podává až po tomto dni.",
-                kdo="úřad", posun=k25.duvod_posunu, odhad=odhad))
-        stiz_do = konec_lhuty(k.datum, 30)
+                "odpoved_do", "Prodloužená lhůta: do tohoto dne vám musí být poskytnuta požadovaná informace "
+                f"({lhuta} + 10 dní) – VÝKLAD: zákon o hl. m. Praze lhůtu nestanoví", k25.datum,
+                paragraf + "; lhůta: § 14 odst. 5 písm. d) a § 14 odst. 6 zákona č. 106/1999 Sb. "
+                "(subsidiárně – výklad)", url,
+                co_odpoved + " Prodloužení musí mít jeden z důvodů v § 14 odst. 6 písm. a)–d) InfZ a úřad vám "
+                "ho musel oznámit před uplynutím 15denní lhůty.",
+                kdo="úřad", posun=k25.duvod_posunu,
+                poznamka=" ".join(x for x in (vyklad, pocitani, pozn_prodl) if x), odhad=odhad))
+            konec_pozdejsi, konec_drivejsi = pozdejsi, drivejsi
+        else:
+            out.append(Lhuta(
+                "odpoved_do", f"Do tohoto dne vám musí být poskytnuta požadovaná informace ({lhuta} dní)"
+                + (" – VÝKLAD: zákon o hl. m. Praze lhůtu nestanoví" if vyklad else ""),
+                k.datum, par_lhuta, url, co_odpoved,
+                kdo="úřad", posun=k.duvod_posunu, poznamka=(vyklad + " " if vyklad else "") + pocitani,
+                odhad=odhad))
+            if vyklad:
+                out.append(Lhuta(
+                    "prodlouzeni_max", "Nejzazší termín, pokud úřad lhůtu ze závažných důvodů prodlouží o 10 dní "
+                    "a včas vám to oznámí (výklad – subsidiárně InfZ)", k25.datum,
+                    "§ 14 odst. 6 zákona č. 106/1999 Sb.", u(URL_INFZ, "p14-6"),
+                    "Platí jen při včasném oznámení prodloužení; pak se stížnost podává až po tomto dni – "
+                    "přepočítejte lhůty s prodlouzeno=true.",
+                    kdo="úřad", posun=k25.duvod_posunu,
+                    poznamka=(f"Při výkladu „10 dní od posunutého konce původní lhůty“ by to byl "
+                              f"{fmt_datum(k25_alt.datum)}." if k25_alt.datum != k25.datum else ""), odhad=odhad))
+            konec_pozdejsi = konec_drivejsi = k.datum
+        pozn_stiz = ""
+        if vyklad and not prodlouzeno:
+            pozn_stiz = (f" Pokud vám úřad včas oznámí prodloužení lhůty o 10 dní (§ 14 odst. 6 InfZ), počítá se "
+                         f"stížnost od prodloužené lhůty: podat ji lze až po {fmt_datum(pozdejsi)} – přepočítejte "
+                         "lhůty s prodlouzeno=true.")
+        stiz_do = konec_lhuty(konec_drivejsi, 30)
         out.append(Lhuta(
             "stiznost_od", "Nejdříve lze podat stížnost na nečinnost (den po uplynutí lhůty)",
-            k.datum + timedelta(days=1),
+            konec_pozdejsi + timedelta(days=1),
             "§ 16a odst. 1 písm. b) zákona č. 106/1999 Sb. (subsidiárně – výklad)", u(URL_INFZ, "p16a-1-b"),
             "Pokud informace nepřišla ani nepřišlo rozhodnutí o odmítnutí: stížnost u toho, komu jste "
             f"žádost poslali (o ní rozhoduje nadřízený orgán – {cfg['nadrizeny']}). Text: šablona "
@@ -577,7 +619,7 @@ def lhuty_zastupitel(datum_podani: date, druh: str = "obec", zpusob: str = "dato
             "na ochranu proti nečinnosti (§ 79 s. ř. s.) – doporučte právníka.",
             kdo="vy", poznamka=ZAKLAD_INFZ_SUBSIDIARNE[0].upper() + ZAKLAD_INFZ_SUBSIDIARNE[1:]
             + "; proti neposkytnutí informace se zastupitel brání stížností a poté žalobou proti "
-            "nečinnosti, ne zásahovou žalobou.", odhad=odhad))
+            "nečinnosti, ne zásahovou žalobou." + pozn_stiz, odhad=odhad))
         out.append(Lhuta(
             "stiznost_do", "Nejpozději lze podat stížnost na nečinnost (30 dní od uplynutí lhůty)",
             stiz_do.datum, "§ 16a odst. 3 písm. b) zákona č. 106/1999 Sb. (subsidiárně – výklad)",
@@ -591,7 +633,22 @@ def lhuty_zastupitel(datum_podani: date, druh: str = "obec", zpusob: str = "dato
             "Vyhodnoťte, zda odpověď odpovídá na všechny body; nejasnosti vzneste jako doplňující dotaz "
             "nebo na zasedání zastupitelstva."
             + (" Pokud vám byla informace rozhodnutím odepřena, odvolání do 15 dnů od doručení rozhodnutí "
-               "(§ 16 InfZ subsidiárně – výklad)." if podani == "informace" else ""), kdo="info"))
+               "(§ 16 InfZ subsidiárně – výklad; termín viz odvolani_do)." if podani == "informace" else ""),
+            kdo="info"))
+        if podani == "informace":
+            k15o = konec_lhuty(datum_doruceni_odpovedi, 15)
+            out.append(Lhuta(
+                "odvolani_do", "Odvolání proti rozhodnutí o odmítnutí žádosti zastupitele o informace (i částečném) "
+                "– 15 dní od doručení rozhodnutí", k15o.datum,
+                "§ 16 odst. 1 a § 20 odst. 4 písm. b) zákona č. 106/1999 Sb. (subsidiárně – výklad); § 83 odst. 1 "
+                "zákona č. 500/2004 Sb.", u(URL_INFZ, "p16"),
+                "Jen pokud vám úřad informaci (i zčásti) odepřel rozhodnutím: odvolání u toho, kdo rozhodl (šablona "
+                f"odvolani-106 upravená na {paragraf}). Na odepření bez rozhodnutí se podává stížnost "
+                "(§ 16a odst. 1 písm. c) InfZ).",
+                kdo="vy", posun=k15o.duvod_posunu,
+                poznamka=(ZAKLAD_INFZ_SUBSIDIARNE[0].upper() + ZAKLAD_INFZ_SUBSIDIARNE[1:] + ". Doručení datovou "
+                          "schránkou: okamžik přihlášení, nejpozději 10. den po dodání (§ 17 odst. 3 a 4 zákona "
+                          "č. 300/2008 Sb.).")))
     return sorted(out, key=lambda x: (x.datum, x.kdo != "info"))
 
 
