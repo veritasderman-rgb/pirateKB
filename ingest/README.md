@@ -28,6 +28,7 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 | [ÚDH](https://udh.gov.cz/vyrocni-financni-zpravy-stran-a-hnuti) (JSON exporty výročních zpráv a zpráv o kampaních na `zpravy.udh.gov.cz`), [transparentní účty Fio](https://ib.fio.cz/ib/transparent?a=2100048174), [Piroplácení](https://piroplaceni.pirati.cz/rozpocet/) (rozpočty, seznam účtů) | `financovani.py` | `data/financovani/vyrocni-zpravy/<rok>.md`, `kampane/<volby>.md`, `rozpocty/<rok>.md`, `ucty/<ucet>.md`, `ucty.jsonl`, `financovani.jsonl`, `prehled.md` | výroční finanční zprávy 2017–dnes (příjmy podle kategorií, státní příspěvky, dary, členské příspěvky, výdaje na volby, zaměstnanci, dluhy), zprávy o financování kampaní, rozpočty centrály, měsíční souhrny 7 transparentních účtů; typ `financni-zprava`, autorita `oficialni-udhpsh` / `oficialni-transparentni-ucet` / `oficialni-evidence`; **dárci – fyzické osoby jen souhrnně, jmenovitě jen právnické osoby, z účtů jen agregace** | měsíčně `--jen ucty rozpocty` (~30 s); v lednu, dubnu až červnu a prosinci úplný běh (zprávy a kampaně, ~1 min s cache, ~3 min poprvé) |
 | X/Twitter a Bluesky poslanců (účty v `socialni_site_ucty.yaml`) | `socialni_site.py` | `data/social/x/<ucet>.jsonl`, `x/<ucet>/<RRRR-MM>.md`, totéž v `bluesky/` | veřejné příspěvky pirátských poslanců: text, datum, odkaz, počty reakcí, označení repostů a odpovědí (autorita `vyjadreni-politika`, ne stanovisko strany) | denně (`--platforma vse`); X bez API tokenu vrací jen nejnovější dávku, takže častý běh = úplnější historie |
 | [Pirátská hospodářská strategie](https://majak.pirati.cz/documents/647/Piratska_Hospodarska_strategie.pdf) (PDF, PEER) | `dokumenty.py` | `data/dokumenty/hospodarska-strategie/00-cely-dokument.md`, `NN-<kapitola>.md` | obecný převod PDF -> Markdown (pdfplumber): nadpisy podle velikosti písma, tabulky, popisky grafů jako `> Graf:`; celý text a 7 kapitol s rozsahem stran; profily dokumentů v `DOKUMENTY` | při vydání nového dokumentu (přidat profil) |
+| [frankbold.org/o-nas/publikace](https://frankbold.org/o-nas/publikace) a [archiv publikací](https://frankbold.org/o-nas/publikace/archiv-publikaci) (PDF; robots.txt `Crawl-delay: 10`) | `frankbold.py` | `data/frankbold/<slug>/00-karta.md`, `NN-<kapitola>.md`, `publikace.jsonl`, `stav.json` | publikace Frank Bold (příručky pro občany a zastupitele, analýzy, sborníky, případové studie): karta s rokem, tématy, licencí z tiráže a varováním před zastaralou právní úpravou; plný doslovný text po kapitolách jen u licence Creative Commons; typ `prirucka`, autorita `externi-prirucka` | měsíčně (první týden); stahuje jen nové; `--aktualni` jen kontrola katalogu (~20 s) |
 | [peer.pirati.cz](https://peer.pirati.cz) | `subweby.py` | `data/subweby/peer/*.md` | úvodní stránka s členy PEER (rozcestník), stránka strategie (programový dokument), články „Co si o tom myslíme“ (aktuality); konfigurace `WEBY` je připravená pro další weby z Majáku | týdně |
 | [majak.pirati.cz](https://majak.pirati.cz) | `subweby.py` | `data/majak/seznam-webu.md`, `napoveda/*.md`, `zalozeni-webu.md`, `uvod.md` | seznam všech pirátských webů v Majáku (mapa webů strany), nápověda a postupy pro správce webů; `/admin/` a `/trash-can/` se vynechávají | měsíčně |
 | regionální a tematické weby `*.pirati.cz` ze seznamu webů v Majáku (13 KS, 83 MS a místních webů, 31 tematických) | `subweby.py --z-majaku` | `data/subweby/<slug-webu>/*.md`, `data/subweby/stav.json` | hlavní stránky webů (rozcestník), aktuality a tiskové zprávy, profily lidí (osoba) s poli `web`, `druh_webu` (KS/MS/tematicky), `region` (kraj), `sdruzeni`, `misto`; z každé sitemap max 300 nových URL na běh, nejnovější články první | týdně `--z-majaku` (hotové weby se jen obnovují: nové URL ze sitemap + hlavní stránky); první naplnění několika běhy, viz poznámka |
@@ -250,6 +251,18 @@ dvakrát až třikrát po sobě (každý běh max 10 000 požadavků, cca 45 min
 parametrů. `domazlice.pirati.cz` přesměrovává na plzensky.pirati.cz (ve stavu `presmerovano`);
 `/media/` vrací 403 a vynechává se. Šablonu Majáku mají všechny dosud zpracované weby.
 
+**Publikace Frank Bold (`frankbold.py`).** Katalog frankbold.org (aktuální + archiv) odkazuje
+rovnou na PDF, vstupní stránky publikací nejsou. Web nemá otevřenou licenci, proto skript u každé
+publikace hledá licenční doložku v tiráži: plný doslovný text (rozdělený do kapitol analýzou písma
+z `dokumenty.py`, s atribucí a poznámkou „beze změn“) ukládá jen u licencí Creative Commons; CC
+u převzatých obrázků se nepočítá. Ostatní publikace mají jen kartu s metadaty a odkazem. Každá
+publikace má `rok` a `stav_pravni_upravy`; starší než velké změny zákonů (stavební zákon
+283/2021 Sb., EIA, InfZ, zákon o obcích …) dostanou viditelné varování. robots.txt: `Crawl-delay: 10`.
+Cache `.cache/frankbold/`. Svolení k převzetí textu se zapíše do `PROFILY` (ruční licence).
+Potřebuje `pdftotext` a `pdfinfo` (poppler-utils), u souborů DOC LibreOffice (`soffice`); bez
+`pdftotext` spouští `scripts/update_data.sh` jen `--aktualni`. Podrobnosti v
+[`docs/integrace/frankbold.md`](../docs/integrace/frankbold.md).
+
 **YouTube (`youtube.py`).** Seznam videí přes `yt-dlp --flat-playlist --dump-json` (záložky
 `videos` a `streams`, nejnovější první, fronty kanálů a záložek se střídají), pro každé video jen
 metadata a titulky (`--skip-download --write-subs --write-auto-subs --sub-langs cs,cs-orig
@@ -305,6 +318,7 @@ python3 pirati_web.py          # desítky minut (tisíce článků, 4 vlákna)
 python3 subweby.py             # sekundy (peer.pirati.cz, majak.pirati.cz)
 python3 subweby.py --z-majaku --limit-webu 20   # ~20 minut; regionální a tematické weby, opakovat, dokud nejsou hotové
 python3 dokumenty.py           # desítky sekund, stáhne PDF (3 MB) a převede ho
+python3 frankbold.py           # první běh ~17 min (Crawl-delay 10 s × 96 PDF); pak jen nové; --aktualni ~20 s
 python3 socialni_site.py       # minuty (Bluesky API + headless Chromium pro X)
 python3 youtube.py --limit 100 # desítky minut (yt-dlp, jen titulky)
 python3 validate.py            # nenulový exit kód při chybách

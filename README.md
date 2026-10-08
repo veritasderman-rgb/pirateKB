@@ -14,6 +14,7 @@ Jeden zdroj pravdy o Pirátské straně, ke kterému se každý pirát připojí
 - výsledky voleb a zvolení Piráti (ČSÚ),
 - financování strany (výroční zprávy, kampaně, transparentní účty),
 - průvodce žádostí podle zákona 106 a dotazem zastupitele (lhůty, šablony, grafika a video),
+- externí příručky a publikace Frank Bold (karty s odkazy; plné texty jen s licencí CC),
 - příspěvky politiků na sítích a přepisy videí,
 - weby krajských a místních sdružení,
 - brand a šablony,
@@ -91,7 +92,7 @@ jsou v [docs/ukazky](docs/ukazky/README.md).
 | `get_government_record` | Piráti ve vládě Petra Fialy 2021–2024: tiskové zprávy resortů (MMR, MZV, digitalizace, DIA, legislativa) a usnesení vlády předložená Bartošem, Lipavským a Šalomounem |
 | `get_resolutions` | usnesení Zastupitelstva a Rady hl. m. Prahy (předkladatel, hlasování Pirátů, odkaz do archivu usnesení) |
 | `get_party_finances` | financování strany: příjmy, státní příspěvky, dary, kampaně, rozpočet a transparentní účty po letech (dárci FO jen souhrnně) |
-| `pruvodce_zadosti`, `lhuty_zadosti` | žádost podle zákona 106 a dotaz zastupitele krok za krokem: šablony, lhůty do kalendáře (Google, Microsoft 365, ICS), stížnost a odvolání |
+| `pruvodce_zadosti`, `lhuty_zadosti` | žádost podle zákona 106 a dotaz zastupitele krok za krokem: šablony, lhůty do kalendáře (Google, Microsoft 365, ICS), stížnost a odvolání, odkazy na externí příručky Frank Bold |
 | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec s kontaktem |
 | `profil_politika` | přehled o člověku z celé báze: funkce, kontakt, zvolení, období v PSP/Senátu/EP/vládě, výbory a komise Sněmovny, hlasování, návrhy zákonů, pozměňovací návrhy, interpelace, vystoupení, činnost v EP (projevy, otázky, zprávy, výbory), sítě, média; u každé sekce zdroj a tool pro detail |
 | `profil_obce` | pirátský pohled na obec nebo kraj: místní a krajské sdružení, weby a aktuality, zvolení Piráti, výsledky voleb, poslanci a senátoři z kraje, média; instrukce pro doplnění z Hlídače státu |
@@ -144,14 +145,14 @@ nahlásí.
 - **Telemetrie a statistika používání:** anonymní, bez textu dotazů, IP adres a identity;
   volitelně trvale v Postgresu (počty volání toolů a připojení konektoru), aby šlo po
   měsících vyhodnotit, jestli server dává smysl. Viz [docs/statistika.md](docs/statistika.md).
-- **Evals:** 107 testovacích otázek běží v CI při každém pull requestu.
+- **Evals:** 110 testovacích otázek běží v CI při každém pull requestu.
 - **Skills pro Claude** ve složce [`skills/`](skills/README.md): tisková zpráva, brief a
   sociální sítě, včetně toho, kdy přibrat MCP Hlídače státu.
 
 ## Zdroje dat
 
 Všechna data jsou z veřejných zdrojů a vytěžují se automaticky do [`data/`](data/README.md).
-Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky, pozměňovací návrhy, předpisy, činnost v EP, volby, financování, vláda a Praha k 7. 10. 2026).
+Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky, pozměňovací návrhy, předpisy, činnost v EP, volby, financování, vláda a Praha k 7. 10. 2026, publikace Frank Bold k 8. 10. 2026).
 
 | Zdroj | Obsah | Počet | Obnova |
 |---|---|---|---|
@@ -192,6 +193,7 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky
 | [styleguide.pirati.cz](https://styleguide.pirati.cz) | barvy a písma | 42 + 11 | týdně |
 | [Flickr](https://www.flickr.com/people/pirati) | fotoalba strany (odkazy) | 125 alb | týdně |
 | dokumenty | Pirátská hospodářská strategie (PDF) | 1 | ručně |
+| [frankbold.org](https://frankbold.org/o-nas/publikace) | publikace Frank Bold (dříve Ekologický právní servis): příručky pro občany a zastupitele, analýzy, sborníky, případové studie; karta s rokem, licencí a varováním před zastaralou právní úpravou, plný doslovný text jen u licence Creative Commons (externí zdroj, ne stanovisko strany) | 96 publikací (93 jen karta, 3 s plným textem v 38 kapitolách) | měsíčně (jen nové) |
 | média | články o Pirátech a jejich politicích (Google News, RSS) | 2 303 | denně |
 | systémy strany | audit systémů (Zulip, Redmine, fórum, Nalodění, mrak…) a rozcestník „kam s problémem“ | 122 aktivních | týdně |
 

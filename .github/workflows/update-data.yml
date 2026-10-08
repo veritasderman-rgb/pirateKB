@@ -53,6 +53,11 @@ jobs:
       - name: Instalace závislostí
         run: pip install -r ingest/requirements.txt -r server/requirements.txt
 
+      # pdftotext pro měsíční běh frankbold.py (nové PDF publikace); bez něj jen kontrola katalogu.
+      - name: poppler-utils (pdftotext)
+        continue-on-error: true
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
       # Volitelné: headless Chromium pro X/Twitter bez API tokenu (socialni_site.py).
       # Když selže, X se přeskočí a běh pokračuje.
       - name: Playwright a Chromium (volitelné)

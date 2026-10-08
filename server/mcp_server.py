@@ -54,7 +54,7 @@ DOC_TYPES = ["tiskova-zprava", "aktualita", "stanovisko", "program", "programovy
              "materialy", "prispevek-socialni-site", "schuzka", "navod", "system",
              "clanek-media", "prepis-videa", "projev", "slovnik", "sablona", "vysledek", "material",
              "tisk", "interpelace", "volby", "financni-zprava", "usneseni", "dotaz-ep", "zprava-ep",
-             "pozmenovaci-navrh", "organy-psp"]
+             "pozmenovaci-navrh", "organy-psp", "prirucka"]
 SOCIAL_PLATFORMS = ["x", "bluesky"]
 # šablony výstupů: texty v server/prompts/<typ>.md, typy z TEMPLATE_CONTENT v content/sablony/<typ>.md
 TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev", "video-106", "grafika-106",
@@ -106,6 +106,10 @@ AUTORITA_POPIS = {
                               "sám zveřejnil = oficiální rozhodnutí v jeho působnosti (nejvyšší autorita "
                               "spolu s programem)",
     "oficialni-rejstrik-mv": "údaj z rejstříku politických stran Ministerstva vnitra (úřední evidence)",
+    "externi-prirucka": "odborná příručka nebo publikace externí neziskové organizace (Frank Bold); NENÍ "
+                        "stanovisko strany. Právní stav k roku vydání (pole stav_pravni_upravy / rok) – před "
+                        "radou vždy ověř aktuální znění zákona (zakonyprolidi.cz, e-Sbírka); text_ulozen: false "
+                        "= v bázi je jen karta, plný text na odkazu",
 }
 AUTORITA_PODLE_TYPU = {
     "program": "program", "programovy-dokument": "program", "stanovisko": "stanovisko",
@@ -116,6 +120,7 @@ AUTORITA_PODLE_TYPU = {
     "tisk": "oficialni-data-psp", "interpelace": "oficialni-data-psp", "volby": "oficialni-data-csu",
     "financni-zprava": "oficialni-udhpsh", "dotaz-ep": "oficialni-data-ep", "zprava-ep": "oficialni-data-ep",
     "pozmenovaci-navrh": "oficialni-data-psp", "organy-psp": "oficialni-data-psp",
+    "prirucka": "externi-prirucka",
 }
 
 SERVER_INSTRUCTIONS = """Znalostní báze České pirátské strany (lidé, organizace, program,
@@ -126,12 +131,12 @@ europoslanců (2019–dnes), návrhy zákonů, pozměňovací návrhy, interpela
 pirátských poslanců, působení Pirátů ve vládě Petra Fialy (2021–2024), usnesení Zastupitelstva
 a Rady hl. m. Prahy, výsledky voleb a zvolení Piráti (ČSÚ), financování strany (ÚDH,
 transparentní účty), příspěvky poslanců na X a Bluesky, přepisy videí z YouTube, weby
-krajských a místních sdružení, brand, šablony).
+krajských a místních sdružení, brand, šablony; externí příručky a publikace Frank Bold).
 Většina dat je automaticky vytěžená z veřejných zdrojů (pirati.cz a weby sdružení,
 lide.pirati.cz, rv.pirati.cz, rp.pirati.cz, mv.gov.cz (rejstřík stran), sbirka.pirati.cz,
 psp.cz, senat.cz, howtheyvote.eu, data.europarl.europa.eu, vlada.gov.cz a weby resortů,
 opendata.praha.eu, usneseni.praha.eu, volby.gov.cz, udh.gov.cz, ib.fio.cz,
-styleguide.pirati.cz, X, Bluesky, YouTube) a není kurátorovaná; dokumenty s autoritou
+styleguide.pirati.cz, X, Bluesky, YouTube, frankbold.org) a není kurátorovaná; dokumenty s autoritou
 „kurator-schvaleno“ schválil kurátor báze, „kurator-navrh“ je zatím jen návrh. Pravidla pro odpovědi:
 1. U každého tvrzení cituj URL ze pole „Zdroj“.
 2. Rozlišuj autoritu: program a usnesení orgánů strany = oficiální postoj strany (v bázi jsou
@@ -141,7 +146,10 @@ styleguide.pirati.cz, X, Bluesky, YouTube) a není kurátorovaná; dokumenty s a
    webu, profil, názor jednotlivce, projev poslance ve Sněmovně nebo europoslance v EP,
    pozměňovací návrh poslance nebo příspěvek na sociální síti ≠ stanovisko strany. TZ
    ministerstva, usnesení vlády nebo usnesení orgánů hl. m. Prahy jsou rozhodnutí a výstupy
-   státu či města, ne stanovisko strany.
+   státu či města, ne stanovisko strany. Externí příručky a publikace Frank Bold (typ
+   `prirucka`, autorita `externi-prirucka`) jsou rada externí NGO, ne stanovisko strany; právní
+   stav k roku vydání, ověř aktuální znění; u většiny je v bázi jen karta s odkazem na PDF
+   (text_ulozen: false) – obsah publikace z karty necituj.
 3. Nikdy nevymýšlej stanoviska. Pokud báze nic nemá, řekni to a navrhni, u koho to ověřit.
 4. Začni toolem search_kb nebo get_position; pro lidi find_people, pro brand get_brand,
    pro šablony get_template, pro vyjádření poslanců na sítích get_social_posts, pro to,
@@ -316,6 +324,8 @@ def _fmt_result(i: int, r: dict, snippet_len: int = 400) -> str:
                      + (_s(r.get("aktualni_zneni_url")) or "https://wiki.pirati.cz/rules/"))
     elif r.get("platnost") == "aktualni":
         lines.append("   Platnost: aktuální znění nebo citace" + (f" (ověřeno k {_s(r.get('verze'))})" if r.get("verze") else ""))
+    if r.get("typ") == "prirucka":
+        lines.extend("   " + x for x in _prirucka_upozorneni(r))
     if not _blank(r.get("nadpis")):
         lines.append(f"   Sekce: {_clean(r.get('nadpis'))}")
     if not _blank(r.get("snippet")):
@@ -324,26 +334,55 @@ def _fmt_result(i: int, r: dict, snippet_len: int = 400) -> str:
     return "\n".join(lines)
 
 
+_META_PODLE_TYPU = {
+    "predpis": ("platnost", "verze", "aktualni_zneni_url"),
+    "prirucka": ("rok", "stav_pravni_upravy", "varovani", "text_ulozen", "puvodni_url", "vydavatel"),
+}
+
+
 def _anotuj_predpisy(kb: Any, results: list[dict]) -> list[dict]:
     """Doplní k výsledkům typu ``predpis`` pole ``platnost``, ``verze`` a ``aktualni_zneni_url``
-    z ``documents.meta`` (výsledek ``kb.search`` meta nemá), aby se historické znění předpisu
-    nevydávalo za platné. Starší KB bez ``_rows`` výsledky vrátí beze změny."""
-    ids = list(dict.fromkeys(_s(r.get("doc_id")) for r in results if r.get("typ") == "predpis" and r.get("doc_id")))
+    (aby se historické znění předpisu nevydávalo za platné) a k výsledkům typu ``prirucka`` rok,
+    varování a ``text_ulozen`` (aby se karta publikace nevydávala za její text) z ``documents.meta``
+    (výsledek ``kb.search`` meta nemá). Starší KB bez ``_rows`` výsledky vrátí beze změny."""
+    ids = list(dict.fromkeys(_s(r.get("doc_id")) for r in results
+                             if r.get("typ") in _META_PODLE_TYPU and r.get("doc_id")))
     if not ids or not hasattr(kb, "_rows"):
         return results
     try:
         rows = kb._rows(f"SELECT id, meta FROM documents WHERE id IN ({','.join('?' * len(ids))})", ids)
         metas = {r["id"]: json.loads(r["meta"] or "{}") for r in rows}
     except Exception as exc:  # noqa: BLE001
-        log.warning("meta předpisů se nepodařilo načíst: %s", exc)
+        log.warning("meta předpisů a příruček se nepodařilo načíst: %s", exc)
         return results
     for r in results:
         m = metas.get(_s(r.get("doc_id")))
         if m:
-            for k in ("platnost", "verze", "aktualni_zneni_url"):
-                if m.get(k):
+            for k in _META_PODLE_TYPU.get(_s(r.get("typ")), ()):
+                if m.get(k) is not None and m.get(k) != "":
                     r[k] = m[k]
     return results
+
+
+def _prirucka_upozorneni(m: dict) -> list[str]:
+    """Řádky upozornění k externí příručce (typ ``prirucka``): rok a právní stav, první varování
+    před zastaralou právní úpravou a u karty bez textu výslovně, že obsah publikace v bázi není."""
+    out = []
+    rok = m.get("stav_pravni_upravy") or m.get("rok")
+    out.append(f"Externí publikace ({_clean(m.get('vydavatel')) or 'Frank Bold'}), ne stanovisko strany; "
+               + (f"právní stav k roku {rok}" if rok else "rok vydání neuveden")
+               + " – ověř aktuální znění předpisů.")
+    varovani = m.get("varovani") or []
+    if isinstance(varovani, str):
+        varovani = [varovani]
+    if varovani:
+        out.append(f"POZOR, zastaralá právní úprava: {_clean(varovani[0])}"
+                   + (f" (+ {len(varovani) - 1} další varování v kartě)" if len(varovani) > 1 else ""))
+    if m.get("text_ulozen") is False:
+        url = _s(m.get("puvodni_url")) or _s(m.get("zdroj"))
+        out.append("JEN KARTA: plný text publikace v bázi NENÍ (bez licence k šíření) – obsah z ní necituj "
+                   f"ani nedomýšlej; celé znění na {url or 'odkazu ve zdroji'}.")
+    return out
 
 
 def _fmt_results(results: list[dict], snippet_len: int = 400) -> str:
@@ -713,13 +752,14 @@ def search_kb(query: str, typ: list[str] | None = None, od: str | None = None,
     dokumentů (tiskova-zprava, aktualita, stanovisko, program, programovy-dokument,
     predpis, rozcestnik, osoba, organizacni-jednotka, brand, hlasovani, materialy, projev,
     tisk, interpelace, volby, financni-zprava, usneseni, pozmenovaci-navrh, organy-psp,
-    dotaz-ep, zprava-ep, navod, sablona; usneseni = usnesení republikového výboru strany,
+    dotaz-ep, zprava-ep, navod, sablona, prirucka; usneseni = usnesení republikového výboru strany,
     usnesení vlády předložená pirátskými ministry a usnesení Zastupitelstva a Rady hl. m. Prahy
     (rozliší je autorita); predpis = vnitřní předpisy strany, většinou historická znění do 2017
     (pole platnost); pozmenovaci-navrh = pozměňovací návrh pirátského poslance; organy-psp =
     Piráti ve výborech a komisích PS; projev = vystoupení ve Sněmovně i v plénu EP; dotaz-ep =
     otázka europoslance Komisi/Radě s odpovědí; zprava-ep = zpráva nebo stanovisko EP
-    s pirátským zpravodajem / stínovým zpravodajem);
+    s pirátským zpravodajem / stínovým zpravodajem; prirucka = externí příručka nebo publikace
+    Frank Bold, většinou jen karta s odkazem na PDF);
     od/do = rozmezí data YYYY-MM-DD; limit = počet výsledků (výchozí 10, max 50).
     Použij jako první krok, když nevíš, kde informace je."""
     q = _nonempty(query)
@@ -773,6 +813,10 @@ def get_document(doc_id: str, strana: int = 1) -> str:
         if not _blank(extra.get(key)):
             val = extra.get(key)
             meta_lines.append(f"- {key}: {', '.join(map(str, val)) if isinstance(val, list) else val}")
+    if doc.get("typ") == "prirucka":
+        if not _blank(extra.get("licence")):
+            meta_lines.append(f"- Licence: {_clean(extra.get('licence'))}")
+        meta_lines.extend(f"- {x}" for x in _prirucka_upozorneni({**extra, "zdroj": doc.get("zdroj")}))
     meta_lines.append(f"- Zdroj: {_s(doc.get('zdroj')) or 'neuveden'}")
     meta_lines.append(f"- doc_id: `{did}`")
     body = _s(doc.get("body"))
@@ -2748,6 +2792,12 @@ def get_template(typ: str) -> str:
     text = _read_template(typ)
     if text is None:
         return f"Šablona „{typ}“ neexistuje. Dostupné: {', '.join(TEMPLATE_TYPES)}."
+    klic = re.sub(r"[\s_]+", "-", _fold_safe(typ).strip())
+    t_zdroje = {"zadost-106": "106", "dotaz-zastupitele": "zastupitel-obec"}.get(_TEMPLATE_ALIASES.get(klic, klic))
+    if t_zdroje and _dalsi_zdroje(t_zdroje):
+        tail = (f"Další zdroje: `pruvodce_zadosti(faze=\"pripravuji\", typ=\"{t_zdroje}\")`, oddíl Další zdroje "
+                "(externí příručky Frank Bold k tématu; ne stanovisko strany, právní stav k roku vydání).")
+        return _cap_with_tail(text, tail, "Celá šablona je v souboru server/prompts/ nebo content/sablony/.")
     return _cap(text, "Celá šablona je v souboru server/prompts/ nebo content/sablony/.")
 
 
@@ -3192,6 +3242,48 @@ _PRAVIDLA_106 = """Pravidla:
   odbor / koordinátor komunikace."""
 
 
+# Další zdroje k žádostem a dotazům: externí publikace Frank Bold podle témat (data/frankbold/publikace.jsonl,
+# bez indexu). Většina jsou jen karty bez textu (licence) – odkaz vede na PDF.
+_FRANKBOLD_TEMATA = {
+    "106": ["pravo-na-informace"],
+    "zastupitel-obec": ["zastupitel", "obec", "pravo-na-informace"],
+    "zastupitel-mestska-cast": ["zastupitel", "obec", "pravo-na-informace"],
+    "zastupitel-praha": ["zastupitel", "obec", "pravo-na-informace"],
+    "zastupitel-kraj": ["zastupitel", "pravo-na-informace"],
+}
+
+
+def _dalsi_zdroje(t: str, limit: int = 4) -> list[str]:
+    """Oddíl „Další zdroje“: relevantní publikace Frank Bold k typu žádosti (prázdný seznam, když data chybí)."""
+    chci = set(_FRANKBOLD_TEMATA.get(t, []))
+    if not chci:
+        return []
+    path = DATA_DIR / "frankbold" / "publikace.jsonl"
+    try:
+        rows = [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    except (OSError, ValueError):
+        return []
+    vyber = [r for r in rows if r.get("nazev") and r.get("url") and set(r.get("temata") or []) & chci]
+    # pořadí: téma v názvu publikace, příručka před analýzou, počet shodných témat, novější
+    vyber.sort(key=lambda r: (-len(set(r.get("temata_nazev") or []) & chci), r.get("druh") != "prirucka",
+                              -len(set(r.get("temata") or []) & chci), -(r.get("rok") or 0)))
+    if not vyber:
+        return []
+    out = ["", "## Další zdroje (externí, Frank Bold – ne stanovisko strany)",
+           "Starší odborné příručky neziskové organizace; právní stav k roku vydání, paragrafy a lhůty ber z tohoto "
+           "průvodce. Kde je v bázi jen karta, obsah publikace necituj – odkaz vede na PDF."]
+    for r in vyber[:limit]:
+        kde = "v bázi jen karta, plný text na odkazu"
+        if r.get("text_ulozen") and r.get("slug"):
+            kapitoly = sorted((DATA_DIR / "frankbold" / r["slug"]).glob("[0-9][0-9]-*.md"))
+            kapitoly = [k for k in kapitoly if not k.name.startswith("00-")]
+            if kapitoly:
+                kde = f'plný text: `get_document("frankbold/{r["slug"]}/{kapitoly[0].stem}")`'
+        out.append(f'- [{_clean(r["nazev"])}]({r["url"]}) ({r.get("rok") or "rok neuveden"}; {kde})'
+                   + (" – pozor, právní stav k roku vydání, zákon se od té doby změnil" if r.get("varovani") else ""))
+    return out
+
+
 def _typ_zadosti(typ: Any) -> str:
     t = _clean(typ).lower().replace("_", "-").replace(" ", "-") or "106"
     aliasy = {"106/1999": "106", "infz": "106", "inf": "106", "informace": "106", "zadost": "106",
@@ -3482,7 +3574,8 @@ def _pruvodce_pripravuji(t: str, predmet: str, urad: str) -> str:
     else:
         out.append("*(Šablona v content/sablony/ není na serveru k dispozici.)*")
     out += ["", "Po odeslání: `pruvodce_zadosti(faze=\"odeslano\", typ=\"" + t + "\", datum_podani=\"YYYY-MM-DD\", ...)`"
-            " – lhůty do kalendáře a návrh komunikace.", "", _PRAVIDLA_106]
+            " – lhůty do kalendáře a návrh komunikace."]
+    out += _dalsi_zdroje(t) + ["", _PRAVIDLA_106]
     return "\n".join(out)
 
 
@@ -3588,8 +3681,8 @@ def _pruvodce_problem(t: str, predmet: str, urad: str, datum_podani: str, zpusob
             "uloží radě odpovědět.",
             f"3. Podnět ke kontrole: {cfg['kontrola'][0]} – {cfg['kontrola'][1]} ({cfg['kontrola'][2]}). Podnět není "
             "opravný prostředek; MV podle svého stanoviska nemůže věcně posoudit, jak měla být žádost vyřízena.",
-            "4. Souběžně žádost podle zákona č. 106/1999 Sb. (`pruvodce_zadosti(faze=\"pripravuji\", typ=\"106\")`).",
-            "", _PRAVIDLA_106]
+            "4. Souběžně žádost podle zákona č. 106/1999 Sb. (`pruvodce_zadosti(faze=\"pripravuji\", typ=\"106\")`)."]
+        out += _dalsi_zdroje(t) + ["", _PRAVIDLA_106]
         return "\n".join(out)
     if any(k in p for k in ("odmit", "rozhodnut", "odvol")):
         varianta, sablona, pozn = None, "sablony/odvolani-106.md", "Odvolání proti rozhodnutí o odmítnutí (§ 16 InfZ)."
@@ -3646,8 +3739,8 @@ def _pruvodce_problem(t: str, predmet: str, urad: str, datum_podani: str, zpusob
             + "=\"<den, kdy ho úřad obdržel>\")` a zapiš termíny (úřad: 7 dní na předložení stížnosti / 15 dní u "
             "odvolání; nadřízený: 15 dní) do kalendáře uživatele.",
             "Nadřízený orgán: u obce krajský úřad, u kraje v samostatné působnosti Ministerstvo vnitra (§ 178 odst. 2 "
-            "SŘ); když ho nelze určit, ÚOOÚ (§ 20 odst. 5 InfZ).",
-            "", _PRAVIDLA_106]
+            "SŘ); když ho nelze určit, ÚOOÚ (§ 20 odst. 5 InfZ)."]
+    out += _dalsi_zdroje(t) + ["", _PRAVIDLA_106]
     return "\n".join(out)
 
 

@@ -158,6 +158,17 @@ case "$MODE" in
     # starší data bere skript z vlastních výstupů v data/praha (cache se v Actions nedrží).
     run_src praha         praha --aktualni --max-detailu 1500
     run_src dokumenty     dokumenty
+    # Publikace Frank Bold: měsíčně stačí. Plný běh v prvním týdnu měsíce stáhne jen nové publikace
+    # (známé se stejnou URL a velikostí ponechá; robots.txt Crawl-delay 10 s), jinak nic. Bez
+    # pdftotext (poppler-utils) by nová PDF vypadala jako skeny – pak jen kontrola katalogu
+    # (--aktualni: 2 požadavky, nové položky do logu a stav.json; zpracuje je ruční plný běh).
+    if [ "$(date -u +%d)" -le 7 ]; then
+      if command -v pdftotext >/dev/null 2>&1; then
+        run_src frankbold   frankbold
+      else
+        run_src frankbold   frankbold --aktualni
+      fi
+    fi
     run_src systemy       systemy
     ;;
   denni)
