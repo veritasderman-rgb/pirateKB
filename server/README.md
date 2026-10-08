@@ -11,7 +11,7 @@ nekurátorovaná). Architektura je v [`docs/navrh-architektury.md`](../docs/navr
 ## Co server umí
 
 Server při startu otevře SQLite index (`index/kb.sqlite`) postavený z `data/` a
-nabízí AI čtyři druhy věcí (34 toolů, 11 promptů, 7 resources). Tooly volá AI sama
+nabízí AI čtyři druhy věcí (36 toolů, 11 promptů, 7 resources). Tooly volá AI sama
 podle potřeby, prompty si vybírá uživatel (v Claude Desktopu v nabídce „+“), resources
 jsou čtecí odkazy.
 
@@ -29,8 +29,10 @@ jsou čtecí odkazy.
 | tool | `get_government_record` | Piráti ve vládě Petra Fialy 2021–2024: TZ a aktuality resortů pirátských ministrů (MMR, MZV, Úřad vlády – digitalizace a legislativa, DIA) a usnesení vlády, která předložili (čj., předkladatel, výsledek); filtr podle ministra nebo resortu, tématu, data a druhu (`tz`/`usneseni`); TZ resortu ani usnesení vlády nejsou stanovisko strany |
 | tool | `get_resolutions` | usnesení Zastupitelstva hl. m. Prahy (všechna od 11/2018, s hlasováním Pirátů) a Rady hl. m. Prahy (jen předložená pirátským radním); filtr podle orgánu (`zhmp`/`rhmp`), tématu, předkladatele a data; odkaz do archivu usneseni.praha.eu |
 | tool | `get_social_posts` | příspěvky pirátských poslanců na X a Bluesky (podle osoby, tématu, platformy, data); vyjádření jednotlivce, ne stanovisko strany, vždy s URL příspěvku |
-| tool | `get_speeches` | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů psp.cz (období 2017, 2021, 2025; podle poslance, tématu, data): řečník, datum a čas, schůze, bod jednání, úryvek a URL stenozáznamu s kotvou; projev = vyjádření poslance, ne stanovisko strany; `get_position` přidá nejrelevantnější vystoupení jako samostatnou sekci |
+| tool | `get_speeches` | vystoupení pirátských poslanců ve Sněmovně ze stenozáznamů psp.cz (období 2017, 2021, 2025) a pirátských europoslanců v plénu Evropského parlamentu z doslovných záznamů (2019–dnes; parametr `komora` = psp / ep / obě): řečník, datum a čas, schůze nebo plénum EP, bod jednání, úryvek a URL záznamu; u projevů v EP text v jazyce originálu a neautorizovaný český překlad EP; projev = vyjádření poslance, ne stanovisko strany; `get_position` přidá nejrelevantnější vystoupení ze Sněmovny jako samostatnou sekci |
 | tool | `get_bills` | návrhy zákonů předložené Piráty (i vládní návrhy pirátských ministrů): výsledek, Sbírka, závěrečné hlasování, odkaz na psp.cz; filtr podle poslance, tématu, výsledku (`stav`) a období; interpelace přes `search_kb(typ=["interpelace"])` |
+| tool | `get_amendments` | pozměňovací návrhy pirátských poslanců: k jakému tisku, kdy, popis, zda přednesen ve 2. čtení, výsledek ve 3. čtení s odkazem na hlasování; filtr podle poslance, tématu, výsledku (`vysledek`), období a tisku |
+| tool | `get_committees` | členství a funkce pirátských poslanců ve výborech, podvýborech, komisích a delegacích PS (kdo čemu předsedá); filtr podle poslance, orgánu, období, `jen_vedeni`; bez argumentů vedoucí funkce v aktuálním období |
 | tool | `get_election_results` | výsledky Pirátů ve volbách (ČSÚ, Sněmovna, EP, Senát, kraje, obce od 2010): hlasy, %, mandáty, koalice; celostátně, po krajích, v obci |
 | tool | `find_elected` | zvolení Piráti (poslanci, europoslanci, senátoři, krajští a obecní zastupitelé) podle jména, obce, kraje, druhu a roku voleb; výsledek voleb, ne aktuální stav mandátu |
 | tool | `get_party_finances` | financování strany: výroční finanční zprávy ÚDH, kampaně, rozpočty z Piroplácení a měsíční souhrny transparentních účtů; dárci – fyzické osoby jen souhrnně, jmenovitě jen právnické osoby |
@@ -39,14 +41,14 @@ jsou čtecí odkazy.
 | tool | `find_expert` | koho se zeptat: garant, resortní tým nebo poslanec k tématu s veřejným kontaktem (e-mail, telefon jen pokud je na pirati.cz); ostatní tooly ho nabídnou samy, když báze přesnou odpověď nemá |
 | tool | `get_brand` | barvy a písma z grafického manuálu |
 | tool | `get_template` | šablona podle typu: tisková zpráva, post, reels, brief, projev, zadání `video-106` a `grafika-106` (server/prompts/), texty podání `zadost-106`, `stiznost-106`, `odvolani-106`, `dotaz-zastupitele` (kurátorovaná vrstva content/sablony/) |
-| tool | `profil_politika` | přehled o člověku z celé báze: funkce, kontakt, zvolení, období v PSP/Senátu/EP/vládě, hlasování, návrhy zákonů, interpelace, vystoupení, sítě, média; u každé sekce zdroj a tool pro detail |
+| tool | `profil_politika` | přehled o člověku z celé báze: funkce, kontakt, zvolení, období v PSP/Senátu/EP/vládě, výbory a komise Sněmovny, hlasování, návrhy zákonů, pozměňovací návrhy, interpelace, vystoupení, činnost v EP (projevy, otázky, zprávy, výbory), sítě, média; u každé sekce zdroj a tool pro detail |
 | tool | `profil_obce` | pirátský pohled na obec nebo kraj: místní a krajské sdružení, weby a aktuality, zvolení Piráti, výsledky voleb, poslanci a senátoři z kraje, média; instrukce pro doplnění z Hlídače státu |
 | tool | `casova_osa` | téma v čase napříč zdroji (program, návrhy zákonů, hlasování, projevy, TZ, vláda, sítě, média, schůzky): shrnutí, milníky a chronologická osa s autoritou a URL |
 | tool | `novinky` | co v bázi přibylo za období (výchozí 7 dní) po kategoriích s počty, jak hlasovali Piráti, nejvíc sdílené příspěvky; podklad pro newsletter |
 | tool | `jednota_klubu` | nejednotná hlasování Pirátů (PSP/Senát/EP) seřazená podle významu a míra odchylky poslanců od většiny klubu; s metodikou, vnitřní analýza, ne hodnocení |
 | tool | `over_tvrzeni` | ověření tvrzení o Pirátech nebo politikovi: důkazy podle autority (program, TZ, hlasování s hlasem osoby, návrhy zákonů se závěrečným hlasováním, projevy, sítě, média), kontrola jmen, funkcí, čísel a dat; verdikt dělá AI |
 | tool | `zkontroluj_text` | kontrola návrhu TZ, příspěvku, projevu nebo dopisu před zveřejněním: citace a funkce mluvčích, opora „Piráti prosazují…“ v programu, čísla bez zdroje, brand a tón, povinné části TZ; nálezy blokující / doporučené |
-| tool | `rozhodnuti_organu` | usnesení a rozhodnutí orgánů strany (RP, RV, CF, KS, MS, fóra) ze zápisů: orgán, datum, doslovný text, výsledek, odkaz; dnes jen zmínky z Evidence kontaktů a schůzek (formální zápisy orgánů v bázi zatím nejsou), ověřit v originále |
+| tool | `rozhodnuti_organu` | usnesení a rozhodnutí orgánů strany: formální usnesení RV z rv.pirati.cz a archivu sbírky (2010–2014, 2020–2023; značka, text, výsledek), zprávy ze zasedání RV 2019–2026; RP a CF jen zmínky (jejich usnesení jsou jen na wiki a fóru), stejně jako zmínky o rozhodnutích krajských a místních orgánů v Evidenci kontaktů a schůzek |
 | tool | `hledat_interni` | jen pro ověřené členy (instance s přihlášením): hledání v neveřejných dokumentech |
 | tool | `navrhnout_do_baze` | jen pro ověřené členy: návrh doplnění z chatu jako GitHub issue s labelem `kb-navrh` ke schválení kurátorem |
 | tool | `kb_stats` | co je v bázi: počty dokumentů podle typu, stáří dat; navíc souhrn anonymní telemetrie od startu serveru a (s `PIRATEKB_STATS_DB`) trvalé statistiky za 30 dní |
@@ -356,6 +358,14 @@ můžete dodat „použij znalostní bázi Pirátů“.
 19. „Připrav profil Olgy Richterové“ (`profil_politika`), „Jak se vyvíjelo téma stavebního zákona?“
     (`casova_osa`), „Co je nového za poslední týden?“ (`novinky`), „Je pravda, že Piráti hlasovali
     pro nový stavební zákon?“ (`over_tvrzeni`), „Zkontroluj mi tuto TZ před odesláním“ (`zkontroluj_text`)
+20. „Které pozměňovací návrhy Olgy Richterové prošly?“ (`get_amendments`, `vysledek="přijat"`);
+    „Kdo z Pirátů předsedá výboru nebo komisi Sněmovny?“ (`get_committees`)
+21. „Co říkala Markéta Gregorová v Evropském parlamentu o Číně?“ (`get_speeches`, `komora="ep"`;
+    cituje originál, český překlad EP je neautorizovaný); „Na co se ptal Mikuláš Peksa Evropské
+    komise?“ (`search_kb(typ=["dotaz-ep"])`)
+22. „Co rozhodl republikový výbor o pracovních skupinách?“ (`rozhodnuti_organu`, `organ="RV"`);
+    „Kdy naposledy strana měnila stanovy?“ (`search_kb(typ=["predpis"])`; historická znění
+    předpisů jsou označená, aktuální znění je na wiki.pirati.cz/rules)
 
 Další nápady: „Kolik poslanců dnes Piráti mají?“, „Které programové dokumenty
 existují?“, „Co všechno v bázi je a jak je stará?“ (tool `kb_stats`).
@@ -479,9 +489,11 @@ slova z argumentů.
 
 - **Pouze plnotextové hledání** (SQLite FTS), bez embeddingů. Hledání podle významu
   nebo synonym nefunguje spolehlivě; pomůže přeformulovat dotaz nebo zkusit klíčová slova.
-- **Wiki a mrak zatím chybí.** wiki.pirati.cz (předpisy, návody) je za ochranou
-  Cloudflare a mrak.pirati.cz vyžaduje přihlášení; skripty pro ně nejsou. Odpovědi
-  o interních postupech proto báze zatím neumí.
+- **Wiki a mrak zatím chybí.** wiki.pirati.cz (aktuální předpisy, usnesení RP, návody) je za
+  ochranou Cloudflare a mrak.pirati.cz vyžaduje přihlášení. Předpisy jsou v bázi jen jako
+  historická znění do 2017 (`platnost: historicke-zneni`, server je označí) a aktuální citace
+  stanov o RV a RP; usnesení RP a CF v bázi nejsou. Odpovědi o interních postupech proto
+  báze zatím neumí.
 - **Data jsou nekurátorovaná.** Vznikla automaticky a nikdo je neprošel; mohou být
   zastaralá, duplicitní nebo mít špatně určený typ. Kurátorovaná vrstva `content/` se indexuje s autoritou
   `kurator-navrh` nebo `kurator-schvaleno` (viz `docs/kurator.md`); zatím je v ní hlavně návrh.

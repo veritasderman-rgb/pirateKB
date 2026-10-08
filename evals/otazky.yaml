@@ -6,7 +6,8 @@
 #   id               jedinečný identifikátor (prefix = kategorie)
 #   kategorie        lide | organy | program | stanoviska | tiskove-zpravy | hlasovani | brand |
 #                    sablony | schuzky | systemy | media | socialni-site | projevy | tisky |
-#                    interpelace | volby | financovani | prehledy | overeni | vlada | usneseni
+#                    interpelace | volby | financovani | prehledy | overeni | vlada | usneseni |
+#                    predpisy | pozmenovaky | vybory | europarlament
 #   otazka           jak by se zeptal člověk (pro čtenáře a reporty)
 #   tool, argumenty  který tool MCP serveru má AI zavolat a s čím
 #   ocekavane        aspoň jeden z řetězců musí být ve výstupu (bez ohledu na diakritiku a velikost)
@@ -832,3 +833,98 @@ otazky:
     ocekavane: ["1/83"]
     nesmi_obsahovat: [Žádné usnesení neodpovídá]
     zdroj_musi_byt: usneseni.praha.eu
+
+  # ------------------------------------------------------------------ předpisy a usnesení orgánů strany
+  - id: predpisy-01
+    kategorie: predpisy
+    otazka: Kdy naposledy strana změnila stanovy?
+    tool: search_kb
+    argumenty: {query: poslední změna stanov registrovaná ministerstvem vnitra, typ: [predpis], limit: 5}
+    ocekavane: [2. 2. 2026]
+    zdroj_musi_byt: mv.gov.cz
+
+  - id: predpisy-02
+    kategorie: predpisy
+    otazka: Z koho se podle stanov skládá republikové předsednictvo?
+    tool: search_kb
+    argumenty: {query: republikové předsednictvo sestává z předsedy, typ: [predpis], limit: 5}
+    ocekavane: [čtyř místopředsedů]
+    zdroj_musi_byt: [rv.pirati.cz, rp.pirati.cz]
+
+  - id: usneseni-strana-01
+    kategorie: usneseni
+    otazka: Jak republikový výbor upravil pracovní skupiny RV?
+    tool: rozhodnuti_organu
+    argumenty: {organ: RV, query: pracovní skupiny}
+    ocekavane: [12/2023]
+    nesmi_obsahovat: [nenašel žádné rozpoznatelné usnesení]
+    zdroj_musi_byt: rv.pirati.cz
+
+  - id: usneseni-strana-02
+    kategorie: usneseni
+    otazka: Kdo se stal jednateli republikového výboru v roce 2023?
+    tool: rozhodnuti_organu
+    argumenty: {organ: RV, query: los jednatelů, od: "2023", do: "2023"}
+    ocekavane: [10/2023]
+    zdroj_musi_byt: rv.pirati.cz
+
+  # ------------------------------------------------------------------ pozměňovací návrhy a výbory PS
+  - id: pozmenovaky-01
+    kategorie: pozmenovaky
+    otazka: Prosadil Jakub Michálek nějaký pozměňovací návrh ke střetu zájmů?
+    tool: get_amendments
+    argumenty: {poslanec: Michálek, query: střet zájmů, vysledek: přijat}
+    ocekavane: [SD 1691 k tisku 312, přijat, "https://www.psp.cz/sqw/hlasy.sqw?g=80997"]
+    nesmi_obsahovat: [v bázi nepodal, Žádný pozměňovací návrh neodpovídá]
+    zdroj_musi_byt: psp.cz
+
+  - id: pozmenovaky-02
+    kategorie: pozmenovaky
+    otazka: Jaké pozměňovací návrhy k rodičovskému příspěvku podali Piráti po volbách 2025 a jak dopadly?
+    tool: get_amendments
+    argumenty: {query: rodičovský příspěvek, obdobi: "2025", limit: 5}
+    ocekavane: [SD 1386 k tisku 198, nepřijat, Olga Richterová]
+    zdroj_musi_byt: psp.cz
+
+  - id: vybory-01
+    kategorie: vybory
+    otazka: Kdo z Pirátů předsedal výboru pro životní prostředí v letech 2017–2021?
+    tool: get_committees
+    argumenty: {organ: životní prostředí, jen_vedeni: true, obdobi: "2017"}
+    ocekavane: [Dana Balcarová – Předseda – Výbor pro životní prostředí]
+    nesmi_obsahovat: [nenašel]
+    zdroj_musi_byt: psp.cz
+
+  - id: vybory-02
+    kategorie: vybory
+    otazka: Jakou funkci měl Jakub Michálek ve výborech Sněmovny v období 2021–2025?
+    tool: get_committees
+    argumenty: {poslanec: Michálka, obdobi: "2021"}
+    ocekavane: [Místopředseda – Ústavně-právní výbor]
+    zdroj_musi_byt: psp.cz
+
+  # ------------------------------------------------------------------ Evropský parlament (činnost)
+  - id: europarlament-01
+    kategorie: europarlament
+    otazka: Co říkal Mikuláš Peksa v Evropském parlamentu ke střetu zájmů Andreje Babiše?
+    tool: get_speeches
+    argumenty: {poslanec: Peksa, query: střet zájmů Babiš, komora: ep, limit: 5}
+    ocekavane: [Střet zájmů premiéra České republiky]
+    nesmi_obsahovat: [nemá v bázi žádná vystoupení, Žádné vystoupení neodpovídá]
+    zdroj_musi_byt: europarl.europa.eu
+
+  - id: europarlament-02
+    kategorie: europarlament
+    otazka: Ptal se Marcel Kolaja Evropské komise na převzetí televize CME skupinou PPF?
+    tool: search_kb
+    argumenty: {query: převzetí Central European Media Enterprises skupinou PPF, typ: [dotaz-ep], limit: 5}
+    ocekavane: [E-000769/2020]
+    zdroj_musi_byt: europarl.europa.eu
+
+  - id: europarlament-03
+    kategorie: europarlament
+    otazka: Byla Markéta Gregorová zpravodajkou zprávy o liberalizaci obchodu s Moldavskem?
+    tool: search_kb
+    argumenty: {query: liberalizace obchodu moldavské produkty, typ: [zprava-ep], limit: 5}
+    ocekavane: [A9-0219/2023]
+    zdroj_musi_byt: europarl.europa.eu

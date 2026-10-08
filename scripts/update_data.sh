@@ -110,6 +110,18 @@ case "$MODE" in
     # přepočítá z otevřených dat (zipy se cachují 1 den), ústní interpelace období 2025 z webu psp.cz
     # (stránky starší 21 dní z cache); ~2 s s cache, 1–3 min bez cache. Zapisuje i do psp/interpelace.
     run_src tisky         psp/tisky --obdobi 2025
+    # Pozměňovací návrhy a výbory: jen aktuální období (stránky tisků, tisky T/n a stenozáznamy
+    # novějších schůzí se po 6 dnech stáhnou znovu; texty návrhů se cachují natrvalo).
+    run_src pozmenovaky   psp/pozmenovaky --aktualni
+    # Předpisy a usnesení orgánů strany: rv.pirati.cz (nové zprávy ze zasedání přes sitemap),
+    # rejstřík MV (datum změny stanov), pokus o wiki.pirati.cz (dnes výzva Cloudflare → přeskočí).
+    # Git repozitáře archivu (od 2017 beze změn) jen při prvním běhu. Plný běh jednou za měsíc
+    # (první týdenní běh v měsíci), jinak --aktualni.
+    if [ "$(date -u +%d)" -le 7 ]; then
+      run_src predpisy    strana
+    else
+      run_src predpisy    strana --aktualni
+    fi
     run_src lide_pirati   lide
     run_src pirati_web    pirati-web
     run_src flickr        flickr
@@ -139,6 +151,9 @@ case "$MODE" in
       run_src senat       senat --jen-rss
     fi
     run_src ep            ep
+    # Činnost europoslanců (Open Data Portal EP): projevy posledních 60 dní, nové otázky
+    # (prohledaná čísla v data/ep/cinnost/stav.json), nové zprávy/stanoviska, členství.
+    run_src ep_aktivita   ep/projevy --aktualni
     # Praha: aktuální období hlasování ZHMP, seznamy usnesení za 60 dní a nové detaily RHMP;
     # starší data bere skript z vlastních výstupů v data/praha (cache se v Actions nedrží).
     run_src praha         praha --aktualni --max-detailu 1500

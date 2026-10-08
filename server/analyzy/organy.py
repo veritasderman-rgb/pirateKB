@@ -1,8 +1,11 @@
-"""Usnesení a rozhodnutí orgánů strany vytažená ze zápisů (tool ``rozhodnuti_organu``).
+"""Usnesení a rozhodnutí orgánů strany (tool ``rozhodnuti_organu``).
 
-Zdroj: dokumenty typu ``schuzka`` (dnes jen Evidence kontaktů a schůzek z evidence.pirati.cz,
-tj. registr lobbistických schůzek pirátských politiků; formální zápisy z jednání RP, RV,
-CF, KS ani MS v bázi zatím nejsou). Extrakce je záměrně konzervativní:
+Zdroje: (1) formální usnesení a zprávy ze zasedání republikového výboru z ``ingest/predpisy.py``
+(typ ``usneseni``, autorita ``usneseni-organu-strany``; pole z frontmatteru, nic se nevytahuje,
+viz ``nacti_formalni``); (2) dokumenty typu ``schuzka`` (Evidence kontaktů a schůzek
+z evidence.pirati.cz, tj. registr lobbistických schůzek pirátských politiků), ze kterých se
+usnesení a zmínky vytahují regexy. Usnesení RP a CF v bázi nejsou. Extrakce ze zápisů je
+záměrně konzervativní:
 
 * **zápis** (``druh="zapis"``): formální usnesení ve tvaru zápisu z jednání
   („Usnesení: …“, „Usnesení č. 12/2024: …“, „RP schvaluje …“) s volitelným řádkem
@@ -146,12 +149,13 @@ _NOVA_POLOZKA = re.compile(r"(?i:^\W*(?:usneseni|navrh|bod|ad\s*\d|\d+\.\s|hlaso
 # kde hledat oficiální usnesení (pro sekci „Kde ověřit“)
 OFICIALNI = {
     "RP": "web RP https://rp.pirati.cz/ a wiki https://wiki.pirati.cz/rp/start",
-    "RV": "web RV https://rv.pirati.cz/ (usnesení RV)",
+    "RV": ("web RV https://rv.pirati.cz/usneseni/ (usnesení do 2023), zprávy ze zasedání "
+           "https://rv.pirati.cz/aktuality/ a usnesení na fóru"),
     "CF": "https://cf.pirati.cz/ a fórum https://forum.pirati.cz/",
 }
 FORUM = ("fórum https://forum.pirati.cz/ (oficiální jednání a hlasování orgánů CF, RV, KS, MS)")
 PREDPISY = ("působnost orgánů určují stanovy a jednací řády: https://wiki.pirati.cz/rules/ "
-            "a https://sbirka.pirati.cz/")
+            "(aktuální znění); archiv 2010–2017: https://sbirka.pirati.cz/")
 
 AUT_ZAPIS = ("usnesení orgánu strany = oficiální rozhodnutí v působnosti orgánu "
              "(přijetí uvedeno v zápisu)")
@@ -241,7 +245,7 @@ class Usneseni:
     organ_kod: str
     organ_misto: str
     text: str
-    druh: str                         # zapis | zminka
+    druh: str                         # zapis | zminka | formalni | zprava
     vysledek: str                     # prijato | neprijato | neuvedeno
     datum_zapisu: str | None = None
     datum_usneseni: str | None = None
@@ -254,7 +258,8 @@ class Usneseni:
     zdroj: str = ""
     autor: str = ""
     dalsi_zdroje: list[str] = field(default_factory=list)
-    sila: int = 3                     # 3 = výslovné rozhodnutí, 2 = „usnesení X“, 1 = „rozhodnutí X“
+    sila: int = 3                     # 4 = formální usnesení, 3 = výslovné rozhodnutí / zpráva ze zasedání,
+                                      # 2 = „usnesení X“, 1 = „rozhodnutí X“
     dalsi_zminky: int = 0             # další zmínky téhož orgánu v zápisu
 
     @property
@@ -712,8 +717,90 @@ def _kraje(kb: Any) -> dict[str, str]:
     return out
 
 
+def zminky_organu() -> dict[str, set[str]]:
+    """doc_id -> kódy orgánů zmíněných v zápisu (z posledního ``nacti``)."""
+    return _cache.get("zminky") or {}
+
+
+def _dedup(items: list[Usneseni]) -> list[Usneseni]:
+    """Evidence má duplicitní záznamy (stejný text od více autorů): sloučí je."""
+    seen: dict[tuple, Usneseni] = {}
+    out = []
+    for u in sorted(items, key=lambda x: (x.datum_zapisu or "", x.doc_id)):
+        k = (u.organ_kod, _fold(u.organ_misto), _fold(u.text)[:300])
+        if k in seen:
+            if u.zdroj and u.zdroj != seen[k].zdroj and u.zdroj not in seen[k].dalsi_zdroje:
+                seen[k].dalsi_zdroje.append(u.zdroj)
+            continue
+        seen[k] = u
+        out.append(u)
+    return out
+
+
+# >>> usneseni-organu
+AUT_DOKUMENTU = "usneseni-organu-strany"          # documents.autorita z ingest/predpisy.py
+AUT_FORMALNI = ("usnesení orgánu strany ze seznamu přijatých usnesení, který orgán sám zveřejnil "
+                "(rv.pirati.cz, sbírka rozhodnutí) = oficiální rozhodnutí v působnosti orgánu")
+AUT_ZPRAVA = ("zpráva ze zasedání, kterou orgán sám zveřejnil (rv.pirati.cz): shrnutí hlavních "
+              "usnesení, úplné znění a zápis jsou na fóru strany (odkaz u záznamu)")
+DRUH_POPIS = {"zapis": "usnesení v zápisu", "zminka": "zmínka v záznamu ze schůzky",
+              "formalni": "usnesení ze seznamu přijatých usnesení orgánu",
+              "zprava": "zpráva ze zasedání orgánu"}
+ZDROJ_POZNAMKA = (
+    "Zdroj dat: formální usnesení republikového výboru (rv.pirati.cz 2020–2023, archiv sbírky "
+    "2010–2014) a zprávy ze zasedání RV 2019–2026; dále záznamy typu `schuzka` = Evidence kontaktů "
+    "a schůzek (evidence.pirati.cz), kde jsou jen zmínky o rozhodnutích dalších orgánů. Usnesení "
+    "RP a CF v bázi nejsou (zveřejňují se na wiki a fóru strany).")
+_FORMAL_PATICKA = re.compile(r"^\*(?:Přijaté usnesení podle|Záznam ze |Zpráva ze zasedání)[^\n]*\*\s*$", re.M)
+_FORMAL_ODKAZY = re.compile(r"^- (?:Úplný zápis ze zasedání|Seznam přijatých usnesení): \S+\s*$", re.M)
+
+
+def _text_formalni(body: str) -> str:
+    """Text usnesení bez nadpisu, patičky o zdroji a řádků s odkazy na fórum."""
+    t = re.sub(r"\A\s*#\s+[^\n]*\n", "", body or "")
+    t = _FORMAL_ODKAZY.sub("", _FORMAL_PATICKA.sub("", t))
+    return t.strip()
+
+
+def nacti_formalni(kb: Any) -> list[Usneseni]:
+    """Usnesení a zprávy ze zasedání orgánů strany z ingest/predpisy.py (typ usneseni,
+    autorita usneseni-organu-strany): pole z frontmatteru, žádná extrakce z textu."""
+    con = getattr(kb, "con", None)
+    if con is None:
+        return []
+    try:
+        rows = con.execute("SELECT id, nazev, zdroj, datum, meta, body FROM documents "
+                           "WHERE typ = 'usneseni' AND autorita = ?", (AUT_DOKUMENTU,)).fetchall()
+    except Exception:  # noqa: BLE001
+        return []
+    out: list[Usneseni] = []
+    for r in rows:
+        try:
+            meta = json.loads(r[4]) if r[4] else {}
+        except (TypeError, ValueError):
+            meta = {}
+        kod = str(meta.get("organ") or "").upper()
+        if kod not in ORGANY:
+            continue
+        zprava = meta.get("druh") == "zasedani"
+        hl = meta.get("hlasovani") if isinstance(meta.get("hlasovani"), dict) else {}
+        datum = str(meta.get("datum") or r[3] or "")[:10] or None
+        vys = "neuvedeno" if zprava else (meta.get("vysledek") if meta.get("vysledek") in
+                                          ("prijato", "neprijato") else "neuvedeno")
+        dalsi = [u for u in (meta.get("forum_url"), meta.get("usneseni_url"), meta.get("zapis_url"))
+                 if u and u != r[2]]
+        out.append(Usneseni(
+            doc_id=r[0], organ_kod=kod, organ_misto="", text=_zkrat(_text_formalni(r[5])),
+            druh="zprava" if zprava else "formalni", vysledek=vys,
+            datum_zapisu=datum or (str(meta.get("rok")) if meta.get("rok") else None), datum_usneseni=datum,
+            pro=hl.get("pro"), proti=hl.get("proti"), zdrzel=hl.get("zdrzel"),
+            cislo=meta.get("cislo"), nazev=r[1] or "", zdroj=r[2] or "",
+            autor=ORGANY.get(kod, kod), dalsi_zdroje=dalsi, sila=3 if zprava else 4))
+    return out
+
+
 def nacti(kb: Any) -> tuple[list[Usneseni], int, dict[str, str]]:
-    """Všechna usnesení ze všech zápisů v indexu (cache v paměti)."""
+    """Všechna usnesení: formální (nacti_formalni) + vytažená ze zápisů (cache v paměti)."""
     key = _db_key(kb)
     with _cache_lock:
         if _cache["key"] == key:
@@ -739,31 +826,48 @@ def nacti(kb: Any) -> tuple[list[Usneseni], int, dict[str, str]]:
             kody = {m.lastgroup for m in ORGAN_RE.finditer(_fold_keep(f"{r[1] or ''}\n{_popis(r[6] or '')}"))}
             if kody:
                 zminky[r[0]] = kody
-    items = _dedup(items)
+    formalni = nacti_formalni(kb)
+    docs += len({u.doc_id for u in formalni})
+    items = _dedup(items + formalni)
     kraje = _kraje(kb)
     with _cache_lock:
         _cache.update(key=key, items=items, docs=docs, kraje=kraje, zminky=zminky)
     return items, docs, kraje
 
 
-def zminky_organu() -> dict[str, set[str]]:
-    """doc_id -> kódy orgánů zmíněných v zápisu (z posledního ``nacti``)."""
-    return _cache.get("zminky") or {}
+def _autorita(u: Usneseni) -> str:
+    if u.druh == "formalni":
+        return AUT_ZAPIS_NEPRIJATO if u.vysledek == "neprijato" else AUT_FORMALNI
+    if u.druh == "zprava":
+        return AUT_ZPRAVA
+    if u.druh == "zminka":
+        return AUT_ZMINKA
+    return {"prijato": AUT_ZAPIS, "neprijato": AUT_ZAPIS_NEPRIJATO}.get(u.vysledek, AUT_ZAPIS_NEOVERENO)
 
 
-def _dedup(items: list[Usneseni]) -> list[Usneseni]:
-    """Evidence má duplicitní záznamy (stejný text od více autorů): sloučí je."""
-    seen: dict[tuple, Usneseni] = {}
-    out = []
-    for u in sorted(items, key=lambda x: (x.datum_zapisu or "", x.doc_id)):
-        k = (u.organ_kod, _fold(u.organ_misto), _fold(u.text)[:300])
-        if k in seen:
-            if u.zdroj and u.zdroj != seen[k].zdroj and u.zdroj not in seen[k].dalsi_zdroje:
-                seen[k].dalsi_zdroje.append(u.zdroj)
-            continue
-        seen[k] = u
-        out.append(u)
-    return out
+def _fmt_usneseni(i: int, u: Usneseni, kraje: dict[str, str]) -> str:
+    lines = [f"{i}. **{organ_label(u, kraje)}** – {DRUH_POPIS.get(u.druh, u.druh)}"
+             + (f" č. {u.cislo}" if u.cislo else "")]
+    if u.druh in ("formalni", "zprava"):
+        d = u.datum_usneseni or ""
+        lines.append(f"   Datum: {_datum_cz(d)}" if len(d) >= 10 else
+                     f"   Rok: {u.datum or 'neuveden'} (přesné datum seznam usnesení neuvádí)")
+    else:
+        lines.append(f"   Datum schůze/záznamu: {_datum_cz(u.datum_zapisu)}"
+                     + (f"; datum usnesení podle textu: {_datum_cz(u.datum_usneseni)}" if u.datum_usneseni else ""))
+    lines.append(f"   > „{u.text}“")
+    if u.dalsi_zminky:
+        lines.append(f"   (v záznamu je o tomto orgánu ještě {u.dalsi_zminky}× další zmínka – viz zdroj)")
+    lines.append(f"   Výsledek: {_fmt_hlasovani(u)}")
+    lines.append(f"   Autorita: {_autorita(u)}")
+    zdroje = " | ".join([u.zdroj or "neuveden"] + u.dalsi_zdroje)
+    if u.druh in ("formalni", "zprava"):
+        lines.append(f"   Zdroj: {zdroje} | doc_id: `{u.doc_id}`")
+    else:
+        zap = _clean(u.nazev) + (f" (zapsal/a {u.autor})" if u.autor else "")
+        lines.append(f"   Zápis: {zap} – Zdroj: {zdroje} | doc_id: `{u.doc_id}`")
+    return "\n".join(lines)
+# <<< usneseni-organu
 
 
 # ----------------------------------------------------------------------------- dotaz
@@ -798,11 +902,11 @@ def hledej(kb: Any, query: str = "", organ: str = "", od: str = "", do: str = ""
             shoda = sum(1 for prefix, st in qs if prefix in hay or (st and st in hay_st))
             if shoda == 0:
                 continue
-            ranked.append((shoda, score.get(u.doc_id, 0.0), u.datum, u))
-        ranked.sort(key=lambda x: (x[0], x[1], x[2]), reverse=True)
+            ranked.append((shoda, u.sila, score.get(u.doc_id, 0.0), u.datum, u))
+        ranked.sort(key=lambda x: (x[0], x[1], x[2], x[3]), reverse=True)
         uplne = [x for x in ranked if x[0] == len(qs)]
         castecna = bool(ranked) and not uplne
-        vybrane = [x[3] for x in (uplne or ranked)]
+        vybrane = [x[-1] for x in (uplne or ranked)]
     else:
         vybrane = sorted(kand, key=lambda u: u.datum, reverse=True)
     celkem = len(vybrane)
@@ -858,29 +962,6 @@ def _fmt_hlasovani(u: Usneseni) -> str:
     return (", ".join(casti) + " → " if casti else "hlasování v textu neuvedeno → ") + vys
 
 
-def _autorita(u: Usneseni) -> str:
-    if u.druh == "zminka":
-        return AUT_ZMINKA
-    return {"prijato": AUT_ZAPIS, "neprijato": AUT_ZAPIS_NEPRIJATO}.get(u.vysledek, AUT_ZAPIS_NEOVERENO)
-
-
-def _fmt_usneseni(i: int, u: Usneseni, kraje: dict[str, str]) -> str:
-    druh = "usnesení v zápisu" if u.druh == "zapis" else "zmínka v záznamu ze schůzky"
-    lines = [f"{i}. **{organ_label(u, kraje)}** – {druh}"
-             + (f" č. {u.cislo}" if u.cislo else "")]
-    lines.append(f"   Datum schůze/záznamu: {_datum_cz(u.datum_zapisu)}"
-                 + (f"; datum usnesení podle textu: {_datum_cz(u.datum_usneseni)}" if u.datum_usneseni else ""))
-    lines.append(f"   > „{u.text}“")
-    if u.dalsi_zminky:
-        lines.append(f"   (v záznamu je o tomto orgánu ještě {u.dalsi_zminky}× další zmínka – viz zdroj)")
-    lines.append(f"   Výsledek: {_fmt_hlasovani(u)}")
-    lines.append(f"   Autorita: {_autorita(u)}")
-    zap = _clean(u.nazev) + (f" (zapsal/a {u.autor})" if u.autor else "")
-    zdroje = " | ".join([u.zdroj or "neuveden"] + u.dalsi_zdroje)
-    lines.append(f"   Zápis: {zap} – Zdroj: {zdroje} | doc_id: `{u.doc_id}`")
-    return "\n".join(lines)
-
-
 _BOILERPLATE = re.compile(r"Schůzka \d{1,2}\. \d{1,2}\. \d{4}\. Zapsal/a: [^()]*\([^)]*\)\.\s*|"
                           r"##+ (?:Přijaté|Poskytnuté) výhody\s*(?:neuvedeno)?\s*")
 
@@ -917,13 +998,6 @@ def _kde_overit(flt: OrganFiltr | None) -> str:
     return "\n".join(out)
 
 
-ZDROJ_POZNAMKA = (
-    "Zdroj dat: záznamy typu `schuzka` = Evidence kontaktů a schůzek (evidence.pirati.cz), "
-    "registr schůzek pirátských politiků s lobbisty a partnery. Formální zápisy z jednání "
-    "RP, RV, CF ani sdružení v bázi zatím nejsou, takže většina nálezů jsou zmínky "
-    "o rozhodnutích orgánů v těchto záznamech.")
-
-
 def formatuj(res: dict, query: str, organ: str, od: str, do: str, jen_prijata: bool,
              cap=None, limit: int = 15) -> str:
     flt: OrganFiltr | None = res["filtr"]
@@ -954,7 +1028,7 @@ def formatuj(res: dict, query: str, organ: str, od: str, do: str, jen_prijata: b
         parts.append("\n\n".join(_fmt_usneseni(i, u, kraje) for i, u in enumerate(us, 1)))
     else:
         parts.append("## Rozpoznaná usnesení a rozhodnutí (0)\n"
-                     f"V {res['docs']} zápisech v bázi jsem nenašel žádné rozpoznatelné usnesení "
+                     f"V {res['docs']} dokumentech v bázi (usnesení a zápisy) jsem nenašel žádné rozpoznatelné usnesení "
                      "ani rozhodnutí orgánu odpovídající zadání. Neznamená to, že orgán nerozhodl – "
                      "jeho usnesení v bázi nejsou. Odpověz uživateli, že báze usnesení nemá, "
                      "a odkaž na oficiální zdroje níže.")
@@ -1009,7 +1083,8 @@ def register(mcp: Any, s: Any) -> None:
         Pro každé usnesení vrací orgán, datum schůze, doslovný text, výsledek hlasování
         (pro/proti/zdržel, přijato/nepřijato) a URL zápisu. Extrakce je konzervativní;
         zápisy k tématu bez usnesení jsou v samostatné sekci jako pouhá informace.
-        Pozor: v bázi jsou dnes jen záznamy z Evidence kontaktů a schůzek
-        (evidence.pirati.cz), ne formální zápisy RP/RV/CF – nálezy jsou většinou zmínky
-        o rozhodnutích, které je třeba ověřit v originále (web orgánu, fórum)."""
+        V bázi jsou formální usnesení republikového výboru (2010–2014 a 2020–2023, se značkou,
+        textem a výsledkem), zprávy ze zasedání RV 2019–2026 a zmínky o rozhodnutích dalších
+        orgánů v Evidenci kontaktů a schůzek. Usnesení RP a CF v bázi nejsou (jsou jen na wiki
+        a fóru strany)."""
         return rozhodnuti_organu(query, organ, od, do, jen_prijata, limit, s=s)

@@ -1,0 +1,343 @@
+---
+zdroj: https://sbirka.pirati.cz/predpisy/prah/2017-02-01
+nazev: Pravidla hospodaření (historické znění 1. 2. 2017)
+typ: predpis
+datum: '2017-02-01'
+autorita: predpis
+zkratka: prah
+vydal: RV
+vydal_nazev: Republikový výbor
+druh: uplne-zneni
+platnost: historicke-zneni
+platnost_od: '2017-02-01'
+ucinnost_od: '2017-02-01'
+verze: '2017-02-01'
+verze_historie:
+- datum: '2014-06-02'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-06-03'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-06-05'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-06-08'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-06-09'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-06-14'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-06-19'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-07-01'
+  zdroj: https://sbirka.pirati.cz/predpisy/prah/2014-07-01
+- datum: '2014-07-06'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-07-12'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-07-15'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-07-23'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-07-27'
+  zdroj: https://github.com/pirati-cz/rules/commits/master/rv/prah.md
+- datum: '2014-08-02'
+  zdroj: https://sbirka.pirati.cz/predpisy/prah/2014-08-02
+- datum: '2016-09-26'
+  zdroj: https://sbirka.pirati.cz/predpisy/prah/2016-09-26
+- datum: '2017-02-01'
+  zdroj: https://sbirka.pirati.cz/predpisy/prah/2017-02-01
+aktualni_zneni_url: https://wiki.pirati.cz/rules/prah
+stav_ve_sbirce_2017: aktuální
+viditelnost: verejne
+stazeno: '2026-10-07'
+---
+
+# Pravidla hospodaření (historické znění 1. 2. 2017)
+
+> **Historické znění k 1. 2. 2017, ne aktuální.** Text pochází z archivu (sbirka.pirati.cz); předpis se od té doby mohl změnit nebo být zrušen. Aktuální znění: https://wiki.pirati.cz/rules/prah. Pro výklad platných pravidel vždy ověř aktuální znění.
+
+## Pravidla hospodaření
+
+### Obecná ustanovení
+
+#### § 1 Účel předpisu
+
+Pravidla hospodaření stanoví způsob, kterým týmy průhledně, hospodárně a odpovědně používají majetek strany k politické činnosti a činnosti s ní související.
+
+#### § 2 Dobrovolnictví
+
+(1) Organizační složky zajišťují plnění svých úkolů přednostně dobrovolníky. Není-li s členem nebo příznivcem ujednána úplata s písemným potvrzením objednávky, jde o plnění dobrovolnické a bezúplatné.
+
+(2) Pokud to tým uzná za potřebné, může rozhodnout o tom, že svým členům nebo dobrovolníkům uhradí cestovné nebo nabídne drobné občerstvení, pokud jde o řádně svolané zasedání nebo jinou akci týmu. Podmínkou je, že se člen nebo dobrovolník akce v potřebném rozsahu zúčastnil.
+
+#### § 3 Placené úkoly
+
+(1) Nelze-li důležitý úkol v požadované kvalitě zajistit pomocí dobrovolníků, organizační složka na něj vypíše odměnu nebo ho jinak zajistí aspoň částečně dobrovolnicky, případně za jiných výhodnějších podmínek, anebo za obvyklou cenu.
+
+(2) Odměnu úkoly za řádně plněné při výkonu funkce v týmu lze ujednat jen předem, a to v písemné smlouvě o výkonu funkce. Při uzavření smlouvy o výkonu funkce jedná za stranu nadřízený tým, ve kterém je odměňovaný.
+
+#### § 4 Hospodář
+
+(1) **Hospodář** je člověk, který stojí v čele organizační složky, zástupce nebo jiný člen, kterého organizační složka určila hospodářem.
+
+(2) Hospodář v mezích působnosti organizační složky, případně též v mezích jí zvlášť určených,
+
+    a) vykonává jejím jménem oprávnění při správě věcí (§ 9),
+    b) činí objednávky, uzavírá smlouvy a jinak právně jedná ve věci schválených záměrů (§ 11),
+    c) podává žádosti o proplacení z bankovního účtu (§ 14).
+
+(3) Hospodář a ten, kdo se podílí na rozhodování o hospodaření strany, má postupovat hospodárně, s nezbytnou loajalitou, v souladu s vnitřními předpisy i s potřebnými znalostmi a pečlivostí. Pečlivě a s potřebnými znalostmi jedná ten, kdo při rozhodování mohl v dobré víře rozumně předpokládat, že jedná informovaně a v obhajitelném zájmu strany.
+
+#### § 5 Zakázaná právní jednání
+
+Zakazuje se
+
+a) hospodařit s majetkem strany v rozporu s politikou strany,
+b) objednávat občerstvení na večírek a jiné nepřiměřené občerstvení, nemravné služby, alkohol a jiné psychotropní látky, ledaže se cena zaplatí z prostředků na to darovaných dárcem nebo určených celostátním fórem,
+c) slibovat třetí osobě za její protiplnění politický prospěch, kterým není naplňována politika strany,
+d) zastupovat stranu ve vlastní věci nebo jiném případě střetu zájmu strany s osobním zájmem, aniž by byl jednající v dané věci nahrazen,
+e) vynakládat prostředky na zjevně zbytečně nákladné alternativy (např. na taxislužbu nebo leteckou přepravu, pokud pro ně není důvod),
+f) zavazovat stranu k dlouhodobému opakovanému plnění bez možnosti výpovědi nebo takovému plnění, pro které nelze v rozpočtu nebo rozpočtovém výhledu očekávat prostředky,
+g) zřídit k věci v majetku strany zástavní nebo předkupní právo,
+h) zatížit věc v majetku strany věcným břemenem v rozsahu větším, než je nezbytně nutné pro rozumné uspořádání vztahů.
+
+#### § 6 Výběrová řízení
+
+(1) Na zakázku s celkovými náklady nad 50 000 Kč musí tým vypsat veřejné výběrové řízení ve dvou fázích:
+
+ * V **zadávací fázi** zveřejní hospodář týmu zadání, které obsahuje požadavky na nabídky a způsob výběru vítěze takovým způsobem, aby kritériím hodnocení mohli uchazeči přizpůsobit své nabídky. Zpravidla také aspoň tři dodavatele osloví nebo zjistí jejich nabídky. Proti zadání lze podat podnět k nápravě nadřízenému týmu, ledaže výběrové řízení probíhá za standardních podmínek, které nadřízený tým schválil.
+
+ * V **hodnotící fázi** vybere hodnotitel vítěze z nabídek, které obdrží. Nestačí-li hodnocení podle nabídkové ceny, hodnotící komise musí být sestavena nejméně ze tří odborníků způsobem schváleným v zadávací fázi. Rozhodnutí o hodnocení lze přezkoumat na základě stížnosti,[^rr] která nemá odkladný účinek.
+
+(2) Výběrové řízení na zakázku podle odstavce 1 se nevyhlašuje, pokud proběhl výběr jiným předepsaným způsobem nebo to nedává smysl (např. jde o místo obsazené volbou, rozšíření nájmu v jednom objektu apod.). Použití této výjimky podléhá předchozímu souhlasu příslušného schvalujícího týmu a musí být předem oznámeno kontrolní komisi
+
+[^rr]: § 2 rozhodčího řádu.
+
+#### § 7 Nabytí věci
+
+Strana smí nabýt věc, pokud
+
+a) zcizitel věci potřebným způsobem uvedl svou totožnost,[^identifikace]
+b) bezúplatné plnění není zakázáno[^zakazani-darci] a
+c) republikové předsednictvo se záměrem předem souhlasilo a uzavřelo s dárcem písemnou darovací smlouvu s úředně ověřenými podpisy,[^darovaci-smlouvy] pokud má strana bezúplatně nabýt od jednoho dárce v jednom roce majetek nad 50 000 Kč.
+
+[^identifikace]: § 18 odst. 1 písm. d) zákona č. 424/1991 Sb., o sdružování v politických stranách a v politických hnutích, ve znění pozdějších předpisů.
+[^zakazani-darci]: § 19 zákona č. 424/1991 Sb., o sdružování v politických stranách a v politických hnutích, ve znění pozdějších předpisů.
+[^darovaci-smlouvy]: § 18 odst. 3 zákona č. 424/1991 Sb., o sdružování v politických stranách a v politických hnutích, ve znění pozdějších předpisů.
+
+#### § 8 Účel věci
+
+(1) Věc může být závazně určena pro některý účel, případně také k užívání určitým týmem nebo organizační jednotkou strany. Věc s určeným účelem je zakázáno zcizit za jiným účelem, dokud účelové určení trvá.
+
+(2) Účelové určení vzniká, pokud tak stanoví předpis[^ropr] nebo v souladu s ním právní jednání, které stranu zavazuje.[^zavazek] Účel peněz v rozpočtové položce se stanoví podle rozpočtu schváleného v souladu s jiným předpisem.
+
+(3) Pokud pro trvalou překážku nelze věc použít k určenému účelu, rozhodne její správce, že se použije k podobnému účelu, nebo účelové určení zruší a použije ji k plnění svých úkolů. Účel věci může republikový výbor také změnit, nemůže-li strana jinak splnit splatný závazek a přislíbí-li současně, že k původnímu účelu určí náhradní věc, jakmile to bude možné.
+
+[^ropr]: § 3 rozpočtových pravidel.
+[^zavazek]: Účelově určený dar, závěť.
+
+#### § 9 Správa věci
+
+(1) Věc spravuje[^sprava-veci] organizační složka, která ji za stranu obdržela, případně která má plnit úkoly, k nimž je věc určená nebo potřebná. V pochybnostech rozhoduje o správě nejblíže společné předsednictvo.
+
+(2) Jen správce věci je oprávněn ji za stanovených podmínek zcizit nebo po dohodě převést správu na jinou organizační složku. Správce věci spravuje rovněž příslušenství věci.
+
+(3) S věcí správce hospodaří s péčí řádného hospodáře, s přihlédnutím k jejímu účelu, politice strany a společenské odpovědnosti strany. Pokud to není na újmu této péči, lze s věcí hospodařit i jinak.
+
+[^sprava-veci]: § 1400 a násl. občanského zákoníku.
+
+#### § 9a Sdílená služba a její vyúčtování
+
+(1) Správcem sdílené služby je tým, který v oblasti své kompetence
+poskytuje určitou službu ostatním týmům jako sdílenou, pokud to vyplývá z
+předpisu nebo pokud se tak tým rozhodne.
+
+(2) Rozpočtová jednotka, která službu využívá, je povinna uhradit náklady sdílené služby
+na ni připadající. Správce sdílené služby je zmocněn požádat o vnitřní převod z jejího
+rozpočtu k úhradě těchto nákladů nebo o přiměřenou zálohu na ně nebo učinit jejím
+jménem jiný potřebný úkon.
+
+(3) Vnitřní předpis nebo usnesení republikového předsednictva stanoví, kdy je služba
+povinně sdílená. Služba je povinně sdílená vždy, pokud je to hospodárnější. Uživatel
+sdílené služby není povinen konat výběrové řízení.
+
+(4) Pokud není riziko nedobytnosti vnitřní pohledávky na rozpočtové jednotce,
+poznamenají se náklady sdílené služby na příslušný účet sdílených služeb. Jeho
+vyúčtování provede finanční odbor hromadným vnitřním převodem z libovolné
+vhodné rozpočtové položky rozpočtové jednotky užívající službu.
+
+(5) Na sdílené dodávky platí toto ustanovení obdobně
+
+#### § 10 Záměr a jeho celkové náklady
+
+(1) **Záměr** je souhrn závazků v jedné rozpočtové jednotce[^rozpoctova-jednotka], které spolu věcně a časově úzce souvisí (např. koupě nebo prodej věci s příslušenstvím, organizace akce nebo turné, objednávka série plakátů a vylepení, koupě raznice a matrice na odznaky, počítač s monitorem a jeho příslušenství). Za záměr se považuje i opomenutí, které má za následek promlčení dluhu nebo jiné náklady.
+
+(2) **Celkové náklady záměru** jsou vyjádřeny peněžitou hodnotou[^hodnota] nákladů, které lze v rozpočtové jednotce důvodně očekávat v souvislosti se záměrem, a to včetně rezervy na nečekané výdaje. Celkové náklady záměru se posuzují nezávisle na počtu účetních případů, do kterých byl záměr rozdělen. V případě výpůjčky, pronájmu, pachtu či věcného břemena k věci strany zahrnují náklady záměru též tržní odměnu, která je za užívání obvyklá. Náklady záměru trvajícího přes jeden rok, který je na dobu neurčitou či na dobu určitou s možností výpovědi bez dalších podmínek, se vyčíslí podle nákladů na jeden rok.
+
+[^hodnota]: § 492 zákona č. 89/2012 Sb., občanský zákoník.
+[^rozpoctova-jednotka]: § 6 odst. 3 rozpočtových pravidel.
+
+#### § 11 Schvalování záměru
+
+(1) Ještě před objednávkou, uzavřením smlouvy, veřejným vyhlášením výběrového řízení nebo jiným vznikem závazku musí hospodář
+
+    a) odhadnout celkové náklady záměru,
+    b) ověřit v rozpočtu nebo rozpočtovém výhledu dostatek prostředků nutných pro financování záměru (z výdajů spravovaných jím samotným nebo se souhlasem příslušného hospodáře)
+    c) zajistit udělení a vyhlášení souhlasů jiných týmů, pokud jsou potřeba.
+
+(2) Záměr rozpočtové jednotky, jehož celkové náklady mají přesáhnout
+
+    a) prahovou hodnotu 5 000 Kč, je podmíněn souhlasem příslušného předsednictva,
+    b) prahovou hodnotu 50 000 Kč, je podmíněn souhlasem příslušného schvalujícího orgánu.[^schvalujici-organ]
+
+(3) Prahovou hodnotu pro svůj souhlas může příslušný tým usnesením snížit, a to jak pro jednotlivé případy, tak obecně.
+
+(4) Souhlas se záměrem vyslovuje příslušný tým usnesením, které obsahuje dostupné informace o záměru a výši jím odsouhlasených nákladů záměru. Do této výše jsou jím odsouhlasena všechna právní jednání.
+
+(5) Dodatečné rozšíření záměru je podmíněno souhlasem příslušného týmu, jen pokud jím neodsouhlasené náklady na tento záměr přesáhnou prahovou hodnotu pro souhlas.
+
+[^schvalujici-organ]: § 6 odst. 3 rozpočtových pravidel.
+
+#### § 12 Průhlednost hospodaření
+
+Na webu strany se zveřejňují
+
+a) faktury, objednávky a doklady na výdaje,
+b) výroční finanční zprávy,
+c) účetní výkazy podle zákona o účetnictví,
+d) rozpočty a jejich plnění včetně žádostí o proplacení, pokladní knihy (§ 17a)
+e) veškeré písemné smlouvy,
+f) soupis věcí, které spravuje každá organizační složka, s jejich hodnotou a místem výskytu,
+g) seznam transparentních bankovních účtů,
+h) seznam jiných finančních účtů s přehledem transakcí na nich.
+
+#### § 13 Účetní doklady
+
+Hospodář je povinen každý výdaj řádně doložit ve stanovené lhůtě dokladem podle zákona.[^zou] Strana není zavázána uhradit náklady schváleného výdaje, pokud doklad neobdrží ani v dodatečně určené lhůtě.
+
+[^zou]: Zákon č. 563/1991 Sb., o účetnictví, ve znění pozdějších předpisů.
+
+### Hospodaření s penězi
+
+#### § 14 Bankovní účty
+
+(1) Strana hospodaří elektronicky, není-li stanoveno jinak. Jako bankovní účty strana používá pouze transparentní bankovní účty ve správě finančního odboru. Stavy a transakce na bankovních účtech strany zveřejňuje banka na internetové stránce.
+
+(2) Předseda strany zřídí k bankovnímu účtu správcovská oprávnění jen vedoucímu finančního odboru nebo jím pověřeným členům finančního odboru.
+
+(3) Osoba, která má získat jakákoliv přístupová oprávnění k bankovnímu účtu strany, musí před zapsáním tohoto oprávnění u banky podepsat dohodu o hmotné odpovědnosti za neoprávněné převody provedené pod svými uživatelskými údaji a musí být poučena o bezpečnostních pravidlech.
+
+#### § 15 Struktura bankovních účtů
+
+(1) Česká pirátská strana používá v souladu se zákonem[^x] následující bankovní účty:
+
+ * a) Příspěvky ze státního rozpočtu, příjmy z darů a jiných bezúplatných plnění jsou přijímány na jeden společný celostátní účet.
+ * b) Prostředky k plnění vyplývajících z pracovněprávního vztahu ke straně a související výdaje jsou na jednom společném celostátním účtu.
+ * c) Financování volební kampaně za podmínek stanovených volebními zákony je
+spravováno na příslušném účtu celostátní, krajské nebo místní kampaně.
+ * d) Zvláštní účet pro zprostředkování plateb souvisejících s rozhodčím řízením (§
+24 rozhodčího řádu).
+ * e) Ostatní příjmy a výdaje jsou na některém celostátním účtu nebo na
+provozním účtu krajského sdružení.
+
+[^x]: § 17a zákona č. 424/1991 Sb., o politických stranách.
+
+(2) Ukládání přebytku a přiměřené části disponibilního zůstatku na celostátní výhodněji úročený účet a průběžné převádění prostředků formou pravidelných plateb na příslušné účty poskytuje finanční odbor jako povinně sdílenou službu.
+
+(3) Účty se vedou u stejné banky, nerozhodne-li republikové předsednictvo jinak.
+
+(4) Okruh osob spravujících účet, rozsah jejich oprávnění, dispoziční limity a další
+bezpečnostní opatření se volí tak, aby bylo omezeno riziko zneužití.
+
+(5) Přehled bankovních a jiných finančních účtů, odkazů na ně a zůstatků je
+agregován na jedné webové stránce, kterou provozuje technický odbor.
+
+#### § 16 Žádost o proplacení
+(1) Finanční odbor převádí peníze z bankovního účtu na žádost o proplacení podanou jejich hospodářem.
+
+(2) Žádost musí obsahovat informaci o druhu výdaje podle zákonného třídění,[^trideni] jakož i jiné třídění stanovené finančním odborem.
+
+(3) Před vyplácením rozhodnutím o žádosti finanční odbor zkoumá, zda výdaj odpovídá pravidlům hospodaření, zejména
+
+    a) zda byl výdaj schválen hospodářem organizační složky, která odpovídá za výdajovou rozpočtovou položku, ze které má být výdaj proplacen,[^ropr-odpovednost]
+    b) zda je výdaj součástí záměru, který mají odsouhlasit další týmy, případně zda je připojen jejich souhlas,
+    c) zda byla registrována výdajová rozpočtová položka, z níž má být výdaj proplacen, zda je v ní dostatek peněz pro proplacení a zda výdaj odpovídá určení rozpočtové položky,
+    d) zda byl výdaj hodnověrně doložen, pokud je proplácen zpětně,
+    e) zda je na příslušném bankovním účtu dostatek prostředků pro proplacení výdaje.
+
+(4) Finanční odbor zamítne žádost, která je v rozporu s pravidly hospodaření. Jinak finanční odbor žádosti vyhoví a žádost proplatí zpětně nebo dopředu na účet příjemce bez zbytečného odkladu.
+
+(5) Při vnitřních převodech mezi organizačními složkami se postupuje přiměřeně jako u žádosti o proplacení.
+
+[^ropr-odpovednost]: § 8 odst. 1 písm. c) rozpočtových pravidel.
+
+[^trideni]: § 18 odst. 1 písm. c) zákona č. 424/1991 Sb., o politických stranách a politických hnutích, ve znění pozdějších předpisů.
+
+#### § 17 Domněnka komisionáře
+
+(1) Pokud není příjemce uvedený v žádosti o proplacení přímým dodavatelem a není ujednáno jinak, považuje se příjemce za komisionáře, se kterým strana uzavřela bezúplatnou komisionářskou smlouvu podle obsahu žádosti.[^komisionar]
+
+(2) Komisionář je povinen převést nabytý majetek na stranu a přiložit k žádosti o proplacení pokud možno účetní doklady, které mu vystavil přímý dodavatel.
+
+[^komisionar]: § 2455 a násl. zákona č. 89/2012 Sb., občanský zákoník.
+
+#### § 17a Pokladny
+
+(1) Za účelem efektivnějšího proplácení výdajů lze používat pokladny, pokud tak
+rozhodne finanční odbor. Z pokladny lze hradit v hotovosti nejvýše částku
+5000 Kč. Na rozdíl od záloh jsou pokladny ve vlastnictví strany.
+
+(2) Každá pokladna má jednoznačný identifikátor. Pokladna je vždy svázána s
+určitou jmenovitě určenou osobou (pokladníkem), která patří do týmu správce
+rozpočtové položky, ze které jsou výdaje čerpány, a je zároveň členem
+finančního odboru.
+
+(3) Pokladník se musí straně předem písemně zavázat ke hmotné odpovědnosti
+za svěřené peníze a má povinnost svěřené peníze vyúčtovat a výdaje doložit.
+Žádost o proplacení je nahrazena záznamem v pokladní knize.
+
+(4) Podrobnosti o používání pokladen stanoví finanční odbor.
+
+###  Hospodaření s jinými věcmi
+
+#### § 18 Předání hmotných věcí
+
+Kdo pro stranu hodlá nabýt věc, která má hodnotu nad 5 000 Kč a není určena ke spotřebě, zařadí ji do soupisu věcí a odevzdá ji do správy příslušné organizační složce. Věc strana nabývá předáním příslušné organizační složce.
+
+#### § 19 Licence
+
+Členská díla[^zam-dilo] a díla vytvořená dobrovolníkem pro Českou pirátskou stranu jsou dostupná pod veřejnou nevýhradní licenci [CC-BY-SA verze 4](http://creativecommons.org/licenses/by-sa/4.0/). Není-li ujednáno jinak, poskytnutím díla straně dobrovolník uděluje tuto licenci. Strana může užívat nehmotný statek pro své propagační účely, a to i bez jména autora, je-li to při užití obvyklé.
+
+[^zam-dilo]: § 58 odst. 10 zákona č. 121/2000 Sb., autorský zákon, ve znění pozdějších předpisů.
+
+### Závěrečná ustanovení
+
+#### § 20 Obchodní společnost
+
+Strana může založit  obchodní společnost  nebo družstvo nebo se účastnit jako společník nebo člen na již založené obchodní  společnosti  nebo  družstvu  za podmínek stanovených zákonem,[^korporace] pokud republikový výbor vysloví předem souhlas se smlouvou, kterou mají být ujednány vztahy s touto obchodní společností nebo družstvem.
+
+[^korporace]: § 17 odst. 3 zákona č. 424/1991 Sb., o sdružování v politických stranách a v politických hnutích, ve znění pozdějších předpisů.
+
+#### § 21 Hospodaření s vkladem
+
+Pokud strana vloží majetek do koalice, obchodní společnosti nebo družstva nebo jinak sdruží či vyčlení majetek k určitému účelu, musí aspoň co do vkladu strany předem smluvně zajistit hospodaření s péčí řádného hospodáře (§ 4), vyloučit zakázaná jednání (§ 5), zajistit průhlednost hospodaření (§ 12), jakož i možnost kontroly kontrolními orgány strany.
+
+#### § 21a Vymahatelnost práva
+
+Pokud orgán neuhradí peníze, které měl uhradit podle předpisu, usnesení
+příslušného orgánu či vnitřní dohody, převede peníze finanční odbor oprávněnému
+na základě jeho žádosti doložené doklady.
+
+#### § 22 Sankce zastavení peněz
+
+Porušuje-li organizační složka i přes upozornění pravidla hospodaření, finanční odbor jí rozhodnutím zakáže podávat žádosti o proplacení, dokud porušení nenapraví a neuhradí případnou škodu. Nestane-li se tak do dvou měsíců, vyšle finanční odbor do organizační složky svého člena, který smí učinit veškeré kroky nutné k nápravě.
+
+#### § 23 Prováděcí předpisy
+
+Tento předpis provede finanční odbor: Vyhláškou stanoví zejména
+
+a) variabilní symboly pro všechny příchozí platby na účet,
+b) lhůtu pro doložení transakce dokladem,
+c) lhůty pro zpětné proplacení a ohlášku,
+d) výši náhrady za cesty autem.
+e) podrobnosti o používání pokladen,
+f) postupy pro náležité zaškolení správců účtů a pokladníků

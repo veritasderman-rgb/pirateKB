@@ -200,7 +200,7 @@ OSA_LABEL = {
     "predpis": "PŘEDPIS", "tiskova-zprava": "TISKOVÁ ZPRÁVA", "aktualita": "AKTUALITA",
     "prepis-videa": "VIDEO", "tisk": "NÁVRH ZÁKONA", "interpelace": "INTERPELACE",
     "hlasovani": "HLASOVÁNÍ", "projev": "PROJEV", "vlada": "VLÁDA", "social": "PŘÍSPĚVEK",
-    "media": "MÉDIA", "schuzka": "SCHŮZKA",
+    "media": "MÉDIA", "schuzka": "SCHŮZKA", "dotaz-ep": "OTÁZKA EP", "zprava-ep": "ZPRÁVA EP",
 }
 # kategorie souhrnu (klíč položky "kat") -> popis do souhrnu
 OSA_KAT = {
@@ -208,6 +208,7 @@ OSA_KAT = {
     "zakony": "návrhy zákonů (předložení a výsledek)", "hlasovani": "hlasování",
     "projevy": "vystoupení ve Sněmovně", "interpelace": "interpelace", "vlada": "působení ve vládě",
     "social": "příspěvky politiků", "media": "mediální zmínky", "schuzky": "schůzky (evidence)",
+    "europarlament": "otázky a zprávy europoslanců v EP",
 }
 _TYP_PRIORITA = {"program": 0, "programovy-dokument": 0, "stanovisko": 1, "predpis": 1,
                  "tiskova-zprava": 2, "aktualita": 4, "prepis-videa": 5}
@@ -259,12 +260,13 @@ def _item(datum: str, kat: str, label: str, popis: str, autorita: str, url: str,
 
 
 def _osa_dokumenty(kb: Any, tema: str, od: str | None, do: str | None) -> list[dict]:
-    """Program/stanoviska, TZ a aktuality, videa, vláda, interpelace, schůzky."""
+    """Program/stanoviska, TZ a aktuality, videa, vláda, interpelace, otázky a zprávy v EP, schůzky."""
     skupiny = [
         ("program", ["program", "programovy-dokument", "stanovisko", "predpis"], None, 40),
         ("tz", ["tiskova-zprava", "aktualita", "prepis-videa"], None, 150),
         ("vlada", None, ["vlada"], 60),
         ("interpelace", ["interpelace"], None, 40),
+        ("europarlament", ["dotaz-ep", "zprava-ep"], None, 30),
         ("schuzky", ["schuzka"], None, 60),
     ]
     vybrane: dict[str, tuple[str, dict]] = {}
@@ -334,7 +336,7 @@ def _osa_dokumenty(kb: Any, tema: str, od: str | None, do: str | None) -> list[d
         elif kat == "schuzky":
             kdo = ", ".join(m.get("ucastnici_nasi") or []) or _txt(d.get("autor"))
             popis = nazev + (f" (za Piráty: {kdo})" if kdo else "")
-        elif kat == "interpelace" and h.get("snippet"):
+        elif kat in ("interpelace", "europarlament") and h.get("snippet"):
             popis = f"{nazev}: „{_short(h.get('snippet'), 60)}“"
         elif typ == "aktualita" and m.get("web"):
             popis = f"{nazev} ({_txt(m.get('web'))})"
@@ -752,7 +754,7 @@ NOVINKY_KAT = {
     "tz": "Tiskové zprávy, aktuality a videa",
     "program": "Program, stanoviska a předpisy",
     "hlasovani": "Hlasování a jak hlasovali Piráti",
-    "projevy": "Vystoupení ve Sněmovně",
+    "projevy": "Vystoupení ve Sněmovně a v Evropském parlamentu",
     "zakony": "Návrhy zákonů a interpelace",
     "vlada": "Působení ve vládě",
     "media": "Mediální zmínky",
@@ -761,7 +763,7 @@ NOVINKY_KAT = {
     "ostatni": "Další nové dokumenty",
 }
 NOVINKY_KRATCE = {"tz": "TZ a aktuality", "program": "program a stanoviska", "hlasovani": "hlasování",
-                  "projevy": "vystoupení ve Sněmovně", "zakony": "návrhy zákonů a interpelace",
+                  "projevy": "vystoupení ve Sněmovně a v EP", "zakony": "návrhy zákonů a interpelace",
                   "vlada": "vláda", "media": "média", "socialni-site": "příspěvky politiků",
                   "schuzky": "schůzky", "ostatni": "ostatní"}
 _NOVINKY_ALIAS = {
@@ -872,17 +874,20 @@ def _novinky_projevy(kb: Any, od: str, do: str) -> list[dict]:
     skup: dict[tuple, list[dict]] = defaultdict(list)
     for r in rows:
         m = _loads(r.get("meta"), {})
+        komora = m.get("komora") or "psp"     # PSP projevy pole komora nemají; projevy z EP mají "ep"
         for v in m.get("vystoupeni") or []:
             d = _day(v.get("datum"))
             if _in(d, od, do):
-                skup[(_txt(r["autor"]), d)].append({**v, "doc_id": r["id"], "zdroj": r["zdroj"]})
+                skup[(_txt(r["autor"]), d, komora)].append({**v, "doc_id": r["id"], "zdroj": r["zdroj"]})
     out = []
-    for (jmeno, d), vs in skup.items():
+    for (jmeno, d, komora), vs in skup.items():
         vs.sort(key=lambda x: _txt(x.get("cas")))
         body = list(dict.fromkeys(_short(v.get("bod"), 60) for v in vs if _txt(v.get("bod"))))
         znaku = sum(int(v.get("znaku") or 0) for v in vs)
-        text = f"{jmeno} – {len(vs)} vystoupení" + (f" (body: {'; '.join(body[:3])})" if body else "")
-        out.append(_nv(d, text, _txt(vs[0].get("url") or vs[0].get("zdroj")), "vyjadreni-politika", znaku,
+        kde = " v plénu Evropského parlamentu" if komora == "ep" else ""     # výchozí = Sněmovna
+        text = f"{jmeno} – {len(vs)} vystoupení{kde}" + (f" (body: {'; '.join(body[:3])})" if body else "")
+        out.append(_nv(d, text, _txt(vs[0].get("url") or vs[0].get("zdroj")),
+                       "projev-ep" if komora == "ep" else "vyjadreni-politika", znaku,
                        extra=f"doc_id `{vs[0]['doc_id']}`"))
     return out
 

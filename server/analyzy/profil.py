@@ -203,7 +203,7 @@ def _kandidati(s: Any, kb: Any, dotaz: str) -> list[dict]:
     for r in kb._rows("SELECT DISTINCT jmeno FROM vote_members"):
         add(r["jmeno"], "hlasovani")
     for r in kb._rows("SELECT DISTINCT autor FROM documents WHERE typ IN ('projev', 'interpelace') "
-                      "AND autor IS NOT NULL"):
+                      "AND autor IS NOT NULL AND COALESCE(json_extract(meta, '$.komora'), 'psp') = 'psp'"):
         add(r["autor"], "snemovna")
     if _has_table(kb, "social_posts"):
         for r in kb._rows("SELECT DISTINCT jmeno FROM social_posts WHERE jmeno IS NOT NULL"):
@@ -503,7 +503,8 @@ def _sec_vystoupeni(s: Any, kb: Any, jm: str, kompakt: bool = False) -> list[str
         return []
     temata: Counter = Counter()
     url_tematu: dict[str, str] = {}
-    for r in kb._rows("SELECT meta, zdroj FROM documents WHERE typ = 'projev' AND autor = ?", (sm["poslanec"],)):
+    for r in kb._rows("SELECT meta, zdroj FROM documents WHERE typ = 'projev' AND autor = ? "
+                      "AND COALESCE(json_extract(meta, '$.komora'), 'psp') = 'psp'", (sm["poslanec"],)):
         for v in _loads(r.get("meta"), {}).get("vystoupeni") or []:
             t = _bod_tema(v.get("bod") or "")
             if t:
@@ -519,6 +520,139 @@ def _sec_vystoupeni(s: Any, kb: Any, jm: str, kompakt: bool = False) -> list[str
         for t, n in temata.most_common(2 if kompakt else VYSTUPENI_TEMAT):
             out.append(f"- {s._snippet(t, 110)} ({n}×) – {url_tematu.get(t)}")
     out.append(f"Autorita: {VYJADRENI}. Detail: `get_speeches(poslanec=\"{jm}\", query=\"<téma>\")`.")
+    return out
+
+
+def _sec_pozmenovaky(s: Any, kb: Any, jm: str) -> list[str]:
+    """Pozměňovací návrhy poslance (get_amendments): počty podle výsledku, 3 nejnovější přijaté."""
+    fn = getattr(s, "amendments_query", None)
+    if fn is None:
+        return []
+    try:
+        res = fn(kb, poslanec=jm, limit=10_000)
+    except Exception:  # noqa: BLE001
+        return []
+    if res.get("prazdny_index") or not res.get("nalezen") or not res.get("items"):
+        return []
+    if [_f(x) for x in res.get("poslanec") or []] != [_f(jm)]:
+        return []
+    souhrn = ", ".join(f"{s._PN_SOUHRN.get(k, k)} {n}" for k, n in
+                       sorted(res["souhrn"].items(), key=lambda x: -x[1]))
+    prijate, tisky = [], set()      # nejnovější přijaté, každý k jinému tisku
+    for d in res["items"]:
+        k = (d["meta"].get("obdobi"), d["meta"].get("cislo_tisku"))
+        if d["meta"].get("vysledek") in ("prijat", "castecne-prijat") and k not in tisky:
+            tisky.add(k)
+            prijate.append(d)
+    out = ["## Pozměňovací návrhy",
+           f"Písemných pozměňovacích návrhů: {res['celkem']} ({souhrn})."]
+    if prijate:
+        out.append("Nejnovější přijaté (různé tisky):")
+        for d in prijate[:3]:
+            m = d["meta"]
+            out.append(f"- SD {m.get('cislo_sd')} k tisku {m.get('cislo_tisku')} "
+                       f"({s._clean(m.get('nazev_tisku')) or 'tisk'}; {_datum(d.get('datum'))}; "
+                       f"{s.PN_VYSLEDEK.get(m.get('vysledek'), m.get('vysledek'))}) – {d.get('zdroj')}")
+    out.append(f"Autorita: {s.AUTORITA_POPIS['oficialni-data-psp']}; pozměňovací návrh je návrh poslance, "
+               f"ne stanovisko strany. Detail: `get_amendments(poslanec=\"{jm}\")`.")
+    return out
+
+
+def _sec_vybory(s: Any, jm: str, kompakt: bool = False) -> list[str]:
+    """Výbory, komise a podvýbory PS (get_committees): vedoucí funkce + členství v posledním období."""
+    fn = getattr(s, "committees_query", None)
+    if fn is None:
+        return []
+    try:
+        res = fn(poslanec=jm)
+    except Exception:  # noqa: BLE001
+        return []
+    if res.get("chybi_data") or not res.get("nalezen") or not res.get("rows"):
+        return []
+    if [_f(x) for x in res.get("poslanec") or []] != [_f(jm)]:
+        return []
+    rows = res["rows"]
+
+    def org(r: dict) -> str:
+        return r["organ"] + (f" ({r['nadrazeny_organ']})" if r.get("nadrazeny_organ") else "")
+
+    vedeni = [r for r in rows if r["funkce_obecna"] in ("predseda", "mistopredseda")
+              and r["typ_organu"] != "meziparlamentni-skupina"]
+    posledni = max(r["obdobi"] for r in rows)
+    clen = list(dict.fromkeys(org(r) for r in rows if r["obdobi"] == posledni and r not in vedeni
+                              and r["typ_organu"] in ("vybor", "komise", "podvybor")))
+    if not (vedeni or clen):
+        return []
+    out = ["## Výbory a komise Sněmovny"]
+    if vedeni:
+        out.append("Vedoucí funkce:")
+        for r in vedeni[:3 if kompakt else 6]:
+            out.append(f"- {r['funkce'].capitalize()} – {org(r)}, {r.get('od') or '?'} – {r.get('do') or 'dosud'} "
+                       f"(období {s.OBDOBI_LABEL.get(r['obdobi'], r['obdobi'])}) – {r['url']}")
+    if clen:
+        n = 4 if kompakt else 8
+        out.append(f"Členství v období {s.OBDOBI_LABEL.get(posledni, posledni)}: " + "; ".join(clen[:n])
+                   + (" …" if len(clen) > n else "") + ".")
+    out.append(f"Autorita: {s.AUTORITA_POPIS['oficialni-data-psp']}. Detail: `get_committees(poslanec=\"{jm}\")`.")
+    return out
+
+
+def _sec_ep(s: Any, kb: Any, jm: str, kompakt: bool = False) -> list[str]:
+    """Činnost europoslance (ep_aktivita.py): projevy v plénu, otázky, zprávy, výbory a funkce v EP."""
+    jf = _f(jm)
+    sm: dict = {}
+    fn = getattr(kb, "speeches_summary", None)
+    if fn is not None and hasattr(kb, "speech_chamber"):
+        try:
+            sm = fn(jm, komora="ep") or {}
+        except Exception:  # noqa: BLE001
+            sm = {}
+        if sm.get("nalezen") and _f(sm.get("poslanec")) != jf:
+            sm = {}
+    d = Path(s.DATA_DIR) / "ep" / "cinnost"
+    otazky = [r for r in _jsonl(d / "otazky.jsonl") if any(_f(a) == jf for a in r.get("autori_pirati") or [])]
+    zpravy = [r for r in _jsonl(d / "zpravy.jsonl") if any(_f(a) == jf for a in r.get("role_pirati") or {})]
+    clen = [r for r in _jsonl(d / "clenstvi.jsonl") if _f(r.get("jmeno")) == jf]
+    if not (sm.get("nalezen") or otazky or zpravy):
+        return []
+    out = ["## Činnost v Evropském parlamentu"]
+    if sm.get("nalezen"):
+        out.append(f"Projevy v plénu: {sm.get('celkem', 0)} vystoupení ({_datum(sm.get('od'))} – {_datum(sm.get('do'))}); "
+                   f"detail `get_speeches(poslanec=\"{jm}\", komora=\"ep\")`.")
+    if otazky:
+        otazky.sort(key=lambda r: r.get("datum") or "", reverse=True)
+        zodp = sum(1 for r in otazky if r.get("odpoved"))
+        o = otazky[0]
+        out.append(f"Otázky Komisi, Radě a VP/HR: {len(otazky)} (zodpovězeno {zodp}); nejnovější: "
+                   f"{s._snippet(o.get('nazev'), 100)} ({o.get('cislo')}, {_datum(o.get('datum'))}) – {o.get('url')}")
+    if zpravy:
+        role: Counter = Counter()
+        for r in zpravy:
+            for k, v in (r.get("role_pirati") or {}).items():
+                if _f(k) == jf:
+                    role.update(v)
+        zprav = sorted((r for r in zpravy if any("stinov" not in _f(x) for k, v in r["role_pirati"].items()
+                                                if _f(k) == jf for x in v)),
+                       key=lambda r: r.get("datum") or "", reverse=True)
+        out.append("Zprávy a stanoviska: " + ", ".join(f"{k} {n}" for k, n in role.most_common())
+                   + (f"; nejnovější jako zpravodaj/ka: {s._snippet(zprav[0].get('nazev'), 100)} "
+                      f"({zprav[0].get('label')}) – {zprav[0].get('url')}" if zprav else "") + ".")
+    if clen:
+        fce = [r for r in clen if r.get("role") not in ("člen", "členka", "náhradník", "náhradnice",
+                                                         "poslanec EP", "poslankyně EP")]
+        vybory = list(dict.fromkeys(f"{r['organ']}" + (f" ({r['zkratka']})" if r.get("zkratka") else "")
+                                    for r in sorted(clen, key=lambda r: r.get("od") or "", reverse=True)
+                                    if r.get("druh_organu") in ("stálý výbor", "dočasný výbor", "zvláštní výbor",
+                                                                "podvýbor")))
+        n = 3 if kompakt else 6
+        if fce:
+            out.append("Funkce v EP: " + "; ".join(f"{r['role']} – {r['organ']} ({r.get('od') or '?'} – "
+                                                  f"{r.get('do') or 'dosud'})" for r in fce[:n]) + ".")
+        if vybory:
+            out.append("Výbory (nejnovější první): " + "; ".join(vybory[:n]) + (" …" if len(vybory) > n else "") + ".")
+    out.append(f"Zdroj: Open Data Portal EP (data.europarl.europa.eu). Autorita: {s.AUTORITA_POPIS['oficialni-data-ep']}; "
+               f"projevy = {s.AUTORITA_POPIS['projev-ep']}. Otázky: `search_kb(\"{jm}\", typ=[\"dotaz-ep\"])`, "
+               f"zprávy: `search_kb(\"{jm}\", typ=[\"zprava-ep\"])`.")
     return out
 
 
@@ -611,8 +745,10 @@ def politik_profil(s: Any, jmeno: str, _kompakt: bool = False) -> str:
         head.append(f"> {s._snippet(p['medailonek'], 300)}  \n> (medailonek z profilu: {p.get('url') or p.get('profil_web')})")
     sekce = [
         _sec_funkce(s, p), _sec_kontakt(s, p), _sec_volby(s, p, jm), _sec_obdobi(s, kb, p, jm),
-        _sec_hlasovani(s, kb, jm), _sec_tisky(s, kb, jm), _sec_interpelace(s, kb, p, jm),
-        _sec_vystoupeni(s, kb, jm, _kompakt), _sec_site(s, kb, jm), _sec_vlada_dokumenty(s, kb, jm),
+        _sec_vybory(s, jm, _kompakt), _sec_hlasovani(s, kb, jm), _sec_tisky(s, kb, jm),
+        _sec_pozmenovaky(s, kb, jm), _sec_interpelace(s, kb, p, jm),
+        _sec_vystoupeni(s, kb, jm, _kompakt), _sec_ep(s, kb, jm, _kompakt), _sec_site(s, kb, jm),
+        _sec_vlada_dokumenty(s, kb, jm),
         _sec_media(s, kb, jm, _kompakt),
     ]
     body = [x for x in sekce if x]
@@ -1012,8 +1148,11 @@ def register(mcp: Any, s: Any) -> None:
         """Přehled o člověku z celé báze na jednom místě: funkce a jednotky ve straně
         (lide.pirati.cz), oficiální kontakt z veřejného profilu, mandáty a zvolení (volby ČSÚ),
         poslanecké/senátorské/europoslanecké a vládní období, souhrn hlasování podle komor,
-        návrhy zákonů (počty, výsledky, 3 nejvýznamnější), interpelace, vystoupení ve Sněmovně
-        (počet a nejčastější body jednání), aktivita na X/Bluesky, zmínky v médiích za 12 měsíců
+        výbory a komise Sněmovny (vedoucí funkce, členství), návrhy zákonů (počty, výsledky,
+        3 nejvýznamnější), pozměňovací návrhy (počty podle výsledku, nejnovější přijaté),
+        interpelace, vystoupení ve Sněmovně (počet a nejčastější body jednání), činnost
+        v Evropském parlamentu (projevy, otázky, zprávy, výbory a funkce), aktivita na
+        X/Bluesky, zmínky v médiích za 12 měsíců
         a dokumenty z působení ve vládě. Každá sekce má URL zdroje a tool pro detail.
 
         jmeno = celé jméno nebo jen příjmení (diakritika ani pád nevadí: „Hřib“, „Bartoše“).

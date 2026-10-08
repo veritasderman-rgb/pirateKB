@@ -275,6 +275,11 @@ def kb_plny(tmp_path_factory):
          "datum": "2022-01-01", "autor": "Ministerstvo pro místní rozvoj", "ministr": "Ivan Bartoš",
          "resort": "mmr", "viditelnost": "verejne", "autorita": "vlada-resort"},
         "# Bydlení\n\nPodpora bydlení, okrajově rozpočet.")
+    _md(data / "strana/usneseni/rv/2021/004-rozpocet-strany.md",
+        {"zdroj": "https://rv.pirati.cz/usneseni/usneseni-v-roce-2021/", "nazev": "Usnesení RV 4/2021: pravidla",
+         "typ": "usneseni", "viditelnost": "verejne", "datum": "2021-02-01", "autorita": "usneseni-organu-strany",
+         "organ": "RV", "cislo": "4/2021", "autor": "Republikový výbor"},
+        "# Usnesení RV 4/2021\n\nRepublikový výbor schvaluje pravidla hospodaření, okrajově rozpočet strany.")
     db = tmp_path_factory.mktemp("index_plny") / "kb.sqlite"
     build_index(data, db, embeddings_provider=None, content_dir=None)
     kb = KB(db, embeddings_provider=None)
@@ -290,6 +295,14 @@ def test_resolutions_predkladatel_za_hranici_kandidatu(kb_plny):
 def test_government_record_ministr_za_hranici_kandidatu(kb_plny):
     res = mcp_server.government_records(kb_plny, ministr="Bartoš", query="rozpočet")
     assert [r["doc_id"] for r in res["polozky"]] == ["vlada/tz/mmr/2022/rozpocet-mmr"]
+
+
+def test_position_usneseni_strany_za_hranici_kandidatu(kb_plny, monkeypatch):
+    # stovky usnesení Prahy (stejný typ usneseni) nesmí vytlačit usnesení orgánu strany
+    monkeypatch.setitem(mcp_server._state, "kb", kb_plny)
+    out = mcp_server.get_position("rozpočet")
+    assert "strana/usneseni/rv/2021/004-rozpocet-strany" in out
+    assert "V bázi není žádné stanovisko ani usnesení" not in out
 
 
 def test_organy_cache_podle_viditelnosti(kb):
