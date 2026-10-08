@@ -35,6 +35,7 @@ ZDROJE = [
     ("socialni_site", "X a Bluesky poslanců", "social"),
     ("subweby", "subwebů strany", "subweby"),
     ("dokumenty", "dokumenty strany (PDF)", "dokumenty"),
+    ("frankbold", "publikace Frank Bold (frankbold.org; karty, plný text jen s licencí CC)", "frankbold"),
     ("media", "média", "media"),
     ("systemy", "systémy a návody", "systemy"),
 ]

@@ -20,8 +20,11 @@ Uživatel odeslal podání typu „{{typ}}“ ve věci „{{predmet}}“ úřadu
    pro občany důležité, kdy má úřad odpovědět (datum z `lhuty_zadosti`), že výsledek
    zveřejníme. Postup a tón podle `get_template("social-post")`; vizuál podle `get_brand`.
 4. **Grafika a video.** {{grafika}} {{video}}
-5. Připomeň: úřad poskytnuté informace do 15 dnů od poskytnutí sám zveřejní (§ 5 odst. 3
-   zákona č. 106/1999 Sb.) – komunikaci výsledku je dobré mít připravenou předem.
+5. Jen u žádosti podle InfZ (typ 106, nebo zastupitel, který žádal výslovně i podle InfZ):
+   úřad poskytnuté informace do 15 dnů od poskytnutí sám zveřejní (§ 5 odst. 3 zákona
+   č. 106/1999 Sb.) – komunikaci výsledku je dobré mít připravenou předem. Odpověď na dotaz
+   nebo žádost zastupitele jen podle zákona o obcích / krajích / hl. m. Praze úřad
+   nezveřejňuje.
 
 ## Výstup
 

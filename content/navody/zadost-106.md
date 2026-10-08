@@ -97,9 +97,13 @@ jiný údaj o žadateli, úřad vás do 7 dnů vyzve k doplnění (§ 14 odst. 5
   písm. b)) a k úhradě za mimořádně rozsáhlé vyhledání (§ 17 odst. 1).
 - **Zveřejnění.** Úřad poskytnuté informace do 15 dnů zveřejní (§ 5 odst. 3) – počítejte
   s tím při plánování komunikace (viz `pruvodce_zadosti(faze="odpoved")`).
-- **Souběh s právy zastupitele.** Jako zastupitel můžete stejné informace žádat i podle
-  § 82 zákona o obcích (30 dní, bez stížnosti a odvolání). Žádost podle InfZ je pomalejší
-  na přípravu, ale má vymahatelné lhůty a opravné prostředky.
+- **Souběh s právy zastupitele.** Jako zastupitel můžete informace související s výkonem
+  funkce žádat i podle § 82 písm. c) zákona o obcích (30 dní, bezplatně, bez anonymizace
+  u věcí, o kterých rozhoduje zastupitelstvo). Podle NSS (8 Aps 5/2012-47) se na takovou
+  žádost subsidiárně použije procesní úprava InfZ včetně stížnosti a odvolání; žádáte-li
+  výslovně podle obou zákonů, platí podle stanoviska MV č. 1/2016 lhůta 15 dní (výklad).
+  Jen dotazy a podněty podle § 82 písm. b) stížnost ani odvolání nemají. Viz
+  `dotaz-zastupitele`.
 
 ## 4. Lhůty
 

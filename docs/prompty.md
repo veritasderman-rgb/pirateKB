@@ -172,6 +172,10 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 > Jako zastupitel obce chci položit dotaz radě k prodeji obecních bytů. Připrav dotaz
 > podle § 82 zákona o obcích a řekni mi, do kdy musím dostat odpověď.
 
+> Jsem zastupitel městské části Prahy a potřebuju od úřadu kopie smluv na úklid. Připrav
+> žádost o informace podle zákona o hl. m. Praze, spočítej lhůtu a řekni mi, co dělat,
+> když mi je neposkytnou.
+
 Kalendář se vyplní, jen pokud máte v Claude připojený Google Calendar nebo
 Microsoft 365. Jinak AI nabídne soubor ICS k importu.
 

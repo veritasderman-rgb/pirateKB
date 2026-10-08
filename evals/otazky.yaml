@@ -928,3 +928,28 @@ otazky:
     argumenty: {query: liberalizace obchodu moldavské produkty, typ: [zprava-ep], limit: 5}
     ocekavane: [A9-0219/2023]
     zdroj_musi_byt: europarl.europa.eu
+
+  # ------------------------------------------------------------------ externí příručky (Frank Bold)
+  - id: prirucky-01
+    kategorie: prirucky
+    otazka: Má báze příručku Frank Bold o tom, jak uspořádat místní referendum?
+    tool: search_kb
+    argumenty: {query: jak uspořádat místní referendum Frank Bold, typ: [prirucka], limit: 5}
+    ocekavane: [prirucka_referendum__web.pdf]
+    zdroj_musi_byt: frankbold.org
+
+  - id: prirucky-02
+    kategorie: prirucky
+    otazka: Je příručka Frank Bold o povolování staveb ještě aktuální?
+    tool: search_kb
+    argumenty: {query: průvodce povolováním staveb Frank Bold, typ: [prirucka], limit: 5}
+    ocekavane: [283/2021]
+    zdroj_musi_byt: frankbold.org
+
+  - id: prirucky-03
+    kategorie: prirucky
+    otazka: Kde najdu externí návod k právu na informace pro žádost podle 106?
+    tool: pruvodce_zadosti
+    argumenty: {faze: pripravuji, typ: "106"}
+    ocekavane: [pruvodce_pravem_na_informace.pdf]
+    zdroj_musi_byt: frankbold.org

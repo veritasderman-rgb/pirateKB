@@ -1,0 +1,20 @@
+{
+ "datum": "2026-10-08",
+ "katalog": [
+  "https://frankbold.org/o-nas/publikace",
+  "https://frankbold.org/o-nas/publikace/archiv-publikaci"
+ ],
+ "polozek": 96,
+ "s_textem": 3,
+ "jen_karta": 93,
+ "kapitol": 38,
+ "licence": {
+  "by": 1,
+  "by-nc": 2,
+  "copyright": 28,
+  "neuvedena": 64,
+  "vyhrazeno": 1
+ },
+ "chyby": {},
+ "crawl_delay_s": 10.0
+}
