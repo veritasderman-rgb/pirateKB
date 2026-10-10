@@ -1,6 +1,6 @@
 ---
 zdroj: https://www.youtube.com/watch?v=Ad-F6LDF8wU
-nazev: Republika v pohybu | Veronika Kovářová
+nazev: Republika v pohybu | Veronika Kovářová
 typ: prepis-videa
 datum: '2026-03-06'
 autor: Piráti
@@ -9,10 +9,10 @@ delka_s: 921
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-10-09'
+stazeno: '2026-10-10'
 ---
 
-# Republika v pohybu | Veronika Kovářová
+# Republika v pohybu | Veronika Kovářová
 
 Video na kanálu Piráti, zveřejněno 2026-03-06, délka 15:21. <https://www.youtube.com/watch?v=Ad-F6LDF8wU>
 
