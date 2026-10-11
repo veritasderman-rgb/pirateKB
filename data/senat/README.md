@@ -1,7 +1,7 @@
 ---
 zdroj: https://www.senat.cz/senatori/
 nazev: Hlasování pirátských senátorů (Senát PČR)
-stazeno: '2026-10-06'
+stazeno: '2026-10-11'
 viditelnost: verejne
 autorita: oficialni-data-senat
 typ: hlasovani
@@ -9,7 +9,7 @@ typ: hlasovani
 
 # Hlasování pirátských senátorů (Senát PČR)
 
-Staženo 2026-10-06 z oficiálních RSS „Jak jsem hlasoval/a“ na senat.cz (`/senatori/hlasovani_rss.php?pid=<id>`). Senát nevydává otevřená data hlasování jako datové soubory a detail hlasování (`xqw/xervlet/pssenat/hlasy`) je za ochranou proti botům, proto chybí celkové počty hlasů (`pro`, `proti`, `zdrzel`, `nehlasoval` = null).
+Staženo 2026-10-11 z oficiálních RSS „Jak jsem hlasoval/a“ na senat.cz (`/senatori/hlasovani_rss.php?pid=<id>`). Senát nevydává otevřená data hlasování jako datové soubory a detail hlasování (`xqw/xervlet/pssenat/hlasy`) je za ochranou proti botům, proto chybí celkové počty hlasů (`pro`, `proti`, `zdrzel`, `nehlasoval` = null).
 
 Pirátský senátor = politická příslušnost „Piráti“, nebo zvolen/a za Piráty či za koalici vedenou Piráty (první navrhující strana, např. „PirSZKDU“ v roce 2012) a bez jiné stranické příslušnosti (`koalicni_nominace` u mandátu). Kandidáti, které Piráti jen podpořili v koalici vedené jinou stranou (např. STAN+Piráti+TOP, KDU+Pir+…, Zel+ODS+Pir+TOP), se nezahrnují (přepínač `--vcetne-koalicnich`). Hlasy jen z funkčních období pirátského mandátu. Hlasy jsou jen za mandáty v Senátu; klub „SEN 21 a Piráti“ zahrnuje i nepirátské senátory, ty se nesledují.
 
