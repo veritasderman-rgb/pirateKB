@@ -167,8 +167,9 @@ def sestav_report(dotaz: Callable[[str, dict], list[tuple]], od: date, do: date,
     ]
 
     # --- souhrn
-    (volani, fallbacky, chyby, prihlasenych, p50, p95, nastroju) = dotaz(
-        f"SELECT count(*), count(*) FILTER (WHERE fallback), count(*) FILTER (WHERE chyba), "
+    (volani, nenalezeno, sirsi, chyby, prihlasenych, p50, p95, nastroju) = dotaz(
+        f"SELECT count(*), count(*) FILTER (WHERE nenalezeno), count(*) FILTER (WHERE sirsi_rezim), "
+        f"count(*) FILTER (WHERE chyba), "
         f"count(*) FILTER (WHERE prihlaseny), "
         f"percentile_cont(0.5) WITHIN GROUP (ORDER BY trvani_ms), "
         f"percentile_cont(0.95) WITHIN GROUP (ORDER BY trvani_ms), count(DISTINCT tool) "
@@ -189,7 +190,10 @@ def sestav_report(dotaz: Callable[[str, dict], list[tuple]], od: date, do: date,
         f"Dní s provozem: {aktivni} z {(do - od).days + 1}",
         f"Různých klientů za den (odhad z denního pseudonymu): průměr "
         f"{cislo(sum(klienti_dny) / aktivni if aktivni else 0, 1)}, maximum {max(klienti_dny, default=0)}",
-        f"Fallback „nenašel jsem“: {cislo(fallbacky)} ({procento(fallbacky / vol) if vol else '–'})",
+        f"Nenalezeno (vyhledávání bez jediného výsledku): {cislo(nenalezeno)} "
+        f"({procento(nenalezeno / vol) if vol else '–'})",
+        f"Slabá shoda (výsledky jsou, ale bez přesné shody; přidán kontakt na experta, není to "
+        f"neúspěch): {cislo(sirsi)} ({procento(sirsi / vol) if vol else '–'})",
         f"Chyby: {cislo(chyby)} ({procento(chyby / vol) if vol else '–'})",
         f"Volání přihlášených členů: {procento(prihlasenych / vol) if vol else '–'}",
         f"Doba odpovědi: medián {cislo(p50, 1)} ms, 95. percentil {cislo(p95, 1)} ms",
@@ -198,14 +202,30 @@ def sestav_report(dotaz: Callable[[str, dict], list[tuple]], od: date, do: date,
 
     # --- nástroje
     tooly = dotaz(
-        "SELECT tool, count(*), count(*)::numeric / sum(count(*)) OVER (), avg(fallback::int), "
+        "SELECT tool, count(*), count(*)::numeric / sum(count(*)) OVER (), avg(nenalezeno::int), "
+        "avg(sirsi_rezim::int), "
         "count(*) FILTER (WHERE chyba), percentile_cont(0.5) WITHIN GROUP (ORDER BY trvani_ms), "
         "percentile_cont(0.95) WITHIN GROUP (ORDER BY trvani_ms), avg(pocet_vysledku) "
         f"FROM volani WHERE {PROSTREDI} AND {OBDOBI} GROUP BY tool ORDER BY count(*) DESC, tool", p)
     bloky += [("h2", "Volání podle toolů"), ("tabulka",
-              ["tool", "volání", "podíl", "fallback", "chyby", "p50 ms", "p95 ms", "průměr výsledků"],
-              [[t, cislo(n), procento(podil), procento(fb), cislo(ch), cislo(a, 1), cislo(b, 1), cislo(r, 1)]
-               for t, n, podil, fb, ch, a, b, r in tooly])]
+              ["tool", "volání", "podíl", "nenalezeno", "slabá shoda", "chyby", "p50 ms", "p95 ms",
+               "průměr výsledků"],
+              [[t, cislo(n), procento(podil), procento(nf), procento(sr), cislo(ch), cislo(a, 1), cislo(b, 1),
+                cislo(r, 1)]
+               for t, n, podil, nf, sr, ch, a, b, r in tooly])]
+
+    # --- neúspěšné dotazy podle hrubé kategorie (bez textu dotazu)
+    kategorie = dotaz(
+        "SELECT tool, coalesce(nullif(kategorie, ''), '(bez kategorie)'), "
+        "count(*) FILTER (WHERE nenalezeno), count(*) FILTER (WHERE sirsi_rezim) "
+        f"FROM volani WHERE {PROSTREDI} AND {OBDOBI} AND (nenalezeno OR sirsi_rezim) "
+        "GROUP BY 1, 2 ORDER BY 3 DESC, 4 DESC, 1, 2 LIMIT 30", p)
+    bloky += [("h2", "Neúspěšné dotazy podle kategorie"),
+              ("p", "Kategorie je z pevného seznamu (filtr typu dokumentu, komora, druh voleb, územní "
+                    "úroveň, téma); text dotazu se neukládá. Konkrétní otázky jsou v hlášeních "
+                    "report_gap (kb://gaps/posledni)."),
+              ("tabulka", ["tool", "kategorie", "nenalezeno", "slabá shoda"],
+               [[t, k, cislo(nf), cislo(sr)] for t, k, nf, sr in kategorie])]
 
     # --- koncentrace
     if tooly and vol:
@@ -225,19 +245,19 @@ def sestav_report(dotaz: Callable[[str, dict], list[tuple]], od: date, do: date,
     dotaz("SELECT set_config('piratekb.prostredi', %(prostredi)s, true)", p)  # filtr pohledů
     tydny = dotaz(
         "SELECT tyden, volani, pripojeni, volani_na_pripojeni, klient_dny, max_klientu_za_den, "
-        "podil_fallbacku, p95_ms FROM tydenni_souhrn "
+        "podil_nenalezeno, p95_ms FROM tydenni_souhrn "
         "WHERE tyden BETWEEN date_trunc('week', %(od)s::date)::date AND %(do)s ORDER BY tyden", p)
     bloky += [("h2", "Týdenní trend"),
               ("p", "Týden od pondělí; klient-dny = součet denních odhadů různých klientů "
                     "(pseudonym se mění každý den). Krajní týdny mohou být neúplné."),
               ("tabulka", ["týden", "volání", "připojení", "volání/připojení", "klient-dny",
-                           "max klientů/den", "fallback", "p95 ms"],
+                           "max klientů/den", "nenalezeno", "p95 ms"],
                [[den(t), cislo(v), cislo(pr), cislo(vp, 1), cislo(kd), cislo(mk), procento(fb), cislo(p95w, 1)]
                 for t, v, pr, vp, kd, mk, fb, p95w in tydny])]
 
     # --- klienti
     klienti = dotaz(
-        "WITH v AS (SELECT klient, count(*) AS n, avg(fallback::int) AS fb, "
+        "WITH v AS (SELECT klient, count(*) AS n, avg(nenalezeno::int) AS fb, "
         "count(*) FILTER (WHERE prihlaseny) AS pr "
         f"FROM volani WHERE {PROSTREDI} AND {OBDOBI} GROUP BY klient), "
         "c AS (SELECT rodina AS klient, count(*) AS n FROM pripojeni "
@@ -245,7 +265,7 @@ def sestav_report(dotaz: Callable[[str, dict], list[tuple]], od: date, do: date,
         "SELECT klient, coalesce(v.n, 0), coalesce(c.n, 0), v.fb, coalesce(v.pr, 0) "
         "FROM v FULL JOIN c USING (klient) ORDER BY 2 DESC, 3 DESC, 1", p)
     bloky += [("h2", "Klienti (rodina podle User-Agent)"), ("tabulka",
-              ["klient", "volání", "podíl", "připojení", "volání/připojení", "fallback", "přihlášení"],
+              ["klient", "volání", "podíl", "připojení", "volání/připojení", "nenalezeno", "přihlášení"],
               [[k or "–", cislo(n), procento(int(n) / vol) if vol else "–", cislo(c),
                 cislo(int(n) / int(c), 1) if c else "–", procento(fb), cislo(pr)]
                for k, n, c, fb, pr in klienti])]

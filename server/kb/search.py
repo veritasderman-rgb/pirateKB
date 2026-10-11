@@ -1596,14 +1596,28 @@ class KB:
             except sqlite3.OperationalError:  # starší index bez tabulky
                 out[table] = 0
         if out.get("social_posts"):
-            out["social_posts_by_platforma"] = dict(self.con.execute(
-                "SELECT platforma, COUNT(*) FROM social_posts GROUP BY platforma").fetchall())
+            rows = self.con.execute(
+                "SELECT platforma, COUNT(*), COUNT(DISTINCT ucet), MAX(datum) FROM social_posts "
+                "GROUP BY platforma").fetchall()
+            out["social_posts_by_platforma"] = {p: n for p, n, _u, _d in rows}
+            out["social_posts_detail"] = {p: f"účtů {u}, nejnovější příspěvek {(d or '?')[:10]}"
+                                          for p, _n, u, d in rows}
         out["documents_by_typ"] = dict(self.con.execute(
             "SELECT typ, COUNT(*) FROM documents GROUP BY typ ORDER BY 2 DESC").fetchall())
         out["documents_by_kolekce"] = dict(self.con.execute(
             "SELECT kolekce, COUNT(*) FROM documents GROUP BY kolekce").fetchall())
-        out["votes_by_obdobi"] = dict(self.con.execute(
-            "SELECT obdobi, COUNT(*) FROM votes GROUP BY obdobi").fetchall())
+        # Hlasování po komorách a kalendářních letech (podle data hlasování). `obdobi` je rok
+        # začátku volebního období a sčítal by různé komory dohromady (např. „2024“ = Senát
+        # 2024–2026 + EP 2024–2029), proto se v přehledu nepoužívá.
+        po_komorach: dict[str, dict] = {}
+        for komora, rok, n in self.con.execute(
+                "SELECT komora, substr(datum, 1, 4), COUNT(*) FROM votes "
+                "WHERE datum IS NOT NULL GROUP BY 1, 2 ORDER BY 1, 2").fetchall():
+            po_komorach.setdefault(komora or "?", {"roky": {}})["roky"][rok] = n
+        for komora, od, do, n in self.con.execute(
+                "SELECT komora, MIN(datum), MAX(datum), COUNT(*) FROM votes GROUP BY 1").fetchall():
+            po_komorach.setdefault(komora or "?", {"roky": {}}).update(od=od, do=do, celkem=n)
+        out["votes_by_komora"] = po_komorach
         rng = self.con.execute(
             "SELECT MIN(datum), MAX(datum) FROM documents WHERE datum IS NOT NULL").fetchone()
         out["documents_datum_od"], out["documents_datum_do"] = rng[0], rng[1]

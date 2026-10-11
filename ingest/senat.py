@@ -300,6 +300,117 @@ def merge_senators(path, nalezeni: list[dict]) -> list[dict]:
     return list(by_pid.values())  # pořadí uloženého seznamu, noví na konci (stabilní diff)
 
 
+HLAS_POPIS = {"ano": "pro", "ne": "proti", "zdrzel": "zdržel/a se", "nehlasoval": "nehlasoval/a",
+              "nepritomen": "nepřítomen/a", "omluven": "omluven/a"}
+MESICE = ("leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září",
+          "říjen", "listopad", "prosinec")
+
+
+def _slug(text: str) -> str:
+    import unicodedata
+    t = unicodedata.normalize("NFKD", text.lower())
+    t = "".join(ch for ch in t if not unicodedata.combining(ch))
+    return re.sub(r"[^a-z0-9]+", "-", t).strip("-")
+
+
+def zapis_dokumenty(senatori: list[dict], votes) -> None:
+    """Prohledávatelné dokumenty ze stažených dat (bez dalších požadavků na senat.cz):
+
+    - ``senatori/<jmeno>.md``: profil pirátského senátora (mandáty, obvod, kluby, souhrn hlasů
+      po obdobích, docházka, posledních 30 hlasování),
+    - ``prehledy/<RRRR-MM>.md``: měsíční přehled hlasování pirátských senátorů (bod, tisk,
+      druh hlasování, výsledek, jak hlasovali).
+
+    Dokumenty jsou typu `hlasovani` s autoritou `oficialni-data-senat`; jde o hlasování
+    jednotlivých senátorů, ne o stanovisko strany."""
+    votes = sorted(votes, key=lambda v: (v.get("datum") or "", v.get("cas") or "", v["id"]))
+    keep_s, keep_m = set(), set()
+    for s in senatori:
+        jmeno = s["jmeno"]
+        moje = [v for v in votes if jmeno in v["pirati"]]
+        po_fo: dict[int, Counter] = defaultdict(Counter)
+        for v in moje:
+            po_fo[v["obdobi_cislo"]][v["pirati"][jmeno]] += 1
+        mandaty = "\n".join(
+            f"| {m['obdobi_cislo']}. ({term_start_year(m['obdobi_cislo'])}–{term_start_year(m['obdobi_cislo']) + 2}) "
+            f"| {m['obvod']} | {m.get('zvolen_za') or '?'} ({m.get('rok_volby') or '?'}) | {m.get('prislusnost') or '?'} "
+            f"| {', '.join(m.get('kluby') or []) or '–'} | {m.get('mandat_od') or '?'} – {m.get('mandat_do') or '?'} |"
+            for m in s["mandaty"])
+        souhrn = []
+        for o in sorted(po_fo):
+            c = po_fo[o]
+            celkem = sum(c.values())
+            pritomen = celkem - c.get("nepritomen", 0) - c.get("omluven", 0)
+            souhrn.append(f"| {o}. | {celkem} | {c.get('ano', 0)} | {c.get('ne', 0)} | {c.get('zdrzel', 0)} "
+                          f"| {c.get('nehlasoval', 0)} | {c.get('nepritomen', 0) + c.get('omluven', 0)} "
+                          f"| {100 * pritomen / celkem:.0f} % |" if celkem else "")
+        posledni = [v for v in reversed(moje) if (v.get("druh") or "") != "schválení pořadu"][:30]
+        posl = "\n".join(
+            f"- {v.get('datum')}: {v['nazev']}" + (f", senátní tisk {v['tisk']}" if v.get("tisk") else "")
+            + f" – {HLAS_POPIS.get(v['pirati'][jmeno], v['pirati'][jmeno])}; výsledek {v.get('vysledek') or '?'}"
+            + f" ({v.get('url')})" for v in posledni)
+        obvody = sorted({m["obvod"] for m in s["mandaty"]})
+        body = (
+            f"# {s.get('cele_jmeno') or jmeno}: senátor/ka za Piráty\n\n"
+            f"{jmeno} byl/a pirátským senátorem/senátorkou (obvod {', '.join(obvody)}). "
+            f"Vazba na Piráty: {', '.join(s.get('pirat_podle') or []) or '?'}. "
+            f"Profil na senat.cz: {s['url']}; oficiální RSS hlasování: {s['rss_hlasovani']}.\n\n"
+            "## Mandáty po funkčních obdobích Senátu\n\n"
+            "| období | obvod | zvolen/a za | příslušnost | klub | mandát |\n|---|---|---|---|---|---|\n"
+            f"{mandaty}\n\n"
+            "## Hlasování po obdobích\n\n"
+            "| období | hlasování | pro | proti | zdržel/a se | nehlasoval/a | nepřítomen/omluven | účast |\n"
+            "|---|---|---|---|---|---|---|---|\n" + "\n".join(x for x in souhrn if x) + "\n\n"
+            "## Posledních 30 hlasování (bez schvalování pořadu)\n\n" + (posl or "(žádná)") + "\n\n"
+            "Úplný seznam hlasování dá tool `get_voting_record(komora=\"senat\", poslanec=\""
+            f"{jmeno}\")`. Hlasování senátora je jeho rozhodnutí, ne stanovisko strany. Celkové počty "
+            "hlasů v Senátu RSS neobsahuje.\n")
+        name = _slug(jmeno)
+        keep_s.add(f"{name}.md")
+        write_markdown(OUT / "senatori" / f"{name}.md", {
+            "zdroj": s["url"], "nazev": f"{jmeno}: pirátský senátor/ka, mandáty a hlasování v Senátu",
+            "typ": "hlasovani", "viditelnost": "verejne", "stazeno": today(),
+            "datum": (moje[-1].get("datum") if moje else None) or today(),
+            "autorita": "oficialni-data-senat", "osoba": jmeno}, body)
+
+    po_mesicich: dict[str, list] = defaultdict(list)
+    for v in votes:
+        if v.get("datum"):
+            po_mesicich[v["datum"][:7]].append(v)
+    for mesic, vs in po_mesicich.items():
+        rok, m = int(mesic[:4]), int(mesic[5:7])
+        jmena = sorted({j for v in vs for j in v["pirati"]})
+        po_schuzich: dict[tuple, list] = defaultdict(list)
+        for v in vs:
+            po_schuzich[(v["obdobi_cislo"], v["schuze"])].append(v)
+        casti = []
+        for (o, schuze), sv in sorted(po_schuzich.items()):
+            casti.append(f"## {schuze}. schůze Senátu ({o}. funkční období), {sv[0].get('datum')}"
+                         + (f" – {sv[-1].get('datum')}" if sv[-1].get("datum") != sv[0].get("datum") else ""))
+            for v in sv:
+                hlasy = ", ".join(f"{j}: {HLAS_POPIS.get(h, h)}" for j, h in sorted(v["pirati"].items()))
+                casti.append(f"- č. {v['cislo']} ({v.get('datum')}): {v['nazev']}"
+                             + (f", senátní tisk {v['tisk']}" if v.get("tisk") else "")
+                             + f"; výsledek {v.get('vysledek') or '?'}; {hlasy}")
+            casti.append("")
+        nazev = f"Hlasování pirátských senátorů: {MESICE[m - 1]} {rok}"
+        body = (f"# {nazev}\n\n"
+                f"Hlasování v Senátu PČR za {MESICE[m - 1]} {rok}: {len(vs)} hlasování, pirátští "
+                f"senátoři {', '.join(jmena)}. Zdroj: oficiální RSS „Jak jsem hlasoval/a“ na senat.cz; "
+                "celkové počty hlasů RSS neobsahuje. Hlasování senátora je jeho rozhodnutí, "
+                "ne stanovisko strany.\n\n" + "\n".join(casti))
+        keep_m.add(f"{mesic}.md")
+        write_markdown(OUT / "prehledy" / f"{mesic}.md", {
+            "zdroj": f"{BASE}/senatori/", "nazev": nazev, "typ": "hlasovani", "viditelnost": "verejne",
+            "stazeno": today(), "datum": max(v["datum"] for v in vs),
+            "autorita": "oficialni-data-senat"}, body)
+    for slozka, keep in (("senatori", keep_s), ("prehledy", keep_m)):
+        for f in (OUT / slozka).glob("*.md"):
+            if f.name not in keep:
+                f.unlink()
+    print(f"dokumenty: {len(keep_s)} profilů senátorů, {len(keep_m)} měsíčních přehledů", file=sys.stderr)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--od-obdobi", type=int, default=FIRST_TERM, help="první funkční období Senátu")
@@ -367,6 +478,8 @@ def main() -> None:
         n = write_jsonl(OUT / f"hlasovani-{rok}.jsonl", rows)
         readme_rows.append(f"| {o}. ({rok}–{rok + 2}) | {n} | hlasovani-{rok}.jsonl |")
         print(f"hlasovani {o}. FO ({rok}): {n}", file=sys.stderr)
+
+    zapis_dokumenty(senatori, votes.values())
 
     sen_rows = "\n".join(
         f"| {s['jmeno']} | " + "; ".join(

@@ -131,6 +131,11 @@ case "$MODE" in
     # Financování: transparentní účty a rozpočty (Fio po měsících, uzavřené měsíce z cache; ~30 s);
     # výroční zprávy ÚDH (termín podání 1. 4.) a zprávy o kampaních (do 90 dnů po volbách) navíc
     # v lednu, dubnu–červnu a prosinci (úplný běh, ~1 min).
+    # Po volbách (45 dní) se volby stahují i v ostatních týdnech a v denních bězích (--cerstve):
+    # ČSÚ zveřejní registr se zvolenými den po volbách a 2. kolo Senátu o týden později.
+    if [ "$(date -u +%d)" -gt 7 ]; then
+      run_src volby       volby --cerstve 45
+    fi
     if [ "$(date -u +%d)" -le 7 ]; then
       run_src volby       volby
       case "$(date -u +%m)" in
@@ -179,6 +184,8 @@ case "$MODE" in
     run_src media         media --denne
     run_src socialni_site social
     run_src psp           psp
+    # Volby jen v 45 dnech po volbách (jinak skončí hned bez stahování).
+    run_src volby         volby --cerstve 45
     run_src pirati_web    pirati-web --only aktuality
     # Titulky z YouTube: malé dávky, YouTube z cloudu po desítkách videí blokuje
     # (skript pak skončí kódem 3 a další běh pokračuje ze stav.json).

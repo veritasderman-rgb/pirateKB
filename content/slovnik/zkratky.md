@@ -12,7 +12,7 @@ stazeno: '2026-10-06'
 stav: navrh
 schvalil: null
 schvaleno_dne: null
-reviewed_at: '2026-10-06'
+reviewed_at: '2026-10-11'
 platnost_do: null
 poznamka: "Tabulky jednotek jsou vygenerované z data/lide (pole zkratka, nazev, nadrazeny, zdroj), autorita oficialni-evidence. Oddíl „Ručně psané pojmy“ napsal autor návrhu (popisy systémů podle data/systemy), kurátor ověří."
 ---
@@ -75,6 +75,35 @@ Pokud se význam zkratky liší podle kontextu (např. `PS`), uvádíme oba.
 Tipy pro kurátora: význam `MO`, `RegP`, `PKS/PMS` a `Pirátská identita` ověřit ve
 stanovách a vnitřních předpisech na <https://wiki.pirati.cz/rules/>; po ověření změnit
 sloupec „ověřeno“ na `ano` a doplnit odkaz na předpis.
+
+## Komunální a krajské pojmy (návrh, ověřit)
+
+Pojmy z práce zastupitelů obcí, krajů a Prahy (publikum Kompasu). Zákony: zákon o obcích
+č. 128/2000 Sb., zákon o krajích č. 129/2000 Sb., zákon o hl. m. Praze č. 131/2000 Sb.
+Paragrafy jsou uvedeny jen tam, kde je už ověřil návod `content/navody/dotaz-zastupitele.md`;
+ostatní řádky kurátor doplní a ověří proti znění na zakonyprolidi.cz.
+
+| pojem | význam | kde se používá / odkaz | ověřeno |
+|---|---|---|---|
+| **ZO / ZM** | Zastupitelstvo obce / města: volený orgán obce (komunální volby), schvaluje rozpočet, vyhlášky, územní plán a další vyhrazené věci | zákon č. 128/2000 Sb.; <https://www.zakonyprolidi.cz/cs/2000-128> | ne |
+| **RO / RM** | Rada obce / města: výkonný orgán volený zastupitelstvem ze svých členů (starosta, místostarostové, radní); v malých obcích rada není a její pravomoci vykonává starosta | zákon č. 128/2000 Sb. | ne |
+| **ZK / RK (kraj)** | Zastupitelstvo kraje / Rada kraje; pozor, v pirátské evidenci znamená `ZK` zastupitelský klub a `RK` Rozhodčí komisi | zákon č. 129/2000 Sb.; <https://www.zakonyprolidi.cz/cs/2000-129> | ne |
+| **ZHMP / RHMP / MHMP** | Zastupitelstvo, Rada a Magistrát hlavního města Prahy; usnesení a hlasování ZHMP jsou v bázi (`get_resolutions`, `get_voting_record(komora="zhmp")`) | zákon č. 131/2000 Sb.; <https://usneseni.praha.eu/> | ne |
+| **MČ / ZMČ / RMČ** | Městská část (Praha) nebo městský obvod (statutární města, např. Brno, Ostrava) a její zastupitelstvo / rada | zákon č. 131/2000 Sb., statut města | ne |
+| **OÚ / MÚ / MMx** | Obecní úřad / Městský úřad / Magistrát statutárního města: úřad obce; vykonává samostatnou i přenesenou působnost | zákon č. 128/2000 Sb. | ne |
+| **KÚ** | Krajský úřad: úřad kraje | zákon č. 129/2000 Sb. | ne |
+| **samostatná / přenesená působnost** | Samostatná: věci, o kterých obec nebo kraj rozhoduje sám (rozpočet, majetek, vyhlášky). Přenesená: státní správa svěřená obci nebo kraji (např. stavební úřad, matrika) | zákon č. 128/2000 Sb. | ne |
+| **ORP** | Obec s rozšířenou působností („obec III. typu“): vykonává přenesenou působnost i pro okolní obce ve svém správním obvodu | <https://www.czso.cz/> (číselník ORP) | ne |
+| **POU** | Obec s pověřeným obecním úřadem („obec II. typu“) | <https://www.czso.cz/> | ne |
+| **OZV** | Obecně závazná vyhláška: právní předpis obce v samostatné působnosti (např. místní poplatky, veřejný pořádek); vydává ji zastupitelstvo | zákon č. 128/2000 Sb. | ne |
+| **finanční a kontrolní výbor** | Povinné výbory zastupitelstva obce; kontrolní výbor kontroluje plnění usnesení, finanční výbor hospodaření | zákon č. 128/2000 Sb. | ne |
+| **dotaz zastupitele** | Právo zastupitele vznášet dotazy a požadovat informace od orgánů a zaměstnanců obce nebo kraje; odpověď do 30 dnů (u Prahy viz návod) | § 82 z. č. 128/2000 Sb., § 34 z. č. 129/2000 Sb., § 51 z. č. 131/2000 Sb.; `content/navody/dotaz-zastupitele.md`, tool `pruvodce_zadosti` | ano (návod ověřen 8. 10. 2026) |
+| **žádost podle 106** | Žádost o informace podle zákona č. 106/1999 Sb.; může ji podat kdokoli, nejen zastupitel; lhůta 15 dní | `content/navody/zadost-106.md`, tool `pruvodce_zadosti` | ano (návod) |
+| **rozpočtové opatření** | Změna schváleného rozpočtu obce nebo kraje během roku | zákon č. 250/2000 Sb. o rozpočtových pravidlech územních rozpočtů | ne |
+| **střednědobý výhled rozpočtu** | Plán hospodaření obce nebo kraje na 2 až 5 let po rozpočtovém roce | zákon č. 250/2000 Sb. | ne |
+| **DSO / svazek obcí** | Dobrovolný svazek obcí: sdružení obcí ke společným úkolům (vodovody, odpady, cestovní ruch) | zákon č. 128/2000 Sb. | ne |
+| **koaliční smlouva** | Dohoda stran a hnutí v zastupitelstvu o složení rady a programu; v bázi zatím nejsou | wiki a weby místních sdružení | ne |
+| **komunální volby** | Volby do zastupitelstev obcí (naposledy 9.–10. 10. 2026); výsledky a zvolení Piráti v bázi: `get_election_results(volby="kv")`, `find_elected(druh="kv")` | <https://volby.gov.cz/> | ne |
 
 ## Tabulky organizačních jednotek (vygenerováno z evidence)
 

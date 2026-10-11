@@ -290,6 +290,36 @@ def test_kv_zvoleni_a_kandidatky():
     assert lib["kandidatu"] == 3 and lib["zvoleno_piratu"] == 2 and lib["mandaty_celkem"] == 39
 
 
+def _bez_data(xml: bytes) -> list[dict]:
+    """Registry obcí od 2026: bez sloupce DATUMVOLEB (a bez číselníku kvdatumvoleb)."""
+    out = []
+    for r in volby.iter_xml_rows(xml):
+        if r.get("DATUMVOLEB") == "20220923":
+            out.append({k: v for k, v in r.items() if k != "DATUMVOLEB"})
+    return out
+
+
+def test_kv_bez_ciselniku_datumu_2026():
+    v = volby.Volby("kv", 2026, "https://volby.gov.cz/opendata/kv2026/kv2026_opendata.htm", datum="2026-10-09")
+    res = volby.zpracuj_kv_data(v, _bez_data(KV_ROS), _bez_data(KV_RK), _bez_data(KV_COCO), [], _strany(),
+                                {5103: "Liberec"}, None, "https://example/kv2026.zip")
+    assert res and v.datum == "2026-10-09"
+    zv = {z["jmeno"] for z in res["zvoleni"]}
+    assert {"Jan Pirát", "Eva Nestraníková", "Karel Zrušený"} == zv
+    assert all(z["rok"] == 2026 and z["datum"] == "2026-10-09" for z in res["zvoleni"])
+    # bez data v konfiguraci se nic nevymýšlí
+    v0 = volby.Volby("kv", 2026, "https://volby.gov.cz/opendata/kv2026/kv2026_opendata.htm")
+    assert volby.zpracuj_kv_data(v0, _bez_data(KV_ROS), _bez_data(KV_RK), _bez_data(KV_COCO), [], _strany(),
+                                 {}, None, "x") is None
+
+
+def test_cerstve_volby():
+    v = volby.Volby("kv", 2026, "x", datum="2026-10-09")
+    assert volby.cerstve(v, 45, "2026-10-11") and volby.cerstve(v, 45, "2026-11-23")
+    assert not volby.cerstve(v, 45, "2026-11-24") and not volby.cerstve(v, 45, "2026-10-08")
+    assert not volby.cerstve(volby.Volby("kv", 2022, "x"), 45, "2026-10-11")
+
+
 # ------------------------------------------------------------------ Senát
 
 SERK = _xml("SE_REGKAND", [

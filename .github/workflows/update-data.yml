@@ -36,7 +36,9 @@ jobs:
   aktualizace:
     name: Aktualizace (${{ github.event_name == 'workflow_dispatch' && inputs.rezim || (github.event.schedule == '23 3 * * 0' && 'tydenni' || 'denni') }})
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # Týdenní běh trvá přes hodinu (subweby z Majáku ~10 min, X ~8 min při blokaci, psp, praha…);
+    # při limitu 60 min ho GitHub zrušil u posledního zdroje a nic se necommitlo (11. 10. 2026).
+    timeout-minutes: 120
     env:
       MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.rezim || (github.event.schedule == '23 3 * * 0' && 'tydenni' || 'denni') }}
     steps:
