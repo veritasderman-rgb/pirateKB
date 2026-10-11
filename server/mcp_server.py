@@ -173,7 +173,9 @@ styleguide.pirati.cz, X, Bluesky, YouTube, frankbold.org) a není kurátorovaná
    a navrhnout_do_baze (návrh doplnění ke schválení kurátorem).
 5. Když báze nemá přesnou odpověď, řekni to a doporuč konkrétní osobu s kontaktem
    (tool find_expert); telefon uváděj jen pokud ho báze má z veřejného profilu.
-6. Když nenajdeš odpověď ani po find_expert, zavolej report_gap s původní otázkou.
+6. Když nenajdeš odpověď ani po find_expert nebo tool vrátí prázdný výsledek a jiný tool
+   ani volnější filtr nepomůže, zavolej sám report_gap s otázkou bez osobních údajů
+   (kurátoři z ní doplňují bázi; uživatele se neptej, jen mu řekni, že je to nahlášeno).
    Když se uživatel ptá, co s bází umí, nabídni vzorové prompty z resource kb://navod/prompty.
 7. Pro žádosti podle zákona č. 106/1999 Sb. a dotazy zastupitelů použij pruvodce_zadosti /
    lhuty_zadosti a lhůty zapiš uživateli do kalendáře přes jeho kalendářový konektor
@@ -1463,7 +1465,10 @@ def get_resolutions(organ: str | None = None, query: str | None = None,
 
 
 SOCIAL_DISCLAIMER = ("Jde o vyjádření jednotlivce (poslance), ne stanovisko strany; vždy cituj URL "
-                     "příspěvku a uveď autora, platformu a datum.")
+                     "příspěvku a uveď autora, platformu a datum. Pokrytí X je neúplné: bez placeného "
+                     "X API je u účtu jen výběr asi 100 nejúspěšnějších a několik posledních příspěvků "
+                     "a X automatické stahování z cloudu blokuje; chybějící příspěvek tedy neznamená, "
+                     "že ho poslanec nenapsal.")
 
 
 def _platforma_label(p: Any) -> str:
@@ -2432,6 +2437,17 @@ def _se_souhrn(rows: list[dict]) -> list[dict]:
     return out
 
 
+def _volby_pokryti(data: list[dict]) -> str:
+    """Rozsah let po druzích voleb z načtených dat, např. „Sněmovnu 2010–2025, obce 2010–2026“."""
+    roky: dict[str, set[int]] = {}
+    for r in data:
+        if r.get("rok"):
+            roky.setdefault(r.get("volby"), set()).add(int(r["rok"]))
+    nazvy = {"ps": "Sněmovnu", "ep": "EP", "kz": "kraje", "kv": "obce", "se": "Senát"}
+    casti = [f"{nazvy[d]} {min(roky[d])}–{max(roky[d])}" for d in ("ps", "ep", "kz", "kv", "se") if roky.get(d)]
+    return ", ".join(casti) or "zatím žádné volby"
+
+
 @mcp.tool(structured_output=False)
 @_guard
 def get_election_results(volby: str | None = None, rok: int | None = None, kraj: str | None = None,
@@ -2467,9 +2483,9 @@ def get_election_results(volby: str | None = None, rok: int | None = None, kraj:
         rows = [r for r in rows if kf in _fold_words(r.get("kraj"))]
     filtr = ", ".join(f"{k}={v}" for k, v in (("volby", volby), ("rok", rok), ("kraj", kraj), ("obec", obec)) if v)
     if not rows:
-        return (f"Pro filtr {filtr or '(žádný)'} báze nic nenašla. Data pokrývají Sněmovnu 2010–2025, "
-                "EP 2014–2024, kraje 2012–2024, obce 2010–2022 a Senát 2010–2025; v obcích jen tam, "
-                "kde kandidovala kandidátka s Piráty ve složení. Zkus jiný rok nebo bez filtru.")
+        return (f"Pro filtr {filtr or '(žádný)'} báze nic nenašla. Data pokrývají {_volby_pokryti(data)}; "
+                "v obcích jen tam, kde kandidovala kandidátka s Piráty ve složení. Výsledky nových voleb "
+                "přibývají den až dva po volbách (ČSÚ). Zkus jiný rok nebo bez filtru.")
     rows.sort(key=lambda r: (-int(r.get("rok") or 0), _VOLBY_PORADI.get(r.get("volby"), 9),
                              {"cr": 0, "souhrn": 0, "kraj": 1, "obvod": 2, "obec": 3}.get(r.get("uroven"), 9),
                              _fold_words(r.get("kraj")), _fold_words(r.get("obec"))))
@@ -2823,17 +2839,32 @@ def kb_stats() -> str:
     if st.get("documents_datum_od") or st.get("documents_datum_do"):
         out.append(f"- Dokumenty datované: {_s(st.get('documents_datum_od'))} – {_s(st.get('documents_datum_do'))}")
     for label, key in (("Dokumenty podle typu", "documents_by_typ"),
-                       ("Dokumenty podle kolekce", "documents_by_kolekce"),
-                       ("Hlasování podle období", "votes_by_obdobi"),
-                       ("Příspěvky na sítích podle platformy", "social_posts_by_platforma")):
+                       ("Dokumenty podle kolekce", "documents_by_kolekce")):
         d = st.get(key)
         if isinstance(d, dict) and d:
             out.append(f"\n## {label}")
             out.extend(f"- {k}: {v}" for k, v in d.items())
+    hk = st.get("votes_by_komora")
+    if isinstance(hk, dict) and hk:
+        nazvy = {"psp": "Poslanecká sněmovna", "senat": "Senát", "ep": "Evropský parlament",
+                 "zhmp": "Zastupitelstvo hl. m. Prahy"}
+        out.append("\n## Hlasování podle komory a kalendářního roku")
+        for komora in sorted(hk, key=lambda k: list(nazvy).index(k) if k in nazvy else 9):
+            h = hk[komora]
+            roky = ", ".join(f"{r}: {n}" for r, n in sorted((h.get("roky") or {}).items()))
+            out.append(f"- {nazvy.get(komora, komora)}: {h.get('celkem', 0)} "
+                       f"(od {_s(h.get('od'))} do {_s(h.get('do'))}); {roky}")
+        out.append("Pozn.: v EP jen hlavní (závěrečná) jmenovitá hlasování podle HowTheyVote.eu, "
+                   "u ZHMP jen hlasování o přijatých usneseních.")
+    d = st.get("social_posts_by_platforma")
+    if isinstance(d, dict) and d:
+        detail = st.get("social_posts_detail") or {}
+        out.append("\n## Příspěvky na sítích podle platformy")
+        out.extend(f"- {k}: {v}" + (f" ({detail[k]})" if detail.get(k) else "") for k, v in d.items())
     known = {"built_at", "data_commit", "schema_version", "db_path", "db_bytes", "documents", "chunks",
              "people", "org_units", "votes", "vote_members", "social_posts", "documents_datum_od",
-             "documents_datum_do", "documents_by_typ", "documents_by_kolekce", "votes_by_obdobi",
-             "social_posts_by_platforma"}
+             "documents_datum_do", "documents_by_typ", "documents_by_kolekce", "votes_by_komora",
+             "social_posts_by_platforma", "social_posts_detail"}
     rest = {k: v for k, v in st.items() if k not in known}
     if rest:
         out.append("\n## Další")

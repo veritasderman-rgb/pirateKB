@@ -29,14 +29,37 @@ CREATE TABLE IF NOT EXISTS volani (
     delka_dotazu    integer     NOT NULL DEFAULT 0,      -- součet délek textových argumentů (znaky)
     pocet_vysledku  integer     NOT NULL DEFAULT 0,      -- očíslované položky ve výstupu
     trvani_ms       real        NOT NULL DEFAULT 0,
-    fallback        boolean     NOT NULL DEFAULT false,  -- výstup „Přesnou odpověď jsem nenašel“
+    fallback        boolean     NOT NULL DEFAULT false,  -- původní souhrnný příznak (nenalezeno NEBO slabá shoda)
     chyba           boolean     NOT NULL DEFAULT false,
+    nenalezeno      boolean     NOT NULL DEFAULT false,  -- prázdný výsledek: báze odpověď nemá
+    sirsi_rezim     boolean     NOT NULL DEFAULT false,  -- slabá shoda + nabídka kontaktu (ne neúspěch)
+    kategorie       text        NOT NULL DEFAULT '',     -- jen u neúspěšných: typ/komora/územní úroveň/téma z pevného seznamu
     klient          text        NOT NULL DEFAULT '',     -- rodina klienta z User-Agent (claude, chatgpt, …)
     prihlaseny      boolean     NOT NULL DEFAULT false,  -- přihlášený přes Keycloak (bez identity)
     klient_hash     text        NOT NULL DEFAULT '',     -- denní pseudonym (IP + User-Agent), viz výše
     nasazeni        text        NOT NULL DEFAULT '',     -- krátký commit / ID nasazení na Vercelu
     prostredi       text        NOT NULL DEFAULT 'local' -- production | preview | development | local
 );
+-- Sloupce přidané později (tabulka v Neonu už existuje).
+ALTER TABLE volani ADD COLUMN IF NOT EXISTS nenalezeno  boolean NOT NULL DEFAULT false;
+ALTER TABLE volani ADD COLUMN IF NOT EXISTS sirsi_rezim boolean NOT NULL DEFAULT false;
+ALTER TABLE volani ADD COLUMN IF NOT EXISTS kategorie   text    NOT NULL DEFAULT '';
+
+-- Dopočet příznaků u řádků zapsaných před jejich zavedením. Pravidla odpovídají
+-- server/telemetry.py (is_nenalezeno, is_sirsi_rezim, SEARCH_TOOLS); nové řádky podmínky
+-- nesplní, takže opakované spuštění nic nemění. Nula výsledků u nevyhledávacích toolů
+-- (get_brand, get_template, průvodce, lhůty) neúspěch není: vracejí tabulky a text, které
+-- staré počítání položek nevidělo.
+UPDATE volani SET nenalezeno = true
+WHERE NOT nenalezeno AND NOT chyba AND pocet_vysledku = 0
+  AND (fallback OR tool IN ('search_kb', 'find_people', 'get_program', 'get_position',
+       'search_press_releases', 'find_expert', 'get_voting_record', 'get_resolutions',
+       'get_social_posts', 'get_speeches', 'get_government_record', 'get_bills',
+       'get_amendments', 'get_committees', 'get_election_results', 'find_elected',
+       'get_document', 'hledat_interni'));
+UPDATE volani SET sirsi_rezim = true
+WHERE fallback AND NOT nenalezeno AND NOT sirsi_rezim;
+
 CREATE INDEX IF NOT EXISTS volani_cas_idx ON volani (cas);
 CREATE INDEX IF NOT EXISTS volani_tool_cas_idx ON volani (tool, cas);
 
@@ -75,7 +98,8 @@ $$;
 -- Den po dni: volání, připojení, odhad různých klientů, fallbacky, chyby, rychlost.
 CREATE OR REPLACE VIEW denni_souhrn AS
 WITH v AS (
-    SELECT (cas AT TIME ZONE 'UTC')::date AS den, trvani_ms, fallback, chyba, klient_hash
+    SELECT (cas AT TIME ZONE 'UTC')::date AS den, trvani_ms, fallback, chyba, klient_hash,
+           nenalezeno, sirsi_rezim
     FROM volani WHERE piratekb_prostredi() IN ('*', prostredi)
 ), p AS (
     SELECT (cas AT TIME ZONE 'UTC')::date AS den, klient_hash
@@ -85,6 +109,8 @@ WITH v AS (
            count(*) AS volani,
            count(*) FILTER (WHERE fallback) AS fallbacky,
            count(*) FILTER (WHERE chyba) AS chyby,
+           count(*) FILTER (WHERE nenalezeno) AS nenalezeno,
+           count(*) FILTER (WHERE sirsi_rezim) AS sirsi_rezim,
            percentile_cont(0.5) WITHIN GROUP (ORDER BY trvani_ms) AS median_ms,
            percentile_cont(0.95) WITHIN GROUP (ORDER BY trvani_ms) AS p95_ms
     FROM v GROUP BY den
@@ -103,7 +129,11 @@ SELECT d.den,
        coalesce(vd.chyby, 0)             AS chyby,
        round(vd.fallbacky::numeric / nullif(vd.volani, 0), 3) AS podil_fallbacku,
        round(vd.median_ms::numeric, 1)   AS median_ms,
-       round(vd.p95_ms::numeric, 1)      AS p95_ms
+       round(vd.p95_ms::numeric, 1)      AS p95_ms,
+       -- nové sloupce jen na konci (CREATE OR REPLACE VIEW neumí měnit pořadí)
+       coalesce(vd.nenalezeno, 0)        AS nenalezeno,
+       round(vd.nenalezeno::numeric / nullif(vd.volani, 0), 3) AS podil_nenalezeno,
+       coalesce(vd.sirsi_rezim, 0)       AS sirsi_rezim
 FROM (SELECT den FROM vd UNION SELECT den FROM pd) d
 LEFT JOIN vd USING (den)
 LEFT JOIN pd USING (den)
@@ -114,7 +144,8 @@ ORDER BY d.den DESC;
 -- součet denních odhadů (klient_dny) a maximum za den, ne „různí klienti za týden“.
 CREATE OR REPLACE VIEW tydenni_souhrn AS
 WITH v AS (
-    SELECT date_trunc('week', cas AT TIME ZONE 'UTC')::date AS tyden, tool, trvani_ms, fallback, chyba
+    SELECT date_trunc('week', cas AT TIME ZONE 'UTC')::date AS tyden, tool, trvani_ms, fallback, chyba,
+           nenalezeno, sirsi_rezim
     FROM volani WHERE piratekb_prostredi() IN ('*', prostredi)
 ), vt AS (
     SELECT tyden,
@@ -122,6 +153,8 @@ WITH v AS (
            count(DISTINCT tool) AS pouzitych_nastroju,
            count(*) FILTER (WHERE fallback) AS fallbacky,
            count(*) FILTER (WHERE chyba) AS chyby,
+           count(*) FILTER (WHERE nenalezeno) AS nenalezeno,
+           count(*) FILTER (WHERE sirsi_rezim) AS sirsi_rezim,
            percentile_cont(0.5) WITHIN GROUP (ORDER BY trvani_ms) AS median_ms,
            percentile_cont(0.95) WITHIN GROUP (ORDER BY trvani_ms) AS p95_ms
     FROM v GROUP BY tyden
@@ -148,7 +181,10 @@ SELECT t.tyden,
        round(vt.fallbacky::numeric / nullif(vt.volani, 0), 3) AS podil_fallbacku,
        coalesce(vt.chyby, 0)         AS chyby,
        round(vt.median_ms::numeric, 1) AS median_ms,
-       round(vt.p95_ms::numeric, 1)    AS p95_ms
+       round(vt.p95_ms::numeric, 1)    AS p95_ms,
+       coalesce(vt.nenalezeno, 0)      AS nenalezeno,
+       round(vt.nenalezeno::numeric / nullif(vt.volani, 0), 3) AS podil_nenalezeno,
+       coalesce(vt.sirsi_rezim, 0)     AS sirsi_rezim
 FROM (SELECT tyden FROM vt UNION SELECT tyden FROM pt) t
 LEFT JOIN vt USING (tyden)
 LEFT JOIN pt USING (tyden)
@@ -167,7 +203,10 @@ SELECT tool,
        round((percentile_cont(0.95) WITHIN GROUP (ORDER BY trvani_ms))::numeric, 1) AS p95_ms,
        round(avg(pocet_vysledku)::numeric, 1) AS prumer_vysledku,
        min(cas) AS prvni_pouziti,
-       max(cas) AS posledni_pouziti
+       max(cas) AS posledni_pouziti,
+       count(*) FILTER (WHERE nenalezeno) AS nenalezeno,
+       round(avg(nenalezeno::int)::numeric, 3) AS podil_nenalezeno,
+       count(*) FILTER (WHERE sirsi_rezim) AS sirsi_rezim
 FROM volani
 WHERE piratekb_prostredi() IN ('*', prostredi)
 GROUP BY tool
@@ -176,7 +215,8 @@ ORDER BY volani DESC, tool;
 -- Nástroj × týden: jak se mění obliba jednotlivých toolů.
 CREATE OR REPLACE VIEW nastroje_tydne AS
 WITH v AS (
-    SELECT date_trunc('week', cas AT TIME ZONE 'UTC')::date AS tyden, tool, trvani_ms, fallback
+    SELECT date_trunc('week', cas AT TIME ZONE 'UTC')::date AS tyden, tool, trvani_ms, fallback,
+           nenalezeno, sirsi_rezim
     FROM volani WHERE piratekb_prostredi() IN ('*', prostredi)
 )
 SELECT tyden,
@@ -185,7 +225,9 @@ SELECT tyden,
        round(count(*)::numeric / sum(count(*)) OVER (PARTITION BY tyden), 3) AS podil_v_tydnu,
        count(*) FILTER (WHERE fallback) AS fallbacky,
        round(avg(fallback::int)::numeric, 3) AS podil_fallbacku,
-       round((percentile_cont(0.5) WITHIN GROUP (ORDER BY trvani_ms))::numeric, 1) AS p50_ms
+       round((percentile_cont(0.5) WITHIN GROUP (ORDER BY trvani_ms))::numeric, 1) AS p50_ms,
+       count(*) FILTER (WHERE nenalezeno) AS nenalezeno,
+       count(*) FILTER (WHERE sirsi_rezim) AS sirsi_rezim
 FROM v
 GROUP BY tyden, tool
 ORDER BY tyden DESC, volani DESC, tool;
@@ -200,7 +242,8 @@ WITH v AS (
                FILTER (WHERE klient_hash <> '') AS klient_dny,
            round(avg(fallback::int)::numeric, 3) AS podil_fallbacku,
            min(cas) AS prvni,
-           max(cas) AS posledni
+           max(cas) AS posledni,
+           round(avg(nenalezeno::int)::numeric, 3) AS podil_nenalezeno
     FROM volani WHERE piratekb_prostredi() IN ('*', prostredi)
     GROUP BY klient
 ), p AS (
@@ -217,15 +260,34 @@ SELECT klient,
        coalesce(v.klient_dny, 0) AS klient_dny,
        v.podil_fallbacku,
        v.prvni,
-       v.posledni
+       v.posledni,
+       v.podil_nenalezeno
 FROM v FULL JOIN p USING (klient)
 ORDER BY volani DESC, pripojeni DESC, klient;
 
--- Kde báze nejčastěji „nenašla“: tooly seřazené podle podílu fallbacku (aspoň 10 volání).
+-- Kde báze nejčastěji nic nenašla: tooly seřazené podle podílu prázdných výsledků
+-- (nenalezeno, aspoň 10 volání). Sloupce fallbacky / podil_fallbacku jsou původní souhrnný
+-- příznak včetně slabé shody; zůstávají kvůli kompatibilitě, k vyhodnocení slouží nenalezeno.
 CREATE OR REPLACE VIEW neuspesne AS
 SELECT tool, volani, fallbacky, podil_fallbacku, chyby,
        round(chyby::numeric / nullif(volani, 0), 3) AS podil_chyb,
-       posledni_pouziti
+       posledni_pouziti,
+       nenalezeno, podil_nenalezeno, sirsi_rezim
 FROM nastroje
 WHERE volani >= 10
-ORDER BY podil_fallbacku DESC, volani DESC, tool;
+ORDER BY podil_nenalezeno DESC, volani DESC, tool;
+
+-- Neúspěšné dotazy po týdnech a hrubých kategoriích (typ dokumentu, komora, druh voleb,
+-- územní úroveň, téma z pevného seznamu; text dotazu se neukládá). Podklad pro týdenní
+-- kontrolu kurátorem: co lidé hledají a báze nemá (nenalezeno) nebo má jen slabě (sirsi_rezim).
+CREATE OR REPLACE VIEW nenalezene_kategorie AS
+SELECT date_trunc('week', cas AT TIME ZONE 'UTC')::date AS tyden,
+       tool,
+       coalesce(nullif(kategorie, ''), '(bez kategorie)') AS kategorie,
+       count(*) FILTER (WHERE nenalezeno) AS nenalezeno,
+       count(*) FILTER (WHERE sirsi_rezim) AS sirsi_rezim,
+       max(cas) AS posledni
+FROM volani
+WHERE piratekb_prostredi() IN ('*', prostredi) AND (nenalezeno OR sirsi_rezim)
+GROUP BY 1, 2, 3
+ORDER BY tyden DESC, nenalezeno DESC, sirsi_rezim DESC, tool, kategorie;

@@ -11,7 +11,8 @@ nic nemění: middleware se nevloží, fronta ani vlákno nevzniknou, ``psycopg`
 Co se ukládá (schéma v ``server/statistika.sql``, popis v ``docs/statistika.md``):
 
 - ``volani``: každé volání toolu: čas, tool, délka dotazu ve znacích, počet výsledků,
-  trvání, fallback „nenašel jsem“, chyba, rodina klienta z User-Agent (``claude``,
+  trvání, příznaky nenalezeno (prázdný výsledek) / slabá shoda / chyba, u neúspěšných dotazů
+  hrubá kategorie z pevného seznamu (bez textu dotazu), rodina klienta z User-Agent (``claude``,
   ``chatgpt``, ``cursor`` …), zda byl volající přihlášený (bez identity), denní pseudonym
   klienta, nasazení a prostředí;
 - ``pripojeni``: každý MCP požadavek ``initialize`` (= konverzace, která připojila konektor):
@@ -214,6 +215,7 @@ class Zapisovac:
         self._thread: threading.Thread | None = None
         self._conn: Any = None
         self._schema_ok = False
+        self._sloupce: dict[str, tuple[str, ...]] = dict(SLOUPCE)
         self._soli: dict[date, bytes] = {}
         self._failures = 0
         self._next_try = 0.0
@@ -354,9 +356,27 @@ class Zapisovac:
                     except Exception:  # noqa: BLE001
                         pass
                     raise
+                self._over_nove_sloupce(conn)
             self._schema_ok = True
         self._conn = conn
         return conn
+
+    def _over_nove_sloupce(self, conn: Any) -> None:
+        """Bez práv na DDL nemusí sloupce přidané později v tabulce být: pak zapisuj jen původní,
+        ať se statistika neztrácí, dokud vlastník schéma neaplikuje."""
+        try:
+            conn.execute(f"SELECT {', '.join(NOVE_SLOUPCE['volani'])} FROM volani LIMIT 0")
+            conn.rollback()
+        except Exception:  # noqa: BLE001
+            try:
+                conn.rollback()
+            except Exception:  # noqa: BLE001
+                pass
+            log.warning("statistika: v tabulce volani chybí sloupce %s; zapisuji jen původní. "
+                        "Aplikuj server/statistika.sql jako vlastník tabulek.",
+                        ", ".join(NOVE_SLOUPCE["volani"]))
+            self._sloupce["volani"] = tuple(c for c in SLOUPCE["volani"]
+                                            if c not in NOVE_SLOUPCE["volani"])
 
     def _zavri(self) -> None:
         conn, self._conn = self._conn, None
@@ -399,7 +419,7 @@ class Zapisovac:
                     radky[tabulka].append(r)
             for tabulka, rows in radky.items():
                 if rows:
-                    sql, params = sestav_insert(tabulka, rows)
+                    sql, params = sestav_insert(tabulka, rows, self._sloupce.get(tabulka))
                     conn.execute(sql, params)
             conn.commit()
         except Exception:
@@ -412,15 +432,21 @@ class Zapisovac:
 
 SLOUPCE: dict[str, tuple[str, ...]] = {
     "volani": ("cas", "tool", "delka_dotazu", "pocet_vysledku", "trvani_ms", "fallback", "chyba",
+               "nenalezeno", "sirsi_rezim", "kategorie",
                "klient", "prihlaseny", "klient_hash", "nasazeni", "prostredi"),
     "pripojeni": ("cas", "klient", "klient_verze", "protokol", "rodina", "prihlaseny", "klient_hash",
                   "nasazeni", "prostredi"),
 }
 
 
-def sestav_insert(tabulka: str, rows: list[dict]) -> tuple[str, list[Any]]:
+# Sloupce přidané do existující tabulky (ALTER TABLE v statistika.sql).
+NOVE_SLOUPCE: dict[str, tuple[str, ...]] = {"volani": ("nenalezeno", "sirsi_rezim", "kategorie")}
+
+
+def sestav_insert(tabulka: str, rows: list[dict],
+                  cols: tuple[str, ...] | None = None) -> tuple[str, list[Any]]:
     """Jeden víceřádkový INSERT pro danou tabulku (názvy sloupců jsou pevné, hodnoty jako parametry)."""
-    cols = SLOUPCE[tabulka]
+    cols = cols or SLOUPCE[tabulka]
     placeholder = "(" + ", ".join(["%s"] * len(cols)) + ")"
     sql = (f"INSERT INTO {tabulka} ({', '.join(cols)}) VALUES "
            + ", ".join([placeholder] * len(rows)))
@@ -496,6 +522,9 @@ def zaznamenej_volani(event: dict) -> None:
             "trvani_ms": float(event.get("trvani_ms") or 0.0),
             "fallback": bool(event.get("fallback")),
             "chyba": bool(event.get("chyba")),
+            "nenalezeno": bool(event.get("nenalezeno")),
+            "sirsi_rezim": bool(event.get("sirsi_rezim")),
+            "kategorie": str(event.get("kategorie") or "")[:200],
             "klient": rodina,
             "prihlaseny": _prihlaseny(),
             "_zdroj": zdroj,
@@ -687,27 +716,41 @@ def _nacti_souhrn(connect: Callable[..., Any] | None = None) -> str:
         od = "(now() AT TIME ZONE 'UTC')::date - 29"
         row = conn.execute(
             "SELECT coalesce(sum(volani), 0), coalesce(sum(pripojeni), 0), "
-            "count(*) FILTER (WHERE volani > 0), coalesce(sum(fallbacky), 0) "
+            "count(*) FILTER (WHERE volani > 0), coalesce(sum(nenalezeno), 0), "
+            "coalesce(sum(sirsi_rezim), 0) "
             f"FROM denni_souhrn WHERE den >= {od}").fetchone()
         top = conn.execute(
             "SELECT tool, count(*) FROM volani "
             "WHERE piratekb_prostredi() IN ('*', prostredi) "
             f"AND (cas AT TIME ZONE 'UTC')::date >= {od} "
             "GROUP BY tool ORDER BY count(*) DESC, tool LIMIT 5").fetchall()
+        klienti = conn.execute(
+            "SELECT coalesce(nullif(klient, ''), rodina, '?'), count(*), "
+            "count(*) FILTER (WHERE prihlaseny) FROM pripojeni "
+            "WHERE piratekb_prostredi() IN ('*', prostredi) "
+            f"AND (cas AT TIME ZONE 'UTC')::date >= {od} "
+            "GROUP BY 1 ORDER BY count(*) DESC, 1 LIMIT 6").fetchall()
         conn.rollback()
     finally:
         try:
             conn.close()
         except Exception:  # noqa: BLE001
             pass
-    volani, pripojeni, dny, fallbacky = (int(x or 0) for x in (row or (0, 0, 0, 0)))
+    volani, pripojeni, dny, nenalezeno, sirsi = (int(x or 0) for x in (row or (0, 0, 0, 0, 0)))
     out = ["## Statistika za posledních 30 dní (produkce)",
            f"- Volání toolů: {volani}, připojení konektoru (konverzací): {pripojeni}, "
            f"dní s provozem: {dny}"]
     if volani:
-        out.append(f"- Fallback „nenašel jsem“: {fallbacky} ({100 * fallbacky / volani:.0f} %)")
+        out.append(f"- Nenalezeno (vyhledávání bez jediného výsledku): {nenalezeno} "
+                   f"({100 * nenalezeno / volani:.0f} %)")
+        out.append(f"- Slabá shoda (výsledky jsou, ale bez přesné shody; přidán kontakt na experta): "
+                   f"{sirsi} ({100 * sirsi / volani:.0f} %); není to neúspěch")
     if top:
         out.append("- Nejpoužívanější tooly: " + ", ".join(f"{t} ({int(n)})" for t, n in top))
+    if klienti:
+        prihlaseni = sum(int(p or 0) for _, _, p in klienti)
+        out.append("- Připojení podle klienta: " + ", ".join(f"{k} ({int(n)})" for k, n, _ in klienti)
+                   + f"; přihlášených členů: {prihlaseni}")
     out.append("Trvalá anonymní statistika (bez textu dotazů a identity), viz docs/statistika.md.")
     return "\n".join(out)
 

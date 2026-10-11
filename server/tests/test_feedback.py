@@ -168,7 +168,12 @@ def test_telemetry_counts_calls_without_query_text(mini_kb, tmp_path, monkeypatc
     events = _lines(tel_file)
     assert [e["tool"] for e in events] == ["search_kb", "get_template"]
     assert events[0]["delka_dotazu"] == len(SECRET) and events[0]["fallback"] is True
-    assert set(events[0]) == {"cas", "tool", "delka_dotazu", "pocet_vysledku", "trvani_ms", "fallback", "chyba"}
+    assert set(events[0]) == {"cas", "tool", "delka_dotazu", "pocet_vysledku", "trvani_ms", "fallback", "chyba",
+                              "nenalezeno", "sirsi_rezim", "kategorie"}
+    assert events[0]["nenalezeno"] is True and events[0]["sirsi_rezim"] is False
+    assert events[0]["kategorie"].startswith("tema=")  # jen štítek z pevného seznamu
+    assert events[1]["nenalezeno"] is False and events[1]["kategorie"] == ""
+    assert s["tooly"]["search_kb"]["nenalezeno"] == 1
     # text dotazu se nikam nezapisuje: ani do souboru, ani na stderr, ani do souhrnu
     err = capsys.readouterr().err
     assert '"telemetrie"' in err
@@ -197,6 +202,44 @@ def test_telemetry_fallback_detection():
              "Žádný resortní tým, pracovní skupina ani odbor k tématu v bázi není.")
     assert telemetry.is_fallback(empty, "find_expert")
     assert not telemetry.is_fallback("Výsledky hledání „bydlení“ (3):", "search_kb")
+
+
+def test_telemetry_nenalezeno_vs_slaba_shoda():
+    nenasel = mcp_server.NENASEL
+    slabe = f"Výsledky hledání „x“ (2):\n1. A\n2. B\n\n## {nenasel}. Nejlepší osoba k dotazu:\n- **Y**"
+    assert telemetry.is_fallback(slabe, "search_kb")  # původní souhrnný příznak
+    assert telemetry.is_sirsi_rezim(slabe, "search_kb") and not telemetry.is_nenalezeno(slabe, "search_kb")
+    prazdne = f"Pro dotaz „x“ báze nic nenašla.\n\n## {nenasel}. Nejlepší osoba k dotazu:\n- **Y**"
+    assert telemetry.is_nenalezeno(prazdne, "search_kb") and not telemetry.is_sirsi_rezim(prazdne, "search_kb")
+    # vyhledávací tool bez jediné položky = nenalezeno i bez výslovné hlášky
+    assert telemetry.is_nenalezeno("Žádný zvolený Pirát pro druh=kv.", "find_elected")
+    assert telemetry.is_nenalezeno("Nic.", "get_bills")
+    # nevyhledávací tooly s tabulkou nebo textem nejsou neúspěch, i když nemají očíslovaný seznam
+    brand = "# Brand\n| název | hex |\n|---|---|\n| Pirati Yellow | `#fec934` |\n| White | `#ffffff` |"
+    assert telemetry.count_results(brand) == 2
+    assert not telemetry.is_nenalezeno(brand, "get_brand")
+    assert not telemetry.is_nenalezeno("# Šablona briefu\nText šablony.", "get_template")
+    assert telemetry.is_nenalezeno("Šablona „xyz“ neexistuje. Dostupné: brief.", "get_template")
+    assert not telemetry.is_nenalezeno("Chyba při zpracování: x", "search_kb")
+
+
+def test_telemetry_kategorie_bez_textu_dotazu():
+    k = telemetry.kategorie_dotazu("search_kb", {"query": "Kdo z Pirátů je zastupitel v Horní Dolní?",
+                                                 "typ": ["usneseni", "<script>"], "obec": "Horní Dolní"})
+    assert k == "typ=usneseni;uzemi=obec;tema=komunalni"
+    k = telemetry.kategorie_dotazu("get_voting_record", {"query": "rozpočet", "komora": "ZHMP", "poslanec": "Novák"})
+    assert k == "komora=zhmp;tema=ekonomika" and "Novák" not in k
+    assert telemetry.kategorie_dotazu("search_kb", {"query": "qwerty asdf"}) == "tema=jine"
+    assert telemetry.kategorie_dotazu("get_volby", {"druh": "Komunální obce"}) == ""
+
+
+def test_telemetry_prazdny_vysledek_pripoji_report_gap(mini_kb, monkeypatch):
+    monkeypatch.delenv("PIRATEKB_TELEMETRY", raising=False)
+    telemetry.reset()
+    out = _call("search_kb", {"query": SECRET})
+    assert "report_gap(" in out
+    assert "report_gap(" not in _call("get_template", {"typ": "brief"})
+    telemetry.reset()
 
 
 def test_tools_list_schema_unchanged_by_wrappers():

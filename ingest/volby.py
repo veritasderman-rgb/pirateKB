@@ -724,11 +724,27 @@ def vyber_datumy_kv(ros_rows: list[dict], povolene: set[str]) -> dict[str, str]:
     return best
 
 
+def _s_datem(rows: Iterable[dict], datum: str) -> Iterator[dict]:
+    """Doplní `DATUMVOLEB` řádkům, které ho nemají (registry obcí od 2026)."""
+    for r in rows:
+        if not r.get("DATUMVOLEB"):
+            r = {**r, "DATUMVOLEB": datum}
+        yield r
+
+
 def zpracuj_kv_data(v: Volby, ros_rows: Iterable[dict], rk_rows: Iterable[dict],
                     coco_rows: Iterable[dict], datumy_rows: Iterable[dict], strany: Strany,
                     okresy: dict[int, str], prop: Propojeni | None, zdroj_data: str) -> dict | None:
-    """Obecní volby: pirátské kandidátky (kvros), zvolení Piráti (kvrk). Čistá funkce nad řádky."""
+    """Obecní volby: pirátské kandidátky (kvros), zvolení Piráti (kvrk). Čistá funkce nad řádky.
+
+    Od roku 2026 ČSÚ nevydává číselník `kvdatumvoleb.xml` a v registrech chybí `DATUMVOLEB`
+    (registr obsahuje jen řádné volby). Pak se jako datum bere `v.datum` z konfigurace."""
     radne, opravy = kv_platne_datumy(datumy_rows)
+    if not radne and v.datum:
+        radne = v.datum.replace("-", "")
+        ros_rows = _s_datem(ros_rows, radne)
+        rk_rows = _s_datem(rk_rows, radne)
+        coco_rows = _s_datem(coco_rows, radne)
     if not radne:
         return None
     v.datum = f"{radne[:4]}-{radne[4:6]}-{radne[6:8]}"
@@ -944,7 +960,10 @@ def zpracuj_senat(v: Volby, zipy: dict, prop: Propojeni) -> dict[int, dict]:
     reg, cis = Archiv(zipy["reg"]), Archiv(zipy["cis"])
     strany = Strany.z_archivu(cis)
     obvody = {_int(r.get("OBVOD"), -1): r for r in cis.rows("secobv.xml")} if cis.has("secobv.xml") else {}
-    res = zpracuj_senat_data(reg.rows("serk.xml"), strany, obvody, v.stranka, zipy["reg"], prop)
+    rows = reg.rows("serk.xml")
+    if v.datum:  # registry jednotlivých voleb od 2026 nemají DATUMVOLEB
+        rows = _s_datem(rows, v.datum.replace("-", ""))
+    res = zpracuj_senat_data(rows, strany, obvody, v.stranka, zipy["reg"], prop)
     for y in res.values():
         y["zdroje"] = [zipy["reg"], zipy["cis"]]
         y["strany"] = strany
@@ -1400,8 +1419,20 @@ def _merge_vysledky(nove: list[dict], hotove_klice: set[str]) -> list[dict]:
     return allr
 
 
+def cerstve(v: Volby, dni: int, dnes: str | None = None) -> bool:
+    """Volby, které proběhly za posledních `dni` dní (výsledky, 2. kolo a opravy ještě přibývají)."""
+    if not v.datum:
+        return False
+    d0 = dt.date.fromisoformat(v.datum)
+    d1 = dt.date.fromisoformat(dnes or today())
+    return 0 <= (d1 - d0).days <= dni
+
+
 def zip_urls(v: Volby) -> dict:
-    html = polite_get(v.stranka, max_age=7 * 86400, timeout=60).decode("utf-8", "replace")
+    # Stránka s odkazy na ZIPy: u čerstvých voleb ji ČSÚ přegenerovává s novými daty
+    # (registr po sečtení, 2. kolo Senátu), proto cache jen 6 hodin, jinak týden.
+    max_age = 6 * 3600 if cerstve(v, 60) else 7 * 86400
+    html = polite_get(v.stranka, max_age=max_age, timeout=60).decode("utf-8", "replace")
     z = najdi_zipy(html, v.stranka)
     if "reg" not in z or "cis" not in z:
         raise RuntimeError(f"{v.klic}: na {v.stranka} chybí ZIP registrů nebo číselníků ({z})")
@@ -1412,6 +1443,9 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--volby", nargs="*", help="např. ps-2021 kv-2022 se (výchozí: vše)")
     ap.add_argument("--seznam", action="store_true", help="jen vypíše konfiguraci")
+    ap.add_argument("--cerstve", type=int, metavar="DNI",
+                    help="jen volby konané za posledních DNI dní (denní běh po volbách); "
+                         "když žádné nejsou, skončí hned bez zápisu")
     args = ap.parse_args(argv)
     if args.seznam:
         for v in VOLBY:
@@ -1420,6 +1454,11 @@ def main(argv: list[str] | None = None) -> int:
     want = set(args.volby or [])
     vyber = [v for v in VOLBY if not want or v.klic in want or v.druh in want
              or (v.druh == "se" and any(w.startswith("se") for w in want))]
+    if args.cerstve is not None:
+        vyber = [v for v in vyber if cerstve(v, args.cerstve)]
+        if not vyber:
+            print(f"žádné volby za posledních {args.cerstve} dní, nic se nestahuje", file=sys.stderr)
+            return 0
     prop = Propojeni()
     nove_rows: list[dict] = []
     hotove: set[str] = set()

@@ -383,6 +383,34 @@ def test_zapisovac_bez_prav_na_schema_zapisuje_dal():
     assert z.flush() is True and z.zapsano == 1 and len(db.inserty("volani")) == 1
 
 
+def test_zapisovac_bez_ddl_a_bez_novych_sloupcu_zapisuje_puvodni():
+    """Stará tabulka bez sloupců nenalezeno/sirsi_rezim/kategorie a role bez DDL: INSERT jen
+    s původními sloupci, ať se statistika neztrácí."""
+    db = FakeDB()
+
+    class StaraTabulka(FakeConn):
+        def execute(self, sql, params=None):
+            if sql.lstrip().startswith("--") or "CREATE TABLE" in sql:
+                raise RuntimeError("permission denied for schema public")
+            if sql.startswith("SELECT nenalezeno"):
+                raise RuntimeError('column "nenalezeno" does not exist')
+            return super().execute(sql, params)
+
+    z = statistika.Zapisovac("dsn", lambda dsn: StaraTabulka(db))
+    z.pridej("volani", {**_volani(), "nenalezeno": True, "sirsi_rezim": False, "kategorie": "tema=jine"})
+    assert z.flush() is True and z.zapsano == 1
+    ((sql, _),) = db.inserty("volani")
+    assert "fallback" in sql and "nenalezeno" not in sql and "kategorie" not in sql
+
+    # s novými sloupci (schéma aplikované vlastníkem) se zapisují všechny
+    db2 = FakeDB()
+    z2 = statistika.Zapisovac("dsn", db2.connect)
+    z2.pridej("volani", {**_volani(), "nenalezeno": True, "sirsi_rezim": False, "kategorie": "tema=jine"})
+    assert z2.flush() is True
+    ((sql2, _),) = db2.inserty("volani")
+    assert "nenalezeno" in sql2 and "sirsi_rezim" in sql2 and "kategorie" in sql2
+
+
 def test_zapisovac_stara_sul_se_maze_a_stare_udalosti_bez_hashe():
     db = FakeDB()
     z = statistika.Zapisovac("dsn", db.connect)
@@ -633,9 +661,11 @@ def test_souhrn_timeout_a_cache(monkeypatch):
         def execute(self, sql, params=None):
             Conn.dotazu += 1
             if "FROM denni_souhrn" in sql:
-                return FakeCursor((120, 30, 12, 6))
+                return FakeCursor((120, 30, 12, 6, 9))
             if "FROM volani" in sql:
                 return FakeCursor([("search_kb", 80), ("find_people", 25)])
+            if "FROM pripojeni" in sql:
+                return FakeCursor([("claude-code", 20, 0), ("claude-ai", 10, 1)])
             return FakeCursor()
 
         def rollback(self):
@@ -647,6 +677,10 @@ def test_souhrn_timeout_a_cache(monkeypatch):
     out = statistika.souhrn_markdown(timeout=2, connect=lambda dsn: Conn())
     assert "Statistika za posledních 30 dní" in out and "Volání toolů: 120" in out
     assert "konverzací): 30" in out and "search_kb (80), find_people (25)" in out
+    assert "Nenalezeno (vyhledávání bez jediného výsledku): 6 (5 %)" in out
+    assert "Slabá shoda" in out and "9 (8 %)" in out and "není to neúspěch" in out
+    assert "„nenašel jsem“" not in out
+    assert "claude-code (20), claude-ai (10); přihlášených členů: 1" in out
     n = Conn.dotazu
     assert statistika.souhrn_markdown(connect=lambda dsn: Conn()) == out and Conn.dotazu == n  # cache
     statistika.reset_souhrn()

@@ -14,9 +14,34 @@ nemění.
 
 | Tabulka | Jeden řádek = | Sloupce |
 |---|---|---|
-| `volani` | jedno volání toolu | čas, tool, délka dotazu ve znacích, počet výsledků, trvání v ms, fallback „nenašel jsem“, chyba, rodina klienta, přihlášený ano/ne, denní pseudonym klienta, nasazení, prostředí |
+| `volani` | jedno volání toolu | čas, tool, délka dotazu ve znacích, počet výsledků, trvání v ms, příznaky `nenalezeno`, `sirsi_rezim` a `chyba` (a původní souhrnný `fallback`), u neúspěšných dotazů hrubá `kategorie`, rodina klienta, přihlášený ano/ne, denní pseudonym klienta, nasazení, prostředí |
 | `pripojeni` | jeden MCP požadavek `initialize`, tedy jedna konverzace, která připojila konektor | čas, název a verze klientské aplikace (`clientInfo`), verze protokolu, rodina klienta, přihlášený ano/ne, denní pseudonym, nasazení, prostředí |
 | `sul` | jeden den | náhodná sůl pro denní pseudonym; řádky starší než 2 dny se mažou |
+
+### Nenalezeno, slabá shoda a fallback
+
+- **`nenalezeno`**: báze odpověď nemá. Vyhledávací tool (`search_kb`, `find_people`,
+  `get_voting_record`, `find_elected`… seznam `SEARCH_TOOLS` v `server/telemetry.py`) nevrátil
+  žádnou položku, nebo výstup hlásí prázdný výsledek („báze nic nenašla“, „Šablona … neexistuje“).
+  Jen tohle je míra neúspěchu.
+- **`sirsi_rezim`**: výsledky jsou, ale slabé (víceslovný dotaz bez úplné shody nebo nízké
+  skóre), a tool proto přidal sekci „Přesnou odpověď jsem nenašel“ s kontaktem z `find_expert`.
+  Není to neúspěch.
+- **`fallback`**: původní souhrnný příznak (nenalezeno NEBO slabá shoda). Do 11. 10. 2026 se
+  vykazoval jako „nenašel jsem“, což míru neúspěchu nadhodnocovalo (9 z 27 volání, ale
+  vyhledávání u nich vracelo 6–10 výsledků). Zůstává kvůli kontinuitě; starší řádky se při
+  aplikaci schématu dopočítají do `nenalezeno` a `sirsi_rezim`.
+- **Počet výsledků** se počítá z očíslovaných položek a řádků tabulek. Dřív se počítaly jen
+  očíslované položky, takže `get_brand`, `get_template`, `pruvodce_zadosti` a `lhuty_zadosti`
+  vykazovaly 0 výsledků, i když data vrátily. U těchto nevyhledávacích toolů se nula
+  za neúspěch nepovažuje.
+- **`kategorie`** (jen u `nenalezeno` a `sirsi_rezim`): např. `typ=usneseni;uzemi=obec;tema=doprava`.
+  Skládá se jen z hodnot z pevných seznamů: filtr typu dokumentu, komora, druh voleb, územní
+  úroveň (že byla zadaná obec nebo kraj, ne která) a téma z pevného seznamu (`TEMATA`
+  v `server/telemetry.py`, jinak `jine`). Text dotazu, názvy obcí ani jména se neukládají.
+  Konkrétní otázky bez osobních údajů posílá AI sama přes `report_gap`: vyhledávací tool při
+  prázdném výsledku k výstupu připojí pokyn, a pokud odpověď nenajde ani jiný tool, AI hlášení
+  odešle.
 
 **Neukládá se:**
 
@@ -85,7 +110,7 @@ GRANT SELECT ON volani, pripojeni, denni_souhrn TO piratekb_zapis;   -- souhrn v
 CREATE ROLE piratekb_cteni LOGIN PASSWORD '…';
 GRANT USAGE ON SCHEMA public TO piratekb_cteni;
 GRANT SELECT ON volani, pripojeni, denni_souhrn, tydenni_souhrn, nastroje,
-                nastroje_tydne, klienti, neuspesne TO piratekb_cteni;
+                nastroje_tydne, klienti, neuspesne, nenalezene_kategorie TO piratekb_cteni;
 ```
 
 **Vypnutí:** smažte `PIRATEKB_STATS_DB` a nasaďte znovu. `PIRATEKB_TELEMETRY=0` vypne
@@ -125,8 +150,9 @@ python3 scripts/statistika.py --prostredi preview   # preview nasazení ('*' = v
 Report obsahuje:
 
 - souhrn: volání, připojení, volání na připojení, dny s provozem, různí klienti za den,
-  fallbacky, chyby, rychlost;
-- tabulku toolů (podíl, fallback, chyby, p50/p95);
+  nenalezeno, slabá shoda, chyby, rychlost;
+- tabulku toolů (podíl, nenalezeno, slabá shoda, chyby, p50/p95);
+- neúspěšné dotazy podle hrubé kategorie;
 - koncentraci používání;
 - týdenní trend;
 - klienty a klientské aplikace;
@@ -142,12 +168,13 @@ Konzole Neonu → projekt → **SQL Editor**. Pohledy ukazují jen produkci (`pr
 
 | Pohled | Co ukazuje |
 |---|---|
-| `denni_souhrn` | den: volání, připojení, různí klienti (odhad), fallbacky, chyby, podíl fallbacku, medián a p95 trvání |
+| `denni_souhrn` | den: volání, připojení, různí klienti (odhad), fallbacky, chyby, podíl fallbacku, medián a p95 trvání, **nenalezeno, podíl nenalezeno, slabá shoda** |
 | `tydenni_souhrn` | týden: totéž + volání na připojení, aktivní dny, klient-dny, max klientů za den, počet použitých toolů |
-| `nastroje` | tool za celou dobu: volání, podíl, fallbacky, chyby, p50/p95 ms, průměr výsledků, první a poslední použití |
+| `nastroje` | tool za celou dobu: volání, podíl, fallbacky, chyby, p50/p95 ms, průměr výsledků, první a poslední použití, nenalezeno, podíl nenalezeno, slabá shoda |
 | `nastroje_tydne` | tool × týden: volání, podíl v týdnu, fallback, p50 |
 | `klienti` | rodina klienta: volání, podíl, připojení, volání na připojení, volání přihlášených, klient-dny |
-| `neuspesne` | tooly s aspoň 10 voláními seřazené podle podílu fallbacku „nenašel jsem“ |
+| `neuspesne` | tooly s aspoň 10 voláními seřazené podle podílu nenalezeno (prázdný výsledek) |
+| `nenalezene_kategorie` | týden × tool × kategorie neúspěšného dotazu: počet nenalezeno a slabá shoda (podklad pro týdenní kontrolu kurátorem) |
 
 Hotové dotazy:
 
@@ -164,11 +191,14 @@ SELECT * FROM nastroje;
 -- kde báze nejčastěji nenašla odpověď
 SELECT * FROM neuspesne;
 
+-- co lidé hledají a báze nemá (kategorie z pevného seznamu, bez textu dotazu)
+SELECT * FROM nenalezene_kategorie LIMIT 30;
+
 -- vývoj jednoho toolu po týdnech
 SELECT * FROM nastroje_tydne WHERE tool = 'search_kb';
 
 -- tooly za posledních 30 dní
-SELECT tool, count(*) AS volani, round(avg(fallback::int), 3) AS podil_fallbacku
+SELECT tool, count(*) AS volani, round(avg(nenalezeno::int), 3) AS podil_nenalezeno
 FROM volani
 WHERE prostredi = 'production' AND cas > now() - interval '30 days'
 GROUP BY tool ORDER BY volani DESC;
@@ -210,8 +240,8 @@ Doporučuji se na čísla podívat po 4 týdnech od zveřejnění konektoru a zn
 3. **Volání na připojení** (`volani_na_pripojeni`) ukazuje, jestli AI bázi opravdu
    používá. Kolem 0–1 znamená, že je konektor zapnutý, ale AI ho skoro nevolá; 2 a víc
    znamená, že AI pracuje s více tooly v jedné konverzaci.
-4. **Podíl fallbacku „nenašel jsem“** (`podil_fallbacku` v týdnech a `neuspesne`) by měl
-   s doplňováním dat klesat. Tooly s vysokým podílem jsou kandidáti na doplnění dat nebo
+4. **Podíl nenalezeno** (`podil_nenalezeno` v týdnech a `neuspesne`) by měl s doplňováním
+   dat klesat; slabou shodu (`sirsi_rezim`) za neúspěch nepočítejte. Tooly s vysokým podílem jsou kandidáti na doplnění dat nebo
    lepší popis. Porovnejte s hlášeními `report_gap` (`kb://gaps/posledni`).
 5. **Koncentrace používání** (`nastroje.podil`, sekce „Koncentrace“ v reportu): pokud
    80 % volání padá na 2–3 tooly a jiné se nepoužívají vůbec, zvažte sloučení nebo
@@ -222,7 +252,7 @@ Doporučuji se na čísla podívat po 4 týdnech od zveřejnění konektoru a zn
 Orientační hranice (upravte podle cílů): když je po 3 měsících méně než asi 5 připojení
 týdně a volání na připojení pod 1, server se prakticky nepoužívá. Pak buď zlepšit
 propagaci a návody (`docs/pripojeni/`), nebo zvážit, jestli ho dál provozovat. Stabilní
-nebo rostoucí desítky připojení týdně s klesajícím fallbackem znamenají, že má smysl.
+nebo rostoucí desítky připojení týdně s klesajícím podílem nenalezeno znamenají, že má smysl.
 
 ## Údržba a objem
 

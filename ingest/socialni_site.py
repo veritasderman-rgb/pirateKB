@@ -68,6 +68,7 @@ from common import DATA, USER_AGENT, polite_get, today, write_jsonl, write_markd
 OUT = DATA / "social"
 UCTY = Path(__file__).resolve().parent / "socialni_site_ucty.yaml"
 MAX_NA_UCET = 500
+X_BLOK_PO = 2  # kolik účtů po sobě bez výsledku znamená, že X tuto síť blokuje
 BSKY_API = "https://public.api.bsky.app/xrpc"
 X_API = "https://api.x.com/2"
 X_SYND = "https://syndication.twitter.com/srv/timeline-profile/screen-name/{}?showReplies=false"
@@ -529,6 +530,8 @@ def main() -> int:
                  "nejnovějších příspěvků na účet; pro úplnou historii je potřeba placené X API v2.")
 
     browser: XBrowser | None = None
+    x_prazdne_po_sobe = 0  # X z datacenter (GitHub Actions) vrací 429/403: po X_BLOK_PO účtech bez
+    #                        jediného příspěvku se X v tomto běhu přeskočí (šetří ~35 s na účet)
     totals = defaultdict(lambda: {"ucty": 0, "nove": 0, "aktualizovane": 0, "celkem": 0})
     skipped = []
     try:
@@ -565,8 +568,14 @@ def main() -> int:
                     except Exception as e:  # noqa: BLE001
                         warn(f"X prohlížeč {handle}: {e}")
                     new = new[: args.limit]
+                    x_prazdne_po_sobe = 0 if new else x_prazdne_po_sobe + 1
+                    if x_prazdne_po_sobe >= X_BLOK_PO:
+                        warn(f"X: {X_BLOK_PO} účty po sobě bez jediného příspěvku (X blokuje přístup "
+                             "bez přihlášení z této sítě, typicky 429/403 z cloudu); zbylé účty na X "
+                             "se v tomto běhu přeskočí. Stálé řešení: X_BEARER_TOKEN (placené X API v2).")
+                        x_mode = "blokovano"
                 else:
-                    print("přeskočeno (X vypnuto)")
+                    print("přeskočeno (X " + ("zablokováno v tomto běhu)" if x_mode == "blokovano" else "vypnuto)"))
                     continue
                 path = OUT / platforma / f"{handle}.jsonl"
                 existing = load_existing(path)

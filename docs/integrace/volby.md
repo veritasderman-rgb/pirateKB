@@ -17,9 +17,15 @@ Specifikace pro hlavní agenta. Hotové a otestované jsou `ingest/volby.py`, `d
   = 720 (pole `pirat_podle`: `prislusnost`, `navrh`; u Senátu i `koalice`). Zvolen = `MANDAT=A`,
   Senát `ZVOLEN_K1=1` (1. kolo) nebo `ZVOLEN_K2=1` (2. kolo); `ZVOLEN_K1=2` = postup.
 - Pokrytí: Sněmovna 2010, 2013, 2017, 2021, 2025; EP 2014, 2019, 2024; kraje 2012, 2016, 2020,
-  2024; obce 2010, 2014, 2018, 2022; Senát 2010–2025 (kumulativní registr). Obce 2026 a Senát
-  2026 (9.–10. 10. 2026) jsou v konfiguraci, ale skript je přeskakuje, dokud volby neproběhnou
-  a v registru nejsou mandáty; pak je stačí znovu spustit.
+  2024; obce 2010, 2014, 2018, 2022, 2026; Senát 2010–2025 (kumulativní registr) a 2026
+  (1. kolo 9.–10. 10. 2026; 2. kolo přibude samo dalším během).
+- Od roku 2026 ČSÚ nevydává číselník `kvdatumvoleb.xml` a v registrech obcí i Senátu chybí
+  sloupec `DATUMVOLEB` (registr jednotlivých voleb obsahuje jen řádné volby); datum se pak
+  vezme z konfigurace (`Volby(..., datum=...)`).
+- Po volbách: `volby.py --cerstve 45` zpracuje jen volby z posledních 45 dní (jinak hned skončí
+  bez požadavků); spouští se v denním i týdenním běhu, takže zvolení jsou v bázi den po
+  zveřejnění registru a 2. kolo Senátu týden po volbách. Stránka otevřených dat se u čerstvých
+  voleb cachuje jen 6 hodin.
 - Obce: použijí se řádné volby a soudní opravy výsledků (`kvdatumvoleb.xml`, popis
   „Rozhodnutí … soud…“), u každého zastupitelstva nejnovější z nich; nové, dodatečné a
   opakované volby během období se nezahrnují.
@@ -40,7 +46,7 @@ Běh: ~35 s z cache; první běh stáhne 65 souborů / 53 MB (ZIPy obcí ~10 MB/
 ### `ingest/README.md`, tabulka „Zdroje a skripty“ (nový řádek)
 
 ```markdown
-| [volby.gov.cz otevřená data ČSÚ](https://volby.gov.cz/opendata/opendata.htm) (registry kandidátů a kandidátních listin, číselníky stran `cvs`/`cpp`/`cns`, souhrnné XML `vysledky`) | `volby.py` | `data/volby/vysledky/{druh}-{rok}.md`, `vysledky.jsonl`, `zvoleni/{druh}-{rok}.jsonl`, `zvoleni/{druh}-{rok}[-{kraj}].md`, `README.md` | výsledky Pirátů (kód strany 720, samostatně i v koalicích podle `SLOZENI`) ve volbách do Sněmovny (2010–2025), EP (2014–2024), krajů (2012–2024), obcí (2010–2022) a Senátu (2010–2025): hlasy, %, mandáty, partneři; zvolení Piráti (příslušnost nebo navržení Piráty) jmenovitě s kandidátkou, pořadím a přednostními hlasy; nezvolení jen počty | měsíčně (první týden v měsíci) a ručně po volbách; ~35 s z cache, první běh 53 MB / 2–3 min. `--volby ps-2021 kv-2022 se` jen vybrané volby, `--seznam` konfigurace; nové volby = řádek v `VOLBY` |
+| [volby.gov.cz otevřená data ČSÚ](https://volby.gov.cz/opendata/opendata.htm) (registry kandidátů a kandidátních listin, číselníky stran `cvs`/`cpp`/`cns`, souhrnné XML `vysledky`) | `volby.py` | `data/volby/vysledky/{druh}-{rok}.md`, `vysledky.jsonl`, `zvoleni/{druh}-{rok}.jsonl`, `zvoleni/{druh}-{rok}[-{kraj}].md`, `README.md` | výsledky Pirátů (kód strany 720, samostatně i v koalicích podle `SLOZENI`) ve volbách do Sněmovny (2010–2025), EP (2014–2024), krajů (2012–2024), obcí (2010–2026) a Senátu (2010–2026): hlasy, %, mandáty, partneři; zvolení Piráti (příslušnost nebo navržení Piráty) jmenovitě s kandidátkou, pořadím a přednostními hlasy; nezvolení jen počty | měsíčně (první týden v měsíci) a 45 dní po volbách denně (`--cerstve 45`); ~35 s z cache, první běh 53 MB / 2–3 min. `--volby ps-2021 kv-2022 se` jen vybrané volby, `--seznam` konfigurace; nové volby = řádek v `VOLBY` |
 ```
 
 ### `data/README.md`
@@ -85,7 +91,7 @@ Do „Zásady GDPR“ (nová odrážka):
 ## (b) Řádek do tabulky zdrojů v `README.md`
 
 ```markdown
-| [volby.gov.cz](https://volby.gov.cz/opendata/opendata.htm) (ČSÚ) | výsledky Pirátů ve volbách (Sněmovna, EP, Senát, kraje, obce 2010–2025) a zvolení Piráti | 27 voleb, 878 zvolených (PS 44, EP 4, Senát 9, kraje 107, obce 714) | měsíčně |
+| [volby.gov.cz](https://volby.gov.cz/opendata/opendata.htm) (ČSÚ) | výsledky Pirátů ve volbách (Sněmovna, EP, Senát, kraje, obce 2010–2026) a zvolení Piráti | 29 voleb, 1 108 zvolených (PS 44, EP 4, Senát 10, kraje 107, obce 943) | měsíčně, 45 dní po volbách denně |
 ```
 
 Do odrážek obsahu na začátku README (u „hlasování v Poslanecké sněmovně…“) lze přidat
@@ -321,7 +327,7 @@ def get_election_results(volby: str | None = None, rok: int | None = None, kraj:
     filtr = ", ".join(f"{k}={v}" for k, v in (("volby", volby), ("rok", rok), ("kraj", kraj), ("obec", obec)) if v)
     if not rows:
         return (f"Pro filtr {filtr or '(žádný)'} báze nic nenašla. Data pokrývají Sněmovnu 2010–2025, "
-                "EP 2014–2024, kraje 2012–2024, obce 2010–2022 a Senát 2010–2025; v obcích jen tam, "
+                "EP 2014–2024, kraje 2012–2024, obce 2010–2026 a Senát 2010–2026; v obcích jen tam, "
                 "kde kandidovala kandidátka s Piráty ve složení. Zkus jiný rok nebo bez filtru.")
     rows.sort(key=lambda r: (-int(r.get("rok") or 0), _VOLBY_PORADI.get(r.get("volby"), 9),
                              {"cr": 0, "souhrn": 0, "kraj": 1, "obvod": 2, "obec": 3}.get(r.get("uroven"), 9),

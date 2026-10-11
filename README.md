@@ -172,7 +172,7 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky
 | psp.cz | Piráti ve výborech, komisích a podvýborech Sněmovny: členství a funkce (předsedové, místopředsedové) s daty | 634 členství a funkcí v 279 orgánech | týdně |
 | rv.pirati.cz, rp.pirati.cz, rejstřík MV, archiv sbirka.pirati.cz | usnesení republikového výboru 2010–2014 a 2020–2023, zprávy ze zasedání RV 2019–2026, aktuální citace stanov o RV a RP, datum poslední změny stanov; historická znění vnitřních předpisů (stanovy, jednací řády, rozhodčí a volební řád, pravidla hospodaření …) do roku 2017 | 231 usnesení, 37 zasedání, 29 předpisů (3 aktuální) | týdně |
 | [senat.cz](https://www.senat.cz) | pirátští senátoři | 3 | měsíčně |
-| senat.cz | hlasování v Senátu (od 2012) | 6 794 | týdně |
+| senat.cz | hlasování v Senátu (od 2012); profily senátorů a měsíční přehledy hlasování jako dokumenty | 6 794 hlasování, 3 profily, 146 přehledů | týdně |
 | [HowTheyVote.eu](https://howtheyvote.eu) | pirátští europoslanci | 3 | týdně |
 | HowTheyVote.eu | závěrečná hlasování v Evropském parlamentu (od 2019, názvy anglicky) | 2 470 | týdně |
 | [Open Data Portal EP](https://data.europarl.europa.eu/) | projevy pirátských europoslanců v plénu (doslovný záznam, 2019–dnes; bez řízení schůze) | 234 vystoupení (Gregorová 136, Peksa 54, Kolaja 44) | týdně |
@@ -182,7 +182,7 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky
 | [opendata.praha.eu](https://opendata.praha.eu/) + [volby.cz](https://www.volby.cz) | pirátští zastupitelé hl. m. Prahy (2018–2022, 2022–2026) a jejich funkce v Radě HMP | 25 | týdně |
 | opendata.praha.eu | hlasování Zastupitelstva hl. m. Prahy o usneseních (od 11/2018) | 5 590 | týdně |
 | [usneseni.praha.eu](https://usneseni.praha.eu/) | usnesení ZHMP a Rady HMP od 11/2018 (Markdown: všechna ZHMP, RHMP jen předložená pirátskými radními) | 5 619 ZHMP + 24 119 RHMP (7 368 s pirátským předkladatelem) | týdně |
-| [volby.gov.cz](https://volby.gov.cz/opendata/opendata.htm) (ČSÚ) | výsledky Pirátů ve volbách (Sněmovna, EP, Senát, kraje, obce 2010–2025) a zvolení Piráti | 27 voleb, 878 zvolených (PS 44, EP 4, Senát 9, kraje 107, obce 714) | měsíčně |
+| [volby.gov.cz](https://volby.gov.cz/opendata/opendata.htm) (ČSÚ) | výsledky Pirátů ve volbách (Sněmovna, EP, Senát, kraje, obce 2010–2026) a zvolení Piráti | 29 voleb, 1 108 zvolených (PS 44, EP 4, Senát 10, kraje 107, obce 943) | měsíčně, 45 dní po volbách denně |
 | [ÚDH](https://udh.gov.cz/vyrocni-financni-zpravy-stran-a-hnuti), [Fio](https://ib.fio.cz/ib/transparent?a=2100048174), [Piroplácení](https://piroplaceni.pirati.cz) | financování strany: výroční finanční zprávy (2017–2025), zprávy o kampaních, rozpočty, měsíční souhrny transparentních účtů | 9 zpráv, 12 kampaní, 9 rozpočtů, 7 účtů (174 měsíců) | měsíčně (účty), ročně (zprávy) |
 | X (Twitter) | příspěvky poslanců a politiků | 1 000 | denně |
 | Bluesky | příspěvky politiků | 130 | denně |
