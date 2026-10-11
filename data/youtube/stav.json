@@ -2,12 +2,12 @@
  "kanaly": {
   "https://www.youtube.com/@CeskaPiratskaStrana": {
    "nazev": "Piráti",
-   "seznam_nacten": "2026-10-10T10:55:48",
+   "seznam_nacten": "2026-10-11T11:29:57",
    "videi_v_seznamu": 612
   },
   "https://www.youtube.com/channel/UCcf12G_5igxOSZBFSt4eEAQ": {
    "nazev": "Markéta Gregorová",
-   "seznam_nacten": "2026-10-10T10:55:51",
+   "seznam_nacten": "2026-10-11T11:30:02",
    "videi_v_seznamu": 269
   }
  },
@@ -25,6 +25,22 @@
    "datum": "2025-10-02",
    "stav": "hotovo",
    "titulky": "auto"
+  },
+  "07vIr4iRqw4": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:33:27",
+   "datum": "2024-07-14",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "0JoFDcy3MQw": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:33:51",
+   "datum": "2024-06-16",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
   },
   "2JTorUElnEc": {
    "behu_bez_titulku": 2,
@@ -48,6 +64,14 @@
    "stav": "hotovo",
    "titulky": "zadne"
   },
+  "4I57c3CsLGQ": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:34:39",
+   "datum": "2024-05-14",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "4RvwXR1tsy0": {
    "cas": "2026-10-06T16:24:31",
    "datum": "2026-09-09",
@@ -64,6 +88,22 @@
    "behu_bez_titulku": 2,
    "cas": "2026-10-10T10:57:54",
    "datum": "2015-08-24",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "6PldZ-EokY0": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:32:52",
+   "datum": "2025-10-10",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "6cIPO1hE9T0": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:35:01",
+   "datum": "2024-04-28",
    "jazyk_videa": null,
    "stav": "hotovo",
    "titulky": "zadne"
@@ -108,6 +148,14 @@
    "stav": "hotovo",
    "titulky": "zadne"
   },
+  "9tl5lsIOeaM": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:34:15",
+   "datum": "2024-05-21",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "A5TPRsvDHZ8": {
    "behu_bez_titulku": 2,
    "cas": "2026-10-08T11:47:55",
@@ -125,8 +173,8 @@
    "titulky": "zadne"
   },
   "BlruHUl0X14": {
-   "behu_bez_titulku": 1,
-   "cas": "2026-10-10T11:00:59",
+   "behu_bez_titulku": 2,
+   "cas": "2026-10-11T11:31:04",
    "datum": "2024-11-15",
    "jazyk_videa": null,
    "stav": "hotovo",
@@ -144,6 +192,14 @@
    "behu_bez_titulku": 2,
    "cas": "2026-10-10T10:57:30",
    "datum": "2025-02-11",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "DwRBbnjY4g0": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:34:02",
+   "datum": "2025-09-29",
    "jazyk_videa": null,
    "stav": "hotovo",
    "titulky": "zadne"
@@ -170,6 +226,22 @@
    "stav": "hotovo",
    "titulky": "zadne"
   },
+  "GyLfIH1gnw8": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:34:27",
+   "datum": "2025-09-17",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "H7Xe1PB_Y_A": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:32:17",
+   "datum": "2024-09-22",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "HElNfVssSrs": {
    "behu_bez_titulku": 2,
    "cas": "2026-10-08T11:49:39",
@@ -192,6 +264,14 @@
    "stav": "hotovo",
    "titulky": "auto"
   },
+  "Izma4OijFlI": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:31:52",
+   "datum": "2024-10-14",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "JviAiF0nifk": {
    "behu_bez_titulku": 2,
    "cas": "2026-10-09T11:39:37",
@@ -208,9 +288,17 @@
    "stav": "hotovo",
    "titulky": "zadne"
   },
-  "KB-lwJGduRg": {
+  "K3axu82LRTI": {
    "behu_bez_titulku": 1,
-   "cas": "2026-10-10T11:01:35",
+   "cas": "2026-10-11T11:35:36",
+   "datum": "2025-09-11",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "KB-lwJGduRg": {
+   "behu_bez_titulku": 2,
+   "cas": "2026-10-11T11:30:53",
    "datum": "2026-01-28",
    "jazyk_videa": null,
    "stav": "hotovo",
@@ -249,8 +337,8 @@
    "titulky": "zadne"
   },
   "LdfMi4p9Sq8": {
-   "behu_bez_titulku": 1,
-   "cas": "2026-10-10T11:01:22",
+   "behu_bez_titulku": 2,
+   "cas": "2026-10-11T11:31:29",
    "datum": "2024-10-22",
    "jazyk_videa": null,
    "stav": "hotovo",
@@ -286,11 +374,27 @@
    "stav": "hotovo",
    "titulky": "zadne"
   },
+  "P5iPBwRZ3wE": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:32:39",
+   "datum": "2024-09-17",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "PUBsN0k7s9Y": {
    "behu_bez_titulku": 1,
    "cas": "2026-10-06T16:34:48",
    "datum": "2026-06-16",
    "jazyk_videa": "en",
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "PzniPAxXT8g": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:31:41",
+   "datum": "2026-01-15",
+   "jazyk_videa": null,
    "stav": "hotovo",
    "titulky": "zadne"
   },
@@ -331,8 +435,8 @@
    "titulky": "zadne"
   },
   "Sr4bfazIepk": {
-   "behu_bez_titulku": 1,
-   "cas": "2026-10-10T11:00:37",
+   "behu_bez_titulku": 2,
+   "cas": "2026-10-11T11:30:42",
    "datum": "2024-11-16",
    "jazyk_videa": null,
    "stav": "hotovo",
@@ -392,6 +496,14 @@
    "stav": "hotovo",
    "titulky": "auto"
   },
+  "Xg0M9H4EtwE": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:31:17",
+   "datum": "2026-01-22",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "XgiYD8RsYJo": {
    "cas": "2026-10-06T16:30:58",
    "datum": "2026-04-02",
@@ -407,8 +519,8 @@
    "titulky": "zadne"
   },
   "YH2eKU0Du2g": {
-   "behu_bez_titulku": 1,
-   "cas": "2026-10-10T11:01:12",
+   "behu_bez_titulku": 2,
+   "cas": "2026-10-11T11:30:31",
    "datum": "2026-02-04",
    "jazyk_videa": null,
    "stav": "hotovo",
@@ -452,6 +564,14 @@
    "stav": "hotovo",
    "titulky": "auto"
   },
+  "_B1A0adphdk": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:33:40",
+   "datum": "2025-09-29",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "_I-nwUFCkWc": {
    "cas": "2026-10-06T16:29:53",
    "datum": "2025-04-23",
@@ -465,8 +585,8 @@
    "titulky": "auto"
   },
   "a0jbK8NQqZo": {
-   "behu_bez_titulku": 3,
-   "cas": "2026-10-10T10:56:21",
+   "behu_bez_titulku": 4,
+   "cas": "2026-10-11T11:30:19",
    "datum": "2026-10-08",
    "jazyk_videa": null,
    "stav": "hotovo",
@@ -526,6 +646,14 @@
    "stav": "hotovo",
    "titulky": "zadne"
   },
+  "foFAW1nyz0o": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:35:47",
+   "datum": "2024-04-15",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "gGle2UoKMkY": {
    "cas": "2026-10-06T16:27:21",
    "datum": "2026-10-06",
@@ -536,6 +664,22 @@
    "behu_bez_titulku": 2,
    "cas": "2026-10-08T11:50:14",
    "datum": "2021-01-09",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "hT_7_CYdB4A": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:33:03",
+   "datum": "2024-07-31",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "iwNBrqcpZOA": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:32:04",
+   "datum": "2025-12-22",
    "jazyk_videa": null,
    "stav": "hotovo",
    "titulky": "zadne"
@@ -556,10 +700,34 @@
    "stav": "hotovo",
    "titulky": "zadne"
   },
+  "kuiFc3W7YSY": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:35:13",
+   "datum": "2025-09-12",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
   "lHQ54xL5Bk0": {
    "behu_bez_titulku": 2,
    "cas": "2026-10-08T11:47:32",
    "datum": "2026-04-30",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "lhWxLTsZ3Vk": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:32:28",
+   "datum": "2025-11-30",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "msJ17c9v6vk": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:33:14",
+   "datum": "2025-10-01",
    "jazyk_videa": null,
    "stav": "hotovo",
    "titulky": "zadne"
@@ -574,6 +742,22 @@
    "behu_bez_titulku": 2,
    "cas": "2026-10-09T11:39:25",
    "datum": "2026-07-21",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "pMvrenq6HMc": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:34:50",
+   "datum": "2025-09-12",
+   "jazyk_videa": null,
+   "stav": "hotovo",
+   "titulky": "zadne"
+  },
+  "prU23nQYS14": {
+   "behu_bez_titulku": 1,
+   "cas": "2026-10-11T11:35:24",
+   "datum": "2024-04-27",
    "jazyk_videa": null,
    "stav": "hotovo",
    "titulky": "zadne"
@@ -673,8 +857,8 @@
    "titulky": "zadne"
   },
   "vhbKADfhkz0": {
-   "behu_bez_titulku": 2,
-   "cas": "2026-10-10T10:55:57",
+   "behu_bez_titulku": 3,
+   "cas": "2026-10-11T11:30:07",
    "datum": "2026-10-08",
    "jazyk_videa": null,
    "stav": "hotovo",
