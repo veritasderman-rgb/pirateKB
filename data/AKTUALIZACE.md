@@ -4,7 +4,7 @@ nazev: Stav aktualizací
 typ: materialy
 viditelnost: verejne
 autorita: oficialni-evidence
-stazeno: 2026-10-13
+stazeno: 2026-10-14
 ---
 
 # Stav aktualizací znalostní báze
@@ -15,28 +15,28 @@ jak dopadl a kolik dat v bázi je. Řádek, který v posledním běhu nebyl spu�
 neobnovuje týdenní zdroje), zůstává z předchozího běhu. Sloupce `Soubory` a `Řádky` se vždy
 přepočítají z aktuálního obsahu `data/`.
 
-Poslední běh: **2026-10-13 11:49 UTC, režim denni**.
+Poslední běh: **2026-10-14 09:31 UTC, režim denni**.
 
 | Zdroj | Poslední běh (UTC) | Výsledek | Poslední úspěšný běh | Soubory .md | Řádky .jsonl |
 |---|---|---|---|---|---|
 | `styleguide` styleguide.pirati.cz (barvy, písma) | — | nespuštěno | — | 1 | 0 |
-| `psp` psp.cz otevřená data (poslanci, hlasování) | 2026-10-13 11:49 (denni, 35 s) | OK | 2026-10-13 11:49 | 2815 | 32633 |
+| `psp` psp.cz otevřená data (poslanci, hlasování) | 2026-10-14 09:31 (denni, 9 s) | OK | 2026-10-14 09:31 | 2815 | 32633 |
 | `steno` psp.cz stenozáznamy (vystoupení pirátských poslanců) | — | nespuštěno | — | 1342 | 7827 |
 | `tisky` psp.cz sněmovní tisky a interpelace Pirátů | — | nespuštěno | — | 346 | 1188 |
 | `pozmenovaky` psp.cz pozměňovací návrhy a výbory Pirátů | — | nespuštěno | — | 1123 | 1123 |
 | `predpisy` předpisy a usnesení orgánů strany (rv.pirati.cz, rejstřík MV, archiv sbírky) | — | nespuštěno | — | 285 | 321 |
 | `ep_aktivita` Evropský parlament: projevy, otázky a zprávy pirátských europoslanců | — | nespuštěno | — | 422 | 555 |
 | `lide_pirati` lide.pirati.cz (struktura, lidé s funkcí) | — | nespuštěno | — | 293 | 735 |
-| `pirati_web` pirati.cz (aktuality, program, profily) | 2026-10-13 11:49 (denni, 159 s) | OK | 2026-10-13 11:49 | 3672 | 3586 |
+| `pirati_web` pirati.cz (aktuality, program, profily) | 2026-10-14 09:31 (denni, 164 s) | OK | 2026-10-14 09:31 | 3675 | 3589 |
 | `flickr` Flickr Pirátů (metadata alb) | — | nespuštěno | — | 1 | 125 |
-| `evidence` evidence.pirati.cz (lobbistické schůzky) | 2026-10-13 11:49 (denni, 3 s) | OK | 2026-10-13 11:49 | 7260 | 7761 |
-| `volby` volby.gov.cz (výsledky voleb a zvolení Piráti, ČSÚ) | 2026-10-13 11:49 (denni, 9 s) | OK | 2026-10-13 11:49 | 125 | 2075 |
+| `evidence` evidence.pirati.cz (lobbistické schůzky) | 2026-10-14 09:31 (denni, 3 s) | OK | 2026-10-14 09:31 | 7260 | 7761 |
+| `volby` volby.gov.cz (výsledky voleb a zvolení Piráti, ČSÚ) | 2026-10-14 09:31 (denni, 9 s) | OK | 2026-10-14 09:31 | 125 | 2075 |
 | `financovani` financování strany (ÚDH, transparentní účty Fio, Piroplácení) | — | nespuštěno | — | 38 | 204 |
-| `socialni_site` X a Bluesky poslanců | 2026-10-13 11:49 (denni, 70 s) | OK | 2026-10-13 11:49 | 372 | 1130 |
+| `socialni_site` X a Bluesky poslanců | 2026-10-14 09:31 (denni, 71 s) | OK | 2026-10-14 09:31 | 372 | 1130 |
 | `subweby` subwebů strany | — | nespuštěno | — | 3640 | 0 |
 | `dokumenty` dokumenty strany (PDF) | — | nespuštěno | — | 8 | 0 |
 | `frankbold` publikace Frank Bold (frankbold.org; karty, plný text jen s licencí CC) | — | nespuštěno | — | 134 | 96 |
-| `media` média | 2026-10-13 11:49 (denni, 382 s) | OK | 2026-10-13 11:49 | 208 | 2993 |
+| `media` média | 2026-10-14 09:31 (denni, 341 s) | OK | 2026-10-14 09:31 | 208 | 3066 |
 | `systemy` systémy a návody | — | nespuštěno | — | 2 | 359 |
 
 ## Chyby posledního běhu
