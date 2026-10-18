@@ -3,7 +3,7 @@ zdroj: https://volby.gov.cz/opendata/opendata.htm
 nazev: Volební výsledky Pirátů 2010–dnes (přehled)
 typ: volby
 viditelnost: verejne
-stazeno: '2026-10-11'
+stazeno: '2026-10-18'
 autorita: oficialni-data-csu
 ---
 
@@ -42,7 +42,7 @@ Výsledky České pirátské strany ve volbách od roku 2010 z otevřených dat 
 | 2024 | zastupitelstev krajů | kandidátky s Piráty celkem (součet za kraje) | ProOl | 92 167 | 3,87 % | 3 | 3 | vysledky/kz-2024.md |
 | 2025 | Poslanecké sněmovny | Česká pirátská strana | – | 504 537 | 8,97 % | 18 | 18 | vysledky/ps-2025.md |
 | 2025 | Senát | 1 kandidátů s vazbou na Piráty | – | – | – | 1 | 1 | vysledky/se-2025.md |
-| 2026 | Senát | 15 kandidátů s vazbou na Piráty | – | – | – | 1 | 1 | vysledky/se-2026.md |
+| 2026 | Senát | 15 kandidátů s vazbou na Piráty | – | – | – | 6 | 6 | vysledky/se-2026.md |
 | 2026 | zastupitelstev obcí | 173 kandidátek | BST, Budoucnost, Fakt Brno, GEN, Generace, HR, Idealisté, JsmePRO!, KDU-ČSL, KOA, LES, NČ, ODS, PRAHA SOBĚ, PRO Zdraví, SOM, STAN, Slezská, TOP 09, UFO, Volt, ZS, Zelení, nezávislí kandidáti | – | – | 513 | 229 | vysledky/kv-2026.md |
 
 Mandáty = všechny mandáty kandidátky s Piráty (u koalic i partnerů); zvolení Piráti = kandidáti s politickou příslušností Piráti nebo navržení Piráty (u Senátu i kandidáti koalic s Piráty, viz pole `pirat_podle`). U obecních voleb se hlasy nesčítají.
