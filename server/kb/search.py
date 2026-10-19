@@ -610,22 +610,27 @@ class KB:
                 out.append(v[:-3])
         return list(dict.fromkeys(v for v in out if v))
 
+    def documents_by_source(self, url: str, limit: int = 20) -> list[dict]:
+        """Dokumenty, jejichž ``zdroj`` je dané URL (s lomítkem na konci i bez, bez kotvy #).
+        Jedno URL může sdílet víc dokumentů (profil na X po měsících, kapitoly jednoho PDF,
+        usnesení z jedné stránky)."""
+        base = (url or "").strip().split("#", 1)[0].rstrip("/")
+        if not base.startswith(("http://", "https://")):
+            return []
+        return self._rows("SELECT id AS doc_id, nazev, datum FROM documents WHERE zdroj IN (?, ?) "
+                          "ORDER BY datum DESC, id LIMIT ?", (base, base + "/", limit))
+
     def resolve_document_id(self, doc_id: str) -> str | None:
         """Najde skutečné id dokumentu: přesná shoda, běžné varianty zápisu id, nebo URL
-        zdroje (pole ``zdroj``, s lomítkem na konci i bez). Neveřejný dokument se nenajde
-        stejně jako u přesné shody."""
+        zdroje (pole ``zdroj``, s lomítkem na konci i bez) – URL jen když mu odpovídá právě
+        jeden dokument; sdílené URL se nehádá (viz :meth:`documents_by_source`). Neveřejný
+        dokument se nenajde stejně jako u přesné shody."""
         varianty = self._id_varianty(doc_id)
         for v in varianty:
             if self._rows("SELECT id FROM documents WHERE id = ?", (v,)):
                 return v
-        did = varianty[0] if varianty else ""
-        if did.startswith(("http://", "https://")):
-            base = did.split("#", 1)[0].rstrip("/")
-            rows = self._rows("SELECT id FROM documents WHERE zdroj IN (?, ?) ORDER BY length(id) LIMIT 1",
-                              (base, base + "/"))
-            if rows:
-                return rows[0]["id"]
-        return None
+        kandidati = self.documents_by_source(varianty[0] if varianty else "", limit=2)
+        return kandidati[0]["doc_id"] if len(kandidati) == 1 else None
 
     def get_document(self, doc_id: str) -> dict | None:
         real = self.resolve_document_id(doc_id)

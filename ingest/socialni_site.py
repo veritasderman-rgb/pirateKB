@@ -526,6 +526,7 @@ def main() -> int:
                 warn("X: Playwright není nainstalován (pip install playwright && playwright install chromium); "
                      "X se přeskočí. Alternativa: X_BEARER_TOKEN pro oficiální API.")
                 x_mode = "zadny"
+                x_selhalo = True
         if not token:
             warn("X: bez X_BEARER_TOKEN jde bez přihlášení získat jen ~100 nejúspěšnějších a několik "
                  "nejnovějších příspěvků na účet; pro úplnou historii je potřeba placené X API v2.")

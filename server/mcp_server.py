@@ -799,8 +799,16 @@ def get_document(doc_id: str, strana: int = 1) -> str:
     did = _clean(doc_id)
     if not did:
         return "Chybí doc_id. Získej ho z výsledků search_kb."
-    doc = get_kb().get_document(did)
+    kb = get_kb()
+    doc = kb.get_document(did)
     if not doc:
+        kandidati = kb.documents_by_source(did, limit=10)
+        if len(kandidati) > 1:
+            radky = [f"{i}. `{k['doc_id']}` – {_clean(k.get('nazev')) or k['doc_id']}"
+                     + (f" ({_clean(k.get('datum'))})" if not _blank(k.get("datum")) else "")
+                     for i, k in enumerate(kandidati, 1)]
+            return (f"Zdroj `{did}` sdílí v bázi víc dokumentů; zavolej get_document "
+                    "s konkrétním doc_id:\n\n" + "\n".join(radky))
         return f"Dokument `{did}` v bázi není. Zkus search_kb."
     did = _s(doc.get("doc_id")) or did
     meta_lines = [f"# {_clean(doc.get('nazev')) or did}", ""]

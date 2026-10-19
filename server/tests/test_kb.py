@@ -99,8 +99,14 @@ def test_documents(kb: KB):
     for varianta in ("data/pirati-web/program/01-snemovni-volby-2025.md",
                      "`pirati-web/program/01-snemovni-volby-2025`"):
         assert kb.get_document(varianta)["doc_id"] == doc["doc_id"]
-    if doc.get("zdroj", "").startswith("http"):
-        assert kb.get_document(doc["zdroj"].rstrip("/") + "/") is not None
+    if doc.get("zdroj", "").startswith("http") and len(kb.documents_by_source(doc["zdroj"])) == 1:
+        assert kb.get_document(doc["zdroj"].rstrip("/") + "/")["doc_id"] == doc["doc_id"]
+    # URL sdílené víc dokumenty (měsíce profilu na X, kapitoly jednoho PDF) se nehádá
+    sdilene = kb.con.execute("SELECT zdroj FROM documents WHERE zdroj LIKE 'http%' "
+                             "GROUP BY zdroj HAVING COUNT(*) > 1 LIMIT 1").fetchone()
+    assert sdilene
+    assert kb.get_document(sdilene[0]) is None
+    assert len(kb.documents_by_source(sdilene[0])) > 1
     lst = kb.list_documents(typ=["tiskova-zprava"], limit=5)
     assert len(lst) == 5 and all(d["typ"] == "tiskova-zprava" for d in lst)
     lst = kb.list_documents(kolekce=["psp"], typ=["hlasovani"])
