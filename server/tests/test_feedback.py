@@ -223,6 +223,34 @@ def test_telemetry_nenalezeno_vs_slaba_shoda():
     assert not telemetry.is_nenalezeno("Chyba při zpracování: x", "search_kb")
 
 
+def test_telemetry_odrazkove_tooly_nejsou_falesne_nenalezeno():
+    # úspěšný get_document a get_committees vracejí odrážky, ne očíslovaný seznam
+    doc = "# Název\n\n- Typ: aktualita\n- Autorita: web\n- Zdroj: https://x\n\n---\n\nText."
+    assert telemetry.count_results(doc) == 0
+    assert not telemetry.is_nenalezeno(doc, "get_document")
+    assert telemetry.is_nenalezeno("Dokument `x` v bázi není. Zkus search_kb.", "get_document")
+    vybory = "## Novák: výbory, komise a funkce v PS\n\n- Člen – Rozpočtový výbor, 2021 – dosud"
+    assert not telemetry.is_nenalezeno(vybory, "get_committees")
+    assert telemetry.is_nenalezeno(
+        "Žádné členství ani funkce neodpovídají filtrům (poslanec, organ, obdobi, jen_vedeni).",
+        "get_committees")
+    # nepřihlášený uživatel u interních zdrojů = chybí oprávnění, ne mezera v bázi
+    login = ("Interní (neveřejné) zdroje báze jsou jen pro ověřené členy Pirátské strany.\n\n"
+             "Tento požadavek nemá ověřenou členskou identitu.")
+    assert not telemetry.is_nenalezeno(login, "hledat_interni")
+    assert telemetry.is_nenalezeno("Interní zdroje: nic.", "hledat_interni")
+
+
+def test_telemetry_kategorie_vybory_lide_dokument():
+    assert telemetry.kategorie_dotazu("get_committees", {"organ": "rozpočtový"}) == "tema=ekonomika"
+    assert telemetry.kategorie_dotazu("find_people", {"region": "Brno"}) == "uzemi=kraj"
+    assert telemetry.kategorie_dotazu("find_people", {"jednotka": "KS Praha"}) == "uzemi=jednotka"
+    k = telemetry.kategorie_dotazu("get_document", {"doc_id": "https://www.pirati.cz/tajne/"})
+    assert k == "doc=url" and "pirati" not in k
+    assert telemetry.kategorie_dotazu("get_document", {"doc_id": "pirati-web/a.md"}) == "doc=cesta"
+    assert telemetry.kategorie_dotazu("get_document", {"doc_id": "abc123"}) == "doc=bez-cesty"
+
+
 def test_telemetry_kategorie_bez_textu_dotazu():
     k = telemetry.kategorie_dotazu("search_kb", {"query": "Kdo z Pirátů je zastupitel v Horní Dolní?",
                                                  "typ": ["usneseni", "<script>"], "obec": "Horní Dolní"})

@@ -82,6 +82,13 @@ FALLBACK_MARKERS = (
 EMPTY_MARKERS = FALLBACK_MARKERS[1:] + (
     "Žádný zvolený Pirát",                    # find_elected
     "neexistuje. Dostupné:",                  # get_template
+    "Žádné členství ani funkce neodpovídají", # get_committees
+    "mezi pirátskými poslanci (2017–dnes) nenašel",  # get_committees
+)
+# Výstupy, které nejsou „báze nic nemá“, ale chybějící oprávnění (nepřihlášený uživatel
+# u interních zdrojů). Nezapočítávají se jako nenalezeno ani nedostanou nápovědu report_gap.
+NEOPRAVNENO_MARKERS = (
+    "jsou jen pro ověřené členy",             # hledat_interni bez přihlášení
 )
 # Tooly, které vracejí očíslovaný seznam nalezených položek: nula položek = nenalezeno.
 # U ostatních (brand, šablony, průvodce, lhůty, statistika) se počet položek nevykládá
@@ -89,9 +96,13 @@ EMPTY_MARKERS = FALLBACK_MARKERS[1:] + (
 SEARCH_TOOLS = frozenset({
     "search_kb", "find_people", "get_program", "get_position", "search_press_releases",
     "find_expert", "get_voting_record", "get_resolutions", "get_social_posts", "get_speeches",
-    "get_government_record", "get_bills", "get_amendments", "get_committees",
-    "get_election_results", "find_elected", "get_document", "hledat_interni",
+    "get_government_record", "get_bills", "get_amendments",
+    "get_election_results", "find_elected", "hledat_interni",
 })
+# get_document a get_committees vracejí odrážky (metadata, členství), ne očíslovaný seznam;
+# nula očíslovaných položek u nich neznamená prázdný výsledek. Nenalezeno je u nich jen
+# podle výslovné hlášky z EMPTY_MARKERS; nápovědu report_gap ale dostanou stejně.
+GAP_HINT_TOOLS = SEARCH_TOOLS | {"get_committees", "get_document"}
 FALLBACK_ALL_OF = {
     "find_expert": ("Nikdo s rolí nebo medailonkem", "Žádný resortní tým"),
 }
@@ -215,6 +226,8 @@ def is_nenalezeno(output: Any, tool: str | None = None, pocet: int | None = None
     every = FALLBACK_ALL_OF.get(tool or "")
     if every:
         return all(m in output for m in every)
+    if any(m in output for m in NEOPRAVNENO_MARKERS):
+        return False
     if any(m in output for m in EMPTY_MARKERS):
         return True
     if tool in SEARCH_TOOLS:
@@ -254,10 +267,17 @@ def kategorie_dotazu(tool: str, arguments: dict[str, Any]) -> str:
             casti.append(f"{klic}={hodnota.strip().lower()}")
     if arguments.get("obec"):
         casti.append("uzemi=obec")
-    elif arguments.get("kraj"):
+    elif arguments.get("kraj") or arguments.get("region"):
         casti.append("uzemi=kraj")
+    elif arguments.get("jednotka"):
+        casti.append("uzemi=jednotka")
+    if tool == "get_document":
+        did = str(arguments.get("doc_id") or "").strip()
+        casti.append("doc=url" if did.startswith(("http://", "https://"))
+                     else "doc=cesta" if "/" in did else "doc=bez-cesty" if did else "doc=prazdne")
     text = " ".join(str(v) for k, v in arguments.items()
-                    if isinstance(v, str) and k in ("query", "dotaz", "tema", "otazka", "q", "role"))
+                    if isinstance(v, str) and k in ("query", "dotaz", "tema", "otazka", "q", "role",
+                                                    "organ"))
     if text.strip():
         folded = _fold(text)
         slova = re.findall(r"[a-z0-9]+", folded)
@@ -380,7 +400,7 @@ def wrap(fn: Callable[..., Any], name: str | None = None) -> Callable[..., Any]:
         record(tool_name, query_length(arguments), pocet,
                (time.perf_counter() - t0) * 1000, fallback=is_fallback(out, tool_name),
                chyba=is_error(out), nenalezeno=nenalezeno, sirsi_rezim=sirsi, kategorie=kategorie)
-        if nenalezeno and isinstance(out, str) and tool_name in SEARCH_TOOLS:
+        if nenalezeno and isinstance(out, str) and tool_name in GAP_HINT_TOOLS:
             out = out.rstrip() + "\n\n" + REPORT_GAP_HINT
         return out
 

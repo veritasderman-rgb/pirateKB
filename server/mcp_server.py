@@ -802,6 +802,7 @@ def get_document(doc_id: str, strana: int = 1) -> str:
     doc = get_kb().get_document(did)
     if not doc:
         return f"Dokument `{did}` v bázi není. Zkus search_kb."
+    did = _s(doc.get("doc_id")) or did
     meta_lines = [f"# {_clean(doc.get('nazev')) or did}", ""]
     for label, key in (("Typ", "typ"), ("Datum", "datum"), ("Autor", "autor"),
                        ("Kolekce", "kolekce"), ("Viditelnost", "viditelnost")):

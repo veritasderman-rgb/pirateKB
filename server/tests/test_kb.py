@@ -95,6 +95,12 @@ def test_documents(kb: KB):
     assert doc and doc["typ"] == "program" and "bydlení" in doc["body"].lower()
     assert doc["meta"]["poradi"] == 1
     assert kb.get_document("neexistuje") is None
+    # běžné varianty zápisu id a URL zdroje vedou na stejný dokument
+    for varianta in ("data/pirati-web/program/01-snemovni-volby-2025.md",
+                     "`pirati-web/program/01-snemovni-volby-2025`"):
+        assert kb.get_document(varianta)["doc_id"] == doc["doc_id"]
+    if doc.get("zdroj", "").startswith("http"):
+        assert kb.get_document(doc["zdroj"].rstrip("/") + "/") is not None
     lst = kb.list_documents(typ=["tiskova-zprava"], limit=5)
     assert len(lst) == 5 and all(d["typ"] == "tiskova-zprava" for d in lst)
     lst = kb.list_documents(kolekce=["psp"], typ=["hlasovani"])

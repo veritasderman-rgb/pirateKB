@@ -596,13 +596,47 @@ class KB:
 
     # ------------------------------------------------------------ dokumenty
 
+    @staticmethod
+    def _id_varianty(doc_id: str) -> list[str]:
+        """Varianty id, které AI asistenti běžně posílají místo přesného id: s prefixem
+        ``data/`` nebo ``content/``, v uvozovkách či zpětných apostrofech, s příponou ``.md``."""
+        did = (doc_id or "").strip().strip("`'\"").strip()
+        out = [did]
+        for prefix in ("./", "data/", "content/"):
+            if did.startswith(prefix):
+                out.append(did[len(prefix):])
+        for v in list(out):
+            if v.endswith(".md"):
+                out.append(v[:-3])
+        return list(dict.fromkeys(v for v in out if v))
+
+    def resolve_document_id(self, doc_id: str) -> str | None:
+        """Najde skutečné id dokumentu: přesná shoda, běžné varianty zápisu id, nebo URL
+        zdroje (pole ``zdroj``, s lomítkem na konci i bez). Neveřejný dokument se nenajde
+        stejně jako u přesné shody."""
+        varianty = self._id_varianty(doc_id)
+        for v in varianty:
+            if self._rows("SELECT id FROM documents WHERE id = ?", (v,)):
+                return v
+        did = varianty[0] if varianty else ""
+        if did.startswith(("http://", "https://")):
+            base = did.split("#", 1)[0].rstrip("/")
+            rows = self._rows("SELECT id FROM documents WHERE zdroj IN (?, ?) ORDER BY length(id) LIMIT 1",
+                              (base, base + "/"))
+            if rows:
+                return rows[0]["id"]
+        return None
+
     def get_document(self, doc_id: str) -> dict | None:
-        rows = self._rows("SELECT * FROM documents WHERE id = ?", (doc_id,))
+        real = self.resolve_document_id(doc_id)
+        if real is None:
+            return None
+        rows = self._rows("SELECT * FROM documents WHERE id = ?", (real,))
         if not rows:
             return None
         doc = self._doc_row(rows[0], with_body=True)
         doc["chunky"] = self.con.execute(
-            "SELECT COUNT(*) FROM chunks WHERE doc_id = ?", (doc_id,)).fetchone()[0]
+            "SELECT COUNT(*) FROM chunks WHERE doc_id = ?", (real,)).fetchone()[0]
         return doc
 
     def list_documents(self, typ: list[str] | None = None, kolekce: list[str] | None = None,

@@ -512,6 +512,7 @@ def main() -> int:
 
     token = os.environ.get("X_BEARER_TOKEN")
     x_mode = args.x_rezim
+    x_selhalo = False  # X v tomto běhu zablokováno nebo bez prohlížeče (ne úmyslně vypnuto)
     if "x" in platforms:
         if x_mode == "auto":
             x_mode = "api" if token else "prohlizec"
@@ -561,6 +562,7 @@ def main() -> int:
                         except Exception as e:  # noqa: BLE001
                             warn(f"X: headless Chromium se nepodařilo spustit ({e}); X se přeskočí")
                             x_mode = "zadny"
+                            x_selhalo = True
                             print("přeskočeno")
                             continue
                     try:
@@ -574,6 +576,7 @@ def main() -> int:
                              "bez přihlášení z této sítě, typicky 429/403 z cloudu); zbylé účty na X "
                              "se v tomto běhu přeskočí. Stálé řešení: X_BEARER_TOKEN (placené X API v2).")
                         x_mode = "blokovano"
+                        x_selhalo = True
                 else:
                     print("přeskočeno (X " + ("zablokováno v tomto běhu)" if x_mode == "blokovano" else "vypnuto)"))
                     continue
@@ -606,6 +609,11 @@ def main() -> int:
     chybi = [a["jmeno"] for a in accounts if not a.get("x") and not a.get("bluesky")]
     if chybi:
         print("Bez známého účtu (doplňte do socialni_site_ucty.yaml): " + ", ".join(chybi))
+    if x_selhalo:
+        # Ostatní data jsou zapsaná; kód 3 (jako youtube.py) jen zviditelní v data/AKTUALIZACE.md,
+        # že X v tomto běhu nic nedodalo – dřív to vypadalo jako „ok“.
+        warn("X v tomto běhu nedodalo žádná data (zablokováno nebo bez prohlížeče); kód 3")
+        return 3
     return 0
 
 
