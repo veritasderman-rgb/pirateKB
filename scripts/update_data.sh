@@ -186,6 +186,10 @@ case "$MODE" in
     run_src psp           psp
     # Volby jen v 45 dnech po volbách (jinak skončí hned bez stahování).
     run_src volby         volby --cerstve 45
+    # Stenozáznamy i denně (malý limit stránek): týdenní běh se v říjnu 2026 nestihl dokončit
+    # a vystoupení ze Sněmovny pak v bázi chyběla. Hotové schůze se přeskočí (stav.json),
+    # nedokončené pokračují příští běh; stažené stránky drží HTTP cache.
+    run_src steno         psp/steno --obdobi 2025 --max-stranek 120
     run_src pirati_web    pirati-web --only aktuality
     # Titulky z YouTube: malé dávky, YouTube z cloudu po desítkách videí blokuje
     # (skript pak skončí kódem 3 a další běh pokračuje ze stav.json).

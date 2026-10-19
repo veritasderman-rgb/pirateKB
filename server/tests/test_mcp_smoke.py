@@ -72,6 +72,12 @@ class FakeKB:
             return None
         return {**self.DOC, "body": "# Sněmovní volby 2025\n\n" + "Dostupné bydlení. " * 900, "meta": {}}
 
+    def documents_by_source(self, url, limit=20):
+        if url.rstrip("/") != "https://x.com/sdileny":
+            return []
+        return [{"doc_id": f"social/x-{m}", "nazev": f"X {m}", "datum": f"2026-{m}-01"}
+                for m in ("09", "10")][:limit]
+
     def list_documents(self, **kw):
         return [dict(self.DOC)]
 
@@ -205,6 +211,9 @@ def test_mock_tools_do_not_crash(fake_kb):
     doc = mcp_server.get_document(FakeKB.DOC["doc_id"])
     assert "strana 1/" in doc and "strana=2" in doc and len(doc) < mcp_server.MAX_CHARS + 500
     assert "konec dokumentu" in mcp_server.get_document(FakeKB.DOC["doc_id"], strana=99)
+    vic = mcp_server.get_document("https://x.com/sdileny/")
+    assert "`social/x-09`" in vic and "`social/x-10`" in vic and "v bázi není" not in vic
+    assert "v bázi není" in mcp_server.get_document("https://x.com/nikdo")
     assert "Zdeněk Hřib" in mcp_server.find_people(role="předseda")
     assert "rp@pirati.cz" in mcp_server.get_org_unit("RP")
     assert "Centrála" in mcp_server.get_org_tree()
