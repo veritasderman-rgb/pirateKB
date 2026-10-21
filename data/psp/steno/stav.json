@@ -1,5 +1,5 @@
 {
- "aktualizovano": "2026-10-06",
+ "aktualizovano": "2026-10-21",
  "obdobi": {
   "2017": {
    "1": {
@@ -3630,6 +3630,19 @@
     "vystoupeni": 24,
     "zdroj": "stranky",
     "zpracovano": "2026-10-06"
+   },
+   "34": {
+    "hotovo": true,
+    "nesoulad_rec": 0,
+    "podle_jmena": 0,
+    "poslancu": 15,
+    "stranek_bez_rec": 80,
+    "stranek_stazeno": 118,
+    "vynechano_kratke": 6,
+    "vynechano_predsedajici": 0,
+    "vystoupeni": 65,
+    "zdroj": "stranky",
+    "zpracovano": "2026-10-21"
    },
    "4": {
     "hotovo": true,
