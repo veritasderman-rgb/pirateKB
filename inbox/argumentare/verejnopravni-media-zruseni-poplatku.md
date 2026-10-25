@@ -1,5 +1,5 @@
 ---
-zdroj: text vložený do báze přispěvatelem (příspěvek na sociální síti, autor neuveden)
+zdroj: https://x.com/ZdenekHrib/status/2113971609782345788
 zdroje:
   - https://www.pirati.cz/jak-pirati-pracuji/pirati-s-vyhradami-podporuji-navrh-novely-zakona-o-ceske-televizi-a-ceskem-rozhlasu/
   - https://www.pirati.cz/jak-pirati-pracuji/vlada-projida-budoucnost-mlade-generace-navrh-rozpoctu-vykazuje-deficit-az-440-miliard-korun-0124bf9/
@@ -13,17 +13,18 @@ nazev: 'Argumentář: zrušení poplatků a převod ČT a ČRo pod státní rozp
 typ: material
 viditelnost: clenske
 stazeno: '2026-10-25'
-datum: '2026-10-25'
-autorita: nazor-jednotlivce
-autor: neuveden (doplnit)
+datum: '2026-10-24'
+autorita: vyjadreni-politika
+autor: Zdeněk Hřib
 stav: navrh
 reviewed_at: '2026-10-25'
 poznamka: >-
   Argumentář k vládnímu návrhu na zrušení koncesionářských poplatků a financování ČT a ČRo
-  ze státního rozpočtu (hlasování ve Sněmovně v říjnu 2026). Vychází z příspěvku jednotlivce,
-  není to stanovisko strany. Podklady z báze jsou u každého bodu; tvrzení označená „ověřit“
-  báze nepotvrdila. Kurátor: doplnit autora, ověřit čísla (ČEZ, strukturální schodek) a
-  rozhodnout o případném přesunu do content/.
+  ze státního rozpočtu (hlasování ve Sněmovně v říjnu 2026). Vychází z příspěvku
+  předsedy Pirátů Zdeňka Hřiba na X (24. 10. 2026); je to vyjádření politika, ne usnesení
+  orgánu strany. Podklady z báze jsou u každého bodu; tvrzení označená „ověřit“ báze
+  nepotvrdila. Kurátor: ověřit čísla (ČEZ, strukturální schodek) a rozhodnout o případném
+  přesunu do content/.
 ---
 
 # Argumentář: zrušení poplatků a převod ČT a ČRo pod státní rozpočet
@@ -32,8 +33,8 @@ poznamka: >-
 financování České televize a Českého rozhlasu do státního rozpočtu. Piráti návrh odmítají
 spolu s celou opozicí ([společné prohlášení mladých poslanců, 23. 10. 2026](https://www.pirati.cz/jak-pirati-pracuji/spolecne-prohlaseni-mladych-poslancu-a-poslankyn-napric-opozicnimi-kluby-na-obranu-verejnopravnich-medii/)).
 
-**Autorita:** text vychází z příspěvku jednotlivce (`nazor-jednotlivce`), ne z usnesení
-orgánu strany. Podklady jsou články na pirati.cz (autorita `web`) a vystoupení poslanců ve
+**Autorita:** text vychází z [příspěvku předsedy Pirátů Zdeňka Hřiba na X](https://x.com/ZdenekHrib/status/2113971609782345788)
+(24. 10. 2026, autorita `vyjadreni-politika`), ne z usnesení orgánu strany. Podklady jsou články na pirati.cz (autorita `web`) a vystoupení poslanců ve
 Sněmovně. Oficiální stanovisko strany k financování veřejnoprávních médií báze zatím nemá.
 
 **Hlavní sdělení (jednou větou):** Zrušení poplatků není úleva, ale přesun účtu na všechny
@@ -147,7 +148,8 @@ nepřipojili, ačkoli byli pozváni; vládní poslanci pak činnost skupiny pod 
 ukončili a skupina pokračuje pod záštitou Senátu
 ([pirati.cz, 11. 5. 2026](https://www.pirati.cz/jak-pirati-pracuji/piratka-hoffmannova-predstavila-zavery-pracovni-skupiny-k-mediim-ministerstvo-kultury-musi-stahnout-navrh-zakona-o-mediich-verejne-sluzby-chybi-analyzy-i-odborna-debata/),
 [pirati.cz, 25. 5. 2026](https://www.pirati.cz/jak-pirati-pracuji/hoffmannova-posila-medialni-zakon-k-posouzeni-do-evropy-podle-piratu-ohrozuje-nezavislost-ct-a-cro/)).
-Nepřítomnost premiéra na konkrétním jednání **ověřit a doplnit datum**.
+Nepřítomnost premiéra **ověřit**: „včera“ v příspěvku z 24. 10. 2026 znamená jednání
+Sněmovny 23. 10. 2026.
 
 ### 9. Načasování a motivy
 
@@ -190,6 +192,8 @@ Kontrola textu nástrojem `zkontroluj_text` a podle [`content/brand/ton-komunika
 ---
 
 ## Původní text (beze změn)
+
+Zdeněk Hřib na X, 24. 10. 2026: <https://x.com/ZdenekHrib/status/2113971609782345788>
 
 > Budu výjimečně trochu delší, protože výjimečnost situace si to žádá:
 >
