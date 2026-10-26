@@ -1,7 +1,7 @@
 ---
 zdroj: https://www.psp.cz/sqw/hp.sqw?k=1300
 nazev: Hlasování pirátských poslanců (otevřená data PSP)
-stazeno: '2026-10-25'
+stazeno: '2026-10-26'
 viditelnost: verejne
 autorita: oficialni-data-psp
 typ: hlasovani
@@ -9,11 +9,12 @@ typ: hlasovani
 
 # Hlasování pirátských poslanců (otevřená data PSP)
 
-Staženo 2026-10-25 z https://www.psp.cz/sqw/hp.sqw?k=1300.
+Staženo 2026-10-26 z https://www.psp.cz/sqw/hp.sqw?k=1300.
 
 | volební období (rok voleb) | počet hlasování | soubor |
 |---|---|---|
 | 2017 | 10267 | hlasovani-2017.jsonl |
+| 2021 | 9016 | hlasovani-2021.jsonl |
 
 ## poslanci.jsonl
 
