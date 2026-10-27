@@ -99,6 +99,9 @@ AUTORITA_POPIS = {
     "usneseni-rhmp": "usnesení Rady hl. m. Prahy předložené pirátským radním (rozhodnutí Rady jako celku, "
                      "NE stanovisko strany)",
     "oficialni-data-praha": "otevřená data hl. m. Prahy (hlasování ZHMP)",
+    "usneseni-kraje": "usnesení zastupitelstva kraje (rozhodnutí orgánu kraje, NE stanovisko strany)",
+    "oficialni-data-kraje": "oficiální evidence kraje o jmenovitém hlasování zastupitelstva "
+                            "(usneseni.kr-plzensky.cz)",
     "oficialni-data-zhmp": "otevřená data hl. m. Prahy o hlasování Zastupitelstva hl. m. Prahy",
     "predpis": "vnitřní předpis strany (stanovy, řády, statuty); POZOR na pole platnost: "
                "historicke-zneni = starší znění z archivu, které už nemusí platit",

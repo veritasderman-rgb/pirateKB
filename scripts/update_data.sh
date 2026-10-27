@@ -164,6 +164,9 @@ case "$MODE" in
     # Praha: aktuální období hlasování ZHMP, seznamy usnesení za 60 dní a nové detaily RHMP;
     # starší data bere skript z vlastních výstupů v data/praha (cache se v Actions nedrží).
     run_src praha         praha --aktualni --max-detailu 1500
+    # Krajská zastupitelstva (zatím Plzeňský kraj): jednání za posledních 120 dní, hotová starší
+    # 60 dní se přeskočí podle data/kraje/<kraj>/stav.json (cache se v Actions nedrží); ~6 min/jednání.
+    run_src kraje         kraje --aktualni
     run_src dokumenty     dokumenty
     # Publikace Frank Bold: měsíčně stačí. Plný běh v prvním týdnu měsíce stáhne jen nové publikace
     # (známé se stejnou URL a velikostí ponechá; robots.txt Crawl-delay 10 s), jinak nic. Bez

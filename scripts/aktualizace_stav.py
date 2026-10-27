@@ -34,6 +34,7 @@ ZDROJE = [
     ("financovani", "financování strany (ÚDH, transparentní účty Fio, Piroplácení)", "financovani"),
     ("socialni_site", "X a Bluesky poslanců", "social"),
     ("kalendar", "Pirátský kalendář akcí (veřejný Google kalendář, ICS)", "kalendar"),
+    ("kraje", "krajská zastupitelstva: usnesení a hlasování Pirátů (Plzeňský kraj)", "kraje"),
     ("subweby", "subwebů strany", "subweby"),
     ("dokumenty", "dokumenty strany (PDF)", "dokumenty"),
     ("frankbold", "publikace Frank Bold (frankbold.org; karty, plný text jen s licencí CC)", "frankbold"),

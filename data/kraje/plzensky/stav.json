@@ -1,0 +1,81 @@
+{
+ "jednani": {
+  "2737963": {
+   "datum": "2026-09-14",
+   "usneseni": 74,
+   "hlasovani": 74,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2714942": {
+   "datum": "2026-06-15",
+   "usneseni": 62,
+   "hlasovani": 62,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2640518": {
+   "datum": "2026-04-13",
+   "usneseni": 78,
+   "hlasovani": 78,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2613826": {
+   "datum": "2026-02-09",
+   "usneseni": 54,
+   "hlasovani": 53,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2588340": {
+   "datum": "2025-12-15",
+   "usneseni": 113,
+   "hlasovani": 113,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2565560": {
+   "datum": "2025-09-15",
+   "usneseni": 65,
+   "hlasovani": 65,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2530393": {
+   "datum": "2025-06-23",
+   "usneseni": 80,
+   "hlasovani": 80,
+   "hotovo": false,
+   "zpracovano": "2026-10-27"
+  },
+  "2502759": {
+   "datum": "2025-04-07",
+   "usneseni": 60,
+   "hlasovani": 60,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2473106": {
+   "datum": "2025-02-10",
+   "usneseni": 48,
+   "hlasovani": 47,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2454986": {
+   "datum": "2024-12-16",
+   "usneseni": 89,
+   "hlasovani": 88,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  },
+  "2440387": {
+   "datum": "2024-10-30",
+   "usneseni": 11,
+   "hlasovani": 10,
+   "hotovo": true,
+   "zpracovano": "2026-10-27"
+  }
+ }
+}
