@@ -60,6 +60,8 @@ Ing. Pavlu Čížkovi, náměstkovi hejtmana pro oblast dopravy, podepsat plnou 
 
 Termín:
 
+23. 6. 2025
+
 Zodpovídá:
 
 Ing. Pavel Čížek

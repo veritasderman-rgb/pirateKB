@@ -58,6 +58,8 @@ předsedovi Výboru pro sport Zastupitelstva Plzeňského kraje zajistit činnos
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Michael Sinkule

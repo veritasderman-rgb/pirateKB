@@ -60,6 +60,8 @@ náměstkovi hejtmana pro oblast investic a majetku Martinu Záhořovi informova
 
 Termín:
 
+31. 12. 2025
+
 Zodpovídá:
 
 Martin Záhoř

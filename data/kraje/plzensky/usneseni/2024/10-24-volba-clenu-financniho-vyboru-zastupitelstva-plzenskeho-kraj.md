@@ -72,3 +72,5 @@ v souladu s ust. § 35 odst. 2 písm. o) zákona č. 129/2000 Sb., o krajích, d
 10. Mgr. Jana Šaška
 
 Termín:
+
+30. 10. 2024

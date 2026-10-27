@@ -50,6 +50,8 @@ bez výhrad roční zprávu o stavu požární ochrany Plzeňského kraje za rok
 
 Termín:
 
+30. 6. 2026
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

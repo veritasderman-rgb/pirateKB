@@ -60,6 +60,8 @@ Bc. Tomáši Soukupovi, náměstkovi hejtmana Plzeňského kraje pro oblast zdra
 
 Termín:
 
+31. 1. 2026
+
 Zodpovídá:
 
 Bc. Tomáš Soukup

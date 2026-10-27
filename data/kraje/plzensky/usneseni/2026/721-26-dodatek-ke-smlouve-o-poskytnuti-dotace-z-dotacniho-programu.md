@@ -62,6 +62,8 @@ náměstkovi hejtmana Mgr. Martinu Rybárovi podepsat dodatek č. 1 uvedený v b
 
 Termín:
 
+30. 11. 2026
+
 Zodpovídá:
 
 Mgr. Martin Rybár

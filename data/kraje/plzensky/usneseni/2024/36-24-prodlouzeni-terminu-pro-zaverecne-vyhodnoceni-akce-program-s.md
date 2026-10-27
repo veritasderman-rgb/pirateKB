@@ -66,6 +66,8 @@ Petru Vankovi, náměstkovi hejtmana pro oblast regionálního rozvoje, zajistit
 
 Termín:
 
+31. 12. 2024
+
 Zodpovídá:
 
 Petr Vanka

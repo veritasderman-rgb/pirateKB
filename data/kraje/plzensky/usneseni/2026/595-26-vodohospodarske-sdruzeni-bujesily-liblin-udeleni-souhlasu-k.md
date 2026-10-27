@@ -54,6 +54,8 @@ převod vlastnického práva k vodárenskému zařízení žadatele Vodohospodá
 
 Termín:
 
+1. 6. 2026
+
 Zodpovídá:
 
 Petr Fišer

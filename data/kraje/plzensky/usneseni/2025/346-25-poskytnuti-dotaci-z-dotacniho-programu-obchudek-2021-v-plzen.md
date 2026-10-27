@@ -64,6 +64,8 @@ náměstkovi hejtmana Plzeňského kraje pro oblast IT a evropských záležitos
 
 Termín:
 
+31. 10. 2025
+
 Zodpovídá:
 
 Mgr. Martin Rybár

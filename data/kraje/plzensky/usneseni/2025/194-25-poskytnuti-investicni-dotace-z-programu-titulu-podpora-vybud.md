@@ -70,6 +70,8 @@ IV. Ukládá
 
 Termín:
 
+31. 12. 2025
+
 Zodpovídá:
 
 Ing. Vladimír Kroc

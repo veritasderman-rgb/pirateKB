@@ -50,6 +50,8 @@ v souladu s ustanovením § 22 odst. 14 zákona č. 250/2000 Sb., o rozpočtový
 
 Termín:
 
+30. 4. 2026
+
 Zodpovídá:
 
 Ing. et Ing. Jan Bozděch, Ph.D.

@@ -116,6 +116,8 @@ ostat. komunikace
 
 III/23217
 
+742/13
+
 ostatní plocha
 
 ostat. komunikace
@@ -128,17 +130,23 @@ Dražovice u Sušice
 
 Dražovice
 
-ostatní plocha
-
-silnice
-
-III/17122
+180/78
 
 ostatní plocha
 
 silnice
 
 III/17122
+
+180/79
+
+ostatní plocha
+
+silnice
+
+III/17122
+
+180/80
 
 ostatní plocha
 
@@ -154,11 +162,15 @@ silnice
 
 III/17122
 
+273/32
+
 ostatní plocha
 
 silnice
 
 II/171
+
+383/10
 
 ostatní plocha
 
@@ -195,6 +207,8 @@ II. Ukládá
 náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku Martinu Záhořovi zajistit plnění tohoto usnesení
 
 Termín:
+
+30. 12. 2026
 
 Zodpovídá:
 

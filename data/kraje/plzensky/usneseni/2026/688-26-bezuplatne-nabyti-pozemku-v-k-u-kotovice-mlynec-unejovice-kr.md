@@ -104,6 +104,8 @@ Křenice
 
 Křenice
 
+547/10
+
 (podíl ½)
 
 ostatní plocha
@@ -133,6 +135,8 @@ II. Ukládá
 náměstkovi hejtmana pro oblast ekonomiky, majetku a Centrální nákup Bc. Pavlu Strolenému zajistit plnění tohoto usnesení
 
 Termín:
+
+31. 12. 2028
 
 Zodpovídá:
 

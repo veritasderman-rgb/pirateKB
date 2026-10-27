@@ -54,6 +54,8 @@ Ing. Pavlu Čížkovi, náměstkovi hejtmana pro oblast dopravy, Ing. Pavlu Čí
 
 Termín:
 
+30. 6. 2026
+
 Zodpovídá:
 
 Ing. Pavel Čížek

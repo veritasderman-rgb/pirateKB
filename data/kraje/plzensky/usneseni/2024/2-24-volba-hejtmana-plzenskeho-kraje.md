@@ -52,3 +52,5 @@ I. Volí
 v souladu s ust. § 35 odst. 2 písm. m) zákona č. 129/2000 Sb., o krajích, MUDr. Kamala Farhana do funkce hejtmana Plzeňského kraje
 
 Termín:
+
+30. 10. 2024

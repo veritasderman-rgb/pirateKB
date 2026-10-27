@@ -58,6 +58,8 @@ c) předseda Výboru pro sport Zastupitelstva Plzeňského kraje
 
 Termín:
 
+1. 1. 2026
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

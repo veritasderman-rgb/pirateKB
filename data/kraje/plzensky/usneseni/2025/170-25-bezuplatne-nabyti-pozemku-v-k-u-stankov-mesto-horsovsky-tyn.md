@@ -86,17 +86,23 @@ jiná plocha
 
 III/19346
 
-ostatní plocha
-
-jiná plocha
-
-III/19352
+1456/15
 
 ostatní plocha
 
 jiná plocha
 
 III/19352
+
+1456/32
+
+ostatní plocha
+
+jiná plocha
+
+III/19352
+
+1456/35
 
 ostatní plocha
 
@@ -125,6 +131,8 @@ II. Ukládá
 náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku Martinu Záhořovi zajistit plnění tohoto usnesení
 
 Termín:
+
+30. 4. 2027
 
 Zodpovídá:
 

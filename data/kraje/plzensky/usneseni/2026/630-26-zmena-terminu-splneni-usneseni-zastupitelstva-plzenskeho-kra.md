@@ -58,6 +58,8 @@ ZPK 1538/24
 
 ZPK schvaluje bezúplatné nabytí pozemků v k.ú. Jablečno a dalších pozemků ve vlastnictví České republiky – Úřadu pro zastupování státu ve věcech majetkových
 
+30.06.2026
+
 II. Schvaluje
 
 změnu termínu pro splnění usnesení Zastupitelstva Plzeňského kraje č. 1538/24 ze dne 05.02.2024 na nový termín 31.12.2027
@@ -67,6 +69,8 @@ III. Ukládá
 náměstkovi hejtmana pro oblast ekonomiky, majetku a Centrální nákup Bc. Pavlu Strolenému zajistit plnění tohoto usnesení
 
 Termín:
+
+31. 12. 2027
 
 Zodpovídá:
 

@@ -54,6 +54,8 @@ MUDr. Kamalu Farhanovi, hejtmanovi Plzeňského kraje, podepsat dodatek č. 19 k
 
 Termín:
 
+31. 7. 2026
+
 Zodpovídá:
 
 Bc. Karel Pressl

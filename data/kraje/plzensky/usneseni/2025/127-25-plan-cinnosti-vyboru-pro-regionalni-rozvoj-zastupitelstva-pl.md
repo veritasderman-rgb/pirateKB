@@ -58,6 +58,8 @@ předsedovi Výboru pro regionální rozvoj Zastupitelstva Plzeňského kraje za
 
 Termín:
 
+31. 12. 2025
+
 Zodpovídá:
 
 František Konvář

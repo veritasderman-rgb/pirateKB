@@ -168,11 +168,15 @@ Kovčín
 
 Kovčín
 
+948/20
+
 ostatní plocha
 
 silnice
 
 III/18623
+
+948/21
 
 ostatní plocha
 
@@ -216,6 +220,8 @@ Velhartice
 
 Velhartice
 
+298/10
+
 ostatní plocha
 
 silnice
@@ -238,17 +244,23 @@ silnice
 
 III/1718
 
-ostatní plocha
-
-silnice
-
-III/1718
+321/17
 
 ostatní plocha
 
 silnice
 
 III/1718
+
+321/29
+
+ostatní plocha
+
+silnice
+
+III/1718
+
+321/31
 
 ostatní plocha
 
@@ -278,6 +290,8 @@ Vlkanov u Nového Kramolína
 
 Vlkanov
 
+789/46
+
 ostatní plocha
 
 silnice
@@ -289,6 +303,8 @@ středisko Plzeň-jih
 Borovy
 
 Borovy
+
+1123/94
 
 vodní plocha
 
@@ -308,6 +324,8 @@ Nebílovský Borek
 
 Štěnovický Borek
 
+277/14
+
 vodní plocha
 
 koryto vodního toku přirozené nebo upravené
@@ -321,6 +339,8 @@ II. Ukládá
 náměstkovi hejtmana pro oblast ekonomiky, majetku a Centrální nákup Bc. Pavlu Strolenému zajistit plnění tohoto usnesení
 
 Termín:
+
+31. 12. 2028
 
 Zodpovídá:
 

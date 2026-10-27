@@ -58,6 +58,8 @@ náměstkovi hejtmana pro oblast školství a sportu, Ing. Vladimíru Krocovi, p
 
 Termín:
 
+31. 1. 2027
+
 Zodpovídá:
 
 Ing. Vladimír Kroc

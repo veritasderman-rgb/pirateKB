@@ -58,6 +58,8 @@ předsedkyni Výboru pro zdravotnictví Zastupitelstva Plzeňského kraje zajist
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Ivana Bubeníčková

@@ -56,6 +56,8 @@ II. Ukládá
 
 Termín:
 
+31. 10. 2026
+
 Zodpovídá:
 
 Bc. Karel Pressl

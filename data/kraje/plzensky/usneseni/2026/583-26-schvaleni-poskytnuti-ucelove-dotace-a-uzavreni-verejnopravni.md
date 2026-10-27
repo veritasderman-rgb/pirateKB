@@ -58,6 +58,8 @@ náměstkovi hejtmana Plzeňského kraje pro oblast školství a sportu, Ing. Vl
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Vladimír Kroc

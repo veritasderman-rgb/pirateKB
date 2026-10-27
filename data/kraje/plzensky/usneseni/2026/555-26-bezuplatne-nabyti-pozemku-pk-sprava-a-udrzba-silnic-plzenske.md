@@ -100,6 +100,8 @@ Horažďovice
 
 Horažďovice
 
+2730/10
+
 ostatní plocha
 
 silnice
@@ -118,11 +120,15 @@ silnice
 
 III/17110
 
+679/13
+
 ostatní plocha
 
 silnice
 
 III/17110
+
+679/14
 
 ostatní plocha
 
@@ -154,6 +160,8 @@ Bezvěrov
 
 Bezvěrov
 
+1056/40
+
 ostatní plocha
 
 ostatní komunikace
@@ -163,6 +171,8 @@ III/1939
 Milavče
 
 Milavče
+
+1568/15
 
 ostatní plocha
 
@@ -174,6 +184,8 @@ Těšovice u Kolovče
 
 Srbice
 
+1007/74
+
 (podíl 1/52)
 
 ostatní plocha
@@ -181,6 +193,8 @@ ostatní plocha
 silnice
 
 III/18318
+
+1007/75
 
 (podíl 1/52)
 
@@ -197,6 +211,8 @@ II. Ukládá
 náměstkovi hejtmana pro oblast ekonomiky, majetku a Centrální nákup Bc. Pavlu Strolenému zajistit plnění tohoto usnesení
 
 Termín:
+
+30. 6. 2028
 
 Zodpovídá:
 

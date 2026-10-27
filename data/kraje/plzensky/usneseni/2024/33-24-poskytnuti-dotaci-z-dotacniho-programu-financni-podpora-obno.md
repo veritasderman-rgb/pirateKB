@@ -56,6 +56,8 @@ II. Schvaluje
 
 Termín:
 
+31. 12. 2024
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

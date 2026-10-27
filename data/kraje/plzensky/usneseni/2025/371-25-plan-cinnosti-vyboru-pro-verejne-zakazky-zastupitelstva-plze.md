@@ -58,6 +58,8 @@ předsedovi Výboru pro veřejné zakázky Zastupitelstva Plzeňského kraje zaj
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Bc. Karel Pressl

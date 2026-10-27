@@ -62,6 +62,8 @@ náměstkovi hejtmana pro oblast školství a sportu, Ing. Vladimíru Krocovi, i
 
 Termín:
 
+28. 2. 2026
+
 Zodpovídá:
 
 Ing. Vladimír Kroc

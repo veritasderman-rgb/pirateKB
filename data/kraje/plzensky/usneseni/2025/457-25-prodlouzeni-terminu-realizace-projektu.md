@@ -72,6 +72,8 @@ III. Ukládá
 
 Termín:
 
+27. 2. 2026
+
 Zodpovídá:
 
 Petr Fišer

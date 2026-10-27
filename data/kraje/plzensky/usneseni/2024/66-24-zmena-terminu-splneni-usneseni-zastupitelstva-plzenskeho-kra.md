@@ -58,13 +58,19 @@ ZPK 1089/23
 
 ZPK schvaluje bezúplatné nabytí pozemku v k.ú. Pocinovice, ve vlastnictví České republiky – ČR – Správa železnic, státní organizace, Dlážděná 1003/7, 110 00 Praha 1, IČO: 70994234
 
+31.12.2024
+
 ZPK 1452/23
 
 ZPK schvaluje bezúplatné nabytí pozemků v k. ú. Milavče ve vlastnictví České republiky – Správa železnic, státní organizace, Dlážděná 1003/7, 110 00 Praha 1, IČO: 70994234
 
+31.12.2024
+
 ZPK 1468/23
 
 ZPK schvaluje bezúplatné nabytí pozemků a bezúplatný převod pozemků v k. ú. Neuměř mezi Plzeňským krajem a obcí Neuměř, IČO: 00572331
+
+31.12.2024
 
 II. Schvaluje
 
@@ -81,6 +87,8 @@ III. Ukládá
 náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku Martinu Záhořovi zajistit plnění tohoto usnesení
 
 Termín:
+
+31. 12. 2024
 
 Zodpovídá:
 

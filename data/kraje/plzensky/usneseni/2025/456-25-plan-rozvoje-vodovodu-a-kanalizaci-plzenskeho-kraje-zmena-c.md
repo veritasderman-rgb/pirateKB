@@ -54,6 +54,8 @@ II. Ukládá
 
 Termín:
 
+15. 12. 2025
+
 Zodpovídá:
 
 Petr Fišer

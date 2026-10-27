@@ -60,6 +60,8 @@ náměstkovi hejtmana pro oblast investic Bc. Tomáši Soukupovi podepsat všech
 
 Termín:
 
+30. 6. 2026
+
 Zodpovídá:
 
 Bc. Tomáš Soukup

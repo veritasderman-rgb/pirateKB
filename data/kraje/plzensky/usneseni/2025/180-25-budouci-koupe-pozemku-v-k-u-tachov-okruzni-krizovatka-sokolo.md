@@ -76,6 +76,8 @@ náměstkovi hejtmana pro oblast investic a majetku Martinu Záhořovi uzavřít
 
 Termín:
 
+31. 12. 2030
+
 Zodpovídá:
 
 Martin Záhoř

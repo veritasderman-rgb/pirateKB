@@ -54,6 +54,8 @@ Všechny dotace z dotačního titulu Rekonstrukce obecní budovy na nájemní by
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Petr Vanka

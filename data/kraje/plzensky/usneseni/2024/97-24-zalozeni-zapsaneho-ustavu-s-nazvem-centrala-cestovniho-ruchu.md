@@ -90,6 +90,8 @@ V. Ukládá
 
 Termín:
 
+31.01.2025
+
 Zodpovídá:
 
 Ing. Libor Picka

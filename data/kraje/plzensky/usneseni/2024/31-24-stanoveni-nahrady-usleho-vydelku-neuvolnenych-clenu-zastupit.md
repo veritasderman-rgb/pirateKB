@@ -52,6 +52,8 @@ Náhrada ušlého výdělku se poskytuje za účast na zasedání Zastupitelstva
 
 Termín:
 
+28. 2. 2025
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

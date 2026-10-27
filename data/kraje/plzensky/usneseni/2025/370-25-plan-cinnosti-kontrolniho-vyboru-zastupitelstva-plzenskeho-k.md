@@ -65,6 +65,8 @@ Kontrolní výbor Zastupitelstva Plzeňského kraje kontrolní činností dle p�
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Rudolf Špoták

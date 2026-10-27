@@ -68,3 +68,5 @@ IV. Pověřuje
 předsedu Kontrolního výboru Zastupitelstva Plzeňského kraje sledováním plnění tohoto usnesení a informováním Kontrolního výboru a Zastupitelstva Plzeňského kraje
 
 Termín:
+
+31. 12. 2026

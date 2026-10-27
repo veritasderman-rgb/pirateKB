@@ -58,6 +58,8 @@ Ing. Pavlu Čížkovi, náměstkovi hejtmana pro oblast dopravy, prostřednictv�
 
 Termín:
 
+16. 12. 2024
+
 Zodpovídá:
 
 Ing. Pavel Čížek

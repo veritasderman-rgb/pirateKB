@@ -54,6 +54,8 @@ odboru regionálního rozvoje Krajského úřadu Plzeňského kraje jako pořizo
 
 Termín:
 
+31. 12. 2029
+
 Zodpovídá:
 
 Petr Vanka

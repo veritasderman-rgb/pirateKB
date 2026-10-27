@@ -114,6 +114,8 @@ Bc. Tomáši Soukupovi, náměstkovi hejtmana Plzeňského kraje pro oblast zdra
 
 Termín:
 
+31. 10. 2025
+
 Zodpovídá:
 
 Bc. Tomáš Soukup

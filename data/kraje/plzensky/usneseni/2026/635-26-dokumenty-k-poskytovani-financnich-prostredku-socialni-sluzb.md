@@ -54,6 +54,8 @@ I. Schvaluje
 
 Termín:
 
+30. 6. 2026
+
 Zodpovídá:
 
 Ing. et Ing. Jan Bozděch, Ph.D.

@@ -94,6 +94,8 @@ Bc. Pavlu Strolenému, radnímu pro oblast ekonomiky, zajistit zveřejnění sch
 
 Termín:
 
+23. 7. 2025
+
 Zodpovídá:
 
 Bc. Pavel Strolený

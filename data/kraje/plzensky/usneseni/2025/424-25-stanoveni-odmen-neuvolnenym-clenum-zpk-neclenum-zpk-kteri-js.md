@@ -76,6 +76,8 @@ b) člen výboru – 500 Kč za účast na jednání kontrolní skupiny nebo kom
 
 Termín:
 
+28. 2. 2026
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

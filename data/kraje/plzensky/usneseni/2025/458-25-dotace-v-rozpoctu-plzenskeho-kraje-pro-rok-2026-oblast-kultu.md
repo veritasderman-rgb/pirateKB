@@ -54,6 +54,8 @@ Ing. Liboru Pickovi, radnímu pro oblast kultury, památkové péče a cestovní
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Libor Picka

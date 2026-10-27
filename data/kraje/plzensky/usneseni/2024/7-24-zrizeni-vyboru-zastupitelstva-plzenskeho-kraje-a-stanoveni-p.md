@@ -104,3 +104,5 @@ III. Stanoví
 počet členů výborů na 13 (třináct)
 
 Termín:
+
+30. 10. 2024

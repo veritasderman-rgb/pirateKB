@@ -58,6 +58,8 @@ v souladu s ustanovením § 35 odst. 2 písm. o) zák. č. 129/2000 Sb., o kraj�
 
 Termín:
 
+16. 12. 2024
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

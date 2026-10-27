@@ -54,6 +54,8 @@ hejtmanovi Plzeňského kraje MUDr. Kamalu Farhanovi podepsat dohodu uvedenou v 
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Mgr. Martin Rybár

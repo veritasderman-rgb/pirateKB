@@ -62,6 +62,8 @@ Mgr. Janu Karáskovi, vedoucímu odboru zdravotnictví Krajského úřadu Plzeň
 
 Termín:
 
+30. 9. 2026
+
 Zodpovídá:
 
 Bc. Karel Pressl

@@ -106,6 +106,8 @@ MUDr. Kamalu Farhanovi, hejtmanovi Plzeňského kraje, podepsat dodatky zřizova
 
 Termín:
 
+31. 12. 2024
+
 Zodpovídá:
 
 Ing. Libor Picka

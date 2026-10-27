@@ -54,6 +54,8 @@ Ing. Ivana Bubeníčková
 
 Termín:
 
+16. 12. 2024
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

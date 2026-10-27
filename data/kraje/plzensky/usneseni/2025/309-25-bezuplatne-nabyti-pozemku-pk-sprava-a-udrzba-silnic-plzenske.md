@@ -152,11 +152,15 @@ Zářečí u Horažďovic
 
 Horažďovice
 
+2411/13
+
 ostatní plocha
 
 silnice
 
 II/169
+
+2411/14
 
 ostatní plocha
 
@@ -181,6 +185,8 @@ II/171
 Sušice nad Otavou
 
 Sušice
+
+2254/32
 
 ostatní plocha
 
@@ -247,6 +253,8 @@ II. Ukládá
 náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku Martinu Záhořovi zajistit plnění tohoto usnesení
 
 Termín:
+
+30. 9. 2027
 
 Zodpovídá:
 

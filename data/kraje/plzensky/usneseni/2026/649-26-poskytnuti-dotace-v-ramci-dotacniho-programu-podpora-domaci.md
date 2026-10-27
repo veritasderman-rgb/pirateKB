@@ -60,6 +60,8 @@ Bc. Karlu Presslovi, členu Rady Plzeňského kraje pro oblast zdravotnictví, p
 
 Termín:
 
+30. 9. 2026
+
 Zodpovídá:
 
 Bc. Karel Pressl

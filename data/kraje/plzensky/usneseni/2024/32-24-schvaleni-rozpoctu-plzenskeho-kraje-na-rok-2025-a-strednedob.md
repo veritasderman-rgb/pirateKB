@@ -64,6 +64,8 @@ II. Ukládá
 
 Termín:
 
+31. 1. 2026
+
 Zodpovídá:
 
 Bc. Pavel Strolený

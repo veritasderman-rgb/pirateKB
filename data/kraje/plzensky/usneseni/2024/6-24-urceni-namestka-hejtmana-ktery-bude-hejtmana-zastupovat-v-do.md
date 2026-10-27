@@ -52,3 +52,5 @@ I. Určuje
 v souladu s ust. § 64 zákona č. 129/2000 Sb., o krajích, Petra Vanku náměstkem hejtmana Plzeňského kraje, který bude hejtmana zastupovat v době jeho nepřítomnosti nebo v době, kdy hejtman nevykonává funkci
 
 Termín:
+
+30. 10. 2024

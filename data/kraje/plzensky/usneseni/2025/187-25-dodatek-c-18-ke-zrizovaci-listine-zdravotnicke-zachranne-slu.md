@@ -54,6 +54,8 @@ MUDr. Kamalu Farhanovi, hejtmanovi Plzeňského kraje, podepsat dodatek č. 18 k
 
 Termín:
 
+30. 6. 2025
+
 Zodpovídá:
 
 Bc. Tomáš Soukup

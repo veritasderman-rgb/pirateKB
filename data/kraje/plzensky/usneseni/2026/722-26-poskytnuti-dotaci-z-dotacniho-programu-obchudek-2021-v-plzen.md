@@ -60,6 +60,8 @@ náměstkovi hejtmana pro oblast IT a evropských záležitostí, Mgr. Martinu R
 
 Termín:
 
+31. 10. 2026
+
 Zodpovídá:
 
 Mgr. Martin Rybár

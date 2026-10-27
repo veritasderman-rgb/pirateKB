@@ -54,6 +54,8 @@ v souladu s ust. § 35 odst. 2 písm. o) zákona č. 129/2000 Sb., o krajích, d
 
 Termín:
 
+7. 4. 2025
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

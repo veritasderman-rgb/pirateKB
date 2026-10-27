@@ -134,6 +134,8 @@ náměstkovi hejtmana Plzeňského kraje Mgr. Martinu Rybárovi:
 
 Termín:
 
+30. 9. 2026
+
 Zodpovídá:
 
 Mgr. Martin Rybár

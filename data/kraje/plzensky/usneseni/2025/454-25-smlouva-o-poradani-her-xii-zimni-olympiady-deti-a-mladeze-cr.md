@@ -54,6 +54,8 @@ hejtmanovi Plzeňského kraje, MUDr. Kamalu Farhanovi, podepsat smlouvu o pořá
 
 Termín:
 
+31. 1. 2026
+
 Zodpovídá:
 
 Ing. Vladimír Kroc

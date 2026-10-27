@@ -126,6 +126,8 @@ Sušice nad Otavou
 
 Sušice
 
+2332/56
+
 ostatní plocha
 
 silnice
@@ -204,11 +206,7 @@ silnice
 
 III/02214
 
-ostatní plocha
-
-silnice
-
-III/02214
+1378/10
 
 ostatní plocha
 
@@ -216,17 +214,31 @@ silnice
 
 III/02214
 
-ostatní plocha
-
-silnice
-
-III/02214
+1378/11
 
 ostatní plocha
 
 silnice
 
 III/02214
+
+1378/12
+
+ostatní plocha
+
+silnice
+
+III/02214
+
+1378/13
+
+ostatní plocha
+
+silnice
+
+III/02214
+
+1378/14
 
 2 560
 
@@ -236,17 +248,23 @@ silnice
 
 III/02214
 
-ostatní plocha
-
-silnice
-
-III/02214
+1378/15
 
 ostatní plocha
 
 silnice
 
 III/02214
+
+1378/16
+
+ostatní plocha
+
+silnice
+
+III/02214
+
+1378/17
 
 ostatní plocha
 
@@ -294,6 +312,8 @@ u Domažlic
 
 Domažlice
 
+635/57
+
 ostatní plocha
 
 silnice
@@ -304,11 +324,15 @@ Kdyně
 
 Kdyně
 
+1112/38
+
 ostatní plocha
 
 ostatní komunikace
 
 III/0221
+
+1112/39
 
 ostatní plocha
 
@@ -334,11 +358,15 @@ Tlučná
 
 Tlučná
 
+1429/49
+
 ostatní plocha
 
 silnice
 
 II/180
+
+1429/54
 
 ostatní plocha
 
@@ -350,11 +378,15 @@ Odlezly
 
 Žihle
 
+398/10
+
 ostatní plocha
 
 silnice
 
 III/20140
+
+398/16
 
 ostatní plocha
 
@@ -396,6 +428,8 @@ Kbelnice u Letin
 
 Letiny
 
+576/13
+
 (podíl 1/5)
 
 ostatní plocha
@@ -411,6 +445,8 @@ II. Ukládá
 náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku zajistit plnění tohoto usnesení
 
 Termín:
+
+31. 12. 2027
 
 Zodpovídá:
 

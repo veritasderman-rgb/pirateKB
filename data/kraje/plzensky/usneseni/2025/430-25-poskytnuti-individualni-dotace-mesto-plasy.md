@@ -56,6 +56,8 @@ II. Schvaluje
 
 Termín:
 
+31. 12. 2025
+
 Zodpovídá:
 
 Petr Vanka

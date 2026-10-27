@@ -58,6 +58,8 @@ předsedovi Výboru pro legislativu, bezpečnost a záchranný systém Zastupite
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Michal Hausner

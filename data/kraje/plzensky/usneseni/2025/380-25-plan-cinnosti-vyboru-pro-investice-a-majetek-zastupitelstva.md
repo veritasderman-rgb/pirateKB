@@ -58,6 +58,8 @@ předsedovi Výboru pro investice a majetek Zastupitelstva Plzeňského kraje za
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Jan Bostl

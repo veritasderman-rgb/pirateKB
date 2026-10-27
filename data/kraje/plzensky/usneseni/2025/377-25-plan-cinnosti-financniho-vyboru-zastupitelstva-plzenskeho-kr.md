@@ -62,6 +62,8 @@ Finanční výbor Zastupitelstva Plzeňského kraje činností dle přílohy č.
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Jan Volný

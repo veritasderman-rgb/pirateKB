@@ -73,6 +73,8 @@ V případě nástupu náhradníka na uprázdněný mandát člena zastupitelstv
 
 Termín:
 
+31. 12. 2024
+
 Zodpovídá:
 
 Mgr. Štěpánka Szabó, MBA

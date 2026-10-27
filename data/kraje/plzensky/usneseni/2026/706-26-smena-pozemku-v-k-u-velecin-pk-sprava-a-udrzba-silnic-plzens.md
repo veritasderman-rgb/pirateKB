@@ -70,6 +70,8 @@ náměstkovi hejtmana pro oblast ekonomiky, majetku a Centrální nákup Bc. Pav
 
 Termín:
 
+31. 03. 2028
+
 Zodpovídá:
 
 Bc. Pavel Strolený

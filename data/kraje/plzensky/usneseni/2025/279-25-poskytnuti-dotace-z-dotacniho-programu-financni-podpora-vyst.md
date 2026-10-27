@@ -106,6 +106,8 @@ náměstkovi hejtmana Plzeňského kraje Mgr. Martinu Rybárovi:
 
 Termín:
 
+15. 9. 2025
+
 Zodpovídá:
 
 Mgr. Martin Rybár

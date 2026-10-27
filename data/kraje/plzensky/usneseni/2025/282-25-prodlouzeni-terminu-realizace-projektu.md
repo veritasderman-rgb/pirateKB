@@ -72,6 +72,8 @@ III. Ukládá
 
 Termín:
 
+31. 8. 2025
+
 Zodpovídá:
 
 Petr Fišer

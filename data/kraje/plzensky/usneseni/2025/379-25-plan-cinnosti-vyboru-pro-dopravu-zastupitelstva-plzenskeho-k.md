@@ -58,6 +58,8 @@ předsedovi Výboru pro dopravu Zastupitelstva Plzeňského kraje zajistit činn
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Mgr. David Procházka

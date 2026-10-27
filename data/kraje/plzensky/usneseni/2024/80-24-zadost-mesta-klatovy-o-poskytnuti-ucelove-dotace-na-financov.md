@@ -60,6 +60,8 @@ náměstkovi hejtmana pro oblast dopravy, Ing. Pavlu Čížkovi, uzavřít a pod
 
 Termín:
 
+20. 12. 2024
+
 Zodpovídá:
 
 Ing. Pavel Čížek

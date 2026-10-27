@@ -34,6 +34,7 @@ Použití:
   python3 ingest/kraje.py --aktualni           # týdně: jednání za posledních 120 dní, hotová
                                                # starší 60 dní se přeskočí (stav.json)
   python3 ingest/kraje.py --bez-textu          # bez stahování plných textů (rychlejší)
+  python3 ingest/kraje.py --znovu              # přegenerovat i hotová jednání (po změně zpracování; z cache)
   KRAJE_INTERVAL=1.0 (s mezi požadavky; nejméně 1 s)
 """
 from __future__ import annotations
@@ -366,13 +367,29 @@ def text_z_wordu(raw: bytes) -> str:
     # je v tabulce bez odstavců nebo v h1; co z ní přece jen prosákne, vynechat
     hlavicka = ("ZASTUPITELSTVO ", "Ve věci", "Číslo usnesení", "Číslo zasedání", "Datum konání")
     body: list[str] = []
-    for i, ln in enumerate(lines):
-        if ln == "Usnesení" or ln.startswith(hlavicka) or (cz_date(ln) and len(ln) < 15):
+    for ln in lines:
+        # jen dokud nezačal vlastní text: samostatné datum dál v těle (Termín: 31. 12. 2025) zůstává
+        if not body and (ln == "Usnesení" or ln.startswith(hlavicka) or (cz_date(ln) and len(ln) < 15)
+                         or re.fullmatch(r"\d{1,4}/\d{2}", ln)):
             continue
-        if re.fullmatch(r"\d{1,4}/\d{2}", ln) or re.fullmatch(r"\d{1,3}", ln):
+        if re.fullmatch(r"\d{1,3}", ln):   # číslo stránky z exportu
             continue
         body.append(ln)
     return "\n\n".join(body).strip()
+
+
+def predchozi_text(path: Path) -> str | None:
+    """Dříve uložený text usnesení z existujícího Markdownu (sekce „## Text usnesení“), aby
+    neúspěšné stažení při obnově (nebo ``--bez-textu``) nepřepsalo dokument prázdným."""
+    if not path.is_file():
+        return None
+    try:
+        obsah = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    m = re.search(r"^## Text usnesení\n\n(.*)\Z", obsah, flags=re.S | re.M)
+    text = m.group(1).strip() if m else ""
+    return text or None
 
 
 # ----------------------------------------------------------------------------- zpracování
@@ -389,9 +406,13 @@ def hlasy_piratu(detail: dict, klub: str, zname: list[str]) -> tuple[dict[str, s
     return out, None
 
 
-def md_usneseni(slug: str, kraj: dict, u: dict, v: dict | None, text: str | None, zdroj: str) -> tuple[Path, dict, str]:
+def cesta_usneseni(slug: str, u: dict) -> Path:
     rok = (u.get("datum") or "0000")[:4]
-    path = OUT / slug / "usneseni" / rok / f"{slugify(u['cislo'].replace('/', '-'))}-{slugify(u.get('nazev') or 'usneseni', 60)}.md"
+    return OUT / slug / "usneseni" / rok / f"{slugify(u['cislo'].replace('/', '-'))}-{slugify(u.get('nazev') or 'usneseni', 60)}.md"
+
+
+def md_usneseni(slug: str, kraj: dict, u: dict, v: dict | None, text: str | None, zdroj: str) -> tuple[Path, dict, str]:
+    path = cesta_usneseni(slug, u)
     titul = f"Usnesení {kraj['zkratka']} č. {u['cislo']}: {u.get('nazev') or ''}".strip(": ")
     meta = {
         "zdroj": zdroj, "nazev": titul, "typ": "usneseni", "viditelnost": "verejne", "stazeno": today(),
@@ -492,7 +513,7 @@ def load_jsonl(path: Path) -> list[dict]:
 
 
 def zpracuj_kraj(slug: str, kraj: dict, *, od: str, limit: int | None, aktualni: bool, bez_textu: bool,
-                 use_cache: bool) -> dict:
+                 use_cache: bool, znovu: bool = False) -> dict:
     client = Methis(kraj["url_base"], slug, use_cache=use_cache)
     zname = zvoleni_pirati(kraj["nazev"])
     state = load_state(slug)
@@ -511,7 +532,7 @@ def zpracuj_kraj(slug: str, kraj: dict, *, od: str, limit: int | None, aktualni:
     for j in jednani:
         jid = str(j["id"])
         stare = (dnes - date.fromisoformat(j["datum"])).days > OBNOVIT_DNI
-        if stare and state["jednani"].get(jid, {}).get("hotovo"):
+        if stare and not znovu and state["jednani"].get(jid, {}).get("hotovo"):
             stats["preskoceno"] += 1
             continue
         max_age = None if stare else 86400
@@ -568,6 +589,8 @@ def zpracuj_kraj(slug: str, kraj: dict, *, od: str, limit: int | None, aktualni:
                 text = client.text_usneseni(u["dokument_id"])
                 if text is None:
                     hotovo = False
+            if text is None:   # selhání stažení nebo --bez-textu: ponechat dříve uložený text
+                text = predchozi_text(cesta_usneseni(slug, u))
             row = {"id": f"{slug}:{u['cislo']}", "komora": kraj["organ"], "kraj": kraj["nazev"], "jednani_id": j["id"],
                    **{k: u.get(k) for k in ("cislo", "datum", "nazev", "odbor", "stav", "druh", "zpracovatel",
                                              "predkladatel", "predkladatel_pirati", "jednani_cislo", "dokument_id")},
@@ -643,6 +666,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--aktualni", action="store_true", help=f"jen jednání za posledních {AKTUALNI_DNI} dní")
     ap.add_argument("--bez-textu", action="store_true", help="nestahovat plné texty usnesení")
     ap.add_argument("--bez-cache", action="store_true", help="ignorovat cache")
+    ap.add_argument("--znovu", action="store_true",
+                    help="přegenerovat i hotová starší jednání (např. po změně zpracování textu; z cache rychle)")
     args = ap.parse_args(argv)
 
     registr = load_registr()
@@ -657,7 +682,8 @@ def main(argv: list[str] | None = None) -> int:
     for slug, kraj in vybrane.items():
         try:
             souhrn[slug] = zpracuj_kraj(slug, kraj, od=args.od, limit=args.limit, aktualni=args.aktualni,
-                                        bez_textu=args.bez_textu, use_cache=not args.bez_cache)
+                                        bez_textu=args.bez_textu, use_cache=not args.bez_cache,
+                                        znovu=args.znovu)
         except Exception as e:  # noqa: BLE001
             warn(f"{slug}: {e}")
             souhrn[slug] = {"chyba": str(e)}

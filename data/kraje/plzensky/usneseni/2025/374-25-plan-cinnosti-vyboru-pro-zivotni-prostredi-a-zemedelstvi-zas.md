@@ -58,6 +58,8 @@ předsedovi Výboru pro životní prostředí a zemědělství Zastupitelstva Pl
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Josef Bernard

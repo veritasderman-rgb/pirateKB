@@ -60,6 +60,8 @@ Dotace bude poskytnuta v režimu podpor de minimis podle Nařízení Komise (EU)
 
 Termín:
 
+31. 12. 2025
+
 Zodpovídá:
 
 Petr Vanka

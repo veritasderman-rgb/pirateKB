@@ -50,6 +50,8 @@ hejtmana Plzeňského kraje, k tomu, aby při všech jednáních a dalším zabe
 
 Termín:
 
+31. 12. 2027
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

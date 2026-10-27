@@ -58,6 +58,8 @@ předsedovi Výboru pro sociální věci Zastupitelstva Plzeňského kraje zajis
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Bc. Andrej Červený

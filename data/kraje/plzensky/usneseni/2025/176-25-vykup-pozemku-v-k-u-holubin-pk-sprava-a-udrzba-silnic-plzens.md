@@ -62,6 +62,8 @@ náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku Martinu Z
 
 Termín:
 
+30. 4. 2027
+
 Zodpovídá:
 
 Martin Záhoř

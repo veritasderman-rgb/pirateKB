@@ -58,21 +58,31 @@ ZPK 1274/16
 
 ZPK schvaluje bezúplatné nabytí pozemků v k.ú. Otov u Nového Kramolína a dalších pozemků ve vlastnictví České republiky – Státní pozemkový úřad
 
+31.12.2025
+
 ZPK 887/18
 
 ZPK schvaluje bezúplatné nabytí pozemků v k. ú. Hejná a dalších pozemků ve vlastnictví České republiky – Úřadu pro zastupování státu ve věcech majetkových
+
+31.12.2025
 
 ZPK 1328/19
 
 ZPK schvaluje bezúplatné nabytí pozemků v k.ú. Velhartice a dalších pozemků ve vlastnictví České republiky – Úřadu pro zastupování státu ve věcech majetkových
 
+31.12.2025
+
 ZPK 1434/20
 
 ZPK schvaluje bezúplatné nabytí pozemků v k. ú. Plánice a dalších pozemků ve vlastnictví České republiky – Úřadu pro zastupování státu ve věcech majetkových
 
+31.12.2025
+
 ZPK 1459/23
 
 ZPK schvaluje bezúplatné nabytí pozemků v k. ú. Radkovice u Měčína a dalších pozemků ve vlastnictví České republiky – Úřadu pro zastupování státu ve věcech majetkových
+
+31.12.2025
 
 II. Schvaluje
 
@@ -93,6 +103,8 @@ III. Ukládá
 náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku Martinu Záhořovi zajistit plnění tohoto usnesení
 
 Termín:
+
+31. 12. 2025
 
 Zodpovídá:
 

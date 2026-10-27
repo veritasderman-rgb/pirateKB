@@ -58,6 +58,8 @@ předsedovi Výboru pro IT a evropské záležitosti Zastupitelstva Plzeňského
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Bc. Jiří Sýkora

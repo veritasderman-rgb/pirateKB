@@ -54,6 +54,8 @@ Kontrolnímu výboru Zastupitelstva Plzeňského kraje:
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Mgr. Lukáš Hegner

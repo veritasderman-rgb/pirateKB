@@ -58,6 +58,8 @@ odboru školství, mládeže a sportu Krajského úřadu Plzeňského kraje uzav
 
 Termín:
 
+31. 12. 2024
+
 Zodpovídá:
 
 Ing. Vladimír Kroc

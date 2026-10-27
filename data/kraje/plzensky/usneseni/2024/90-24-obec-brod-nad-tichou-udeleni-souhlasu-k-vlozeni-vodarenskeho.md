@@ -54,6 +54,8 @@ vložení vodárenského zařízení žadatele obce Brod nad Tichou, se sídlem 
 
 Termín:
 
+31. 1. 2025
+
 Zodpovídá:
 
 Petr Fišer

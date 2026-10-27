@@ -66,6 +66,8 @@ programu
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Libor Picka

@@ -54,6 +54,8 @@ hejtmanovi Plzeňského kraje, MUDr. Kamalovi Farhanovi, podepsat Dodatek č. 58
 
 Termín:
 
+30. 6. 2026
+
 Zodpovídá:
 
 Ing. Pavel Čížek

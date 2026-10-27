@@ -54,6 +54,8 @@ MUDr. Kamalu Farhanovi, hejtmanovi Plzeňského kraje, podepsat veřejnoprávní
 
 Termín:
 
+31. 05. 2026
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

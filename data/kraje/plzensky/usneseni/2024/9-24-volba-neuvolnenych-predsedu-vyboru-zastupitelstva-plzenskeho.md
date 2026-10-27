@@ -64,3 +64,5 @@ Bc. Stanislava Antoše - předseda Výboru pro sport
 Bc. Jiřího Sýkoru – předseda Výboru pro IT a evropské záležitosti
 
 Termín:
+
+30. 10. 2024

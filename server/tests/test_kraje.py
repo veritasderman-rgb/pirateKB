@@ -160,3 +160,28 @@ def test_registr_plzensky():
     assert reg["kraje"]["plzensky"]["system"] == "methis" and reg["kraje"]["plzensky"]["stav"] == "hotovo"
     assert reg["kraje"]["plzensky"]["url_base"].startswith("http://usneseni.kr-plzensky.cz")
     assert len(reg["kraje"]) == 14
+
+
+def test_text_z_wordu_keeps_dates_in_body():
+    """Samostatné datum v těle (Termín: 31. 12. 2025) zůstává; vyhazuje se jen hlavička (Codex review PR #30)."""
+    html = (
+        '<html><head><meta http-equiv=Content-Type content="text/html; charset=windows-1250"></head><body>'
+        '<p>Usnesení</p><p>465/25</p><p>15. 12. 2025</p>'
+        '<p>I. Ukládá</p><p>předsedovi výboru zajistit audit</p>'
+        '<p>Termín:</p><p>31. 12. 2025</p><p>Zodpovídá:</p><p>Jan Novák</p><p>2</p></body></html>'
+    ).encode("windows-1250")
+    text = kraje.text_z_wordu(html)
+    assert text.startswith("I. Ukládá")
+    assert "465/25" not in text and "15. 12. 2025" not in text
+    assert "Termín:\n\n31. 12. 2025\n\nZodpovídá:\n\nJan Novák" in text
+    assert "\n\n2" not in text   # číslo stránky
+
+
+def test_predchozi_text(tmp_path):
+    p = tmp_path / "u.md"
+    assert kraje.predchozi_text(p) is None
+    p.write_text("---\nnazev: x\n---\n# U\n\n## Hlasování\n\nPiráti: ano 3\n\n## Text usnesení\n\nI. Schvaluje\n\nrozpočet\n",
+                 encoding="utf-8")
+    assert kraje.predchozi_text(p) == "I. Schvaluje\n\nrozpočet"
+    p.write_text("---\nnazev: x\n---\n# U\n\nPlný text usnesení: odkaz.\n", encoding="utf-8")
+    assert kraje.predchozi_text(p) is None

@@ -62,6 +62,8 @@ III. Schvaluje
 
 Termín:
 
+30. 9. 2025
+
 Zodpovídá:
 
 Petr Vanka

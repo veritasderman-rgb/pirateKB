@@ -56,6 +56,8 @@ Ing. et Ing. Janu Bozděchovi, Ph.D., náměstkovi hejtmana Plzeňského kraje p
 
 Termín:
 
+31. 8. 2025
+
 Zodpovídá:
 
 Ing. et Ing. Jan Bozděch, Ph.D.

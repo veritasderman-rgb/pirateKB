@@ -66,6 +66,8 @@ náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku informova
 
 Termín:
 
+31. 12. 2025
+
 Zodpovídá:
 
 Martin Záhoř

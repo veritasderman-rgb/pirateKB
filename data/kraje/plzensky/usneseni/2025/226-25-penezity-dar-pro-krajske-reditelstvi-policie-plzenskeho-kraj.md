@@ -54,6 +54,8 @@ uzavření darovací smlouvy, jejíž návrh tvoří přílohu č. 2 návrhu usn
 
 Termín:
 
+31. 8. 2025
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

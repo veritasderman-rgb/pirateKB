@@ -58,6 +58,8 @@ Mgr. Janu Karáskovi, vedoucímu odboru zdravotnictví Krajského úřadu Plzeň
 
 Termín:
 
+31. 1. 2026
+
 Zodpovídá:
 
 Bc. Tomáš Soukup

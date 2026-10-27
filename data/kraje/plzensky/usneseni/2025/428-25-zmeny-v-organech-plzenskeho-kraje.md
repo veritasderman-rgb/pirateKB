@@ -70,6 +70,8 @@ v souladu s ust. § 35 odst. 2 písm. m) a písm. o) zákona č. 129/2000 Sb., o
 
 Termín:
 
+1. 1. 2026
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

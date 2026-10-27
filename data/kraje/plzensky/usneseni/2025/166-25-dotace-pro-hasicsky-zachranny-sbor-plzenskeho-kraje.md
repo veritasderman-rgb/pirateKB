@@ -52,6 +52,8 @@ I. Schvaluje
 
 Termín:
 
+30. 6. 2025
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

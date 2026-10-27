@@ -62,6 +62,8 @@ náměstkovi hejtmana pro oblast sociálních věcí Ing. et Ing. Janu Bozděcho
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. et Ing. Jan Bozděch, Ph.D.

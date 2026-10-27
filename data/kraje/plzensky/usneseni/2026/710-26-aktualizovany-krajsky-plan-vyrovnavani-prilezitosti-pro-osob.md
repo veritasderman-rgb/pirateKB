@@ -54,6 +54,8 @@ Mgr. Filipu Zapletalovi, vedoucímu odboru sociálních věcí Krajského úřad
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. et Ing. Jan Bozděch, Ph.D.

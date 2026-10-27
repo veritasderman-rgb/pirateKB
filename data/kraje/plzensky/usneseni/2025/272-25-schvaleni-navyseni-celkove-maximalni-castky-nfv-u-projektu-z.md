@@ -58,6 +58,8 @@ Ing. Pavlu Čížkovi, náměstkovi hejtmana pro oblast dopravy, informovat pros
 
 Termín:
 
+24. 6. 2025
+
 Zodpovídá:
 
 Ing. Pavel Čížek

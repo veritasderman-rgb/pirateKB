@@ -54,6 +54,8 @@ hejtmanovi Plzeňského kraje podepsat Dodatek č. 52 ke Zřizovací listině or
 
 Termín:
 
+31. 12. 2024
+
 Zodpovídá:
 
 Ing. Pavel Čížek MUDr. Kamal Farhan

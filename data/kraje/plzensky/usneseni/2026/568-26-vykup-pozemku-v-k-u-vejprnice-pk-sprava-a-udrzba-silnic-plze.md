@@ -62,6 +62,8 @@ náměstkovi hejtmana Plzeňského kraje pro oblast ekonomiky, majetku a Centrá
 
 Termín:
 
+31. 10. 2027
+
 Zodpovídá:
 
 Bc. Pavel Strolený

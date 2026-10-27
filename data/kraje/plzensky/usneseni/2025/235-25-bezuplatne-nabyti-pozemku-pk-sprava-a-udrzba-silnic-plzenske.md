@@ -172,6 +172,8 @@ silnice
 
 III/19023
 
+1090/10
+
 1 348
 
 ostatní plocha
@@ -196,17 +198,23 @@ silnice
 
 III/19023
 
-ostatní plocha
-
-silnice
-
-III/19023
+1387/19
 
 ostatní plocha
 
 silnice
 
 III/19023
+
+1387/20
+
+ostatní plocha
+
+silnice
+
+III/19023
+
+1387/21
 
 ostatní plocha
 
@@ -231,6 +239,8 @@ II. Ukládá
 náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku Martinu Záhořovi zajistit plnění tohoto usnesení
 
 Termín:
+
+30. 6. 2027
 
 Zodpovídá:
 

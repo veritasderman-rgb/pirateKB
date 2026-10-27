@@ -58,6 +58,8 @@ II. Schvaluje
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Petr Vanka

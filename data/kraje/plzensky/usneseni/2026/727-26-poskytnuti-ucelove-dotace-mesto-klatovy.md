@@ -64,6 +64,8 @@ Ing. Liboru Pickovi, členu Rady Plzeňského kraje pro oblast kultury, památko
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Libor Picka

@@ -49,3 +49,5 @@ I. Volí
 v souladu s ustanovením § 35 odst. 2 písm. o) zák. č. 129/2000 Sb., o krajích, Mgr. et Mgr. Lucii Kantorovou do funkce členky Výboru pro výchovu, vzdělávání a zaměstnanost Zastupitelstva Plzeňského kraje
 
 Termín:
+
+10. 2. 2025

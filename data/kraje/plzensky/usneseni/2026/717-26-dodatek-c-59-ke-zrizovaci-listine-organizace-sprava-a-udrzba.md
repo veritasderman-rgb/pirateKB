@@ -54,6 +54,8 @@ hejtmanovi Plzeňského kraje podepsat Dodatek č. 59 ke Zřizovací listině or
 
 Termín:
 
+30. 9. 2026
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

@@ -50,6 +50,8 @@ I. Schvaluje
 
 Termín:
 
+28. 2. 2026
+
 Zodpovídá:
 
 Mgr. Martin Rybár

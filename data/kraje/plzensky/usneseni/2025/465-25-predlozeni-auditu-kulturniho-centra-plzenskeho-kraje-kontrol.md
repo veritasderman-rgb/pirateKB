@@ -65,6 +65,8 @@ předsedu Kontrolního výboru Zastupitelstva Plzeňského kraje zajistit předl
 
 Termín:
 
+31. 3. 2026
+
 Zodpovídá:
 
 Rudolf Špoták

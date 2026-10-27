@@ -52,3 +52,5 @@ Bc. Andreje Červeného - předseda Výboru pro sociální věci
 Františka Jelínka - předseda Výboru pro kulturu, památkovou péči a cestovní ruch
 
 Termín:
+
+30. 10. 2024

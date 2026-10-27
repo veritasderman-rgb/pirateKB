@@ -56,6 +56,8 @@ náměstkovi hejtmana pro oblast školství a sportu, Ing. Vladimíru Krocovi, z
 
 Termín:
 
+30. 4. 2025
+
 Zodpovídá:
 
 Ing. Vladimír Kroc

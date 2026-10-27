@@ -50,6 +50,8 @@ uzavření veřejnoprávní smlouvy, dle návrhu v příloze návrhu usnesení, 
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

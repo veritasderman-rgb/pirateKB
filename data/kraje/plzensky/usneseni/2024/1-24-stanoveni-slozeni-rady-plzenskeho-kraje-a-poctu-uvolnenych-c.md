@@ -66,3 +66,5 @@ b) 4 (čtyři) náměstci hejtmana, uvolněni pro výkon funkce od 30. 10. 2024
 c) 3 (tři) další členové rady, uvolněni pro výkon funkce od 30. 10. 2024
 
 Termín:
+
+30. 10. 2024

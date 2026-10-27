@@ -58,6 +58,8 @@ předsedovi Výboru pro kulturu, památkovou péči a cestovní ruch Zastupitels
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 František Jelínek

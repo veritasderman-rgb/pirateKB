@@ -70,6 +70,8 @@ III. Ukládá
 
 Termín:
 
+30. 5. 2025
+
 Zodpovídá:
 
 Petr Fišer

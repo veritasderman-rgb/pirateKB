@@ -80,6 +80,8 @@ III. Ukládá
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Ing. Vladimír Kroc

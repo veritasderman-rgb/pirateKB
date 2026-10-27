@@ -58,6 +58,8 @@ předsedovi Výboru pro výchovu, vzdělávání a zaměstnanost Zastupitelstva 
 
 Termín:
 
+31. 12. 2025
+
 Zodpovídá:
 
 Mgr. Michal Marek

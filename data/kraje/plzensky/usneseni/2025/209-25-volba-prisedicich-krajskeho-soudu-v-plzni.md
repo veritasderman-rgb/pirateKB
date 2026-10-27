@@ -58,6 +58,8 @@ do funkce přísedících Krajského soudu v Plzni níže jmenované:
 
 Termín:
 
+7. 7. 2025
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

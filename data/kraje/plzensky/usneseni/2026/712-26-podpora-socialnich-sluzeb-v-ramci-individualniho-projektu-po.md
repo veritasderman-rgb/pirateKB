@@ -62,6 +62,8 @@ Ing. et Ing. Janu Bozděchovi, Ph.D., náměstkovi hejtmana pro oblast sociáln�
 
 Termín:
 
+30. 9. 2026
+
 Zodpovídá:
 
 Ing. et Ing. Jan Bozděch, Ph.D.

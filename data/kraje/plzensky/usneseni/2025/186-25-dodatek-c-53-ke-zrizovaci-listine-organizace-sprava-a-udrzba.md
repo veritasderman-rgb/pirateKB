@@ -54,6 +54,8 @@ hejtmanovi Plzeňského kraje podepsat Dodatek č. 53 ke Zřizovací listině or
 
 Termín:
 
+30. 4. 2025
+
 Zodpovídá:
 
 Ing. Pavel Čížek

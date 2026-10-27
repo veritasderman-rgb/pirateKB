@@ -52,6 +52,8 @@ I. Schvaluje
 
 Termín:
 
+31. 10. 2026
+
 Zodpovídá:
 
 MUDr. Kamal Farhan

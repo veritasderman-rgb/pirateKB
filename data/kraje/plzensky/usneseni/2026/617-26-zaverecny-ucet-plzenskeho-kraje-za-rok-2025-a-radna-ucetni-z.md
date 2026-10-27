@@ -94,6 +94,8 @@ Bc. Pavlu Strolenému, náměstkovi hejtmana pro oblast ekonomiky, majetku a Cen
 
 Termín:
 
+15. 7. 2026
+
 Zodpovídá:
 
 Bc. Pavel Strolený

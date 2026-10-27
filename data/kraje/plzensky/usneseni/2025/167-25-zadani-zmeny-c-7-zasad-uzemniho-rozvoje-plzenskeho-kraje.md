@@ -54,6 +54,8 @@ náměstkovi hejtmana Plzeňského kraje Petru Vankovi zajistit pořízení Změ
 
 Termín:
 
+31. 12. 2027
+
 Zodpovídá:
 
 Petr Vanka

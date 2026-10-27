@@ -70,6 +70,8 @@ náměstkovi hejtmana Petru Vankovi předložit návrh Změny č. 7 Zásad územ
 
 Termín:
 
+31. 12. 2026
+
 Zodpovídá:
 
 Petr Vanka

@@ -52,4 +52,4 @@ získali mandáty v krajských volbách 2024.
 Osobní údaje: jen jména zvolených zastupitelů a jejich hlasy (veřejná funkce), jména předkladatelů
 a zpracovatelů z úřadu tak, jak je kraj zveřejňuje. Kontakty se neukládají.
 
-Poslední běh: 2026-10-27; {"plzensky": {"usneseni_celkem": 734, "hlasovani_celkem": 730, "klub": ["Daniel Kůs", "Pavel Hais", "Rudolf Špoták"], "usneseni": 734, "hlasovani": 730, "jednani": 11, "md_zapsano": 660, "pozadavku": 2091}}
+Poslední běh: 2026-10-27; {"plzensky": {"usneseni_celkem": 734, "hlasovani_celkem": 730, "klub": ["Daniel Kůs", "Pavel Hais", "Rudolf Špoták"], "usneseni": 734, "hlasovani": 730, "jednani": 11, "md_zapsano": 449, "pozadavku": 731}}

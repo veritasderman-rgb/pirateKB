@@ -58,6 +58,8 @@ náměstkovi hejtmana pro oblast dopravy, Ing. Pavlu Čížkovi, podepsat a uzav
 
 Termín:
 
+30. 09. 2025
+
 Zodpovídá:
 
 Ing. Pavel Čížek
