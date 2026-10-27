@@ -1,0 +1,65 @@
+---
+zdroj: http://usneseni.kr-plzensky.cz/Vzhled/Usneseni_HlasovaniUcastniku.aspx?IDs=2600883
+nazev: 'Usnesení ZPK č. 392/25: Bezúplatné nabytí pozemku v k. ú. Starý Plzenec – PK – Správa a údržba silnic Plzeňského kraje, středisko Plzeň-jih x obec Šťáhlavy'
+typ: usneseni
+viditelnost: verejne
+stazeno: '2026-10-27'
+datum: '2025-12-15'
+autorita: usneseni-kraje
+organ: zpk
+kraj: Plzeňský kraj
+cislo: 392/25
+jednani: 7
+odbor: OIM
+stav: Platný
+autor: Záhoř Martin
+zpracovatel: Sejáková Renáta
+text_ulozen: true
+hlasovani:
+  vysledek: Schváleno
+  pro: 45
+  proti: 0
+  zdrzel: 0
+  nehlasoval: 5
+  pritomno: 50
+pirati:
+  Pavel Hais: nehlasoval
+  Daniel Kůs: nehlasoval
+  Rudolf Špoták: nehlasoval
+---
+
+# Usnesení ZPK č. 392/25: Bezúplatné nabytí pozemku v k. ú. Starý Plzenec – PK – Správa a údržba silnic Plzeňského kraje, středisko Plzeň-jih x obec Šťáhlavy
+
+- Orgán: Zastupitelstvo Plzeňského kraje
+- Číslo usnesení: 392/25 ze dne 2025-12-15 (7. jednání)
+- Předkládající: Záhoř Martin
+- Odbor: OIM
+
+Detail a jmenovité hlasování: http://usneseni.kr-plzensky.cz/Vzhled/Usneseni_HlasovaniUcastniku.aspx?IDs=2600883
+Seznam usnesení zastupitelstva: http://usneseni.kr-plzensky.cz/Vzhled/UsneseniZastupitelstvo.aspx
+
+## Hlasování zastupitelstva 2025-12-15 12:37
+Výsledek: Schváleno (pro 45, proti 0, zdrželo se 0, nehlasovalo 5, přítomno 50).
+Piráti: nehlasoval 3 (Pavel Hais nehlasoval, Daniel Kůs nehlasoval, Rudolf Špoták nehlasoval)
+
+## Text usnesení
+
+I. Schvaluje
+
+1. bezúplatné nabytí pozemku, který je ve vlastnictví obce Šťáhlavy, se sídlem Masarykova 169, 332 03 Šťáhlavy, IČO: 00257290, do vlastnictví Plzeňského kraje, a to pozemku:
+
+- parc. č. 1432/10 o výměře 575 m², ostatní plocha, silnice,
+
+zapsaného na LV č. 2772 v katastru nemovitostí vedeném Katastrálním úřadem pro Plzeňský kraj, Katastrální pracoviště Plzeň-město, pro obec a k. ú. Starý Plzenec
+
+2. předání uvedeného pozemku po vkladu vlastnického práva pro Plzeňský kraj do katastru nemovitostí k hospodaření příspěvkové organizaci Plzeňského kraje Správa a údržba silnic Plzeňského kraje, se sídlem Koterovská 162, 326 00 Plzeň, IČO: 72053119
+
+II. Ukládá
+
+náměstkovi hejtmana Plzeňského kraje pro oblast investic a majetku zajistit plnění tohoto usnesení
+
+Termín:
+
+Zodpovídá:
+
+Martin Záhoř

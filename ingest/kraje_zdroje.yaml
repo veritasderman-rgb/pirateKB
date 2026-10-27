@@ -1,0 +1,109 @@
+# Registr krajů pro ingest/kraje.py: kde kraj zveřejňuje usnesení zastupitelstva a jmenovité
+# hlasování a jestli se už stahují.
+#
+# stav:    hotovo      zpracovává se (ingest/kraje.py umí jeho systém)
+#          bez-piratu  Piráti nemají v zastupitelstvu kraje mandát (krajské volby 2024, viz
+#                      data/volby/zvoleni/kz-2024.jsonl) – zatím se nestahuje
+#          neznamo     neověřeno, kde a v jaké podobě kraj usnesení zveřejňuje
+# system:  methis      aplikace Methis (usnesení + hlasování, ASP.NET WebForms, bez přihlášení)
+#          neznamo     neověřeno
+# Pole url_base, url, url_hlasovani, organ, organ_nazev, zkratka vyplňuje jen zpracovaný kraj.
+# Praha má vlastní zdroj (ingest/praha.py, data/praha), v tomto registru je jen pro úplnost.
+#
+# Ověřeno 2026-10-27 z cloudového prostředí: weby označené „dosažitelný“ odpověděly 200,
+# „nedosažitelný“ spojení odmítly (může být jen blokace cloudových IP).
+
+kraje:
+  praha:
+    nazev: Hlavní město Praha
+    web: https://praha.eu/
+    system: obis
+    stav: hotovo
+    poznamka: zpracovává ingest/praha.py (opendata.praha.eu + usneseni.praha.eu), výstup data/praha
+  stredocesky:
+    nazev: Středočeský kraj
+    web: https://www.kr-stredocesky.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web z cloudu nedosažitelný (reset spojení)
+  jihocesky:
+    nazev: Jihočeský kraj
+    web: https://www.kr-jihocesky.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web z cloudu nedosažitelný (502 na proxy)
+  plzensky:
+    nazev: Plzeňský kraj
+    web: https://www.plzensky-kraj.cz/
+    system: methis
+    stav: hotovo
+    url_base: http://usneseni.kr-plzensky.cz/
+    url: http://usneseni.kr-plzensky.cz/Vzhled/UsneseniZastupitelstvo.aspx
+    url_hlasovani: http://usneseni.kr-plzensky.cz/Vzhled/HlasovaniJednani.aspx
+    organ: zpk
+    organ_nazev: Zastupitelstvo Plzeňského kraje
+    zkratka: ZPK
+    poznamka: >-
+      Piráti 2024–2028: 3 zastupitelé (Rudolf Špoták, Daniel Kůs, Pavel Hais; klub „Česká pirátská
+      strana“, id klubu 36). Jednání zastupitelstva od 12/2013, jmenovité hlasování od 12/2013.
+      Rada kraje (UsneseniRada.aspx) se nestahuje.
+  karlovarsky:
+    nazev: Karlovarský kraj
+    web: https://www.kr-karlovarsky.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web dosažitelný
+  ustecky:
+    nazev: Ústecký kraj
+    web: https://www.kr-ustecky.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web dosažitelný
+  liberecky:
+    nazev: Liberecký kraj
+    web: https://www.kraj-lbc.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web dosažitelný
+  kralovehradecky:
+    nazev: Královéhradecký kraj
+    web: https://www.kr-kralovehradecky.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web z cloudu nedosažitelný (reset spojení)
+  pardubicky:
+    nazev: Pardubický kraj
+    web: https://www.pardubickykraj.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web dosažitelný
+  vysocina:
+    nazev: Kraj Vysočina
+    web: https://www.kr-vysocina.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web z cloudu nedosažitelný (prázdná odpověď)
+  jihomoravsky:
+    nazev: Jihomoravský kraj
+    web: https://www.jmk.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web přesměrovává na přihlašovací bránu (my.policy), z cloudu nedosažitelný
+  olomoucky:
+    nazev: Olomoucký kraj
+    web: https://www.olkraj.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web dosažitelný
+  zlinsky:
+    nazev: Zlínský kraj
+    web: https://zlinskykraj.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web dosažitelný
+  moravskoslezsky:
+    nazev: Moravskoslezský kraj
+    web: https://www.msk.cz/
+    system: neznamo
+    stav: bez-piratu
+    poznamka: web dosažitelný
