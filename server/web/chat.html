@@ -77,6 +77,7 @@
   <span id="model"></span>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" integrity="sha512-xeUh+KxNyTufZOje++oQHstlMQ8/rpyzPuM+gjMFYK3z5ILJGE7l2NvYL+XfliKURMpBIKKp1XoPN/qswlSMFA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.7/purify.min.js" integrity="sha512-BdRNuI8/lsyxkKQVxK1lVtfZshggfXPAwEP+JAOJEKx6Y8SLfcBSRdaWyXQmMxo+wG180uFqXYGjGRL0mh4/Jw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 (function () {
   var ENABLED = __CHAT_ENABLED__;
@@ -93,12 +94,19 @@
   }
 
   function esc(s) { return s.replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  // Odpověď modelu může obsahovat cokoli (i HTML z uživatelského dotazu nebo z dat), proto
+  // se Markdown po převodu čistí DOMPurify (allowlist). Bez DOMPurify se vykreslí jen text.
   function render(md) {
-    if (window.marked) {
+    if (window.marked && window.DOMPurify) {
       var html = marked.parse(md, { gfm: true, breaks: true });
-      var d = document.createElement('div'); d.innerHTML = html;
-      d.querySelectorAll('a').forEach(function (a) { a.target = '_blank'; a.rel = 'noopener'; });
-      d.querySelectorAll('script, iframe, object, embed').forEach(function (n) { n.remove(); });
+      var clean = DOMPurify.sanitize(html, {
+        USE_PROFILES: { html: true },
+        FORBID_TAGS: ['style', 'form', 'input', 'button', 'img', 'svg', 'math'],
+        FORBID_ATTR: ['style'],
+        ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i
+      });
+      var d = document.createElement('div'); d.innerHTML = clean;
+      d.querySelectorAll('a').forEach(function (a) { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
       return d.innerHTML;
     }
     return esc(md).replace(/\n/g, '<br>');

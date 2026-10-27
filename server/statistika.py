@@ -221,6 +221,7 @@ class Zapisovac:
         self._schema_ok = False
         self._sloupce: dict[str, tuple[str, ...]] = dict(SLOUPCE)
         self._soli: dict[date, bytes] = {}
+        self._oddelene_varovano: set[str] = set()
         self._failures = 0
         self._next_try = 0.0
         self._warned = False
@@ -422,7 +423,7 @@ class Zapisovac:
                 if tabulka in radky:
                     radky[tabulka].append(r)
             for tabulka, rows in radky.items():
-                if rows:
+                if rows and tabulka not in ODDELENE_TABULKY:
                     sql, params = sestav_insert(tabulka, rows, self._sloupce.get(tabulka))
                     conn.execute(sql, params)
             conn.commit()
@@ -432,7 +433,31 @@ class Zapisovac:
             except Exception:  # noqa: BLE001
                 pass
             raise
+        # Tabulky přidané později (``mezery``) se zapisují zvlášť: na starším schématu nebo
+        # s rolí bez práva INSERT by jinak shodil celou dávku i běžnou statistiku. Chyba se
+        # jednou zaloguje a řádky se zahodí, ``volani`` a ``pripojeni`` jsou už potvrzené.
+        for tabulka in ODDELENE_TABULKY:
+            rows = radky.get(tabulka) or []
+            if not rows:
+                continue
+            try:
+                sql, params = sestav_insert(tabulka, rows, self._sloupce.get(tabulka))
+                conn.execute(sql, params)
+                conn.commit()
+            except Exception as exc:  # noqa: BLE001
+                try:
+                    conn.rollback()
+                except Exception:  # noqa: BLE001
+                    pass
+                if tabulka not in self._oddelene_varovano:
+                    self._oddelene_varovano.add(tabulka)
+                    log.warning("statistika: zápis do %s selhal (%d řádků zahozeno; chybí tabulka "
+                                "nebo právo INSERT? viz server/statistika.sql): %s",
+                                tabulka, len(rows), exc)
 
+
+# Tabulky zapisované ve vlastní transakci (přidané později, nemusí existovat na starším schématu).
+ODDELENE_TABULKY: tuple[str, ...] = ("mezery",)
 
 SLOUPCE: dict[str, tuple[str, ...]] = {
     "volani": ("cas", "tool", "delka_dotazu", "pocet_vysledku", "trvani_ms", "fallback", "chyba",

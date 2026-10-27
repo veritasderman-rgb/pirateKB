@@ -866,3 +866,38 @@ def test_schema_mezery_a_pohledy():
     for pohled in ("mezery_posledni", "mezery_tydne"):
         assert f"CREATE OR REPLACE VIEW {pohled} AS" in sql
     assert "piratekb_prostredi() IN ('*', prostredi)" in sql.split("CREATE OR REPLACE VIEW mezery_posledni AS")[1]
+
+
+def test_zapis_mezer_oddelene_neshodi_statistiku(caplog):
+    """Starší schéma bez tabulky ``mezery`` (nebo role bez INSERT): řádky mezer se zahodí
+    s jedním varováním, ``volani`` a ``pripojeni`` se potvrdí (Codex review, PR #29)."""
+    db = FakeDB()
+
+    class KonecMezer(FakeConn):
+        def execute(self, sql, params=None):
+            if sql.startswith("INSERT INTO mezery"):
+                raise RuntimeError('relation "mezery" does not exist')
+            return super().execute(sql, params)
+
+    db.connect = lambda dsn: KonecMezer(db)  # type: ignore[method-assign]
+    z = statistika.Zapisovac("dsn", db.connect)
+    mezera = {"cas": datetime.now(timezone.utc), "otazka": "?", "poznamka": "", "tool": "search_kb",
+              "klient": "claude", "prihlaseny": False, "issue_url": None, "duplikat": False,
+              "nasazeni": "abc", "prostredi": "production"}
+    z.pridej("volani", _volani())
+    z.pridej("mezery", mezera)
+    z.pridej("volani", _volani(1))
+    with caplog.at_level("WARNING", logger="piratekb.statistika"):
+        assert z.flush() is True
+    assert len(db.inserty("volani")) == 1 and db.commits >= 1
+    varovani = [r for r in caplog.records if "mezery" in r.getMessage()]
+    assert len(varovani) == 1
+    # druhá dávka: statistika dál funguje, varování už se neopakuje
+    z.pridej("mezery", mezera)
+    z.pridej("pripojeni", {"cas": datetime.now(timezone.utc), "klient": "c", "klient_verze": "1",
+                           "protokol": "p", "rodina": "claude", "prihlaseny": False,
+                           "_zdroj": ("198.51.100.1", "ua"), "nasazeni": "abc", "prostredi": "production"})
+    with caplog.at_level("WARNING", logger="piratekb.statistika"):
+        assert z.flush() is True
+    assert len(db.inserty("pripojeni")) == 1
+    assert len([r for r in caplog.records if "mezery" in r.getMessage()]) == 1
