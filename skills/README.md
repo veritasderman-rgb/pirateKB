@@ -10,8 +10,9 @@ znalostní báze volat, jak citovat, co kontrolovat). Data dodává MCP server `
 | [`piratekb-tiskova-zprava`](piratekb-tiskova-zprava/SKILL.md) | návrh tiskové zprávy podle struktury TZ na pirati.cz, s ověřeným postojem, citacemi a kontrolou proti programu; výstup ke schválení mediálním odborem |
 | [`piratekb-brief`](piratekb-brief/SKILL.md) | interní brief k tématu: postoj a autorita, fakta, co jsme udělali, argumenty, kdo mluví (`find_expert`), co chybí |
 | [`piratekb-socialni-site`](piratekb-socialni-site/SKILL.md) | posty (FB, IG, X) a scénáře Reels podle brand pravidel Pirátů |
+| [`piratekb-kurator`](piratekb-kurator/SKILL.md) | pro kurátora: zpracování jednoho návrhu z `inbox/` (výsledky „co jsme dokázali“, dokumenty z mraku) se `scripts/kurator_navrh.py`: podklady z `data/` a MCP, ověření, shrnutí, schválení jen po souhlasu člověka |
 
-Všechny skills obsahují sekci **„Kdy použít Hlídač státu“** (smlouvy, zakázky, dotace,
+Skills pro psaní obsahují sekci **„Kdy použít Hlídač státu“** (smlouvy, zakázky, dotace,
 sponzoři stran z MCP serveru hlidacstatu.cz, pokud ho máte připojený) a **„Když KB
 odpověď nemá“** (`find_expert`, `report_gap`).
 
@@ -34,7 +35,7 @@ Každý skill se nahrává jako ZIP se složkou skillu:
 
 ```sh
 cd skills
-for s in piratekb-tiskova-zprava piratekb-brief piratekb-socialni-site; do
+for s in piratekb-tiskova-zprava piratekb-brief piratekb-socialni-site piratekb-kurator; do
   zip -r "$s.zip" "$s"
 done
 ```
@@ -68,6 +69,8 @@ Stačí psát přirozeně, Claude skill vybere podle popisu:
 - „Napiš tiskovou zprávu k tomu, že vláda škrtla 14 miliard na dostupné bydlení, mluvčí Vendula Svobodová.“
 - „Připrav mi brief k Chat Control, zítra o tom mluvím v rádiu.“
 - „Udělej instagramový karusel a scénář reelsu o transparentnosti veřejných zakázek.“
+- „Jsem kurátor, projdi se mnou jeden návrh výsledku s vysokou jistotou.“ (skill `piratekb-kurator`
+  potřebuje repozitář a shell, např. Claude Code; schvaluje jen po souhlasu kurátora)
 
 Stejné postupy jsou na serveru i jako MCP prompty (`tiskova_zprava`, `brief_k_tematu`,
 `social_post`, `reels_scenar`). Skills navíc fungují bez ručního výběru promptu a obsahují

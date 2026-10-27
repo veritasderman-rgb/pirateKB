@@ -16,6 +16,8 @@ Pokud konektor znalostní báze není připojený, řekni to. Fakta ani postoj s
 1. **Postoj a fakta:** `get_position("<téma>")` pro postoj a autoritu, pak
    `search_press_releases("<téma>", limit=3)` pro čerstvá čísla a události. Čísla
    o smlouvách, zakázkách a dotacích ověř v Hlídači státu, pokud je k dispozici (viz níže).
+   Před psaním zavolej `get_argumentar("<téma>")`: hotové teze, čísla se zdroji a odpovědi
+   na námitky; návrh (stav NÁVRH) ber jen jako inspiraci, ne jako postoj strany.
 2. **Kdo mluví:** `find_people(query="<jméno>")` pro ověření funkce do podpisu citace.
    Pro inspiraci tónem `get_social_posts(osoba="<jméno>", limit=5)`, tedy co dotyčný
    sám píše (jeho názor, ne stanovisko strany).

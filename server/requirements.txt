@@ -2,4 +2,5 @@ mcp[cli]>=1.10
 pyyaml>=6
 requests>=2.31   # jen pro volitelné embeddingy (EMBEDDINGS_PROVIDER=voyage)
 psycopg[binary]>=3.2   # jen pro trvalou statistiku (PIRATEKB_STATS_DB), viz docs/statistika.md
+anthropic>=2.3   # jen pro webový chat /chat (ANTHROPIC_API_KEY), viz server/chat.py
 # numpy          # volitelné: rychlejší kosinová podobnost při hybridním hledání

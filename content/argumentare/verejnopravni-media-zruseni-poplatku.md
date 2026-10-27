@@ -10,21 +10,28 @@ zdroje:
   - https://www.psp.cz/eknih/2025ps/stenprot/010schuz/s010032.htm
   - https://www.psp.cz/eknih/2025ps/stenprot/015schuz/s015021.htm
 nazev: 'Argumentář: zrušení poplatků a převod ČT a ČRo pod státní rozpočet'
-typ: material
-viditelnost: clenske
+typ: argumentar
+tema: koncesionářské poplatky a financování ČT a ČRo ze státního rozpočtu
+tagy: [veřejnoprávní média, Česká televize, Český rozhlas, koncesionářské poplatky, státní rozpočet, NKÚ, EMFA]
+viditelnost: verejne
 stazeno: '2026-10-25'
 datum: '2026-10-24'
 autorita: vyjadreni-politika
 autor: Zdeněk Hřib
+mluvci:
+  - Zdeněk Hřib
+  - Andrea Hoffmannová
 stav: navrh
 reviewed_at: '2026-10-25'
+platnost_do: null
 poznamka: >-
   Argumentář k vládnímu návrhu na zrušení koncesionářských poplatků a financování ČT a ČRo
   ze státního rozpočtu (hlasování ve Sněmovně v říjnu 2026). Vychází z příspěvku
   předsedy Pirátů Zdeňka Hřiba na X (24. 10. 2026); je to vyjádření politika, ne usnesení
   orgánu strany. Podklady z báze jsou u každého bodu; tvrzení označená „ověřit“ báze
-  nepotvrdila. Kurátor: ověřit čísla (ČEZ, strukturální schodek) a rozhodnout o případném
-  přesunu do content/.
+  nepotvrdila. Kurátor: ověřit čísla (ČEZ, strukturální schodek), doplnit platnost_do po
+  rozhodnutí Sněmovny a rozhodnout o schválení. Všechny podklady jsou veřejné zdroje,
+  proto viditelnost verejne; pokud má argumentář sloužit jen členům, změnit na clenske.
 ---
 
 # Argumentář: zrušení poplatků a převod ČT a ČRo pod státní rozpočet
@@ -34,16 +41,28 @@ financování České televize a Českého rozhlasu do státního rozpočtu. Pir
 spolu s celou opozicí ([společné prohlášení mladých poslanců, 23. 10. 2026](https://www.pirati.cz/jak-pirati-pracuji/spolecne-prohlaseni-mladych-poslancu-a-poslankyn-napric-opozicnimi-kluby-na-obranu-verejnopravnich-medii/)).
 
 **Autorita:** text vychází z [příspěvku předsedy Pirátů Zdeňka Hřiba na X](https://x.com/ZdenekHrib/status/2113971609782345788)
-(24. 10. 2026, autorita `vyjadreni-politika`), ne z usnesení orgánu strany. Podklady jsou články na pirati.cz (autorita `web`) a vystoupení poslanců ve
-Sněmovně. Oficiální stanovisko strany k financování veřejnoprávních médií báze zatím nemá.
+(24. 10. 2026, autorita `vyjadreni-politika`), ne z usnesení orgánu strany. Podklady jsou
+články na pirati.cz (autorita `web`) a vystoupení poslanců ve Sněmovně. Oficiální
+stanovisko strany k financování veřejnoprávních médií báze zatím nemá.
 
 **Hlavní sdělení (jednou větou):** Zrušení poplatků není úleva, ale přesun účtu na všechny
 daňové poplatníky a na budoucí generace, a hlavně dává vládě každoroční kontrolu nad penězi
 médií, která ji mají kontrolovat.
 
----
+## Teze
 
-## Argumenty
+1. Neplatit poplatek neznamená, že to nikdo nezaplatí: po převodu do rozpočtu zaplatí
+   ČT a ČRo všichni z daní, i ti, kterých se poplatek dnes netýká.
+2. Při rekordních schodcích to nezaplatí dnešní daňoví poplatníci, ale jejich děti, a
+   s úroky.
+3. Méně peněz znamená méně pořadů a slabší žurnalistiku; ředitelé médií budou každý rok
+   chodit na vládu prosit o peníze.
+4. Jde o ovládnutí médií podle maďarského a slovenského vzoru: každoroční rozhodování
+   politiků o rozpočtu médií, která je mají kontrolovat.
+5. Piráti v roce 2017 navrhovali něco jiného: pevný podíl z daní mimo každoroční
+   schvalování rozpočtu, bez škrtů a bez trestání médií za jejich vysílání.
+
+## Fakta a čísla
 
 ### 1. Neplatit poplatek neznamená, že to nikdo nezaplatí
 
@@ -160,21 +179,30 @@ Sněmovny 23. 10. 2026.
 *Podklady:* čas hlasování **ověřit** v záznamu schůze na psp.cz. Motivy (pomsta, vliv
 Ruska) jsou interpretace autora, ne doložený fakt.
 
----
+## Protiargumenty a odpovědi
 
-## Očekávané protiargumenty a odpovědi
+**Námitka:** „Piráti sami chtěli poplatky zrušit.“
+**Odpověď:** Ano, ale s pevným podílem z daní mimo každoroční schvalování rozpočtu a bez
+škrtů. Vláda navrhuje opak: roční rozhodování politiků a méně peněz (bod 6).
 
-| námitka | odpověď |
-|---|---|
-| „Piráti sami chtěli poplatky zrušit.“ | Ano, ale s pevným podílem z daní mimo každoroční schvalování rozpočtu a bez škrtů. Vláda navrhuje opak: roční rozhodování politiků a méně peněz (bod 6). |
-| „Piráti sami psali, že poplatek je asociální daň z hlavy.“ | Plošný poplatek má sociální slabiny, ty ale lze řešit úpravami (osvobození, slevy) bez ztráty nezávislosti. Tak to doporučila i expertní pracovní skupina. Řešením není předat peníze médií do rukou vlády. |
-| „Lidé ušetří 205 Kč měsíčně.“ | Neušetří, zaplatí to v daních nebo na dluh. A zaplatí i ti, kdo dnes poplatek neplatí (bod 1 a 2). |
-| „Financování bude v zákoně jako mandatorní výdaj.“ | Vláda už ukázala, že zákonem o rozpočtu přebije jiné zákony (bod 5). |
-| „ČT a ČRo nehospodaří efektivně.“ | Kontrolu NKÚ podporujeme, jen ať platí i pro státní firmy (bod 7). |
+**Námitka:** „Piráti sami psali, že poplatek je asociální daň z hlavy.“
+**Odpověď:** Plošný poplatek má sociální slabiny, ty ale lze řešit úpravami (osvobození,
+slevy) bez ztráty nezávislosti. Tak to doporučila i expertní pracovní skupina. Řešením není
+předat peníze médií do rukou vlády.
 
-## Pozor na formulace (před zveřejněním)
+**Námitka:** „Lidé ušetří 205 Kč měsíčně.“
+**Odpověď:** Neušetří, zaplatí to v daních nebo na dluh. A zaplatí i ti, kdo dnes poplatek
+neplatí (body 1 a 2).
 
-Kontrola textu nástrojem `zkontroluj_text` a podle [`content/brand/ton-komunikace.md`](../../content/brand/ton-komunikace.md):
+**Námitka:** „Financování bude v zákoně jako mandatorní výdaj.“
+**Odpověď:** Vláda už ukázala, že zákonem o rozpočtu přebije jiné zákony (bod 5).
+
+**Námitka:** „ČT a ČRo nehospodaří efektivně.“
+**Odpověď:** Kontrolu NKÚ podporujeme, jen ať platí i pro státní firmy (bod 7).
+
+## Co nedělat
+
+Kontrola textu nástrojem `zkontroluj_text` a podle [`content/brand/ton-komunikace.md`](../brand/ton-komunikace.md):
 
 - **„opakovaně soudem uznaný lhář“**: osobní útok a právní riziko. Doporučení: kritizovat
   jednání („tvrdí, že chce diskutovat, ale na jednání nepřišel“), nebo přesně odkázat na
@@ -188,6 +216,18 @@ Kontrola textu nástrojem `zkontroluj_text` a podle [`content/brand/ton-komunika
 - Překlepy v původním textu: „ČR a ČRo“ → „ČT a ČRo“, „plaforma“ → „platforma“,
   „desinformace“ → „dezinformace“, „Hoffmanová“ → v článcích na pirati.cz „Hoffmannová“
   (sjednotit podle profilu poslankyně).
+
+## Zdroje
+
+- Zdeněk Hřib na X, 24. 10. 2026: <https://x.com/ZdenekHrib/status/2113971609782345788>
+- [Piráti s výhradami podporují návrh novely zákona o ČT a ČRo](https://www.pirati.cz/jak-pirati-pracuji/pirati-s-vyhradami-podporuji-navrh-novely-zakona-o-ceske-televizi-a-ceskem-rozhlasu/) (pirati.cz, 26. 4. 2017)
+- [Vláda projídá budoucnost mladé generace: návrh rozpočtu vykazuje deficit až 440 miliard korun](https://www.pirati.cz/jak-pirati-pracuji/vlada-projida-budoucnost-mlade-generace-navrh-rozpoctu-vykazuje-deficit-az-440-miliard-korun-0124bf9/) (pirati.cz, 20. 10. 2026)
+- [Nezávislost médií pod tlakem: Piráti varují před nejasným financováním i politizací mediálních rad](https://www.pirati.cz/jak-pirati-pracuji/nezavislost-medii-pod-tlakem-pirati-varuji-pred-nejasnym-financovanim-i-politizaci-medialnich-rad/) (pirati.cz, 19. 2. 2026)
+- [Pirátka Hoffmannová představila závěry pracovní skupiny k médiím](https://www.pirati.cz/jak-pirati-pracuji/piratka-hoffmannova-predstavila-zavery-pracovni-skupiny-k-mediim-ministerstvo-kultury-musi-stahnout-navrh-zakona-o-mediich-verejne-sluzby-chybi-analyzy-i-odborna-debata/) (pirati.cz, 11. 5. 2026)
+- [Hoffmannová posílá mediální zákon k posouzení do Evropy](https://www.pirati.cz/jak-pirati-pracuji/hoffmannova-posila-medialni-zakon-k-posouzeni-do-evropy-podle-piratu-ohrozuje-nezavislost-ct-a-cro/) (pirati.cz, 25. 5. 2026)
+- [Společné prohlášení mladých poslanců a poslankyň napříč opozičními kluby na obranu veřejnoprávních médií](https://www.pirati.cz/jak-pirati-pracuji/spolecne-prohlaseni-mladych-poslancu-a-poslankyn-napric-opozicnimi-kluby-na-obranu-verejnopravnich-medii/) (pirati.cz, 23. 10. 2026)
+- Stenozáznam PSP, 10. schůze, 3. 3. 2026: <https://www.psp.cz/eknih/2025ps/stenprot/010schuz/s010032.htm>
+- Stenozáznam PSP, 15. schůze, 16. 4. 2026: <https://www.psp.cz/eknih/2025ps/stenprot/015schuz/s015021.htm>
 
 ---
 

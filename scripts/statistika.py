@@ -163,7 +163,8 @@ def sestav_report(dotaz: Callable[[str, dict], list[tuple]], od: date, do: date,
         ("p", f"Období {od.isoformat()} až {do.isoformat()} (dny v UTC), prostředí: "
               f"{'vše' if prostredi == '*' else prostredi}. Vygenerováno "
               f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC. "
-              "Anonymní data: bez textu dotazů, IP adres a identity (docs/statistika.md)."),
+              "Anonymní data: bez textu dotazů, IP adres a identity; výjimkou jsou hlášené mezery "
+              "s textem otázky (docs/statistika.md)."),
     ]
 
     # --- souhrn
@@ -226,6 +227,32 @@ def sestav_report(dotaz: Callable[[str, dict], list[tuple]], od: date, do: date,
                     "report_gap (kb://gaps/posledni)."),
               ("tabulka", ["tool", "kategorie", "nenalezeno", "slabá shoda"],
                [[t, k, cislo(nf), cislo(sr)] for t, k, nf, sr in kategorie])]
+
+    # --- hlášené mezery (report_gap): jediná tabulka s textem od uživatele
+    try:
+        mezery_tydne = dotaz(
+            "SELECT date_trunc('week', cas AT TIME ZONE 'UTC')::date, count(*), "
+            "count(*) FILTER (WHERE NOT duplikat), count(*) FILTER (WHERE issue_url IS NOT NULL AND NOT duplikat) "
+            f"FROM mezery WHERE {PROSTREDI} AND {OBDOBI} GROUP BY 1 ORDER BY 1", p)
+        mezery = dotaz(
+            "SELECT cas, otazka, tool, poznamka, issue_url, duplikat "
+            f"FROM mezery WHERE {PROSTREDI} AND {OBDOBI} ORDER BY cas DESC LIMIT 30", p)
+        bloky += [("h2", "Hlášené mezery (report_gap)"),
+                  ("p", "Otázky, které AI nahlásila jako nezodpovězené (tool report_gap). Jediná část "
+                        "statistiky s textem od uživatele: AI má pokyn posílat otázku bez osobních údajů, "
+                        "server ji zkracuje. Pracovní seznam kurátora (docs/kurator.md, bod 2)."),
+                  ("tabulka", ["týden", "hlášení", "nových", "s issue"],
+                   [[den(t), cislo(n), cislo(nv), cislo(i)] for t, n, nv, i in mezery_tydne]),
+                  ("tabulka", ["čas", "otázka", "tool", "poznámka", "issue"],
+                   [[den(c), (o or "")[:160], t or "–", (pz or "")[:100],
+                     (u or ("duplicita" if d else "–"))] for c, o, t, pz, u, d in mezery])]
+    except Exception as exc:  # noqa: BLE001 - starší databáze bez tabulky mezery
+        try:
+            dotaz("ROLLBACK", {})
+        except Exception:  # noqa: BLE001
+            pass
+        bloky += [("h2", "Hlášené mezery (report_gap)"),
+                  ("p", f"Tabulka mezery není k dispozici ({exc}); aplikuj server/statistika.sql.")]
 
     # --- koncentrace
     if tooly and vol:

@@ -17,6 +17,7 @@ nemění.
 | `volani` | jedno volání toolu | čas, tool, délka dotazu ve znacích, počet výsledků, trvání v ms, příznaky `nenalezeno`, `sirsi_rezim` a `chyba` (a původní souhrnný `fallback`), u neúspěšných dotazů hrubá `kategorie`, rodina klienta, přihlášený ano/ne, denní pseudonym klienta, nasazení, prostředí |
 | `pripojeni` | jeden MCP požadavek `initialize`, tedy jedna konverzace, která připojila konektor | čas, název a verze klientské aplikace (`clientInfo`), verze protokolu, rodina klienta, přihlášený ano/ne, denní pseudonym, nasazení, prostředí |
 | `sul` | jeden den | náhodná sůl pro denní pseudonym; řádky starší než 2 dny se mažou |
+| `mezery` | jedno hlášení toolu `report_gap` („báze nemá odpověď“) | čas, **text otázky**, poznámka (co AI zkoušela), tool, rodina klienta, přihlášený ano/ne, URL GitHub issue (pokud vzniklo), příznak duplicity, nasazení, prostředí |
 
 ### Nenalezeno, slabá shoda a fallback
 
@@ -43,9 +44,27 @@ nemění.
   prázdném výsledku k výstupu připojí pokyn, a pokud odpověď nenajde ani jiný tool, AI hlášení
   odešle.
 
+### Hlášené mezery (`mezery`)
+
+Tool `report_gap` zapisoval hlášení jen do souboru `data/gaps/hlaseni.jsonl` a (s `GITHUB_TOKEN`)
+do GitHub issue. Na Vercelu je souborový systém dočasný, soubor po restartu instance zmizí,
+a bez tokenu issue nevznikne; kurátor tak hlášení neviděl. Se zapnutou statistikou se proto
+každé hlášení uloží i do tabulky `mezery` (`server/gaps.py` → `statistika.zaznamenej_mezeru`).
+
+**Tady se text otázky ukládá**, na rozdíl od zbytku statistiky. Bez textu kurátor neví, co
+doplnit. Proč je to přijatelné: AI má v popisu toolu pokyn posílat otázku bez osobních údajů,
+server ji zkrátí na 500 znaků, odstraní řídicí znaky a neutralizuje `@zmínky`; neukládá se
+IP, identita ani denní pseudonym. Přesto jde o text od uživatele: tabulku čte jen kurátor
+(čtecí role, viz níže), veřejný resource `kb://gaps/posledni` i `kb_stats` texty ukazují jen
+s `PIRATEKB_GAPS_TEXTY=1` (neveřejná instance). Doporučení: hlášení starší než 1 rok mazat
+(`DELETE FROM mezery WHERE cas < now() - interval '1 year';`) a při žádosti o výmaz osobních
+údajů smazat konkrétní řádek. Vyřízené mezery se nemažou, zůstávají jako historie; co je
+hotové, poznáte podle zavřeného issue nebo doplněného dokumentu.
+
 **Neukládá se:**
 
-- text dotazu ani odpověď (jen délka dotazu a počet výsledků);
+- text dotazu ani odpověď (jen délka dotazu a počet výsledků); výjimkou je text otázky
+  v hlášených mezerách (viz výše);
 - IP adresa;
 - identita uživatele: jméno, e-mail, ID z tokenu ani skupiny. U přihlášených se ukládá
   jen `prihlaseny = true`.
@@ -101,16 +120,17 @@ dejte vlastní roli. Ve Vercelu pak použijte connection string této role. Serv
 ```sql
 CREATE ROLE piratekb_zapis LOGIN PASSWORD '…';
 GRANT USAGE ON SCHEMA public TO piratekb_zapis;
-GRANT INSERT ON volani, pripojeni TO piratekb_zapis;
-GRANT USAGE ON SEQUENCE volani_id_seq, pripojeni_id_seq TO piratekb_zapis;
+GRANT INSERT ON volani, pripojeni, mezery TO piratekb_zapis;
+GRANT USAGE ON SEQUENCE volani_id_seq, pripojeni_id_seq, mezery_id_seq TO piratekb_zapis;
 GRANT SELECT, INSERT, DELETE ON sul TO piratekb_zapis;
-GRANT SELECT ON volani, pripojeni, denni_souhrn TO piratekb_zapis;   -- souhrn v kb_stats
+GRANT SELECT ON volani, pripojeni, mezery, denni_souhrn TO piratekb_zapis;   -- souhrn v kb_stats, resource kb://gaps/posledni
 
 -- jen pro čtení reportů (scripts/statistika.py, další lidé)
 CREATE ROLE piratekb_cteni LOGIN PASSWORD '…';
 GRANT USAGE ON SCHEMA public TO piratekb_cteni;
-GRANT SELECT ON volani, pripojeni, denni_souhrn, tydenni_souhrn, nastroje,
-                nastroje_tydne, klienti, neuspesne, nenalezene_kategorie TO piratekb_cteni;
+GRANT SELECT ON volani, pripojeni, mezery, denni_souhrn, tydenni_souhrn, nastroje,
+                nastroje_tydne, klienti, neuspesne, nenalezene_kategorie,
+                mezery_posledni, mezery_tydne TO piratekb_cteni;
 ```
 
 **Vypnutí:** smažte `PIRATEKB_STATS_DB` a nasaďte znovu. `PIRATEKB_TELEMETRY=0` vypne
@@ -157,6 +177,7 @@ Report obsahuje:
 - týdenní trend;
 - klienty a klientské aplikace;
 - nejpomalejší tooly;
+- hlášené mezery (`report_gap`): počty po týdnech a posledních 30 otázek s toolem a datem;
 - tooly, které se v období vůbec nepoužily.
 
 Potřebuje jen `psycopg` (`pip install "psycopg[binary]"`).
@@ -175,6 +196,8 @@ Konzole Neonu → projekt → **SQL Editor**. Pohledy ukazují jen produkci (`pr
 | `klienti` | rodina klienta: volání, podíl, připojení, volání na připojení, volání přihlášených, klient-dny |
 | `neuspesne` | tooly s aspoň 10 voláními seřazené podle podílu nenalezeno (prázdný výsledek) |
 | `nenalezene_kategorie` | týden × tool × kategorie neúspěšného dotazu: počet nenalezeno a slabá shoda (podklad pro týdenní kontrolu kurátorem) |
+| `mezery_posledni` | hlášené mezery (`report_gap`) za posledních 30 dní, nejnovější první: čas, otázka, tool, poznámka, klient, issue, duplicita (pracovní seznam kurátora) |
+| `mezery_tydne` | týden: počet hlášení, z toho nových (bez duplicity), duplicit a s GitHub issue |
 
 Hotové dotazy:
 
@@ -193,6 +216,10 @@ SELECT * FROM neuspesne;
 
 -- co lidé hledají a báze nemá (kategorie z pevného seznamu, bez textu dotazu)
 SELECT * FROM nenalezene_kategorie LIMIT 30;
+
+-- konkrétní otázky, na které báze neměla odpověď (hlášení report_gap, s textem otázky)
+SELECT * FROM mezery_posledni;
+SELECT * FROM mezery_tydne;
 
 -- vývoj jednoho toolu po týdnech
 SELECT * FROM nastroje_tydne WHERE tool = 'search_kb';
@@ -242,7 +269,7 @@ Doporučuji se na čísla podívat po 4 týdnech od zveřejnění konektoru a zn
    znamená, že AI pracuje s více tooly v jedné konverzaci.
 4. **Podíl nenalezeno** (`podil_nenalezeno` v týdnech a `neuspesne`) by měl s doplňováním
    dat klesat; slabou shodu (`sirsi_rezim`) za neúspěch nepočítejte. Tooly s vysokým podílem jsou kandidáti na doplnění dat nebo
-   lepší popis. Porovnejte s hlášeními `report_gap` (`kb://gaps/posledni`).
+   lepší popis. Porovnejte s hlášeními `report_gap` (pohled `mezery_posledni`, `kb://gaps/posledni`).
 5. **Koncentrace používání** (`nastroje.podil`, sekce „Koncentrace“ v reportu): pokud
    80 % volání padá na 2–3 tooly a jiné se nepoužívají vůbec, zvažte sloučení nebo
    odstranění nepoužívaných toolů, případně lepší popisy, aby je AI našla.
@@ -260,6 +287,7 @@ nebo rostoucí desítky připojení týdně s klesajícím podílem nenalezeno z
   Neonu (0,5 GB) tedy vystačí na roky běžného provozu.
 - Pokud budete chtít data stárnout, třeba po 2 letech:
   `DELETE FROM volani WHERE cas < now() - interval '2 years';` (stejně `pripojeni`).
+  Hlášené mezery obsahují text od uživatelů: `DELETE FROM mezery WHERE cas < now() - interval '1 year';`.
 - Změna schématu: upravte `server/statistika.sql` (jen přidávat, `CREATE OR REPLACE VIEW`
   nesmí měnit pořadí ani typy existujících sloupců pohledu). Nová verze serveru ho
   aplikuje sama.

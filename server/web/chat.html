@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pirátská znalostní báze – chat</title>
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --cerna: #000000; --bila: #ffffff; --cyan: #57b3bd; --cyan-tmava: #3e8793;
+    --zluta: #fde119; --seda: #f2f2f2; --seda-tmava: #666666; --text: #111111;
+    --chyba: #b00020;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
+         color: var(--text); background: var(--seda); line-height: 1.45; }
+  header { background: var(--cerna); color: var(--bila); padding: 12px 16px;
+           display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 1.1rem; margin: 0; font-weight: 600; }
+  header a { color: var(--zluta); text-decoration: none; font-size: .9rem; margin-left: auto; }
+  main { max-width: 860px; margin: 0 auto; padding: 16px; }
+  .upozorneni { background: #fff7bf; border-left: 4px solid var(--zluta); padding: 10px 12px;
+                border-radius: 6px; font-size: .92rem; margin-bottom: 14px; }
+  .vypnuto { background: #fde8ec; border-left-color: var(--chyba); }
+  #zpravy { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+  .zprava { padding: 12px 14px; border-radius: 10px; max-width: 100%; overflow-wrap: anywhere; }
+  .user { background: var(--cerna); color: var(--bila); align-self: flex-end; max-width: 85%; white-space: pre-wrap; }
+  .assistant { background: var(--bila); border: 1px solid #ddd; }
+  .assistant a { color: var(--cyan-tmava); }
+  .assistant pre { background: var(--seda); padding: 8px; overflow: auto; border-radius: 6px; }
+  .assistant table { border-collapse: collapse; } .assistant td, .assistant th { border: 1px solid #ddd; padding: 4px 8px; }
+  .meta { font-size: .78rem; color: var(--seda-tmava); margin-top: 8px; }
+  .meta details summary { cursor: pointer; }
+  .meta code { font-size: .78rem; }
+  .chyba { background: #fde8ec; border: 1px solid var(--chyba); color: var(--chyba); }
+  form { display: flex; gap: 8px; align-items: flex-end; background: var(--bila); padding: 10px;
+         border-radius: 10px; border: 1px solid #ddd; position: sticky; bottom: 8px; }
+  textarea { flex: 1; min-height: 56px; max-height: 200px; resize: vertical; font: inherit;
+             padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; }
+  button { font: inherit; font-weight: 600; background: var(--cyan); color: var(--cerna); border: 0;
+           border-radius: 8px; padding: 12px 18px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: progress; }
+  .priklady { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .priklady button { background: var(--bila); border: 1px solid #ccc; font-weight: 400; font-size: .85rem; padding: 6px 10px; }
+  footer { max-width: 860px; margin: 18px auto; padding: 0 16px; font-size: .8rem; color: var(--seda-tmava); }
+  @media (max-width: 600px) { header h1 { font-size: 1rem; } button { padding: 10px 12px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pirátská znalostní báze</h1>
+  <a href="https://github.com/veritasderman-rgb/pirateKB/blob/main/docs/pripojeni/README.md" target="_blank" rel="noopener">Připojit do vlastní AI (MCP)</a>
+</header>
+<main>
+  <div id="stav" class="upozorneni">
+    Odpovědi skládá AI z veřejných dat báze (tiskové zprávy, program, hlasování, lidé…) a u každého tvrzení
+    uvádí zdroj. Data jsou automaticky vytěžená a nekurátorovaná, názor politika není stanovisko strany.
+    Nepište sem osobní údaje. Chat vidí jen veřejná data; členská vrstva je dostupná přes MCP s přihlášením.
+  </div>
+  <div class="priklady" id="priklady">
+    <button type="button">Jaký je postoj Pirátů k dostupnému bydlení?</button>
+    <button type="button">Kdo jsou pirátští zastupitelé v Liberci?</button>
+    <button type="button">Jaké návrhy zákonů předložil Jakub Michálek a které prošly?</button>
+    <button type="button">Co se v bázi objevilo za poslední týden?</button>
+    <button type="button">Jak hlasovali Piráti o státním rozpočtu?</button>
+  </div>
+  <div id="zpravy" aria-live="polite"></div>
+  <form id="form">
+    <label for="otazka" class="sr-only" style="position:absolute;left:-9999px">Otázka</label>
+    <textarea id="otazka" placeholder="Zeptejte se…" required maxlength="4000"></textarea>
+    <button id="odeslat" type="submit">Zeptat se</button>
+  </form>
+</main>
+<footer>
+  Zdrojový kód a data: <a href="https://github.com/veritasderman-rgb/pirateKB">github.com/veritasderman-rgb/pirateKB</a>.
+  Chat nic neukládá kromě anonymní statistiky volání (bez textu otázek). Limit počtu otázek na den.
+  <span id="model"></span>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" integrity="sha512-xeUh+KxNyTufZOje++oQHstlMQ8/rpyzPuM+gjMFYK3z5ILJGE7l2NvYL+XfliKURMpBIKKp1XoPN/qswlSMFA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.7/purify.min.js" integrity="sha512-BdRNuI8/lsyxkKQVxK1lVtfZshggfXPAwEP+JAOJEKx6Y8SLfcBSRdaWyXQmMxo+wG180uFqXYGjGRL0mh4/Jw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+(function () {
+  var ENABLED = __CHAT_ENABLED__;
+  var zpravy = [];
+  var $z = document.getElementById('zpravy'), $f = document.getElementById('form'),
+      $t = document.getElementById('otazka'), $b = document.getElementById('odeslat');
+
+  if (!ENABLED) {
+    var s = document.getElementById('stav');
+    s.className = 'upozorneni vypnuto';
+    s.textContent = 'Chat na tomto serveru není zapnutý (chybí klíč k modelu). Bázi si můžete připojit ' +
+      'do Claude, ChatGPT nebo jiného klienta s MCP, návod je v odkazu nahoře.';
+    $b.disabled = true;
+  }
+
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  // Odpověď modelu může obsahovat cokoli (i HTML z uživatelského dotazu nebo z dat), proto
+  // se Markdown po převodu čistí DOMPurify (allowlist). Bez DOMPurify se vykreslí jen text.
+  function render(md) {
+    if (window.marked && window.DOMPurify) {
+      var html = marked.parse(md, { gfm: true, breaks: true });
+      var clean = DOMPurify.sanitize(html, {
+        USE_PROFILES: { html: true },
+        FORBID_TAGS: ['style', 'form', 'input', 'button', 'img', 'svg', 'math'],
+        FORBID_ATTR: ['style'],
+        ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i
+      });
+      var d = document.createElement('div'); d.innerHTML = clean;
+      d.querySelectorAll('a').forEach(function (a) { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+      return d.innerHTML;
+    }
+    return esc(md).replace(/\n/g, '<br>');
+  }
+  function pridej(role, text, meta) {
+    var d = document.createElement('div');
+    d.className = 'zprava ' + role;
+    if (role === 'user') d.textContent = text; else d.innerHTML = render(text);
+    if (meta) {
+      var m = document.createElement('div'); m.className = 'meta'; m.innerHTML = meta; d.appendChild(m);
+    }
+    $z.appendChild(d); d.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    return d;
+  }
+  function metaHtml(r) {
+    if (!r.nastroje || !r.nastroje.length) return '';
+    var items = r.nastroje.map(function (n) {
+      var args = Object.keys(n.argumenty || {}).map(function (k) { return k + '=' + JSON.stringify(n.argumenty[k]); }).join(', ');
+      return '<li><code>' + esc(n.tool) + '(' + esc(args) + ')</code>' + (n.chyba ? ' – chyba' : '') + '</li>';
+    }).join('');
+    return '<details><summary>Použité nástroje (' + r.nastroje.length + ')' +
+      (r.trvani_ms ? ', ' + Math.round(r.trvani_ms / 100) / 10 + ' s' : '') + '</summary><ul>' + items + '</ul></details>';
+  }
+
+  async function odesli(text) {
+    text = (text || '').trim();
+    if (!text || $b.disabled) return;
+    zpravy.push({ role: 'user', content: text });
+    pridej('user', text);
+    $t.value = ''; $b.disabled = true;
+    var cek = pridej('assistant', 'Hledám v bázi…');
+    try {
+      var resp = await fetch('/chat/api', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                           body: JSON.stringify({ zpravy: zpravy.slice(-12) }) });
+      var data = await resp.json().catch(function () { return {}; });
+      cek.remove();
+      if (!resp.ok || data.chyba) {
+        zpravy.pop();
+        pridej('assistant chyba', data.chyba || ('Chyba ' + resp.status));
+      } else {
+        zpravy.push({ role: 'assistant', content: data.odpoved });
+        pridej('assistant', data.odpoved, metaHtml(data));
+        if (data.model) document.getElementById('model').textContent = 'Model: ' + data.model + '.';
+      }
+    } catch (e) {
+      cek.remove(); zpravy.pop();
+      pridej('assistant chyba', 'Server neodpověděl: ' + e);
+    } finally {
+      if (ENABLED) $b.disabled = false; $t.focus();
+    }
+  }
+
+  $f.addEventListener('submit', function (e) { e.preventDefault(); odesli($t.value); });
+  $t.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); odesli($t.value); } });
+  document.getElementById('priklady').addEventListener('click', function (e) {
+    if (e.target.tagName === 'BUTTON') odesli(e.target.textContent);
+  });
+})();
+</script>
+</body>
+</html>

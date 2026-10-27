@@ -8,7 +8,10 @@
 -- Co se ukládá a co ne, jak číst pohledy a hotové dotazy: docs/statistika.md.
 -- Žádná IP adresa, text dotazu ani identita uživatele se neukládá. ``klient_hash`` je
 -- denní pseudonym (HMAC s denně měněnou solí z tabulky ``sul``, která se po 2 dnech maže)
--- a slouží jen k odhadu počtu různých klientů za den.
+-- a slouží jen k odhadu počtu různých klientů za den. Výjimka je tabulka ``mezery``
+-- (hlášení toolu report_gap): tam je text otázky, kterou AI nahlásila jako nezodpovězenou,
+-- protože bez něj kurátor neví, co doplnit; AI má pokyn posílat otázku bez osobních údajů
+-- a server ji zkracuje a neutralizuje @zmínky (server/gaps.py).
 --
 -- Časy jsou timestamptz; dny a týdny v pohledech se počítají v UTC (týden od pondělí).
 -- Pohledy ukazují jen prostredi = 'production'. Jiné prostředí ve stejné relaci:
@@ -84,6 +87,25 @@ CREATE TABLE IF NOT EXISTS sul (
     den  date  PRIMARY KEY,
     sul  bytea NOT NULL
 );
+
+-- Jedno hlášení „báze nemá odpověď“ (tool report_gap, server/gaps.py). Na Vercelu je
+-- soubor data/gaps/hlaseni.jsonl dočasný a GitHub issue vzniká jen s GITHUB_TOKEN, proto
+-- trvalá evidence pro kurátora žije tady. Otázka je už zkrácená (max. 500 znaků), bez
+-- řídicích znaků a s neutralizovanými @zmínkami; poznámka je volitelný popis, co AI zkoušela.
+CREATE TABLE IF NOT EXISTS mezery (
+    id          bigserial PRIMARY KEY,
+    cas         timestamptz NOT NULL DEFAULT now(),
+    otazka      text        NOT NULL,                 -- otázka uživatele (bez osobních údajů, viz výše)
+    poznamka    text        NOT NULL DEFAULT '',      -- co AI zkoušela / co v bázi chybí
+    tool        text        NOT NULL DEFAULT '',      -- tool, který odpověď nenašel
+    klient      text        NOT NULL DEFAULT '',      -- rodina klienta z User-Agent (jako volani.klient)
+    prihlaseny  boolean     NOT NULL DEFAULT false,   -- přihlášený přes Keycloak (bez identity)
+    issue_url   text,                                 -- GitHub issue, pokud se založilo (nebo existující duplicita)
+    duplikat    boolean     NOT NULL DEFAULT false,   -- stejná otázka už byla hlášena v posledních 7 dnech
+    prostredi   text        NOT NULL DEFAULT 'local',
+    nasazeni    text        NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS mezery_cas_idx ON mezery (cas);
 
 -- ----------------------------------------------------------------------------- filtr prostředí
 
@@ -291,3 +313,25 @@ FROM volani
 WHERE piratekb_prostredi() IN ('*', prostredi) AND (nenalezeno OR sirsi_rezim)
 GROUP BY 1, 2, 3
 ORDER BY tyden DESC, nenalezeno DESC, sirsi_rezim DESC, tool, kategorie;
+
+-- Hlášené mezery za posledních 30 dní (nejnovější první): co lidé hledali a báze neměla.
+-- Hlavní pracovní seznam kurátora (docs/kurator.md, bod 2).
+CREATE OR REPLACE VIEW mezery_posledni AS
+SELECT cas, otazka, tool, poznamka, klient, prihlaseny, issue_url, duplikat
+FROM mezery
+WHERE piratekb_prostredi() IN ('*', prostredi)
+  AND cas >= now() - interval '30 days'
+ORDER BY cas DESC;
+
+-- Hlášené mezery po týdnech (od pondělí): kolik jich přibylo a kolik z nich byly duplicity.
+CREATE OR REPLACE VIEW mezery_tydne AS
+SELECT date_trunc('week', cas AT TIME ZONE 'UTC')::date AS tyden,
+       count(*) AS hlaseni,
+       count(*) FILTER (WHERE NOT duplikat) AS nove,
+       count(*) FILTER (WHERE duplikat) AS duplicity,
+       count(*) FILTER (WHERE issue_url IS NOT NULL AND NOT duplikat) AS issues,
+       count(DISTINCT tool) FILTER (WHERE tool <> '') AS toolu
+FROM mezery
+WHERE piratekb_prostredi() IN ('*', prostredi)
+GROUP BY 1
+ORDER BY tyden DESC;

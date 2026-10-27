@@ -7,7 +7,7 @@
 #   kategorie        lide | organy | program | stanoviska | tiskove-zpravy | hlasovani | brand |
 #                    sablony | schuzky | systemy | media | socialni-site | projevy | tisky |
 #                    interpelace | volby | financovani | prehledy | overeni | vlada | usneseni |
-#                    predpisy | pozmenovaky | vybory | europarlament
+#                    predpisy | pozmenovaky | vybory | europarlament | prirucky | argumentare | kalendar
 #   otazka           jak by se zeptal člověk (pro čtenáře a reporty)
 #   tool, argumenty  který tool MCP serveru má AI zavolat a s čím
 #   ocekavane        aspoň jeden z řetězců musí být ve výstupu (bez ohledu na diakritiku a velikost)
@@ -953,3 +953,41 @@ otazky:
     argumenty: {faze: pripravuji, typ: "106"}
     ocekavane: [pruvodce_pravem_na_informace.pdf]
     zdroj_musi_byt: frankbold.org
+
+  # ------------------------------------------------------------------ kalendář akcí (data/kalendar/)
+  # Data jsou rok zpět a rok dopředu, opakované schůze sdružení se objevují každý měsíc.
+  - id: kalendar-01
+    kategorie: kalendar
+    otazka: Jaké pirátské akce jsou v příštích 60 dnech?
+    tool: get_kalendar
+    argumenty: {od: "2026-10-27", do: "2026-12-26"}
+    ocekavane: ["## "]
+    nesmi_obsahovat: [Žádná akce v tomto období]
+    zdroj_musi_byt: calendar.google.com
+
+  - id: kalendar-02
+    kategorie: kalendar
+    otazka: Kdy se schází Piráti v Plzni?
+    tool: get_kalendar
+    argumenty: {hledat: Plzeň, od: "2026-10-27", do: "2026-12-31"}
+    ocekavane: [Plzeň]
+    nesmi_obsahovat: [Žádná akce v tomto období]
+    zdroj_musi_byt: calendar.google.com
+
+  # ------------------------------------------------------------------ argumentáře (content/argumentare/)
+  - id: argumentare-01
+    kategorie: argumentare
+    otazka: Máme argumentář ke zrušení koncesionářských poplatků a převodu ČT a ČRo pod státní rozpočet?
+    tool: get_argumentar
+    argumenty: {tema: koncesionářské poplatky ČT ČRo státní rozpočet}
+    ocekavane: ["Argumentář: zrušení poplatků a převod ČT a ČRo pod státní rozpočet"]
+    nesmi_obsahovat: ["v bázi nenalezen"]
+    zdroj_musi_byt: [x.com, pirati.cz]
+
+  - id: argumentare-02
+    kategorie: argumentare
+    otazka: Jak odpovědět na námitku, že Piráti sami chtěli poplatky zrušit?
+    tool: get_argumentar
+    argumenty: {tema: veřejnoprávní média poplatky}
+    ocekavane: ["Piráti sami chtěli poplatky zrušit", "Stav: NÁVRH"]
+    nesmi_obsahovat: ["v bázi nenalezen"]

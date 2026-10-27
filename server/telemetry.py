@@ -117,7 +117,7 @@ KATEGORIE_TYPY = frozenset({
     "prispevek-socialni-site", "organizacni-jednotka", "clanek-media", "tisk", "rozcestnik",
     "interpelace", "dotaz-ep", "prirucka", "prepis-videa", "volby", "zprava-ep", "financni-zprava",
     "predpis", "stanovisko", "programovy-dokument", "navod", "program", "sablona", "hlasovani",
-    "materialy", "brand", "organy-psp", "slovnik", "system",
+    "materialy", "brand", "organy-psp", "slovnik", "system", "akce", "argumentar",
 })
 KATEGORIE_HODNOTY = {
     "komora": frozenset({"psp", "senat", "ep", "zhmp"}),

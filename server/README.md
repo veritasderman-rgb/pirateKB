@@ -370,6 +370,28 @@ můžete dodat „použij znalostní bázi Pirátů“.
 Další nápady: „Kolik poslanců dnes Piráti mají?“, „Které programové dokumenty
 existují?“, „Co všechno v bázi je a jak je stará?“ (tool `kb_stats`).
 
+## Webový chat (`/chat`)
+
+Pro lidi bez MCP klienta má server jednoduchou stránku `GET /chat` a JSON endpoint
+`POST /chat/api` (`server/chat.py`, stránka `server/web/chat.html`). Claude v něm používá
+stejné tooly jako MCP klienti (bez členských `hledat_interni` a `navrhnout_do_baze`, uživatel
+není přihlášený), odpovídá s citacemi a volání toolů se počítají do telemetrie a trvalé
+statistiky jako rodina klienta `web-chat`.
+
+| Proměnná | Výchozí | Význam |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | – | zapne chat (bez něj stránka vysvětlí, že chat není zapnutý, a odkáže na MCP); `PIRATEKB_CHAT=0` vypne i s klíčem |
+| `PIRATEKB_CHAT_MODEL` | `claude-opus-5-5` | model; levnější varianta `claude-sonnet-5-5` |
+| `PIRATEKB_CHAT_EFFORT` | `low` | hloubka uvažování (`low` = stručné odpovědi, méně volání toolů) |
+| `PIRATEKB_CHAT_MAX_TOKENS` | `4000` | délka odpovědi |
+| `PIRATEKB_CHAT_PER_MIN`, `PIRATEKB_CHAT_PER_DAY` | `6`, `60` | otázek na IP adresu |
+| `PIRATEKB_CHAT_MAX_PER_DAY` | `400` | otázek celkem za den na instanci (rozpočet) |
+| `PIRATEKB_CHAT_FALLBACK` | `1` | serverový fallback při odmítnutí modelem (`fallbacks="default"`); jen u modelů, které to umí |
+
+Na jednu otázku nejvýš 8 kol volání toolů, historie se zkracuje na 12 zpráv. Text otázek
+se neukládá. Endpoint není chráněný autentizací ani limitem `/mcp`, má vlastní limity výše.
+Digest je na `GET /digest/` (soubory z `docs/digest/`, RSS `/digest/feed.xml`).
+
 ## Zpětná vazba a evals
 
 ### Hlášení „báze nemá odpověď“ (`report_gap`)

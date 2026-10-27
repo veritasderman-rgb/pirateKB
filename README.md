@@ -40,6 +40,9 @@ https://piratekb-veritasderman-3065s-projects.vercel.app/mcp
   `claude mcp add --transport http piratekb https://piratekb-veritasderman-3065s-projects.vercel.app/mcp`
 - **ChatGPT a další klienti s podporou MCP přes HTTP:** stejná adresa.
 - **Kontrola, že server běží:** `…vercel.app/health`.
+- **Bez instalace:** webový chat na `…vercel.app/chat` (jen veřejná data, denní limit otázek;
+  běží, jakmile správce nastaví klíč k modelu, viz [docs/co-zapnout.md](docs/co-zapnout.md))
+  a týdenní digest na `…vercel.app/digest/` (RSS `/digest/feed.xml`).
 
 Podrobný návod, včetně lokálního běhu přes Docker, je v
 [docs/pripojeni/README.md](docs/pripojeni/README.md).
@@ -71,7 +74,7 @@ jsou v [docs/ukazky](docs/ukazky/README.md).
 
 ## Co server umí
 
-**36 toolů:**
+**38 toolů:**
 
 | Tool | K čemu |
 |---|---|
@@ -98,9 +101,11 @@ jsou v [docs/ukazky](docs/ukazky/README.md).
 | `profil_obce` | pirátský pohled na obec nebo kraj: místní a krajské sdružení, weby a aktuality, zvolení Piráti, výsledky voleb, poslanci a senátoři z kraje, média; instrukce pro doplnění z Hlídače státu |
 | `casova_osa` | téma v čase napříč zdroji (program, návrhy zákonů, hlasování, projevy, TZ, vláda, sítě, média, schůzky): shrnutí, milníky a chronologická osa s autoritou a URL |
 | `novinky` | co v bázi přibylo za období (výchozí 7 dní) po kategoriích s počty, jak hlasovali Piráti, nejvíc sdílené příspěvky; podklad pro newsletter |
+| `get_kalendar` | veřejné akce z Pirátského kalendáře (schůze sdružení, zasedání orgánů, semináře, kampaň) v období, podle slov nebo místa; výchozí příštích 30 dní |
 | `jednota_klubu` | nejednotná hlasování Pirátů (PSP/Senát/EP) seřazená podle významu a míra odchylky poslanců od většiny klubu; s metodikou, vnitřní analýza, ne hodnocení |
 | `over_tvrzeni` | ověření tvrzení o Pirátech nebo politikovi: důkazy podle autority (program, TZ, hlasování s hlasem osoby, návrhy zákonů se závěrečným hlasováním, projevy, sítě, média), kontrola jmen, funkcí, čísel a dat; verdikt dělá AI |
 | `zkontroluj_text` | kontrola návrhu TZ, příspěvku, projevu nebo dopisu před zveřejněním: citace a funkce mluvčích, opora „Piráti prosazují…“ v programu, čísla bez zdroje, brand a tón, povinné části TZ; nálezy blokující / doporučené |
+| `get_argumentar` | argumentář k tématu z kurátorované vrstvy: teze, fakta se zdroji, protiargumenty a odpovědi, čemu se vyhnout; označí stav (schváleno × neschválený návrh, který není stanovisko strany) a mluvčí k citování |
 | `rozhodnuti_organu` | usnesení a rozhodnutí orgánů strany: formální usnesení RV z rv.pirati.cz a archivu sbírky, zprávy ze zasedání RV; RP a CF jen zmínky (jejich usnesení jsou jen na wiki a fóru); orgán, datum, doslovný text, výsledek, odkaz |
 | `hledat_interni` | jen pro ověřené členy: hledání v neveřejných (členských) dokumentech |
 | `navrhnout_do_baze` | jen pro ověřené členy: návrh doplnění z chatu jako GitHub issue `kb-navrh` ke schválení kurátorem |
@@ -145,9 +150,16 @@ nahlásí.
 - **Telemetrie a statistika používání:** anonymní, bez textu dotazů, IP adres a identity;
   volitelně trvale v Postgresu (počty volání toolů a připojení konektoru), aby šlo po
   měsících vyhodnotit, jestli server dává smysl. Viz [docs/statistika.md](docs/statistika.md).
+- **Týdenní digest bez konektoru:** každé pondělí vznikne z dat přehled „Co se stalo v pirátské
+  politice tento týden“ ([docs/digest](docs/digest/README.md), RSS `docs/digest/feed.xml`,
+  volitelně do Zulipu), viz [docs/rutiny.md](docs/rutiny.md).
+- **Webový chat** na `/chat` pro lidi bez MCP klienta: stejné tooly, odpovědi s citacemi,
+  vlastní limity a rozpočet; zapíná klíč `ANTHROPIC_API_KEY` (viz [server/README.md](server/README.md),
+  sekce „Webový chat“).
 - **Evals:** 110 testovacích otázek běží v CI při každém pull requestu.
-- **Skills pro Claude** ve složce [`skills/`](skills/README.md): tisková zpráva, brief a
-  sociální sítě, včetně toho, kdy přibrat MCP Hlídače státu.
+- **Skills pro Claude** ve složce [`skills/`](skills/README.md): tisková zpráva, brief,
+  sociální sítě a kurátor (zpracování návrhu z `inbox/` se `scripts/kurator_navrh.py`),
+  včetně toho, kdy přibrat MCP Hlídače státu.
 
 ## Zdroje dat
 
@@ -184,8 +196,9 @@ Kromě vrstvy `content/` nejsou kurátorovaná. Počty jsou k 6. 10. 2026 (tisky
 | [usneseni.praha.eu](https://usneseni.praha.eu/) | usnesení ZHMP a Rady HMP od 11/2018 (Markdown: všechna ZHMP, RHMP jen předložená pirátskými radními) | 5 619 ZHMP + 24 119 RHMP (7 368 s pirátským předkladatelem) | týdně |
 | [volby.gov.cz](https://volby.gov.cz/opendata/opendata.htm) (ČSÚ) | výsledky Pirátů ve volbách (Sněmovna, EP, Senát, kraje, obce 2010–2026) a zvolení Piráti | 29 voleb, 1 108 zvolených (PS 44, EP 4, Senát 10, kraje 107, obce 943) | měsíčně, 45 dní po volbách denně |
 | [ÚDH](https://udh.gov.cz/vyrocni-financni-zpravy-stran-a-hnuti), [Fio](https://ib.fio.cz/ib/transparent?a=2100048174), [Piroplácení](https://piroplaceni.pirati.cz) | financování strany: výroční finanční zprávy (2017–2025), zprávy o kampaních, rozpočty, měsíční souhrny transparentních účtů | 9 zpráv, 12 kampaní, 9 rozpočtů, 7 účtů (174 měsíců) | měsíčně (účty), ročně (zprávy) |
-| X (Twitter) | příspěvky poslanců a politiků | 1 000 | denně |
-| Bluesky | příspěvky politiků | 130 | denně |
+| [Pirátský kalendář](https://calendar.google.com/calendar/embed?src=kddvdvu3adcjef2kro4j6mm838%40group.calendar.google.com&ctz=Europe%2FPrague) (Google, vložený na pirati.cz) | veřejné akce: schůze sdružení, zasedání orgánů, semináře, srazy, kampaň; rok zpět a rok dopředu, bez účastníků a kontaktů | 410 akcí (243 budoucích) | denně |
+| X (Twitter) | příspěvky poslanců a politiků | 1 000 | denně se pokouší; bez placeného X API (`X_BEARER_TOKEN`) X z cloudu blokuje, sběr je od 10/2026 zastaralý a tooly na to upozorňují |
+| Bluesky | příspěvky politiků | 130 | denně (účty publikují zřídka, poslední příspěvky jsou staré, ne sběr) |
 | [YouTube](https://www.youtube.com/@CeskaPiratskaStrana) | přepisy videí z titulků (kanál strany, M. Gregorová) | 42 videí, 29 přepisů | denně po dávkách |
 | weby sdružení na `*.pirati.cz` | krajské a místní weby z Majáku: aktuality, TZ, lidé | 19 webů, 3 635 stránek | týdně po dávkách |
 | [peer.pirati.cz](https://peer.pirati.cz) | Pirátská expertní ekonomická rada: strategie, komentáře | 5 | týdně |
@@ -251,6 +264,8 @@ kurátorovaným obsahem a brandem má kurátor báze. Postup je v
 - [`docs/auth-keycloak.md`](docs/auth-keycloak.md): přihlášení přes auth.pirati.cz
 - [`docs/kurator.md`](docs/kurator.md): týdenní rituál kurátora
 - [`docs/rutiny.md`](docs/rutiny.md): automatické aktualizace
+- [`docs/digest/README.md`](docs/digest/README.md): týdenní digesty toho, co v bázi přibylo (RSS `docs/digest/feed.xml`)
+- [`docs/co-zapnout.md`](docs/co-zapnout.md): co je hotové v kódu a čeká na klíč, nastavení nebo rozhodnutí mimo repozitář (chat, embeddingy, Keycloak, wiki, X)
 - [`docs/navrh-architektury.md`](docs/navrh-architektury.md): architektura a plán
 
 ## Struktura repozitáře

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/veritasderman-rgb/pirateKB/schemas/argumentar.schema.json",
+  "title": "content/argumentare/ a inbox/argumentare/: argumentář k tématu",
+  "description": "Jeden soubor = jeden argumentář (hotové podklady pro komunikaci k tématu: teze, fakta se zdroji, protiargumenty a odpovědi). Tělo má pevné oddíly: ## Teze, ## Fakta a čísla, ## Protiargumenty a odpovědi, volitelně ## Co nedělat, ## Zdroje (validate.py chybějící oddíl jen hlásí jako upozornění). Návrh (stav: navrh) není stanovisko strany; nástroj get_argumentar to v odpovědi označí.",
+  "allOf": [{"$ref": "content.schema.json"}],
+  "required": ["tema", "autor"],
+  "properties": {
+    "typ": {"const": "argumentar"},
+    "tema": {"type": "string", "minLength": 1, "description": "Téma jedním výrazem nebo krátkou větou (podle něj hledá get_argumentar)."},
+    "autor": {"type": "string", "minLength": 1, "description": "Kdo argumentář sestavil nebo čí vyjádření je jeho základem."},
+    "mluvci": {"type": "array", "items": {"type": "string", "minLength": 1}, "description": "Jména lidí, které lze v textech k tématu citovat (mluvčí, garant, poslanec)."},
+    "zdroje": {"type": "array", "items": {"type": "string", "minLength": 1}, "description": "Podklady jako URL (názvy a data podkladů patří do oddílu ## Zdroje v těle)."},
+    "tagy": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "platnost_do": {"anyOf": [{"type": "string", "format": "date"}, {"type": "null"}], "description": "Argumentář k jednomu hlasování nebo kampani zpravidla platí jen do rozhodnutí; po datu je neplatný."},
+    "reviewed_at": {"anyOf": [{"type": "string", "format": "date"}, {"type": "null"}]},
+    "schvalil": {"type": ["string", "null"]},
+    "schvaleno_dne": {"anyOf": [{"type": "string", "format": "date"}, {"type": "null"}]}
+  }
+}

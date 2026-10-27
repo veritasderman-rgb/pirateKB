@@ -13,6 +13,10 @@ issues s labelem ``kb-gap``.
 Ochrana veřejného serveru: otázka se zkrátí na ``MAX_TEXT`` znaků, ``@zmínky`` se v issue
 neutralizují (nikoho nenotifikují) a jedna instance založí nejvýš ``GAPS_MAX_ISSUES_DAY``
 issues za 24 hodin (výchozí 20); další hlášení jdou jen do souboru.
+
+Trvalá evidence: je-li zapnutá trvalá statistika (``PIRATEKB_STATS_DB``), každé hlášení se
+navíc uloží do tabulky ``mezery`` v Postgresu (``server/statistika.py``). Soubor na Vercelu
+po restartu zmizí a issue vzniká jen s tokenem, takže bez tabulky kurátor hlášení nevidí.
 """
 from __future__ import annotations
 
@@ -275,6 +279,7 @@ def report_gap(otazka: str, poznamka: str = "", tool: str = "", now: datetime | 
         soubor = None
         print(f"report_gap: zápis do {path} selhal: {exc}", file=sys.stderr)
         warning = (warning + "; " if warning else "") + f"zápis do souboru selhal ({exc})"
+    _zaznamenej_do_statistiky(record)
     return {
         "zaznam": record,
         "soubor": soubor,
@@ -286,6 +291,44 @@ def report_gap(otazka: str, poznamka: str = "", tool: str = "", now: datetime | 
     }
 
 
+def _zaznamenej_do_statistiky(record: dict) -> None:
+    """Hlášení do trvalé statistiky (tabulka ``mezery``); bez ``PIRATEKB_STATS_DB`` nic, chyba
+    nikdy nerozbije hlášení."""
+    try:
+        from server import statistika
+
+        statistika.zaznamenej_mezeru(record)
+    except Exception as exc:  # noqa: BLE001
+        print(f"report_gap: zápis do trvalé statistiky selhal: {exc}", file=sys.stderr)
+
+
+def _nacti_z_databaze(limit: int) -> list[dict]:
+    """Hlášení z tabulky ``mezery`` (nejnovější první); ``[]`` bez databáze nebo při chybě."""
+    try:
+        from server import statistika
+
+        return statistika.nacti_mezery(limit=limit)
+    except Exception as exc:  # noqa: BLE001
+        print(f"report_gap: čtení trvalé statistiky selhalo: {exc}", file=sys.stderr)
+        return []
+
+
+def _klic(rec: dict) -> tuple[str, str]:
+    """Stejné hlášení v souboru i v databázi: normalizovaná otázka + čas na sekundy."""
+    return (rec.get("otazka_norm") or normalize(rec.get("otazka")), str(rec.get("cas") or "")[:19])
+
+
+def slouc_hlaseni(soubor: list[dict], databaze: list[dict], limit: int) -> list[dict]:
+    """Sloučí hlášení z lokálního souboru a z databáze: záznam, který je v obou (stejná otázka
+    a čas), jen jednou (z databáze); dvě hlášení téže otázky v jednom zdroji zůstávají obě.
+    Nejnovější první, nejvýš ``limit``. Každý záznam má ``zdroj``: ``db``, ``soubor``."""
+    v_databazi = {_klic(rec) for rec in databaze}
+    out: list[dict] = [{**rec, "zdroj": rec.get("zdroj") or "db"} for rec in databaze]
+    out += [{**rec, "zdroj": rec.get("zdroj") or "soubor"} for rec in soubor if _klic(rec) not in v_databazi]
+    out.sort(key=lambda r: str(r.get("cas") or ""), reverse=True)
+    return out[:limit]
+
+
 def texty_verejne() -> bool:
     """Zda resource smí ukázat text otázek. Výchozí NE: server je veřejný a otázky
     mohou obsahovat osobní údaje jiných uživatelů. Kurátor čte texty v souboru
@@ -294,19 +337,29 @@ def texty_verejne() -> bool:
 
 
 def format_recent(limit: int = 50, *, s_texty: bool | None = None) -> str:
-    """Markdown s posledními ``limit`` hlášeními z lokálního souboru (nejnovější první).
+    """Markdown s posledními ``limit`` hlášeními (nejnovější první): z tabulky ``mezery``
+    v Postgresu (je-li zapnutá trvalá statistika) sloučené s lokálním souborem.
 
     Bez ``s_texty`` (výchozí podle ``PIRATEKB_GAPS_TEXTY``) jen čas, tool a stav, bez
     textu otázky a poznámky."""
     if s_texty is None:
         s_texty = texty_verejne()
-    rows = read_reports(limit=limit)
-    out = [f"# Poslední hlášení „báze nemá odpověď“ ({len(rows)})", "",
-           f"Trvalá evidence jsou GitHub issues s labelem `{LABEL}` v {github_repo()}.", ""]
+    z_db = _nacti_z_databaze(limit)
+    rows = slouc_hlaseni(read_reports(limit=limit), z_db, limit)
+    out = [f"# Poslední hlášení „báze nemá odpověď“ ({len(rows)})", ""]
+    if z_db:
+        out.append(f"Zdroj: trvalá statistika (tabulka `mezery` v Postgresu, {len(z_db)} hlášení za 30 dní; "
+                   "pohled `mezery_posledni` v Neonu nebo `python3 scripts/statistika.py`) sloučená s "
+                   "lokálním souborem hlášení této instance.")
+    else:
+        out.append("Zdroj: jen lokální soubor hlášení této instance (na Vercelu po restartu zmizí; "
+                   "trvalá evidence vzniká až se zapnutou statistikou `PIRATEKB_STATS_DB`, tabulka `mezery`).")
+    out.append(f"GitHub issues s labelem `{LABEL}` v {github_repo()} vznikají jen s nastaveným `GITHUB_TOKEN`.")
+    out.append("")
     if not s_texty:
         out += ["Texty otázek se tu nezobrazují: server je veřejný a otázky mohou obsahovat "
-                "osobní údaje jiných uživatelů. Kurátor je najde v souboru hlášení na serveru "
-                "nebo v GitHub issues.", ""]
+                "osobní údaje jiných uživatelů. Kurátor je najde v tabulce `mezery` (Neon), "
+                "v souboru hlášení na serveru nebo v GitHub issues.", ""]
     if not rows:
         out.append("Zatím žádné hlášení.")
         return "\n".join(out)
@@ -315,15 +368,16 @@ def format_recent(limit: int = 50, *, s_texty: bool | None = None) -> str:
         return " ".join(str(v or "").split()).replace("|", "\\|")
 
     if s_texty:
-        out.append("| čas | otázka | tool | poznámka | issue |")
-        out.append("|---|---|---|---|---|")
-        for r in reversed(rows):
+        out.append("| čas | otázka | tool | poznámka | issue | zdroj |")
+        out.append("|---|---|---|---|---|---|")
+        for r in rows:
             out.append(f"| {cell(r.get('cas'))[:19]} | {cell(r.get('otazka'))[:120]} | {cell(r.get('tool'))} | "
-                       f"{cell(r.get('poznamka'))[:120]} | {cell(r.get('issue_url')) or ('duplicita' if r.get('duplikat') else '–')} |")
+                       f"{cell(r.get('poznamka'))[:120]} | {cell(r.get('issue_url')) or ('duplicita' if r.get('duplikat') else '–')} "
+                       f"| {cell(r.get('zdroj'))} |")
     else:
-        out.append("| čas | tool | stav |")
-        out.append("|---|---|---|")
-        for r in reversed(rows):
+        out.append("| čas | tool | stav | zdroj |")
+        out.append("|---|---|---|---|")
+        for r in rows:
             stav = "duplicita" if r.get("duplikat") else ("issue založeno" if r.get("issue_url") else "nové")
-            out.append(f"| {cell(r.get('cas'))[:19]} | {cell(r.get('tool')) or '–'} | {stav} |")
+            out.append(f"| {cell(r.get('cas'))[:19]} | {cell(r.get('tool')) or '–'} | {stav} | {cell(r.get('zdroj'))} |")
     return "\n".join(out)

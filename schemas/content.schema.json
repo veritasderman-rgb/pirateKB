@@ -14,9 +14,9 @@
         "tiskova-zprava", "aktualita", "stanovisko", "program", "programovy-dokument", "predpis",
         "rozcestnik", "osoba", "organizacni-jednotka", "brand", "hlasovani", "materialy", "schuzka",
         "prispevek-socialni-site", "navod", "clanek-media", "system",
-        "slovnik", "sablona", "vysledek", "material"
+        "slovnik", "sablona", "vysledek", "argumentar", "material"
       ],
-      "description": "Typy z data/README.md + typy kurátorované vrstvy: slovnik, sablona, vysledek (co jsme dokázali), material (syrový příspěvek bez jasného typu, jen inbox/)."
+      "description": "Typy z data/README.md + typy kurátorované vrstvy: slovnik, sablona, vysledek (co jsme dokázali), argumentar (argumentář k tématu), material (syrový příspěvek bez jasného typu, jen inbox/)."
     },
     "viditelnost": {"enum": ["verejne", "clenske"]},
     "stazeno": {"type": "string", "format": "date", "description": "Kdy byl text stažen ze zdroje nebo vložen do repozitáře (YYYY-MM-DD)."},
