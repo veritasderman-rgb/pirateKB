@@ -19,6 +19,15 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 > Najdi, jestli máme stanovisko k jaderné energetice. Pokud ne, řekni to a doporuč,
 > koho se zeptat.
 
+## Argumentáře
+
+> Připravuji se na debatu o zrušení koncesionářských poplatků. Dej mi argumentář: teze,
+> čísla se zdroji a co odpovědět na námitku, že Piráti sami chtěli poplatky zrušit.
+> Označ, co je schválená linka a co jen návrh.
+
+> Napiš mi tři krátké odpovědi občanovi, který píše, že ČT „nehospodaří efektivně“.
+> Vyjdi z argumentáře k veřejnoprávním médiím, drž se tónu Pirátů a u každého čísla uveď zdroj.
+
 ## Předpisy a usnesení orgánů strany
 
 > Co rozhodl republikový výbor o pracovních skupinách RV? U každého usnesení dej
@@ -178,6 +187,15 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 
 Kalendář se vyplní, jen pokud máte v Claude připojený Google Calendar nebo
 Microsoft 365. Jinak AI nabídne soubor ICS k importu.
+
+## Kalendář akcí
+
+> Jaké pirátské akce jsou příští měsíc v Plzeňském kraji a kdy se schází krajské sdružení?
+
+> Co se děje tento týden? Vypiš veřejné akce z Pirátského kalendáře a u online schůzí dej odkaz.
+
+AI použije `get_kalendar` (veřejný celostátní kalendář z pirati.cz). Akce místních sdružení
+v něm být nemusí, proto u regionu přidá `profil_obce` a weby sdružení.
 
 ## Financování strany
 

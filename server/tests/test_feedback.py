@@ -362,3 +362,101 @@ def test_evals_questions_file_is_valid():
     assert len(cats) >= 10
     tools = {t.name for t in mcp_server.mcp._tool_manager.list_tools()}
     assert {q["tool"] for q in qs} <= tools
+
+
+# ----------------------------------------------------------------------------- trvalá evidence mezer
+
+class _Sberac:
+    """Náhrada zapisovače trvalé statistiky: jen sbírá, co by se zapsalo."""
+
+    def __init__(self) -> None:
+        self.radky: list[tuple[str, dict]] = []
+
+    def pridej(self, tabulka: str, radek: dict) -> bool:
+        self.radky.append((tabulka, radek))
+        return True
+
+
+@pytest.fixture
+def stats_sberac(monkeypatch):
+    from server import statistika
+
+    monkeypatch.setenv("PIRATEKB_STATS_DB", "postgresql://test@127.0.0.1:1/neexistuje")
+    monkeypatch.delenv("PIRATEKB_TELEMETRY", raising=False)
+    s = _Sberac()
+    prev = statistika.nastav_zapisovac(s)  # type: ignore[arg-type]
+    statistika.reset_mezery()
+    yield s
+    statistika.nastav_zapisovac(prev)
+    statistika.reset_mezery()
+
+
+def test_report_gap_uklada_mezeru_do_trvale_statistiky(gaps_file, stats_sberac, monkeypatch):
+    from server import statistika
+
+    monkeypatch.setattr(statistika, "nacti_mezery", lambda **k: [])
+    out = mcp_server.report_gap("Kdo vede pirátský kroužek vaření?", poznamka="search_kb nic", tool="search_kb")
+    assert "Hlášení zaznamenáno" in out
+    mcp_server.report_gap("kdo vede piratsky krouzek vareni")  # duplicita
+    rows = [r for t, r in stats_sberac.radky if t == "mezery"]
+    assert len(rows) == 2
+    assert rows[0]["otazka"] == "Kdo vede pirátský kroužek vaření?" and rows[0]["tool"] == "search_kb"
+    assert rows[0]["poznamka"] == "search_kb nic" and rows[0]["duplikat"] is False
+    assert rows[0]["issue_url"] is None and rows[0]["klient"] in ("stdio", "neznamy")
+    assert rows[0]["prihlaseny"] is False and rows[0]["prostredi"] == statistika.prostredi()
+    assert rows[1]["duplikat"] is True
+    # soubor se zapsal i tak (stejný čas = stejný záznam)
+    soubor = _lines(gaps_file)
+    assert len(soubor) == 2 and soubor[0]["cas"] == rows[0]["cas"].isoformat(timespec="seconds")
+    assert "otazka_norm" not in rows[0]  # do databáze jde jen pevná sada sloupců
+
+
+def test_report_gap_bez_statistiky_nic_neposila(gaps_file, monkeypatch):
+    from server import statistika
+
+    monkeypatch.delenv("PIRATEKB_STATS_DB", raising=False)
+    prev = statistika.nastav_zapisovac(None)
+    try:
+        gaps.report_gap("otázka bez databáze")
+        assert statistika._instance is None
+        assert statistika.nacti_mezery() == []
+    finally:
+        statistika.nastav_zapisovac(prev)
+
+
+def test_format_recent_slouci_databazi_a_soubor(gaps_file, stats_sberac, monkeypatch):
+    from server import statistika
+
+    monkeypatch.setattr(statistika, "nacti_mezery", lambda **k: [])
+    res = gaps.report_gap("Kolik má strana členů v Brně?", tool="find_people")
+    cas = res["zaznam"]["cas"]
+    z_db = [
+        {"cas": "2030-01-01T10:00:00+00:00", "otazka": "Jen v databázi: postoj k rybolovu", "poznamka": "",
+         "tool": "get_position", "issue_url": None, "duplikat": False, "klient": "claude", "zdroj": "db"},
+        {"cas": cas, "otazka": "Kolik má strana členů v Brně?", "poznamka": "", "tool": "find_people",
+         "issue_url": None, "duplikat": False, "klient": "claude", "zdroj": "db"},
+    ]
+    monkeypatch.setattr(statistika, "nacti_mezery", lambda **k: z_db)
+    text = gaps.format_recent(50, s_texty=True)
+    assert "(2)" in text  # stejný záznam ze souboru i z databáze jen jednou
+    assert text.count("Kolik má strana členů v Brně?") == 1
+    assert text.index("postoj k rybolovu") < text.index("členů v Brně")  # nejnovější první
+    assert "tabulka `mezery`" in text and "| db |" in text
+    # bez textů: žádná otázka, ale zdroj a stav ano
+    text = gaps.format_recent(50, s_texty=False)
+    assert "rybolovu" not in text and "Brně" not in text and "| db |" in text and "nové" in text
+    # bez databáze: jen soubor
+    monkeypatch.setattr(statistika, "nacti_mezery", lambda **k: [])
+    text = gaps.format_recent(50, s_texty=True)
+    assert "(1)" in text and "jen lokální soubor" in text and "| soubor |" in text
+
+
+def test_slouc_hlaseni_radi_a_omezuje():
+    soubor = [{"cas": "2026-10-01T10:00:00+00:00", "otazka": "a", "otazka_norm": "a"},
+              {"cas": "2026-10-03T10:00:00+00:00", "otazka": "c", "otazka_norm": "c"}]
+    db = [{"cas": "2026-10-02T10:00:00+00:00", "otazka": "b", "zdroj": "db"},
+          {"cas": "2026-10-01T10:00:00+00:00", "otazka": "A", "zdroj": "db"}]
+    out = gaps.slouc_hlaseni(soubor, db, limit=2)
+    assert [r["otazka"] for r in out] == ["c", "b"]
+    out = gaps.slouc_hlaseni(soubor, db, limit=10)
+    assert [r["otazka"] for r in out] == ["c", "b", "A"] and out[2]["zdroj"] == "db"

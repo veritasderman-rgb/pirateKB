@@ -63,6 +63,7 @@ ALLOWED_TYP = (
     "volby",  # volební výsledky a zvolení zastupitelé (volby.py)
     "usneseni",  # usnesení vlády a zastupitelstev (vlada.py, praha.py)
     "financni-zprava",  # financování strany: výroční zprávy, účty (financovani.py)
+    "akce",  # veřejné akce z Pirátského kalendáře po měsících (kalendar.py)
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$")
@@ -76,7 +77,10 @@ SCHEMAS = ROOT / "schemas"
 SCHEMA_BY_FOLDER = {
     "brand": "brand", "stanoviska": "stanovisko", "vysledky": "vysledek",
     "slovnik": "slovnik", "sablony": "sablona", "organizace": "organizace",
+    "argumentare": "argumentar",
 }
+# Oddíly těla argumentáře (schemas/argumentar.schema.json); chybějící se jen hlásí jako upozornění.
+ARGUMENTAR_ODDILY = ("Teze", "Fakta a čísla", "Protiargumenty a odpovědi", "Zdroje")
 _schema_cache: dict[str, dict | None] = {}
 
 
@@ -267,6 +271,12 @@ def check_curated(path: Path, meta: dict, body: str, rep: Report, folder: str, l
     if isinstance(platnost, str) and is_date(platnost) and dt.date.fromisoformat(platnost) < dt.date.today():
         rep.warnings.append((rel(path), f"platnost_do {platnost} vypršela: dokument je neplatný"
                                         + (f", nahrazeno: {meta['nahrazeno']}" if meta.get("nahrazeno") else "")))
+
+    if meta.get("typ") == "argumentar":
+        nadpisy = {h.strip().lower() for h in re.findall(r"^##\s+(.+?)\s*$", body, flags=re.M)}
+        chybi = [o for o in ARGUMENTAR_ODDILY if o.lower() not in nadpisy]
+        if chybi:
+            rep.warnings.append((rel(path), "argumentář: chybí oddíl " + ", ".join(f"„## {o}“" for o in chybi)))
 
     rep.md_files[folder] += 1
     typ = meta.get("typ")

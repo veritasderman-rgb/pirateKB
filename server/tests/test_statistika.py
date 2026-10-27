@@ -736,3 +736,133 @@ def test_report_render_markdown_a_html():
     assert h.startswith("<!doctype html>") and "&lt;x&gt;" in h and "prefers-color-scheme: dark" in h
     assert "<td class=n>1 234</td>" in h
     assert rep.procento(0.1234) == "12,3 %" and rep.cislo(None) == "–" and rep.cislo(2.5) == "2,5"
+
+
+# ============================================================================= hlášené mezery (report_gap)
+
+def test_zaznamenej_mezeru_a_insert(sberac):
+    statistika.zaznamenej_mezeru({"cas": "2026-10-20T08:00:00+00:00", "otazka": "Kde je program k bydlení?",
+                                  "otazka_norm": "kde je program k bydleni", "poznamka": "zkoušel search_kb",
+                                  "tool": "get_program", "issue_url": None, "duplikat": False})
+    (radek,) = sberac.tabulka("mezery")
+    assert radek["otazka"] == "Kde je program k bydlení?" and radek["tool"] == "get_program"
+    assert radek["cas"] == datetime(2026, 10, 20, 8, tzinfo=timezone.utc)
+    assert radek["duplikat"] is False and radek["issue_url"] is None and "otazka_norm" not in radek
+    # prázdná otázka a vypnutá statistika se nezapisují
+    statistika.zaznamenej_mezeru({"otazka": ""})
+    assert len(sberac.tabulka("mezery")) == 1
+
+    db = FakeDB()
+    z = statistika.Zapisovac("dsn", db.connect)
+    z.pridej("mezery", radek)
+    z.pridej("volani", _volani())
+    assert z.flush() is True and z.zapsano == 2
+    ((sql, params),) = db.inserty("mezery")
+    assert sql.startswith("INSERT INTO mezery (cas, otazka, poznamka, tool,") and sql.count("(%s") == 1
+    assert params[1] == "Kde je program k bydlení?" and len(params) == len(statistika.SLOUPCE["mezery"])
+    assert len(db.inserty("volani")) == 1
+
+
+def test_zaznamenej_mezeru_vypnuto(monkeypatch):
+    monkeypatch.delenv("PIRATEKB_STATS_DB", raising=False)
+    prev = statistika.nastav_zapisovac(None)
+    try:
+        statistika.zaznamenej_mezeru({"otazka": "x", "cas": "2026-01-01T00:00:00+00:00"})
+        assert statistika._instance is None
+        assert statistika.nacti_mezery() == []
+    finally:
+        statistika.nastav_zapisovac(prev)
+
+
+def test_nacti_mezery_z_databaze_a_cache(monkeypatch):
+    monkeypatch.setenv("PIRATEKB_STATS_DB", "postgresql://x@127.0.0.1:1/x")
+    monkeypatch.delenv("PIRATEKB_TELEMETRY", raising=False)
+    statistika.reset_mezery()
+
+    class Conn:
+        dotazu = 0
+
+        def execute(self, sql, params=None):
+            if "FROM mezery" in sql:
+                Conn.dotazu += 1
+                assert params == (30, 50)
+                return FakeCursor([(datetime(2026, 10, 21, 9, 5, 7, tzinfo=timezone.utc), "Otázka A", "pozn",
+                                    "search_kb", None, False, "claude"),
+                                   (datetime(2026, 10, 20, 9, 0, 0, tzinfo=timezone.utc), "Otázka B", "",
+                                    "", "https://github.com/x/y/issues/3", False, "chatgpt")])
+            return FakeCursor()
+
+        def rollback(self):
+            pass
+
+        def close(self):
+            pass
+
+    rows = statistika.nacti_mezery(timeout=2, connect=lambda dsn: Conn())
+    assert [r["otazka"] for r in rows] == ["Otázka A", "Otázka B"]
+    assert rows[0]["cas"] == "2026-10-21T09:05:07+00:00" and rows[0]["zdroj"] == "db"
+    assert rows[1]["issue_url"] == "https://github.com/x/y/issues/3" and rows[1]["klient"] == "chatgpt"
+    assert statistika.nacti_mezery(connect=lambda dsn: Conn()) == rows and Conn.dotazu == 1  # cache
+    statistika.reset_mezery()
+
+    def spadne(dsn):
+        raise RuntimeError('relation "mezery" does not exist')
+
+    assert statistika.nacti_mezery(timeout=2, connect=spadne) == []
+    statistika.reset_mezery()
+
+
+def test_souhrn_obsahuje_mezery(monkeypatch):
+    monkeypatch.setenv("PIRATEKB_STATS_DB", "postgresql://x@127.0.0.1:1/x")
+    monkeypatch.delenv("PIRATEKB_TELEMETRY", raising=False)
+    monkeypatch.delenv("PIRATEKB_GAPS_TEXTY", raising=False)
+    statistika.reset_souhrn()
+
+    class Conn:
+        def execute(self, sql, params=None):
+            if "FROM denni_souhrn" in sql:
+                return FakeCursor((120, 30, 12, 6, 9))
+            if "count(*) FROM mezery" in sql:
+                return FakeCursor((4,))
+            if "FROM mezery" in sql:
+                return FakeCursor([("Jaký je postoj k rybolovu?", "get_position", None),
+                                   ("Kdo je garant pro vodu?", "", None)])
+            if "FROM volani" in sql:
+                return FakeCursor([("search_kb", 80)])
+            if "FROM pripojeni" in sql:
+                return FakeCursor([("claude-code", 20, 0)])
+            return FakeCursor()
+
+        def rollback(self):
+            pass
+
+        def close(self):
+            pass
+
+    out = statistika.souhrn_markdown(timeout=2, connect=lambda dsn: Conn())
+    assert "(report_gap): 4" in out and "mezery_posledni" in out
+    assert "rybolovu" not in out  # veřejný server: texty jen s PIRATEKB_GAPS_TEXTY=1
+    statistika.reset_souhrn()
+    monkeypatch.setenv("PIRATEKB_GAPS_TEXTY", "1")
+    out = statistika.souhrn_markdown(timeout=2, connect=lambda dsn: Conn())
+    assert "„Jaký je postoj k rybolovu?“ (get_position); „Kdo je garant pro vodu?“" in out
+    statistika.reset_souhrn()
+
+    # starší databáze bez tabulky mezery: souhrn funguje, sekce jen hlásí nulu
+    class BezMezer(Conn):
+        def execute(self, sql, params=None):
+            if "FROM mezery" in sql:
+                raise RuntimeError('relation "mezery" does not exist')
+            return super().execute(sql, params)
+
+    out = statistika.souhrn_markdown(timeout=2, connect=lambda dsn: BezMezer())
+    assert "Volání toolů: 120" in out and "(report_gap): 0" in out
+    statistika.reset_souhrn()
+
+
+def test_schema_mezery_a_pohledy():
+    sql = statistika.SQL_FILE.read_text(encoding="utf-8")
+    assert "CREATE TABLE IF NOT EXISTS mezery (" in sql
+    for pohled in ("mezery_posledni", "mezery_tydne"):
+        assert f"CREATE OR REPLACE VIEW {pohled} AS" in sql
+    assert "piratekb_prostredi() IN ('*', prostredi)" in sql.split("CREATE OR REPLACE VIEW mezery_posledni AS")[1]

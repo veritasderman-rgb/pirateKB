@@ -36,19 +36,55 @@ Každý návrh má v těle checklist „Co ověřit“. Tempo: stačí 5–10 n�
 `jistota: vysoka`. Návrhy „Rozhodly hlasy Pirátů“ jsou z dat PSP a potřebují ověřit, o
 jaké hlasování šlo (poslední hlasování k tisku nemusí být hlasování o zákonu jako celku).
 
-### 2. Mezery v bázi (`kb-gap`)
+**Pomocník na jeden návrh** (`scripts/kurator_navrh.py`, jen stdlib + PyYAML):
 
-Když AI nenajde odpověď, MCP server zapíše hlášení do `data/gaps/hlaseni.jsonl` a
-(je-li nastaven `GITHUB_TOKEN`) založí GitHub issue s labelem `kb-gap`
-(viz `server/gaps.py`).
+```bash
+python3 scripts/kurator_navrh.py seznam --jistota vysoka      # čekající návrhy, nejsilnější první
+python3 scripts/kurator_navrh.py ukaz inbox/vysledky/<soubor>.md
+python3 scripts/kurator_navrh.py schval inbox/vysledky/<soubor>.md --schvalil @login \
+    --shrnuti "Co se změnilo pro lidi a jaký byl podíl Pirátů." --dry-run   # bez --dry-run přesune
+python3 scripts/kurator_navrh.py vrat inbox/vysledky/<soubor>.md --duvod "…"
+```
+
+`ukaz` vypíše k návrhu podklady z `data/` (tisková zpráva, hlasování s hlasy Pirátů, tisk
+a zda jde o závěrečné hlasování, kontrola jmen) a checklist, takže se nemusí otevírat
+psp.cz a pirati.cz zvlášť. `schval` udělá kroky z „Jak schválit dokument“ níže (frontmatter,
+`git mv`, `validate.py content`, text PR); odmítne text s `[DOPLNIT KURÁTOR]` a dokumenty
+`viditelnost: clenske`, dokud neběží členská vrstva. `vrat` zapíše `poznamka_kuratora`
+a soubor nechá v `inbox/` (automatický generátor ho pak nepřepíše). Stejný postup vede
+Clauda skill [`skills/piratekb-kurator`](../skills/piratekb-kurator/SKILL.md): připraví
+podklady a shrnutí, ale schválí jen po výslovném souhlasu kurátora v chatu.
+
+### 2. Mezery v bázi (`report_gap`)
+
+Když AI nenajde odpověď, zavolá tool `report_gap`. Server hlášení uloží do tabulky `mezery`
+v Postgresu (Neon, se zapnutou statistikou `PIRATEKB_STATS_DB`), do lokálního souboru
+`data/gaps/hlaseni.jsonl` (na Vercelu po restartu zmizí) a, je-li nastaven `GITHUB_TOKEN`,
+založí GitHub issue s labelem `kb-gap` (viz `server/gaps.py`).
+
+**Hlavní cesta:** tabulka v Neonu (SQL Editor) nebo report ze skriptu:
+
+```sql
+SELECT * FROM mezery_posledni;            -- posledních 30 dní, nejnovější první
+SELECT * FROM mezery_tydne;               -- kolik hlášení týdně přibývá
+```
+
+```bash
+python3 scripts/statistika.py             # sekce „Hlášené mezery“ (potřebuje PIRATEKB_STATS_DB)
+```
+
+**Vedlejší cesta:** GitHub issues, jen pokud je na Vercelu nastaven `GITHUB_TOKEN`
+(Settings → Environment Variables → `GITHUB_TOKEN`, fine-grained token s právem
+*Issues: Read and write* jen pro tento repozitář, pak Redeploy). Bez tokenu issues
+nevznikají, což byl do 10/2026 stav produkce.
 
 ```bash
 gh issue list --label kb-gap --state open
-tail -n 20 data/gaps/hlaseni.jsonl        # pokud běží lokálně / bez tokenu
+tail -n 20 data/gaps/hlaseni.jsonl        # pokud server běží lokálně
 ```
 
 U každé mezery: existuje zdroj? → doplnit dokument (do `content/` nebo požádat hejno o
-příspěvek do `inbox/`) a issue zavřít s odkazem. Neexistuje (např. strana k tématu nemá
+příspěvek do `inbox/`) a issue (pokud existuje) zavřít s odkazem. Neexistuje (např. strana k tématu nemá
 stanovisko)? → zavřít s vysvětlením, případně předat resortnímu týmu. **Stanovisko nikdy
 nevymýšlet.**
 

@@ -33,6 +33,7 @@ ZDROJE = [
     ("volby", "volby.gov.cz (výsledky voleb a zvolení Piráti, ČSÚ)", "volby"),
     ("financovani", "financování strany (ÚDH, transparentní účty Fio, Piroplácení)", "financovani"),
     ("socialni_site", "X a Bluesky poslanců", "social"),
+    ("kalendar", "Pirátský kalendář akcí (veřejný Google kalendář, ICS)", "kalendar"),
     ("subweby", "subwebů strany", "subweby"),
     ("dokumenty", "dokumenty strany (PDF)", "dokumenty"),
     ("frankbold", "publikace Frank Bold (frankbold.org; karty, plný text jen s licencí CC)", "frankbold"),

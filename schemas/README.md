@@ -24,10 +24,11 @@ základní schéma se aplikuje vždy, složkové navíc.
 | `slovnik.schema.json` | `content/slovnik/` | `typ: slovnik`, `reviewed_at` |
 | `sablona.schema.json` | `content/sablony/` | `typ: sablona`, `reviewed_at` |
 | `organizace.schema.json` | `content/organizace/` | `typ` organizacni-jednotka/osoba/navod/rozcestnik/predpis |
+| `argumentar.schema.json` | `content/argumentare/`, `inbox/argumentare/` | `typ: argumentar`, povinné `tema` a `autor`; volitelně `mluvci`, `zdroje`, `platnost_do`; tělo má oddíly Teze / Fakta a čísla / Protiargumenty a odpovědi / Zdroje (chybějící oddíl = upozornění) |
 
 Složka se mapuje na schéma podle prvního adresáře pod `content/` nebo `inbox/`
 (`brand` → `brand`, `stanoviska` → `stanovisko`, `vysledky` → `vysledek`, `slovnik` →
-`slovnik`, `sablony` → `sablona`, `organizace` → `organizace`). Ostatní složky v
+`slovnik`, `sablony` → `sablona`, `organizace` → `organizace`, `argumentare` → `argumentar`). Ostatní složky v
 `inbox/` (např. `inbox/<jmeno>/`) kontroluje jen základní schéma.
 
 Data ve frontmatter pište v uvozovkách (`stazeno: '2026-10-06'`), jinak je YAML převede

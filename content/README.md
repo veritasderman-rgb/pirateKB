@@ -14,6 +14,7 @@ postup přispívání v [`CONTRIBUTING.md`](../CONTRIBUTING.md) a práce kuráto
 | [`slovnik/`](slovnik/README.md) | zkratky, pirátské pojmy | kurátor nebo pověřený správce |
 | [`sablony/`](sablony/README.md) | šablony textů (TZ, příspěvky, projevy) | kurátor nebo pověřený správce |
 | [`organizace/`](organizace/README.md) | jak strana funguje, kam se obrátit | kurátor nebo pověřený správce |
+| [`argumentare/`](argumentare/README.md) | argumentáře k tématům: teze, fakta se zdroji, protiargumenty a odpovědi (tool `get_argumentar`) | kurátor nebo pověřený správce; návrh není stanovisko strany |
 
 ## Pravidla pro každý soubor
 

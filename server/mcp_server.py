@@ -54,7 +54,7 @@ DOC_TYPES = ["tiskova-zprava", "aktualita", "stanovisko", "program", "programovy
              "materialy", "prispevek-socialni-site", "schuzka", "navod", "system",
              "clanek-media", "prepis-videa", "projev", "slovnik", "sablona", "vysledek", "material",
              "tisk", "interpelace", "volby", "financni-zprava", "usneseni", "dotaz-ep", "zprava-ep",
-             "pozmenovaci-navrh", "organy-psp", "prirucka"]
+             "pozmenovaci-navrh", "organy-psp", "prirucka", "akce", "argumentar"]
 SOCIAL_PLATFORMS = ["x", "bluesky"]
 # šablony výstupů: texty v server/prompts/<typ>.md, typy z TEMPLATE_CONTENT v content/sablony/<typ>.md
 TEMPLATE_TYPES = ["tiskova-zprava", "social-post", "reels", "brief", "projev", "video-106", "grafika-106",
@@ -1561,7 +1561,47 @@ def get_social_posts(osoba: str | None = None, query: str | None = None,
     out.append("")
     out.append(f"Autorita: {AUTORITA_POPIS['vyjadreni-politika']}. {SOCIAL_DISCLAIMER} "
                "Oficiální postoj strany ověř přes get_position.")
+    cerstvost = _social_cerstvost(kb)
+    if cerstvost:
+        out.append(cerstvost)
     return _cap("\n".join(out), "Sniž limit nebo zúž query/osoba/od/do.")
+
+
+def _social_cerstvost(kb: Any, dnes: Any = None, stare_dni: int = 14) -> str:
+    """Řádek „Čerstvost sběru“: nejnovější příspěvek po platformách a varování, když je sběr
+    starší než ``stare_dni`` (X je z cloudu blokované, viz ingest/README.md), aby AI nepodala
+    starý výběr jako „poslední vyjádření“."""
+    import datetime as _dt
+
+    try:
+        rows = kb.con.execute("SELECT platforma, MAX(substr(datum, 1, 10)) FROM social_posts "
+                              "GROUP BY platforma").fetchall()
+    except Exception:  # noqa: BLE001
+        return ""
+    if not rows:
+        return ""
+    dnes = dnes or _dt.date.today()
+    casti, varovani = [], []
+    for platforma, posledni in sorted((str(r[0] or ""), r[1]) for r in rows):
+        if not posledni:
+            continue
+        casti.append(f"{platforma} do {posledni}")
+        try:
+            stari = (dnes - _dt.date.fromisoformat(str(posledni))).days
+        except ValueError:
+            continue
+        if stari > stare_dni and platforma == "x":
+            varovani.append(f"X ({stari} dní; X automatický sběr z cloudu bez placeného API blokuje)")
+        elif stari > stare_dni:
+            varovani.append(f"{platforma} ({stari} dní; sběr běží, sledované účty publikují zřídka)")
+    if not casti:
+        return ""
+    text = "Čerstvost sběru (nejnovější příspěvek v bázi): " + ", ".join(casti) + "."
+    if varovani:
+        text += (" POZOR, nejnovější příspěvek je starší než dva týdny: " + ", ".join(varovani)
+                 + ". Novější příspěvky ověř přímo na profilu politika a tyto neprezentuj jako "
+                   "jeho poslední vyjádření.")
+    return text
 
 
 SPEECH_DISCLAIMER = ("Projev poslance ve Sněmovně = jeho vyjádření, ne stanovisko strany (to je program "
@@ -3089,6 +3129,39 @@ async def _health(request: Any) -> Any:
     return JSONResponse({"status": "ok", "name": "piratekb", "mcp": "/mcp"})
 
 
+def _pridej_web_cesty(app: Any) -> None:
+    """Webový chat (``/chat``, ``server/chat.py``) a týdenní digest (``/digest/``,
+    soubory z ``docs/digest/``). Nejsou chráněné autentizací (jen veřejná data); chat má
+    vlastní limity. Chyba při zapojení server nerozbije."""
+    try:
+        from starlette.responses import FileResponse, PlainTextResponse
+        from starlette.routing import Route
+
+        from server import chat as _chat
+
+        for r in _chat.routes():
+            app.router.routes.append(r)
+
+        digest_dir = REPO_ROOT / "docs" / "digest"
+
+        async def _digest(request: Any) -> Any:
+            name = (request.path_params.get("name") or "README.md").strip()
+            if "/" in name or name.startswith(".") or not name:
+                return PlainTextResponse("Nenalezeno.", status_code=404)
+            p = digest_dir / name
+            if not p.is_file():
+                return PlainTextResponse("Nenalezeno.", status_code=404)
+            media = ("application/rss+xml; charset=utf-8" if name.endswith(".xml")
+                     else "text/markdown; charset=utf-8")
+            return FileResponse(p, media_type=media, headers={"Cache-Control": "public, max-age=600"})
+
+        app.router.routes.append(Route("/digest", _digest, methods=["GET"]))
+        app.router.routes.append(Route("/digest/", _digest, methods=["GET"]))
+        app.router.routes.append(Route("/digest/{name}", _digest, methods=["GET"]))
+    except Exception as exc:  # noqa: BLE001
+        log.warning("web cesty (/chat, /digest) se nepodařilo zapojit: %s", exc)
+
+
 def http_app(host: str = "0.0.0.0", stateless: bool | None = None,
              json_response: bool | None = None) -> Any:
     """Vrátí ASGI (Starlette) aplikaci: Streamable HTTP na ``/mcp`` + ``GET /`` a ``/health``.
@@ -3124,6 +3197,7 @@ def http_app(host: str = "0.0.0.0", stateless: bool | None = None,
         json_response=json_response,
         host=host,
     )
+    _pridej_web_cesty(app)
     app = _statistika.wrap(app)
     app = _auth.wrap(app)
     return _ratelimit.wrap(app)
@@ -3194,11 +3268,13 @@ def report_gap(otazka: str, poznamka: str = "", tool: str = "") -> str:
 
 @mcp.resource("kb://gaps/posledni", name="gaps_posledni", title="Poslední hlášení „báze nemá odpověď“",
               description="Posledních 50 hlášení z toolu report_gap (čas, tool, stav; texty otázek "
-                          "jen na neveřejné instanci s PIRATEKB_GAPS_TEXTY=1).",
+                          "jen na neveřejné instanci s PIRATEKB_GAPS_TEXTY=1). Se zapnutou trvalou "
+                          "statistikou (PIRATEKB_STATS_DB) z tabulky mezery v Postgresu sloučené "
+                          "s lokálním souborem; jinak jen soubor této instance.",
               mime_type="text/markdown")
 def resource_gaps_posledni() -> str:
     try:
-        return _gaps.format_recent(50)
+        return _gaps.format_recent(50)  # sloučí tabulku mezery (Postgres) a lokální soubor
     except Exception as exc:  # noqa: BLE001
         return f"Hlášení nejsou k dispozici: {exc}"
 
@@ -4019,6 +4095,370 @@ def _register_analyzy() -> None:
 
 
 _register_analyzy()
+
+
+# =============================================================================
+# Argumentáře (content/argumentare/): hotové podklady pro komunikaci k tématu
+# =============================================================================
+# Přidáno na konec souboru. Argumentář je kurátorovaný dokument typu `argumentar` (teze,
+# fakta se zdroji, protiargumenty a odpovědi), schéma schemas/argumentar.schema.json.
+# Návrh (stav: navrh, autorita kurator-navrh) není stanovisko strany.
+
+ARGUMENTAR_MAX_TELO = 6500   # znaků těla jednoho argumentáře ve výstupu (zbytek přes get_document)
+# pořadí oddílů, když se tělo musí krátit: nejdřív to, co se při psaní použije přímo
+ARGUMENTAR_PRIORITA = ("Teze", "Protiargumenty a odpovědi", "Co nedělat", "Fakta a čísla", "Zdroje")
+
+
+def _argumentar_telo(body: str, budget: int, doc_id: str) -> str:
+    """Tělo argumentáře do ``budget`` znaků: celé, když se vejde; jinak po oddílech
+    (``## …``) v pořadí ARGUMENTAR_PRIORITA, ostatní oddíly (např. citace původního textu)
+    se vynechají a dlouhý oddíl se zkrátí. Vždy s odkazem na get_document."""
+    body = body.strip()
+    if len(body) <= budget:
+        return body
+    parts = re.split(r"(?m)^(?=## )", body)
+    intro, sections = "", {}
+    for part in parts:
+        m = re.match(r"## (.+)", part)
+        if m:
+            sections.setdefault(m.group(1).strip(), part.strip())
+        else:
+            intro = part.strip()
+    note = f"\n\n*(zkráceno; celý argumentář: get_document(\"{doc_id}\"))*"
+    out: list[str] = []
+    zbyva = budget - len(note)
+    if intro:
+        cut = intro[:min(len(intro), 700)]
+        out.append(cut + ("…" if len(cut) < len(intro) else ""))
+        zbyva -= len(out[-1]) + 2
+    for name in ARGUMENTAR_PRIORITA:
+        sec = sections.get(name)
+        if not sec or zbyva < 200:
+            continue
+        if len(sec) > zbyva:
+            sec = sec[:zbyva]
+            nl = sec.rfind("\n")
+            sec = (sec[:nl] if nl > zbyva * 0.5 else sec) + "…"
+        out.append(sec)
+        zbyva -= len(sec) + 2
+    vynechano = [n for n in sections if n not in ARGUMENTAR_PRIORITA]
+    if vynechano:
+        out.append("*(vynechané oddíly: " + ", ".join(f"„{n}“" for n in vynechano) + ")*")
+    return "\n\n".join(out) + note
+
+
+def _argumentar_stav(doc: dict) -> tuple[str, str]:
+    """(návrh|schváleno, varování) podle frontmatter a autority v indexu."""
+    meta = doc.get("meta") or {}
+    stav = _clean(meta.get("stav")) or ("schvaleno" if _s(doc.get("autorita")) == "kurator-schvaleno" else "navrh")
+    if stav == "schvaleno":
+        kdo = _clean(meta.get("schvalil"))
+        kdy = _clean(meta.get("schvaleno_dne"))
+        return "schváleno", f"Schválil kurátor{(' ' + kdo) if kdo else ''}{(' dne ' + kdy) if kdy else ''}."
+    return "NÁVRH", ("Neschválený návrh: není to stanovisko strany ani schválená komunikační linka. "
+                     "Použij jen jako inspiraci a u faktů cituj uvedené zdroje, ne argumentář sám.")
+
+
+def _argumentar_platnost(doc: dict) -> str:
+    meta = doc.get("meta") or {}
+    pd = _clean(meta.get("platnost_do"))
+    if not pd:
+        return ""
+    try:
+        import datetime as _dt
+        if _dt.date.fromisoformat(pd[:10]) < _dt.date.today():
+            return f"**NEPLATNÝ od {pd}** (rozhodnutí už padlo; použij jen jako historii argumentace)."
+    except ValueError:
+        pass
+    return f"Platí do {pd}."
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_argumentar(tema: str, jen_schvalene: bool = False) -> str:
+    """Argumentář k tématu z kurátorované vrstvy (content/argumentare/): teze, fakta a čísla
+    se zdroji, očekávané protiargumenty s odpověďmi a čemu se vyhnout. Použij před psaním
+    tiskové zprávy, příspěvku na sítě, projevu nebo odpovědi občanovi, a když se připravuje
+    debata nebo rozhovor k tématu. Vrací nejlépe odpovídající argumentář(e) s celým textem.
+
+    Každý argumentář má stav: `schváleno` (kurátor ověřil, autorita kurator-schvaleno)
+    nebo `NÁVRH` (neověřeno; není stanovisko strany, jen inspirace). `jen_schvalene=True`
+    vrátí jen schválené. Argumentář není postoj strany: postoj dává get_position /
+    get_program, argumentář říká, jak ho hájit. Když k tématu žádný není, řekni to, použij
+    get_position a find_expert a mezeru nahlas přes report_gap."""
+    t = _clean(tema)
+    if not t:
+        return "Zadej téma, např. `get_argumentar(\"koncesionářské poplatky\")`."
+    kb = get_kb()
+    hits = kb.search(t, typ=["argumentar"], limit=10)
+    seen: list[str] = []
+    for r in hits:
+        did = _s(r.get("doc_id"))
+        if did and did not in seen:
+            seen.append(did)
+    # bez shody ve fulltextu zkus pole `tema` a název (krátké dotazy, jiné skloňování)
+    if not seen:
+        fold_t = unicodedata.normalize("NFKD", t).encode("ascii", "ignore").decode().lower()
+        for d in kb.list_documents(typ=["argumentar"], limit=200):
+            full = kb.get_document(d["doc_id"]) or {}
+            meta = full.get("meta") or {}
+            hay = unicodedata.normalize("NFKD", " ".join(
+                [_s(meta.get("tema")), _s(d.get("nazev")), " ".join(map(str, d.get("tagy") or []))]
+            )).encode("ascii", "ignore").decode().lower()
+            words = [w for w in fold_t.split() if len(w) > 3]
+            if words and all(w[:5] in hay for w in words):
+                seen.append(d["doc_id"])
+    docs: list[dict] = []
+    for did in seen:
+        doc = kb.get_document(did)
+        if not doc:
+            continue
+        stav, _ = _argumentar_stav(doc)
+        if jen_schvalene and stav != "schváleno":
+            continue
+        docs.append(doc)
+    if not docs:
+        existuji = [d for d in kb.list_documents(typ=["argumentar"], limit=50)]
+        hint = ""
+        if existuji:
+            names = "; ".join(f"{_clean(d.get('nazev'))} (`{d['doc_id']}`)" for d in existuji[:15])
+            hint = f"\n\nArgumentáře v bázi k jiným tématům: {names}"
+        if jen_schvalene and seen:
+            hint = ("\n\nK tématu existuje jen neschválený návrh; zavolej znovu s "
+                    "`jen_schvalene=False`, pokud stačí inspirace." + hint)
+        expert = _expert_section(t, intro=f"## Argumentář k „{t}“ v bázi není. Postoj strany dá "
+                                          "get_position / get_program; nejlepší osoba k dotazu:")
+        return (f"Argumentář k tématu „{t}“ v bázi nenalezen.{hint}\n\n"
+                + (expert + "\n\n" if expert else "")
+                + "Řekni uživateli, že hotový argumentář k tomu není, nabídni postoj z get_position "
+                  "a kontakt z find_expert, a mezeru nahlas: "
+                  f"report_gap(otazka=\"argumentář: {t}\", tool=\"get_argumentar\").")
+    parts: list[str] = []
+    for doc in docs[:3]:
+        meta = doc.get("meta") or {}
+        stav, varovani = _argumentar_stav(doc)
+        head = [f"# {_clean(doc.get('nazev')) or doc['doc_id']}",
+                f"- **Stav: {stav}.** {varovani}",
+                f"- Autorita: {_autorita(doc)}",
+                f"- Téma: {_clean(meta.get('tema')) or '–'}"]
+        if not _blank(doc.get("autor")):
+            head.append(f"- Autor / základ textu: {_clean(doc.get('autor'))}")
+        if not _blank(doc.get("datum")):
+            head.append(f"- Datum: {_clean(doc.get('datum'))}")
+        if meta.get("mluvci"):
+            head.append(f"- Mluvčí k citování: {', '.join(map(str, meta['mluvci']))}")
+        pl = _argumentar_platnost(doc)
+        if pl:
+            head.append(f"- {pl}")
+        if not _blank(meta.get("reviewed_at")):
+            head.append(f"- Naposledy porovnáno se zdroji: {_clean(meta.get('reviewed_at'))}")
+        head.append(f"- Zdroj: {_s(doc.get('zdroj'))} | doc_id: `{doc['doc_id']}`")
+        budget = ARGUMENTAR_MAX_TELO if len(docs) == 1 else max(2500, ARGUMENTAR_MAX_TELO // min(len(docs), 3))
+        body = _argumentar_telo(_s(doc.get("body")), budget, doc["doc_id"])
+        parts.append("\n".join(head) + "\n\n" + body)
+    if len(docs) > 3:
+        parts.append("Další argumentáře: " + "; ".join(f"`{d['doc_id']}`" for d in docs[3:]))
+    tail = ("Pravidla: fakta cituj z odkazů v argumentáři (Zdroj), ne argumentář sám; tvrzení "
+            "označená „ověřit“ nebo [DOPLNIT KURÁTOR] nepoužívej bez ověření; u stavu NÁVRH "
+            "neprezentuj text jako postoj strany (postoj: get_position); respektuj oddíl „Co nedělat“ "
+            "a tón podle get_brand(\"ton\"). Před zveřejněním zkontroluj_text.")
+    return _cap_with_tail("\n\n---\n\n".join(parts), tail,
+                          "Použij get_document(doc_id) pro celý argumentář.")
+
+
+# =============================================================================
+# Kalendář akcí (data/kalendar/, ingest/kalendar.py): veřejný Pirátský kalendář
+# =============================================================================
+# Přidáno na konec souboru. Akce se čtou přímo z data/kalendar/akce.jsonl (bez indexu), aby
+# tool fungoval i po denní aktualizaci dat bez přestavby indexu; měsíční přehledy
+# data/kalendar/<RRRR-MM>.md (typ akce) navíc indexuje search_kb.
+
+KALENDAR_JSONL = DATA_DIR / "kalendar" / "akce.jsonl"
+KALENDAR_EMBED_URL = ("https://calendar.google.com/calendar/embed?src="
+                      "kddvdvu3adcjef2kro4j6mm838%40group.calendar.google.com&ctz=Europe%2FPrague")
+KALENDAR_MAX_LIMIT = 200
+_KALENDAR_DNY = ["pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota", "neděle"]
+_kalendar_cache: dict[str, Any] = {"mtime": None, "rows": []}
+
+
+def _kalendar_rows(path: Path | None = None) -> list[dict]:
+    """Řádky akce.jsonl (cache podle času změny souboru); chybějící soubor = prázdný seznam."""
+    p = Path(path) if path is not None else KALENDAR_JSONL
+    try:
+        mtime = p.stat().st_mtime
+    except OSError:
+        return []
+    if path is None and _kalendar_cache["mtime"] == mtime:
+        return _kalendar_cache["rows"]
+    rows: list[dict] = []
+    with p.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rows.append(json.loads(line))
+            except ValueError:
+                continue
+    rows.sort(key=lambda r: (_s(r.get("zacatek")), _s(r.get("nazev"))))
+    if path is None:
+        _kalendar_cache.update(mtime=mtime, rows=rows)
+    return rows
+
+
+def _kalendar_dnes() -> Any:
+    import datetime as _dt
+    return _dt.date.today()
+
+
+def _kalendar_datum(value: Any, name: str) -> Any:
+    """YYYY-MM-DD nebo D. M. RRRR → date; prázdné → None; jinak ValueError s českou hláškou."""
+    import datetime as _dt
+    v = _clean(value)
+    if not v:
+        return None
+    try:
+        return _dt.date.fromisoformat(v[:10])
+    except ValueError:
+        pass
+    m = re.fullmatch(r"(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})", v)
+    if m:
+        return _dt.date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+    raise ValueError(f"{name}: datum zadej jako RRRR-MM-DD (dostal jsem {v!r}).")
+
+
+def _kalendar_cas(r: dict) -> str:
+    import datetime as _dt
+    z = _s(r.get("zacatek"))
+    k = _s(r.get("konec"))
+    if r.get("cely_den"):
+        if k and k[:10] > z[:10]:
+            try:
+                last = _dt.date.fromisoformat(k[:10]) - _dt.timedelta(days=1)
+                if last.isoformat() > z[:10]:
+                    return f"celý den, do {last.day}. {last.month}."
+            except ValueError:
+                pass
+        return "celý den"
+    try:
+        zd = _dt.datetime.fromisoformat(z)
+    except ValueError:
+        return z
+    out = zd.strftime("%H:%M")
+    if k:
+        try:
+            kd = _dt.datetime.fromisoformat(k)
+            out += "–" + (kd.strftime("%H:%M") if kd.date() == zd.date() else f"{kd.day}. {kd.month}. {kd.strftime('%H:%M')}")
+        except ValueError:
+            pass
+    return out
+
+
+@mcp.tool(structured_output=False)
+@_guard
+def get_kalendar(od: str = "", do: str = "", hledat: str = "", misto: str = "", limit: int = 30) -> str:
+    """Veřejné akce z Pirátského kalendáře (celostátní Google kalendář vložený na www.pirati.cz):
+    schůze krajských a místních sdružení, zasedání orgánů, semináře, srazy, kampaňové akce,
+    volby a lhůty. Výchozí okno je dnes až +30 dní; v datech je rok zpět a rok dopředu.
+
+    Argumenty (volitelné): od, do = RRRR-MM-DD (nebo D. M. RRRR); hledat = slova z názvu,
+    popisu nebo místa (všechna musí být obsažena, bez diakritiky; „schůze KS“, „Plzeň“,
+    „online“); misto = jen místo; limit = nejvýš akcí (výchozí 30, max 200).
+
+    Výstup po dnech: čas (pražský), místo, odkaz na událost, zkrácený popis. Jde o veřejný
+    celostátní kalendář: akce sdružení v něm být nemusí, pro region použij profil_obce
+    (weby a aktuality sdružení). Jména účastníků a kontakty se neukládají."""
+    import datetime as _dt
+    dnes = _kalendar_dnes()
+    try:
+        d_od = _kalendar_datum(od, "od") or dnes
+        d_do = _kalendar_datum(do, "do") or (d_od + _dt.timedelta(days=30))
+    except ValueError as exc:
+        return str(exc)
+    if d_do < d_od:
+        d_od, d_do = d_do, d_od
+    limit = max(1, min(int(limit or 30), KALENDAR_MAX_LIMIT))
+    rows = _kalendar_rows()
+    if not rows:
+        return ("Kalendář akcí v bázi chybí (data/kalendar/akce.jsonl); spusť `python3 ingest/kalendar.py`. "
+                f"Veřejný kalendář: {KALENDAR_EMBED_URL}")
+
+    from server.kb.text import fold as _kfold
+    q_words = [w for w in _kfold(_clean(hledat)).split() if w]
+    q_misto = _kfold(_clean(misto))
+    sel: list[dict] = []
+    for r in rows:
+        den = _s(r.get("zacatek"))[:10]
+        if not (d_od.isoformat() <= den <= d_do.isoformat()):
+            continue
+        if _s(r.get("stav")).upper() == "CANCELLED":
+            continue
+        if q_misto and q_misto not in _kfold(_s(r.get("misto"))):
+            continue
+        if q_words:
+            text = _kfold(" ".join((_s(r.get("nazev")), _s(r.get("popis")), _s(r.get("misto")))))
+            if not all(w in text for w in q_words):
+                continue
+        sel.append(r)
+
+    def _d(iso: str) -> str:
+        d = _dt.date.fromisoformat(iso)
+        return f"{d.day}. {d.month}. {d.year}"
+
+    hlavicka = f"# Kalendář akcí {_d(d_od.isoformat())} – {_d(d_do.isoformat())}"
+    filtr = "; ".join(x for x in (f"hledat: „{_clean(hledat)}“" if hledat else "",
+                                  f"místo: „{_clean(misto)}“" if misto else "") if x)
+    if not sel:
+        okno = [r for r in rows if r.get("zacatek")]
+        rozsah = f"{okno[0]['zacatek'][:10]} – {okno[-1]['zacatek'][:10]}" if okno else "žádný"
+        return "\n".join([
+            hlavicka,
+            "",
+            f"Žádná akce v tomto období{(' (' + filtr + ')') if filtr else ''} v Pirátském kalendáři není.",
+            f"Data pokrývají {rozsah}. Zkus širší období nebo bez filtru; akce krajských a místních "
+            "sdružení bývají jen na jejich webech (profil_obce, search_kb).",
+            "",
+            f"Zdroj: {KALENDAR_EMBED_URL}",
+        ])
+
+    out = [hlavicka, ""]
+    if filtr:
+        out.append(f"Filtr: {filtr}.")
+    out.append(f"Akcí: {len(sel)}{f' (zobrazeno prvních {limit})' if len(sel) > limit else ''}.")
+    out.append("")
+    cur = ""
+    n = 0
+    for r in sel[:limit]:
+        n += 1
+        den = _s(r.get("zacatek"))[:10]
+        if den != cur:
+            if cur:
+                out.append("")
+            cur = den
+            d = _dt.date.fromisoformat(den)
+            out.append(f"## {_KALENDAR_DNY[d.weekday()]} {_d(den)}")
+            out.append("")
+        line = f"{n}. **{_s(r.get('nazev'))}**, {_kalendar_cas(r)}"
+        if r.get("misto"):
+            line += f", místo: {_s(r.get('misto'))}"
+        if _s(r.get("stav")).upper() == "TENTATIVE":
+            line += " (předběžně)"
+        if r.get("opakovani"):
+            line += " (opakovaná akce)"
+        if r.get("url"):
+            line += f". Událost: {r['url']}"
+        out.append(line)
+        popis = " ".join(_s(r.get("popis")).split())
+        if popis:
+            if len(popis) > 240:
+                popis = popis[:240].rsplit(" ", 1)[0] + "…"
+            out.append(f"   {popis}")
+    out.append("")
+    out.append(f"Zdroj: Pirátský kalendář (veřejný Google kalendář strany), {KALENDAR_EMBED_URL}. "
+               "Celostátní kalendář: akce sdružení v něm být nemusí (profil_obce → weby sdružení). "
+               "Odkazy na události jsou orientační; časy v pražském čase. Data: ingest/kalendar.py, denně.")
+    return "\n".join(out)
+
 
 _install_telemetry()  # obalí i nově přidané tooly (už obalené přeskočí)
 

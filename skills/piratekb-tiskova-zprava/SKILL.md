@@ -17,6 +17,8 @@ z vlastní paměti. Postoj strany bez zdroje nesmí vzniknout.
 1. **Postoj strany.** Zavolej `get_position("<téma>")`. Zjisti oficiální postoj a jeho
    autoritu (program / usnesení / stanovisko / TZ). Pro konkrétní programové body
    zavolej `get_program("<téma>")`.
+   Pak `get_argumentar("<téma>")`: když k tématu existuje argumentář, vezmi z něj teze,
+   čísla se zdroji a odpovědi na námitky; návrh (stav NÁVRH) je jen inspirace, ne postoj strany.
 2. **Co jsme už řekli.** Zavolej `search_press_releases("<téma>", limit=5)` a najdi
    nedávné TZ, čísla, tón a formulace. Pak `get_social_posts(query="<téma>", limit=5)`
    ukáže, co k tomu psali poslanci na X/Bluesky. Ber to jen jako inspiraci pro tón a

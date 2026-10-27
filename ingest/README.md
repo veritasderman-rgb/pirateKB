@@ -26,6 +26,7 @@ Architektura a role jednotlivých zdrojů jsou popsány v
 | [Flickr Pirátů](https://www.flickr.com/photos/pirati/albums/) | `flickr.py` | `data/flickr/alba.jsonl`, `alba.md` | seznam fotoalb (název, počet fotek, odkaz, náhled, datum a licence tam, kde je Flickr bez klíče vydá; s API klíčem i popis a data všech alb), jen metadata, ne samotné fotky | měsíčně |
 | [evidence.pirati.cz](https://evidence.pirati.cz) (Evidence kontaktů a schůzek, Open Lobby) | `evidence.py` | `data/evidence/<rok>/*.md`, `schuzky.jsonl`, `autori.jsonl` | registr lobbistických schůzek pirátských politiků z veřejného GraphQL API (`evidence-api.pirati.cz/graphql`): datum, název, popis, přijaté a poskytnuté výhody, naši a ostatní účastníci, autor, permalink; seznam autorů s počtem zpráv | denně (bez parametrů stáhne jen zprávy publikované od posledního běhu), týdně `--plne` (zachytí úpravy a smazání; celý registr je jen ~15 požadavků) |
 | [ÚDH](https://udh.gov.cz/vyrocni-financni-zpravy-stran-a-hnuti) (JSON exporty výročních zpráv a zpráv o kampaních na `zpravy.udh.gov.cz`), [transparentní účty Fio](https://ib.fio.cz/ib/transparent?a=2100048174), [Piroplácení](https://piroplaceni.pirati.cz/rozpocet/) (rozpočty, seznam účtů) | `financovani.py` | `data/financovani/vyrocni-zpravy/<rok>.md`, `kampane/<volby>.md`, `rozpocty/<rok>.md`, `ucty/<ucet>.md`, `ucty.jsonl`, `financovani.jsonl`, `prehled.md` | výroční finanční zprávy 2017–dnes (příjmy podle kategorií, státní příspěvky, dary, členské příspěvky, výdaje na volby, zaměstnanci, dluhy), zprávy o financování kampaní, rozpočty centrály, měsíční souhrny 7 transparentních účtů; typ `financni-zprava`, autorita `oficialni-udhpsh` / `oficialni-transparentni-ucet` / `oficialni-evidence`; **dárci – fyzické osoby jen souhrnně, jmenovitě jen právnické osoby, z účtů jen agregace** | měsíčně `--jen ucty rozpocty` (~30 s); v lednu, dubnu až červnu a prosinci úplný běh (zprávy a kampaně, ~1 min s cache, ~3 min poprvé) |
+| Pirátský kalendář (veřejný Google kalendář vložený na www.pirati.cz, ICS export) | `kalendar.py` | `data/kalendar/akce.jsonl`, `<RRRR-MM>.md` | veřejné akce rok zpět a rok dopředu (opakované rozepsané od 90 dní zpět): název, čas, místo, popis, odkaz; bez účastníků, e-maily a telefony odstraněné | denně (jeden požadavek, ~4 MB; Google po několika rychlých staženích vrací 429, skript drží cache 6 h) |
 | X/Twitter a Bluesky poslanců (účty v `socialni_site_ucty.yaml`) | `socialni_site.py` | `data/social/x/<ucet>.jsonl`, `x/<ucet>/<RRRR-MM>.md`, totéž v `bluesky/` | veřejné příspěvky pirátských poslanců: text, datum, odkaz, počty reakcí, označení repostů a odpovědí (autorita `vyjadreni-politika`, ne stanovisko strany) | denně (`--platforma vse`); X bez API tokenu vrací jen nejnovější dávku, takže častý běh = úplnější historie |
 | [Pirátská hospodářská strategie](https://majak.pirati.cz/documents/647/Piratska_Hospodarska_strategie.pdf) (PDF, PEER) | `dokumenty.py` | `data/dokumenty/hospodarska-strategie/00-cely-dokument.md`, `NN-<kapitola>.md` | obecný převod PDF -> Markdown (pdfplumber): nadpisy podle velikosti písma, tabulky, popisky grafů jako `> Graf:`; celý text a 7 kapitol s rozsahem stran; profily dokumentů v `DOKUMENTY` | při vydání nového dokumentu (přidat profil) |
 | [frankbold.org/o-nas/publikace](https://frankbold.org/o-nas/publikace) a [archiv publikací](https://frankbold.org/o-nas/publikace/archiv-publikaci) (PDF; robots.txt `Crawl-delay: 10`) | `frankbold.py` | `data/frankbold/<slug>/00-karta.md`, `NN-<kapitola>.md`, `publikace.jsonl`, `stav.json` | publikace Frank Bold (příručky pro občany a zastupitele, analýzy, sborníky, případové studie): karta s rokem, tématy, licencí z tiráže a varováním před zastaralou právní úpravou; plný doslovný text po kapitolách jen u licence Creative Commons; typ `prirucka`, autorita `externi-prirucka` | měsíčně (první týden); stahuje jen nové; `--aktualni` jen kontrola katalogu (~20 s) |
@@ -327,6 +328,17 @@ python3 validate.py            # nenulový exit kód při chybách
 `pirati_web.py` umí `--only aktuality|program|lide|materialy` a `--limit N` (pro
 zkušební běh). Při výpadku spuštění prostě zopakujte: hotové stránky se vezmou z cache.
 
+## Kalendář akcí (kalendar.py)
+
+Veřejný Google kalendář „Pirátský kalendář“ (ID `kddvdvu3adcjef2kro4j6mm838@group.calendar.google.com`)
+se stahuje jako jeden iCalendar soubor s celou historií od roku 2012. Skript ho parsuje bez
+externí knihovny (rozbalení řádků, DTSTART s `TZID`, UTC i `VALUE=DATE`), opakování (`RRULE`)
+rozepisuje přes `python-dateutil` jen v okně 90 dní zpět až 365 dní dopředu a respektuje
+`EXDATE` i přesunuté výskyty (`RECURRENCE-ID`). Pole `ATTENDEE` a `ORGANIZER` se nečtou,
+e-maily a telefony se z textů odstraní. `--soubor cesta.ics` načte lokální export (hodí se,
+když Google po opakovaném stahování vrátí 429), `--limit N` jen prvních N událostí.
+Výstup popisuje `data/kalendar/README.md`; tool serveru `get_kalendar` čte `akce.jsonl` přímo.
+
 ## Cache a slušné chování k serverům
 
 - Všechny HTTP požadavky jdou přes `common.polite_get`, která ukládá odpovědi do
@@ -354,5 +366,5 @@ zkušební běh). Při výpadku spuštění prostě zopakujte: hotové stránky 
   heslo aplikace a přístup člena. Postup, omezení zátěže a pravidla pro výběr složek jsou
   v [`docs/ingest/mrak-scraping-prompt.md`](../docs/ingest/mrak-scraping-prompt.md);
   výstup jde do `inbox/mrak/` (ne do `data/`), protože je ve výchozím stavu `clenske`.
-- Další zdroje z návrhu (Google Drive kurátora, Senát, kalendář ICS, Hlídač státu) zatím
+- Další zdroje z návrhu (Google Drive kurátora, Senát, Hlídač státu) zatím
   nemají skript.

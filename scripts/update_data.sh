@@ -144,6 +144,8 @@ case "$MODE" in
       esac
     fi
     run_src socialni_site social
+    # Veřejný Pirátský kalendář (Google ICS): jeden požadavek, akce rok zpět a rok dopředu.
+    run_src kalendar      kalendar
     run_src subweby       subweby
     # Regionální a tematické weby z Majáku: po dávkách (stav v data/subweby/stav.json),
     # aby se týdenní běh vešel do limitu jobu; hotové weby se jen obnovují.
@@ -191,6 +193,8 @@ case "$MODE" in
     # nedokončené pokračují příští běh; stažené stránky drží HTTP cache.
     run_src steno         psp/steno --obdobi 2025 --max-stranek 120
     run_src pirati_web    pirati-web --only aktuality
+    # Kalendář akcí: jeden požadavek (~4 MB ICS), aby tool get_kalendar měl aktuální akce.
+    run_src kalendar      kalendar
     # Titulky z YouTube: malé dávky, YouTube z cloudu po desítkách videí blokuje
     # (skript pak skončí kódem 3 a další běh pokračuje ze stav.json).
     run_src youtube       youtube --limit 30

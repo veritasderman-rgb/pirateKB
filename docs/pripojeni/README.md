@@ -6,6 +6,15 @@ Tři cesty podle toho, kdo jste. Všechny vedou k témuž: vaše AI dostane tool
 nebo `zkontroluj_text` a prompty jako `tiskova_zprava` nebo `reels_scenar`. Úplný seznam
 36 toolů je v [README](../../README.md#co-server-umí).
 
+## 0. Bez instalace: webový chat
+
+Na adrese `https://piratekb-veritasderman-3065s-projects.vercel.app/chat` je jednoduchý chat
+nad veřejnými daty báze (otázka, odpověď s odkazy na zdroje, seznam použitých nástrojů).
+Nic se neinstaluje a nepřihlašuje. Chat běží jen pokud správce serveru nastavil klíč
+k modelu (viz [`docs/co-zapnout.md`](../co-zapnout.md)); jinak stránka odkáže sem. Má denní
+limit otázek, pro soustavnou práci je lepší konektor níže. Týdenní přehled toho, co v bázi
+přibylo, je na `/digest/` (RSS `/digest/feed.xml`).
+
 ## A. Nejjednodušší: připojit hostovaný server (pro běžné piráty)
 
 Server je nasazený (část C popisuje, jak ho hostovat jinde).

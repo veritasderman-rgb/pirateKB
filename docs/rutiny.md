@@ -73,6 +73,33 @@ například `python3 ingest/evidence.py --plne`.
 - Datum `stazeno` v hlavičce dokumentu se při automatickém běhu mění jen tehdy, když se změnil
   obsah dokumentu. „Kdy jsme zdroj naposledy zkontrolovali“ říká `data/AKTUALIZACE.md`.
 
+## Týdenní digest
+
+Každé pondělí 05:40 UTC (po nedělní úplné aktualizaci dat) běží workflow
+[`.github/workflows/digest.yml`](../.github/workflows/digest.yml): skript
+[`scripts/digest.py`](../scripts/digest.py) vyrobí z analýzy `novinky` (stejné jako tool MCP
+serveru) digest „Co se stalo v pirátské politice tento týden“ za minulý týden (pondělí–neděle),
+zapíše ho do `docs/digest/<RRRR>-T<TT>.md`, obnoví seznam [`docs/digest/README.md`](digest/README.md)
+a RSS [`docs/digest/feed.xml`](digest/feed.xml) a commitne je do `main`. Je to přehled dat
+s citacemi a autoritou u každé položky, ne redakční text; bez AI a bez nutnosti cokoli
+připojovat.
+
+**Ručně:** Actions → *Týdenní digest* → *Run workflow* (volitelně `od`/`do`), nebo lokálně:
+
+```sh
+pip install -r server/requirements.txt
+python3 scripts/digest.py --no-zulip                      # minulý týden
+python3 scripts/digest.py --od 2026-10-20 --do 2026-10-26 # vlastní období
+```
+
+Index `index/kb.sqlite` se použije, je-li vybudovaný; jinak se vybuduje z `data/` (minuty).
+
+**Zulip:** nastavte secrets `ZULIP_SITE` (např. `https://zulip.pirati.cz`), `ZULIP_BOT_EMAIL`,
+`ZULIP_API_KEY` (generický bot vytvořený v Zulipu: Settings → Your bots), `ZULIP_STREAM` a volitelně
+`ZULIP_TOPIC` (výchozí „Digest báze“). Workflow pak digest pošle i do zadaného streamu (zkrácený na
+limit 10 000 znaků, s odkazem na celý soubor). Bez secrets se odeslání přeskočí; selhání Zulipu běh
+neshodí, soubory se commitnou vždy. Stejným způsobem lze digest vzít z RSS do newsletteru.
+
 ## Jak přidat nový zdroj (checklist)
 
 1. Napište skript `ingest/<zdroj>.py` (využijte `ingest/common.py`: `polite_get`, `write_markdown`,
