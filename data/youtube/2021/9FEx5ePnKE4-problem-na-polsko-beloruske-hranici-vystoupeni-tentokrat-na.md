@@ -10,7 +10,7 @@ titulky: zadne
 osoba: Markéta Gregorová
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-10-28'
+stazeno: '2026-10-29'
 ---
 
 # Problém na polsko-běloruské hranici - vystoupení tentokrát na CNN Prima News
@@ -24,8 +24,8 @@ Video na kanálu Markéta Gregorová , zveřejněno 2021-11-18, délka 12:00. <h
 > Podívejte se na záznam. Spoiler alert: docela si notujeme, vede mě to tedy k víře, že náš společný tlak na Komisi i členské státy zajistí reakci EU.
 >
 > Pokud vás téma zajímá, můžete se podívat i na:
-> ➡️ debatu v České televizi: https://www.facebook.com/watch/?v=260..., 
-> ➡️ moje vystoupení v Evropském parlamentu:    • Problém na polsko-běloruské hranici - mé v...  .
+> ➡️ debatu v České televizi: https://www.facebook.com/watch/?v=260563882705010, 
+> ➡️ moje vystoupení v Evropském parlamentu: https://youtu.be/_GdNUQ2C8E0.
 
 ## Přepis
 
