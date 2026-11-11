@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2023-01-17'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 69
+delka_s: 70
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-10'
+stazeno: '2026-11-11'
 ---
 
 # Prezidentská kampaň za vaše peníze?!
 
-Video na kanálu Piráti, zveřejněno 2023-01-17, délka 01:09. <https://www.youtube.com/watch?v=Yf6fKku6FZQ>
+Video na kanálu Piráti, zveřejněno 2023-01-17, délka 01:10. <https://www.youtube.com/watch?v=Yf6fKku6FZQ>
 
 ## Popis videa
 

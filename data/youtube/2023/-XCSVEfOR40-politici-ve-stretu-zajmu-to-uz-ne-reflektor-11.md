@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2023-01-18'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 598
+delka_s: 599
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-10'
+stazeno: '2026-11-11'
 ---
 
 # Politici ve střetu zájmů? To už NE! Reflektor #11
 
-Video na kanálu Piráti, zveřejněno 2023-01-18, délka 09:58. <https://www.youtube.com/watch?v=-XCSVEfOR40>
+Video na kanálu Piráti, zveřejněno 2023-01-18, délka 09:59. <https://www.youtube.com/watch?v=-XCSVEfOR40>
 
 ## Popis videa
 

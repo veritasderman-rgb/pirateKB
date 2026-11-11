@@ -10,7 +10,7 @@ titulky: zadne
 osoba: Markéta Gregorová
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-11-10'
+stazeno: '2026-11-11'
 ---
 
 # Tour po Londýně aneb Zasedání naší frakce [#8 BEHIND THE SCENES]
@@ -22,9 +22,9 @@ Video na kanálu Markéta Gregorová , zveřejněno 2019-10-20, délka 04:13. <h
 > Doprovoďte mě na každoroční zasedání naší frakce londýnskými ulicemi a já vám po cestě povím, co jsme tam vlastně na začátku týdne dělali a k čemu to je. :)
 >
 > Díky, že mě sledujete!
-> Twitter:   / marketkag  
-> Instagram:   / ruzovarebelka  
-> FB Page:   / mepgregorova
+> Twitter: http://twitter.com/MarketkaG
+> Instagram: http://instagram.com/ruzovarebelka
+> FB Page: http://facebook.com/MEPGregorova
 
 ## Přepis
 

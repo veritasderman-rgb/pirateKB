@@ -10,7 +10,7 @@ titulky: zadne
 osoba: Markéta Gregorová
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-11-10'
+stazeno: '2026-11-11'
 ---
 
 # Evropa potřebuje Piráty - Sjezd v Miláně [#10 BEHIND THE SCENES]
@@ -22,9 +22,9 @@ Video na kanálu Markéta Gregorová , zveřejněno 2019-11-06, délka 07:29. <h
 > Jak to vypadá na sjezdu evropských Pirátů, kdo tomu předsedá a existují vůbec Piráti mimo Českou republiku? To a další zajímavosti z pirátského hnutí se dozvíte v dnešním oddechovějším videu z víkendu!
 >
 > Sledujte mě i na:
-> Instagramu:   / ruzovarebelka  
-> Twitteru:   / marketkag  
-> Facebook page:   / mepgregorova
+> Instagramu: http://instagram.com/ruzovarebelka
+> Twitteru: http://twitter.com/MarketkaG
+> Facebook page: http://facebook.com/MEPGregorova
 
 ## Přepis
 

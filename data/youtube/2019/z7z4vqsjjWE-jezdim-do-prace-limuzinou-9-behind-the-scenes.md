@@ -10,7 +10,7 @@ titulky: zadne
 osoba: Markéta Gregorová
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-11-10'
+stazeno: '2026-11-11'
 ---
 
 # Jezdím do práce limuzínou? [#9 BEHIND THE SCENES]
@@ -23,10 +23,10 @@ Video na kanálu Markéta Gregorová , zveřejněno 2019-10-27, délka 06:11. <h
 > Jestli je to pravda a záběry z výjimečně slunného Bruselu najdete v dnešním videu!
 >
 > Díky, že sledujete!
-> Twitter: http://twitter.com/MarketkaG
-> Instagram: http://instagram.com/ruzovarebelka
+> Twitter:   / marketkag  
+> Instagram:   / ruzovarebelka  
 > Web: http://gregorova.eu
-> Facebook Page: http://facebook.com/MEPGregorova
+> Facebook Page:   / mepgregorova
 
 ## Přepis
 

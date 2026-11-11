@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2023-02-01'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 491
+delka_s: 492
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-10'
+stazeno: '2026-11-11'
 ---
 
 # Odporná kampááň to byla. Co s tím? Je tu řešení! Reflektor #13
 
-Video na kanálu Piráti, zveřejněno 2023-02-01, délka 08:11. <https://www.youtube.com/watch?v=nUkGMThIn1g>
+Video na kanálu Piráti, zveřejněno 2023-02-01, délka 08:12. <https://www.youtube.com/watch?v=nUkGMThIn1g>
 
 ## Popis videa
 

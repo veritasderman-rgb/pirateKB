@@ -5,17 +5,17 @@ typ: prepis-videa
 datum: '2019-11-17'
 autor: 'Markéta Gregorová '
 kanal_url: https://www.youtube.com/channel/UCcf12G_5igxOSZBFSt4eEAQ
-delka_s: 561
+delka_s: 560
 titulky: zadne
 osoba: Markéta Gregorová
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-11-10'
+stazeno: '2026-11-11'
 ---
 
 # Nejlepší video roku!!! Aneb o DEZINFORMACÍCH [#11 BEHIND THE SCENES]
 
-Video na kanálu Markéta Gregorová , zveřejněno 2019-11-17, délka 09:21. <https://www.youtube.com/watch?v=t7zKakPUv-I>
+Video na kanálu Markéta Gregorová , zveřejněno 2019-11-17, délka 09:20. <https://www.youtube.com/watch?v=t7zKakPUv-I>
 
 ## Popis videa
 
@@ -23,12 +23,12 @@ Video na kanálu Markéta Gregorová , zveřejněno 2019-11-17, délka 09:21. <h
 >
 > Koukněte na video :)
 >
-> Záběr použitý ve videu je z:    • Bez vědomí (2019) Miloš Zeman a jeho faleš...   , Totalfilm.cz
+> Záběr použitý ve videu je z: https://www.youtube.com/watch?v=FzMnDwpKJrI , Totalfilm.cz
 >
 > Sledujte mě i na:
-> Instagramu:   / ruzovarebelka  
-> Twitteru:   / marketkag  
-> Facebook page:   / mepgregorova
+> Instagramu: http://instagram.com/ruzovarebelka
+> Twitteru: http://twitter.com/MarketkaG
+> Facebook page: http://facebook.com/MEPGregorova
 
 ## Přepis
 
