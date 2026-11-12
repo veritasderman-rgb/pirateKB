@@ -10,7 +10,7 @@ titulky: zadne
 osoba: Markéta Gregorová
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-11-11'
+stazeno: '2026-11-12'
 ---
 
 # Delegace: zbytečné výlety nebo síla Parlamentu v praxi? [#9 VOXBOX]
@@ -24,9 +24,9 @@ Video na kanálu Markéta Gregorová , zveřejněno 2019-10-02, délka 05:46. <h
 > S pokusem natočit to na jeden záběr (který nevyšel). ;D
 >
 > Díky, že sledujete!
-> Instagram: http://instagram.com/ruzovarebelka 
-> Twitter: http://twitter.com/MarketkaG 
-> Facebook page: http://facebook.com/MEPGregorova 
+> Instagram:   / ruzovarebelka   
+> Twitter:   / marketkag   
+> Facebook page:   / mepgregorova   
 > Web: http://gregorova.eu
 
 ## Přepis
