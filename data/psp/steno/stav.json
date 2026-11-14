@@ -1,5 +1,5 @@
 {
- "aktualizovano": "2026-11-13",
+ "aktualizovano": "2026-11-14",
  "obdobi": {
   "2017": {
    "1": {
@@ -3643,6 +3643,32 @@
     "vystoupeni": 65,
     "zdroj": "stranky",
     "zpracovano": "2026-10-21"
+   },
+   "35": {
+    "hotovo": true,
+    "nesoulad_rec": 0,
+    "podle_jmena": 0,
+    "poslancu": 3,
+    "stranek_bez_rec": 9,
+    "stranek_stazeno": 16,
+    "vynechano_kratke": 0,
+    "vynechano_predsedajici": 0,
+    "vystoupeni": 10,
+    "zdroj": "stranky",
+    "zpracovano": "2026-11-14"
+   },
+   "36": {
+    "hotovo": true,
+    "nesoulad_rec": 0,
+    "podle_jmena": 0,
+    "poslancu": 4,
+    "stranek_bez_rec": 26,
+    "stranek_stazeno": 26,
+    "vynechano_kratke": 0,
+    "vynechano_predsedajici": 0,
+    "vystoupeni": 11,
+    "zdroj": "stranky",
+    "zpracovano": "2026-11-14"
    },
    "4": {
     "hotovo": true,
