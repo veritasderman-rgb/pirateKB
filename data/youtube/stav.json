@@ -2,13 +2,13 @@
  "kanaly": {
   "https://www.youtube.com/@CeskaPiratskaStrana": {
    "nazev": "Piráti",
-   "seznam_nacten": "2026-11-18T13:07:16",
-   "videi_v_seznamu": 628
+   "seznam_nacten": "2026-11-19T13:37:54",
+   "videi_v_seznamu": 272
   },
   "https://www.youtube.com/channel/UCcf12G_5igxOSZBFSt4eEAQ": {
    "nazev": "Markéta Gregorová",
-   "seznam_nacten": "2026-11-18T13:07:20",
-   "videi_v_seznamu": 270
+   "seznam_nacten": "2026-11-19T13:38:03",
+   "videi_v_seznamu": 151
   }
  },
  "videa": {
@@ -265,12 +265,10 @@
    "titulky": "zadne"
   },
   "3Fqs8DEeBnc": {
-   "behu_bez_titulku": 10,
-   "cas": "2026-11-18T13:07:36",
-   "datum": "2026-11-08",
-   "jazyk_videa": null,
-   "stav": "hotovo",
-   "titulky": "zadne"
+   "cas": "2026-11-19T13:39:06",
+   "chyba": "'NoneType' object has no attribute 'get'",
+   "pokusu": 1,
+   "stav": "chyba"
   },
   "3Ko3-8Kz0ZA": {
    "behu_bez_titulku": 2,
@@ -1942,6 +1940,12 @@
    "stav": "hotovo",
    "titulky": "auto"
   },
+  "RHbYmQDKNho": {
+   "cas": "2026-11-19T13:38:17",
+   "chyba": "'NoneType' object has no attribute 'get'",
+   "pokusu": 1,
+   "stav": "chyba"
+  },
   "RIYEFlTTTos": {
    "behu_bez_titulku": 2,
    "cas": "2026-10-30T11:09:42",
@@ -3115,12 +3119,10 @@
    "titulky": "zadne"
   },
   "fANhxfXRcCY": {
-   "behu_bez_titulku": 9,
-   "cas": "2026-11-18T13:07:25",
-   "datum": "2026-11-09",
-   "jazyk_videa": null,
-   "stav": "hotovo",
-   "titulky": "zadne"
+   "cas": "2026-11-19T13:38:41",
+   "chyba": "'NoneType' object has no attribute 'get'",
+   "pokusu": 1,
+   "stav": "chyba"
   },
   "f_m4dqLI3Xo": {
    "behu_bez_titulku": 2,
