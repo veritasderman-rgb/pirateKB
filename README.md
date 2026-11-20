@@ -14,6 +14,8 @@ Jeden zdroj pravdy o Pirátské straně, ke kterému se každý pirát připojí
 - výsledky voleb a zvolení Piráti (ČSÚ),
 - financování strany (výroční zprávy, kampaně, transparentní účty),
 - průvodce žádostí podle zákona 106 a dotazem zastupitele (lhůty, šablony, grafika a video),
+- návod, jak využít AI v práci zastupitele (rozbor podkladů, návrh usnesení, kontrola smluv,
+  komunikace s občany, pravidla pro data),
 - externí příručky a publikace Frank Bold (karty s odkazy; plné texty jen s licencí CC),
 - příspěvky politiků na sítích a přepisy videí,
 - weby krajských a místních sdružení,
@@ -113,10 +115,11 @@ jsou v [docs/ukazky](docs/ukazky/README.md).
 | `kb_stats` | co báze obsahuje, kdy se aktualizovala, souhrn použití |
 | `report_gap` | nahlásí otázku, na kterou báze nemá odpověď (podklad pro kurátora) |
 
-**11 promptů:** tisková zpráva, scénář reels, příspěvek na sítě, brief k tématu,
+**13 promptů:** tisková zpráva, scénář reels, příspěvek na sítě, brief k tématu,
 odpověď občanovi; k žádostem podle 106 a dotazům zastupitele `zadost_106`,
 `dotaz_zastupitele`, `po_odeslani`, `odpoved_prisla`, `video_106` (scénář videa) a
-`grafika_106` (karta na sítě).
+`grafika_106` (karta na sítě); pro práci zastupitele s AI `rozbor_podkladu` (rozbor bodu
+jednání) a `navrh_usneseni` (návrh usnesení nebo protinávrh).
 
 **Resources:** barvy, písma, seznam programů, statistika, přehled hlášení chybějících odpovědí,
 vzorové prompty (`kb://navod/prompty`).

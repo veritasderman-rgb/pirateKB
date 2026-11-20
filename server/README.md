@@ -11,7 +11,7 @@ nekurátorovaná). Architektura je v [`docs/navrh-architektury.md`](../docs/navr
 ## Co server umí
 
 Server při startu otevře SQLite index (`index/kb.sqlite`) postavený z `data/` a
-nabízí AI čtyři druhy věcí (36 toolů, 11 promptů, 7 resources). Tooly volá AI sama
+nabízí AI čtyři druhy věcí (36 toolů, 13 promptů, 7 resources). Tooly volá AI sama
 podle potřeby, prompty si vybírá uživatel (v Claude Desktopu v nabídce „+“), resources
 jsou čtecí odkazy.
 
@@ -59,6 +59,7 @@ jsou čtecí odkazy.
 | prompt | `brief_k_tematu` | stručný podklad k tématu: stanovisko, argumenty, čísla, hlasování |
 | prompt | `odpoved_obcanovi` | věcná a zdvořilá odpověď občanovi na dotaz nebo kritiku |
 | prompt | `zadost_106`, `dotaz_zastupitele` | připraví žádost o informace nebo dotaz zastupitele se správným paragrafem |
+| prompt | `rozbor_podkladu`, `navrh_usneseni` | AI v práci zastupitele: rozbor přiložených podkladů k bodu jednání (částky se stranou, co chybí, otázky na předkladatele) a návrh usnesení nebo protinávrh; návod `content/navody/ai-pro-zastupitele.md` |
 | prompt | `po_odeslani`, `odpoved_prisla` | lhůty do kalendáře a komunikace po odeslání, vyhodnocení odpovědi úřadu |
 | prompt | `video_106` | scénář krátkého videa k žádosti / dotazu (`faze` podano, odpoved, zjisteni, stiznost, dotaz; `shrnuti` = text podání nebo odpovědi) pro šablonu `templates/video/` |
 | prompt | `grafika_106` | data karty na sítě k žádosti / dotazu (`faze` podano, odpoved, stiznost, dotaz; `format`) pro šablonu `templates/grafika/` |
