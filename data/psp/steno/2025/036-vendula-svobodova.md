@@ -18,7 +18,7 @@ tagy:
 - období 2025–
 - Vendula Svobodová
 zdroj_schuze: https://www.psp.cz/eknih/2025ps/stenprot/036schuz/index.htm
-stazeno: '2026-11-14'
+stazeno: '2026-11-20'
 vystoupeni:
 - nadpis: 2026-11-13 11:40
   datum: '2026-11-13'
@@ -38,7 +38,7 @@ vystoupeni:
   datum: '2026-11-13'
   cas: '13:00'
   bod: null
-  url: https://www.psp.cz/eknih/2025ps/stenprot/036schuz/s036025.htm#r9
+  url: https://www.psp.cz/eknih/2025ps/stenprot/036schuz/s036025.htm#r8
   role: Poslankyně
   znaku: 1210
 ---
@@ -123,7 +123,7 @@ A dále bych ještě chtěla tady zmínit, že společně s dalšími opoziční
 
 ## 2026-11-13 13:00
 
-*Poslankyně Vendula Svobodová* · stenozáznam: https://www.psp.cz/eknih/2025ps/stenprot/036schuz/s036025.htm#r9
+*Poslankyně Vendula Svobodová* · stenozáznam: https://www.psp.cz/eknih/2025ps/stenprot/036schuz/s036025.htm#r8
 
 Děkuji za slovo. Já bych se tímto chtěla přihlásit k pozměňovacímu návrhu 2300, který jsem odůvodnila už v obecné rozpravě. Týká se to snížení zdanění na 25 procent, zahrnutí více subjektů, těch, co vyrábějí energii z uhlí. A alokaci vybraných financí do kapacitních plateb. To je první pozměňovací návrh.
 
