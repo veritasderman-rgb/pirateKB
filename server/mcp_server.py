@@ -182,7 +182,11 @@ styleguide.pirati.cz, X, Bluesky, YouTube, frankbold.org) a není kurátorovaná
    Když se uživatel ptá, co s bází umí, nabídni vzorové prompty z resource kb://navod/prompty.
 7. Pro žádosti podle zákona č. 106/1999 Sb. a dotazy zastupitelů použij pruvodce_zadosti /
    lhuty_zadosti a lhůty zapiš uživateli do kalendáře přes jeho kalendářový konektor
-   (Google Calendar, Microsoft 365); bez konektoru nabídni ICS z výstupu lhuty_zadosti."""
+   (Google Calendar, Microsoft 365); bez konektoru nabídni ICS z výstupu lhuty_zadosti.
+8. Když se zastupitel ptá, jak používat AI ve své práci (rozbor podkladů k jednání, návrh
+   usnesení, kontrola smluv, odpovědi občanům, co do AI nevkládat), vycházej z návodu
+   get_document("content/navody/ai-pro-zastupitele") (návrh, ne stanovisko strany) a nabídni
+   prompty rozbor_podkladu a navrh_usneseni."""
 
 
 # =============================================================================
@@ -3103,7 +3107,8 @@ def resource_stats() -> str:
 
 @mcp.resource("kb://navod/prompty", name="vzorove_prompty", title="Vzorové prompty",
               description="Vzorové prompty podle účelu (postoj strany, lidé, hlasování a zákony, volby, "
-                          "tiskové zprávy a video, žádosti podle zákona 106, financování); docs/prompty.md.",
+                          "tiskové zprávy a video, žádosti podle zákona 106, AI v práci zastupitele, "
+                          "financování); docs/prompty.md.",
               mime_type="text/markdown")
 def resource_vzorove_prompty() -> str:
     try:
@@ -3966,6 +3971,47 @@ def dotaz_zastupitele(predmet: str, organ: str = "", druh: str = "obec") -> str:
     except ValueError:
         d = "obec"
     return _prompt_text("dotaz-zastupitele", predmet=predmet, organ=organ, druh=d)
+
+
+# Prompty k návodu content/navody/ai-pro-zastupitele.md (workshop Kompas 2026): texty
+# server/prompts/rozbor-podkladu.md a navrh-usneseni.md.
+_PRAVIDLA_AI_ZASTUPITEL = """Pravidla:
+- Vycházej jen z podkladů uživatele a ze zdrojů s odkazem (znalostní báze, Hlídač státu, konektor
+  na legislativu). Co v nich není, označ „nevím“ nebo „ověřit“; částky, data, čísla usnesení ani
+  paragrafy nedomýšlej.
+- Osobní údaje občanů (jména z podnětů, adresy, rodná čísla, přílohy žádostí) do výstupu
+  nepřepisuj; neveřejné materiály rady a uzavřených jednání nezpracovávej a uživatele na to upozorni.
+- U každé částky a termínu uveď stranu podkladu nebo odkaz, aby šly zkontrolovat v originále.
+- Uveď i nejsilnější protiargument; nepřitakávej názoru uživatele.
+- Postoj strany jen z `get_position` / `get_program`, jinak jde o názor zastupitele. Nejde o právní
+  radu: finální znění doporuč konzultovat s právníkem úřadu nebo krajským sdružením.
+- Výstup je návrh: rozhoduje, podepisuje a na jednání mluví zastupitel."""
+
+
+def _prompt_ai_zastupitel(nazev: str, **pole: str) -> str:
+    path = PROMPTS_DIR / f"{nazev}.md"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        text = (f"(Text promptu {path.name} na serveru chybí.) Postupuj podle návodu "
+                "get_document(\"content/navody/ai-pro-zastupitele\").")
+    return (_vypln(text, {k: _clean(v) or f"<{k}>" for k, v in pole.items()})
+            + "\n\n" + _PRAVIDLA_AI_ZASTUPITEL)
+
+
+@mcp.prompt(title="Rozbor bodu jednání zastupitelstva")
+def rozbor_podkladu(bod: str, obec: str = "") -> str:
+    """Rozebere přiložené podklady k bodu jednání zastupitelstva: shrnutí, částky a termíny
+    s číslem strany, co chybí nebo si odporuje, otázky na předkladatele, argument pro i proti."""
+    return _prompt_ai_zastupitel("rozbor-podkladu", bod=bod, obec=obec or "obec neuvedena")
+
+
+@mcp.prompt(title="Návrh usnesení / protinávrh")
+def navrh_usneseni(predmet: str, obec: str = "", druh: str = "vlastní bod") -> str:
+    """Připraví návrh usnesení zastupitelstva nebo protinávrh (druh = vlastní bod | protinávrh):
+    kostra bere na vědomí / schvaluje / ukládá s termínem a odpovědnou osobou, odůvodnění, věta do zápisu."""
+    d = "protinávrh" if "proti" in (druh or "").lower() else "vlastní bod"
+    return _prompt_ai_zastupitel("navrh-usneseni", predmet=predmet, obec=obec or "obec neuvedena", druh=d)
 
 
 @mcp.prompt(title="Po odeslání žádosti")

@@ -188,6 +188,35 @@ Nejlepší výsledky dávají prompty, které řeknou **co chcete**, **pro koho 
 Kalendář se vyplní, jen pokud máte v Claude připojený Google Calendar nebo
 Microsoft 365. Jinak AI nabídne soubor ICS k importu.
 
+## AI v práci zastupitele
+
+Celý postup včetně pravidel, co do AI nevkládat, je v návodu
+[content/navody/ai-pro-zastupitele.md](../content/navody/ai-pro-zastupitele.md)
+(z workshopu na Kompasu 2026; návrh, ne stanovisko strany). Server k němu nabízí prompty
+`rozbor_podkladu` a `navrh_usneseni`.
+
+> Jsi analytik zastupitele obce Příklad. Vycházej jen z přiložených podkladů k bodu 7
+> „Prodej pozemku“. Shrň v pěti větách, co se schvaluje, vypiš částky, smluvní strany
+> a termíny s číslem strany, uveď, co chybí nebo si odporuje, a navrhni pět otázek na
+> předkladatele. Co v podkladech není, označ „nevím“. Na konci napiš nejsilnější argument
+> pro schválení i proti němu.
+
+> Připrav protinávrh usnesení k bodu o navýšení ceny rekonstrukce školy: zastupitelstvo
+> ukládá radě předložit rozpis víceprací, s termínem a odpovědnou osobou. Přidej krátké
+> odůvodnění na jednání a jednu větu do zápisu.
+
+> Udělej profil obce Příklad a vypiš zvolené zastupitele z voleb 2026. S kým tam Piráti
+> sedí a jak dopadly volby oproti minule?
+
+> Ze zápisu z jednání zastupitelstva a mých poznámek připrav newsletter v pěti bodech:
+> co se schválilo, co to znamená pro lidi, jak jsem hlasoval a proč. Pak text zkontroluj
+> před zveřejněním.
+
+> Jak mám jako zastupitel začít používat AI a co do ní nikdy nevkládat?
+
+Do AI nevkládejte osobní údaje občanů ani neveřejné materiály rady. U každé částky a
+paragrafu si otevřete stranu nebo odkaz, který AI cituje.
+
 ## Kalendář akcí
 
 > Jaké pirátské akce jsou příští měsíc v Plzeňském kraji a kdy se schází krajské sdružení?

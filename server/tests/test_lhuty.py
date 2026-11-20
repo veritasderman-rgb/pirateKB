@@ -437,6 +437,25 @@ def test_prompty_obsahuji_pravidla():
     assert "lhuty_zadosti" in texty[2] and "Google Calendar" in texty[2]
 
 
+def test_prompty_ai_pro_zastupitele():
+    r = mcp_server.rozbor_podkladu("7 Prodej pozemku", "Obec X")
+    u = mcp_server.navrh_usneseni("rozpis víceprací školy", "Obec X", "protinavrh")
+    for t in (r, u):
+        assert "{{" not in t and "Obec X" in t
+        assert "Osobní údaje občanů" in t and "Nejde o právní" in t
+    assert "7 Prodej pozemku" in r and "argument **proti**" in r
+    assert "protinávrh" in u and "§ 94" in u and "zodpovídá" in u
+    assert "vlastní bod" in mcp_server.navrh_usneseni("x")
+
+    async def main():
+        return {p.name for p in await mcp_server.mcp.list_prompts()}
+
+    assert {"rozbor_podkladu", "navrh_usneseni"} <= anyio.run(main)
+    assert "ai-pro-zastupitele" in mcp_server.SERVER_INSTRUCTIONS
+    navod = (REPO_ROOT / "content/navody/ai-pro-zastupitele.md").read_text(encoding="utf-8")
+    assert "rozbor_podkladu" in navod and "navrh_usneseni" in navod and "stav: navrh" in navod
+
+
 def test_registrace_v_serveru():
     async def main():
         tools = {t.name for t in await mcp_server.mcp.list_tools()}

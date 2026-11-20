@@ -11,6 +11,12 @@ textu výslovně označen jako výklad.
 [`../sablony/`](../sablony/README.md) (`zadost-106.md`, `stiznost-106.md`,
 `odvolani-106.md`, `dotaz-zastupitele.md`).
 
+**AI v práci zastupitele:** [`ai-pro-zastupitele.md`](ai-pro-zastupitele.md) shrnuje
+workshop z Kompasu 2026: jak s AI rozebrat podklady, připravit usnesení, zkontrolovat
+smlouvy a odpovědět občanům a co do AI nevkládat. Na serveru k němu patří prompty
+`rozbor_podkladu` a `navrh_usneseni` (texty v `server/prompts/`). Údaje o nástrojích a
+cenách rychle stárnou, proto je při každé revizi ověřte.
+
 **Kdo schvaluje:** kurátor báze; u právních návodů doporučujeme kontrolu právníkem
 (např. z resortního týmu nebo legislativního odboru). Do schválení mají `stav: navrh`.
 
