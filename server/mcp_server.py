@@ -185,7 +185,7 @@ styleguide.pirati.cz, X, Bluesky, YouTube, frankbold.org) a není kurátorovaná
    (Google Calendar, Microsoft 365); bez konektoru nabídni ICS z výstupu lhuty_zadosti.
 8. Když se zastupitel ptá, jak používat AI ve své práci (rozbor podkladů k jednání, návrh
    usnesení, kontrola smluv, odpovědi občanům, co do AI nevkládat), vycházej z návodu
-   get_document("content/navody/ai-pro-zastupitele") (návrh, ne stanovisko strany) a nabídni
+   get_document("content/navody/ai-pro-zastupitele") (schválený návod, ne stanovisko strany) a nabídni
    prompty rozbor_podkladu a navrh_usneseni."""
 
 

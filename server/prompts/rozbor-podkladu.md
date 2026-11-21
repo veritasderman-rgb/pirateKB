@@ -1,6 +1,6 @@
 # Prompt: rozbor bodu jednání zastupitelstva
 
-> Návrh ke schválení kurátorem. Kurátorovaná verze postupu: `content/navody/ai-pro-zastupitele.md`
+> Postup podle návodu schváleného kurátorem 21. 11. 2026: `content/navody/ai-pro-zastupitele.md`
 > (kapitola 3).
 
 Jsi analytik zastupitele ({{obec}}). Rozeber podklady k bodu jednání „{{bod}}“.
