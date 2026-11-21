@@ -1,93 +1,163 @@
 zdroj: https://styleguide.pirati.cz/2.22.0/
 verze_styleguide: 2.22.0
-stazeno: '2026-10-06'
+stazeno: '2026-11-21'
 viditelnost: verejne
 autorita: oficialni-styleguide
 barvy:
   znackove:
-  - nazev: Primary Black
+  - nazev: Black
     hex: '#000000'
+    paleta: Primary
+    trida: bg-black
   - nazev: White
     hex: '#ffffff'
-  - nazev: Olive Olive 100
+    paleta: Primary
+    trida: bg-white
+  - nazev: Olive 100
     hex: '#d6e8b3'
-  - nazev: Green Green 200
+    paleta: Olive
+    trida: bg-olive-100
+  - nazev: Green 200
     hex: '#92c6ab'
+    paleta: Green
+    trida: bg-green-200
   - nazev: Green 300
     hex: '#76cc9f'
+    paleta: Green
+    trida: bg-green-300
   - nazev: Green 400
     hex: '#4ca971'
-  - nazev: Yellow Yellow 100
+    paleta: Green
+    trida: bg-green-400
+  - nazev: Yellow 100
     hex: '#fff7bf'
+    paleta: Yellow
+    trida: bg-yellow-100
   - nazev: Yellow 200
     hex: '#f7f38a'
+    paleta: Yellow
+    trida: bg-yellow-200
   - nazev: Yellow 300
     hex: '#ffea5a'
+    paleta: Yellow
+    trida: bg-yellow-300
   - nazev: Yellow 400
     hex: '#fde119'
-  - nazev: Blue Blue 100
+    paleta: Yellow
+    trida: bg-yellow-400
+  - nazev: Blue 100
     hex: '#abcdef'
+    paleta: Blue
+    trida: bg-blue-100
   - nazev: Blue 200
     hex: '#76b4cf'
+    paleta: Blue
+    trida: bg-blue-200
   - nazev: Blue 300
     hex: '#027da8'
-  - nazev: Cyan Cyan 100
+    paleta: Blue
+    trida: bg-blue-300
+  - nazev: Cyan 100
     hex: '#a7d4d1'
+    paleta: Cyan
+    trida: bg-cyan-100
   - nazev: Cyan 200
     hex: '#57b3bd'
+    paleta: Cyan
+    trida: bg-cyan-200
   - nazev: Cyan 300
     hex: '#3e8793'
+    paleta: Cyan
+    trida: bg-cyan-300
   - nazev: Cyan 400
     hex: '#497280'
+    paleta: Cyan
+    trida: bg-cyan-400
   - nazev: Cyan 500
     hex: '#004958'
-  - nazev: Orange Orange 100
+    paleta: Cyan
+    trida: bg-cyan-500
+  - nazev: Orange 100
     hex: '#f2d29f'
+    paleta: Orange
+    trida: bg-orange-100
   - nazev: Orange 200
     hex: '#f1ae7b'
+    paleta: Orange
+    trida: bg-orange-200
   - nazev: Orange 300
     hex: '#ed9654'
-  - nazev: Violet Violet 100
+    paleta: Orange
+    trida: bg-orange-300
+  - nazev: Violet 100
     hex: '#edc8bd'
+    paleta: Violet
+    trida: bg-violet-100
   - nazev: Violet 200
     hex: '#d28c94'
+    paleta: Violet
+    trida: bg-violet-200
   - nazev: Violet 300
     hex: '#8d415f'
+    paleta: Violet
+    trida: bg-violet-300
   - nazev: Violet 400
     hex: '#840048'
+    paleta: Violet
+    trida: bg-violet-400
   - nazev: Violet 500
     hex: '#670047'
-  - nazev: Red Red 600
+    paleta: Violet
+    trida: bg-violet-500
+  - nazev: Red 600
     hex: '#d60d53'
+    paleta: Red
+    trida: bg-red-600
   - nazev: Pirati Yellow
     hex: '#fec934'
+    paleta: Pirati
+    trida: bg-pirati-yellow
   neutralni:
   - nazev: Grey 50
     hex: '#f7f7f7'
+    trida: bg-grey-50
   - nazev: Grey 100
     hex: '#f3f3f3'
+    trida: bg-grey-100
   - nazev: Grey 125
     hex: '#f0f0f0'
+    trida: bg-grey-125
   - nazev: Grey 200
     hex: '#adadad'
+    trida: bg-grey-200
   - nazev: Grey 300
     hex: '#4c4c4c'
+    trida: bg-grey-300
   - nazev: Grey 400
     hex: '#343434'
+    trida: bg-grey-400
   - nazev: Grey 500
     hex: '#303132'
+    trida: bg-grey-500
   - nazev: Grey 600
     hex: '#262626'
+    trida: bg-grey-600
   - nazev: Grey 700
     hex: '#202020'
+    trida: bg-grey-700
   - nazev: Grey 800
     hex: '#1f1f1f'
+    trida: bg-grey-800
   cizi_znacky:
   - nazev: Facebook
     hex: '#067ceb'
+    trida: bg-brands-facebook
   - nazev: Twitter
     hex: '#00c9ff'
+    trida: bg-brands-twitter
   - nazev: Gmail
     hex: '#ec230e'
+    trida: bg-brands-gmail
   - nazev: LinkedIn
     hex: '#0066a9'
+    trida: bg-brands-linkedin

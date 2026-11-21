@@ -606,7 +606,8 @@ def _load_brand(data_dir: Path) -> dict:
     if (b / "barvy.yaml").exists():
         y = yaml.safe_load((b / "barvy.yaml").read_text(encoding="utf-8")) or {}
         for skupina, items in (y.get("barvy") or {}).items():
-            lst = [{"skupina": skupina, "nazev": i.get("nazev"), "hex": i.get("hex")}
+            lst = [{"skupina": skupina, "nazev": i.get("nazev"), "hex": i.get("hex"),
+                    "paleta": i.get("paleta"), "trida": i.get("trida")}
                    for i in items or []]
             brand["barvy"].extend(lst)
             brand["barvy_podle_skupiny"][skupina] = lst

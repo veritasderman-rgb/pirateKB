@@ -453,7 +453,7 @@ def test_prompty_ai_pro_zastupitele():
     assert {"rozbor_podkladu", "navrh_usneseni"} <= anyio.run(main)
     assert "ai-pro-zastupitele" in mcp_server.SERVER_INSTRUCTIONS
     navod = (REPO_ROOT / "content/navody/ai-pro-zastupitele.md").read_text(encoding="utf-8")
-    assert "rozbor_podkladu" in navod and "navrh_usneseni" in navod and "stav: navrh" in navod
+    assert "rozbor_podkladu" in navod and "navrh_usneseni" in navod and "stav: schvaleno" in navod
 
 
 def test_registrace_v_serveru():

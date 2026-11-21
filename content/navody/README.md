@@ -15,7 +15,7 @@ textu výslovně označen jako výklad.
 workshop z Kompasu 2026: jak s AI rozebrat podklady, připravit usnesení, zkontrolovat
 smlouvy a odpovědět občanům a co do AI nevkládat. Na serveru k němu patří prompty
 `rozbor_podkladu` a `navrh_usneseni` (texty v `server/prompts/`). Údaje o nástrojích a
-cenách rychle stárnou, proto je při každé revizi ověřte.
+cenách rychle stárnou, proto je při každé revizi ověřte. Schváleno kurátorem 21. 11. 2026.
 
 **Kdo schvaluje:** kurátor báze; u právních návodů doporučujeme kontrolu právníkem
 (např. z resortního týmu nebo legislativního odboru). Do schválení mají `stav: navrh`.

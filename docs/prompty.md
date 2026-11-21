@@ -192,7 +192,7 @@ Microsoft 365. Jinak AI nabídne soubor ICS k importu.
 
 Celý postup včetně pravidel, co do AI nevkládat, je v návodu
 [content/navody/ai-pro-zastupitele.md](../content/navody/ai-pro-zastupitele.md)
-(z workshopu na Kompasu 2026; návrh, ne stanovisko strany). Server k němu nabízí prompty
+(z workshopu na Kompasu 2026; schválený návod, ne stanovisko strany). Server k němu nabízí prompty
 `rozbor_podkladu` a `navrh_usneseni`.
 
 > Jsi analytik zastupitele obce Příklad. Vycházej jen z přiložených podkladů k bodu 7

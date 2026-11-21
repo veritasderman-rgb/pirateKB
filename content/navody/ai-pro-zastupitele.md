@@ -1,6 +1,12 @@
 ---
 zdroj: "Workshop „Jak využít AI v práci zastupitele?“, Kompas 2026, 21. 11. 2026 (prezentace a poznámky lektora)"
 zdroje:
+- https://nukib.gov.cz/cs/infoservis/aktuality/2279-nukib-vydal-varovani-pred-nekterymi-produkty-spolecnosti-deepseek/
+- https://dosimeteraudit.org/research/ai-chatbots-us-midterms-2026
+- https://help.openai.com/en/articles/7730893-data-controls-faq
+- https://privacy.claude.com/en/articles/12109829-how-do-i-change-my-model-improvement-privacy-settings
+- https://support.google.com/gemini/answer/13278892?hl=cs
+- https://help.openai.com/en/articles/20001047-ads-in-chatgpt
 - https://www.zakonyprolidi.cz/cs/2000-128
 - https://www.zakonyprolidi.cz/cs/1999-106
 - https://www.zakonyprolidi.cz/cs/2015-340
@@ -17,19 +23,20 @@ autorita: kurator
 autor: Josef Pavlovic
 stazeno: '2026-11-20'
 datum: '2026-11-21'
-stav: navrh
-schvalil: null
-schvaleno_dne: null
-reviewed_at: '2026-11-20'
+stav: schvaleno
+schvalil: '@veritasderman-rgb'
+schvaleno_dne: '2026-11-21'
+reviewed_at: '2026-11-21'
 platnost_do: null
-poznamka: "Sestaveno z prezentace workshopu na Kompasu 2026. Proti e-Sbírce ověřeno 20. 11. 2026: § 14 odst. 5 a 6 zákona č. 106/1999 Sb. (15 dní, prodloužení nejvýše o 10 dní), § 94 zákona č. 128/2000 Sb. (právo člena předkládat návrhy), existence výjimek v § 3 odst. 2 zákona č. 340/2015 Sb.; § 82 zákona o obcích viz content/navody/dotaz-zastupitele.md (ověřeno 8. 10. 2026). Neověřeno kurátorem: údaje o nástrojích a tarifech (mění se), varování NÚKIB k DeepSeek, čísla z testu Dosimeteru, přesné znění výjimky 50 000 Kč v registru smluv, § 84 a 85 zákona o obcích."
+poznamka: "Sestaveno z prezentace workshopu na Kompasu 2026, schváleno kurátorem 21. 11. 2026. Ověřeno 20. a 21. 11. 2026: § 14 odst. 5 a 6 zákona č. 106/1999 Sb., § 84, 85 a 94 zákona č. 128/2000 Sb., § 3 odst. 2 písm. h) a k) zákona č. 340/2015 Sb. (e-Sbírka, zakonyprolidi.cz); § 82 zákona o obcích viz content/navody/dotaz-zastupitele.md (ověřeno 8. 10. 2026); varování NÚKIB k DeepSeek z 10. 7. 2025 (nukib.gov.cz); studie Dosimeter z 28. 10. 2026 (dosimeteraudit.org); ceny tarifů a názvy nastavení soukromí na webech poskytovatelů. Neověřeno z oficiálního zdroje: datum, od kdy se reklamy v ChatGPT zobrazují uživatelům v Česku. Výklad, ne citace zákona: kdo je správcem osobních údajů z formuláře na webu zastupitele. Ceny a názvy položek v nastavení rychle stárnou; při revizi ověřit znovu."
 ---
 
 # Jak využít AI v práci zastupitele
 
-> **Návrh ke schválení kurátorem.** Praktický postup z workshopu na Kompasu 2026
-> (21. 11. 2026), ne stanovisko strany a ne právní rada. Právní údaje jsou k 20. 11. 2026;
-> údaje o nástrojích a cenách se mění rychle a jsou označené **(ověřit)**.
+> **Schváleno kurátorem 21. 11. 2026.** Praktický postup z workshopu na Kompasu 2026
+> (21. 11. 2026), ne stanovisko strany a ne právní rada. Právní údaje, ceny a názvy
+> položek v nastavení jsou ověřené k 21. 11. 2026; u nástrojů se mění rychle, proto je
+> u nich uvedeno datum.
 
 Návod je pro obecní a krajské zastupitele, hlavně nově zvolené a opoziční. Jedno měřítko
 pro všechno: **ušetří mi to čas a zůstane výsledek správný?** Čas na kontrolu výstupu do
@@ -45,8 +52,8 @@ K čemu se AI zastupiteli hodí nejvíc:
 
 | úroveň | co to je | na co stačí |
 |---|---|---|
-| **1. Chat zdarma** | ChatGPT, Claude, Gemini bez placení | na vyzkoušení; slabší model, limity, u některých reklamy **(ověřit)**. Na skutečné podklady málo. |
-| **2. Placený plán a projekt** | kolem 20 USD měsíčně **(ověřit)** | silnější model, delší dokumenty a **projekt** s vlastními instrukcemi (obec, výbor, styl psaní) a nahranými soubory (jednací řád, rozpočet) |
+| **1. Chat zdarma** | ChatGPT, Claude, Gemini bez placení | na vyzkoušení; slabší model a limity. ChatGPT může v plánech Free a Go zobrazovat reklamy (od srpna 2026 i v Evropě; přesné datum pro Česko OpenAI neuvádí). Na skutečné podklady málo. |
+| **2. Placený plán a projekt** | kolem 20 USD měsíčně (Claude Pro 20 USD, ChatGPT Plus 20 USD, Google AI Pro 19,99 USD; ceny v USA k 21. 11. 2026) | silnější model, delší dokumenty a **projekt** s vlastními instrukcemi (obec, výbor, styl psaní) a nahranými soubory (jednací řád, rozpočet) |
 | **3. Konektory (MCP)** | AI čte zdroje, místo aby hádala | Piráti KB, Sbírka zákonů, Hlídač státu, registr smluv; odpověď má odkaz na zdroj |
 
 Agenti a automatické rutiny jsou další patra. Na začátek stačí úroveň 2 a jeden konektor.
@@ -62,21 +69,34 @@ Než do AI cokoli vložíte:
    zastupitelstvo bývají veřejné, ale jejich přílohy (nájemní smlouvy, dotace fyzickým
    osobám, žádosti o byt) osobní údaje obsahují. GDPR platí i pro zastupitele.
 2. **Vypněte trénování na svých datech.** U osobních plánů je to přepínač v nastavení
-   soukromí (ChatGPT: Ovládání dat; Claude: Soukromí; Gemini: Aktivita v aplikacích)
-   **(ověřit: názvy položek se mění)**. Trvá to minutu.
+   (stav k 21. 11. 2026, názvy se mění). Trvá to minutu.
+   - **ChatGPT:** Settings › Data controls › „Improve the model for everyone“
+     ([nápověda](https://help.openai.com/en/articles/7730893-data-controls-faq)).
+   - **Claude:** Settings › Privacy › „Help improve our AI models“
+     ([nápověda](https://privacy.claude.com/en/articles/12109829-how-do-i-change-my-model-improvement-privacy-settings)).
+   - **Gemini:** Nastavení a nápověda › Historie; pod ní zaškrtávací pole „Obsah chatu
+     včetně textu a nahraných souborů“ a pole pro nahrávky z Gemini Live
+     ([nápověda](https://support.google.com/gemini/answer/13278892?hl=cs)). Dřívější název
+     „Aktivita v aplikacích s Gemini“ už neplatí. I s vypnutou historií Google podle
+     nápovědy konverzace zhruba dva měsíce uchovává.
 3. **Za výsledek odpovídáte vy.** AI navrhuje, zastupitel podepisuje. Nic neodchází bez
    přečtení a žádná citace bez ověření ve zdroji.
 
 **Neveřejné materiály rady a podklady z uzavřených jednání do AI nepatří vůbec.**
-Workshop dále doporučuje nepoužívat DeepSeek s odkazem na varování NÚKIB z července 2025
-**(ověřit u NÚKIB)**.
+**DeepSeek nepoužívejte.** NÚKIB vydal 10. 7. 2025
+[varování před některými produkty společnosti DeepSeek](https://nukib.gov.cz/cs/infoservis/aktuality/2279-nukib-vydal-varovani-pred-nekterymi-produkty-spolecnosti-deepseek/).
+Závazné je pro povinné osoby podle zákona o kybernetické bezpečnosti; pro ostatní závazné
+není, ale osobám ve vysokých politických, veřejných a rozhodovacích funkcích NÚKIB
+doporučuje tyto produkty nepoužívat a veřejnosti zvážit, jaké informace do nich vkládá.
+Netýká se open-source modelů provozovaných lokálně bez spojení se servery DeepSeek.
 
 ## 3. Podklady pro zastupitelstvo
 
 Čtyři kroky od PDF k otázkám na jednání:
 
-1. **Nahrajte celý balík podkladů** do projektu nebo do NotebookLM. NotebookLM odpovídá
-   jen z nahraných souborů a ukazuje, odkud cituje.
+1. **Nahrajte celý balík podkladů** do projektu nebo do NotebookLM (Google ho v červenci 2026
+   přejmenoval na Gemini Notebook). Odpovídá z nahraných zdrojů a u odpovědi ukazuje, odkud
+   cituje ([nápověda](https://support.google.com/notebooklm/answer/16164461?hl=en)).
 2. **Shrnutí bod po bodu s čísly stran:** co se schvaluje, kolik to stojí, kdo je smluvní
    strana, jaké jsou lhůty. Tvrzení bez odkazu na stranu neberte.
 3. **Rizika a co chybí:** chybějící příloha, nejasná cena, změna oproti minulé verzi,
@@ -116,8 +136,12 @@ Usnesení bez termínu a odpovědné osoby se nedá kontrolovat. Chtějte i krá
 pro jednání a jednu větu do zápisu.
 
 **Právní rámec ověřujte konektorem na legislativu, ne z paměti modelu.** Co je vyhrazeno
-zastupitelstvu, upravují § 84 a 85 zákona o obcích; AI má přes konektor (e-Sbírka,
-Zákony pro lidi) přečíst platné znění a citovat paragraf. Finální znění konzultujte
+zastupitelstvu, upravují [§ 84](https://www.zakonyprolidi.cz/cs/2000-128#p84) (např.
+rozpočet, závěrečný účet, zřizování příspěvkových organizací, zakládání právnických osob)
+a [§ 85](https://www.zakonyprolidi.cz/cs/2000-128#p85) zákona o obcích (majetková právní
+jednání: nabytí a převod nemovitých věcí, dary nad 100 000 Kč, dotace nad 250 000 Kč
+a další). AI má přes konektor (e-Sbírka, Zákony pro lidi) přečíst platné znění a citovat
+paragraf. Finální znění konzultujte
 s právníkem úřadu nebo s krajským sdružením.
 
 ## 5. Kontrola hospodaření
@@ -130,10 +154,17 @@ s právníkem úřadu nebo s krajským sdružením.
   zastupitele nebo podnět kontrolnímu výboru.
 
 **Pozor na výjimky z uveřejnění.** Zákon o registru smluv má výjimky
-([§ 3 zákona č. 340/2015 Sb.](https://www.zakonyprolidi.cz/cs/2015-340#p3)), mimo jiné
-pro smlouvy s nízkou hodnotou plnění (50 000 Kč bez DPH, **ověřit** aktuální znění přes
-konektor). Když to AI neví, udělá z „chybějící“ smlouvy špatný závěr. „V registru není“
-neznamená „obec porušila zákon“.
+([§ 3 odst. 2 zákona č. 340/2015 Sb.](https://www.zakonyprolidi.cz/cs/2015-340#p3-2)).
+Pro zastupitele jsou nejdůležitější dvě:
+
+- smlouva, jejíž hodnota předmětu je **50 000 Kč bez DPH nebo nižší** (písm. h)),
+- smlouva, jejíž aspoň jednou stranou je **obec, která nevykonává rozšířenou působnost**,
+  příspěvková organizace takové obce nebo právnická osoba, v níž má taková obec (sama nebo
+  s jinými takovými obcemi) většinovou účast (písm. k)).
+
+Malé obce tedy v registru nemusí mít nic a není to porušení zákona; jejich smlouvy
+získáte dotazem zastupitele nebo žádostí podle zákona 106. Když to AI neví, udělá
+z „chybějící“ smlouvy špatný závěr.
 
 Příklad z praxe: u městské firmy AI prošla registr smluv, seřadila smlouvy podle
 dodavatelů a ukázala dodatky. Vznikly z toho konkrétní dotazy místo obecného „jak
@@ -212,7 +243,9 @@ Stránka k veřejnému projednání, petici nebo anketě za večer:
    smažete. Po projednání stránku vypněte.
 
 **Správcem osobních údajů z formuláře je ten, kdo stránku provozuje** (zastupitel nebo
-místní sdružení), ne obec **(výklad, ověřit s pověřencem)**. Vizuál podle `get_brand`.
+místní sdružení), ne obec. Je to **výklad** definice správce v čl. 4 bodu 7 GDPR (správce
+určuje účely a prostředky zpracování), ne citace zákona; jinak to může být, když stránku
+provozujete z pověření obce. V pochybnostech se zeptejte pověřence. Vizuál podle `get_brand`.
 
 ## 10. Na co si dát pozor
 
@@ -221,9 +254,13 @@ místní sdružení), ne obec **(výklad, ověřit s pověřencem)**. Vizuál po
   výrazně snižují, kontrolu nenahrazují.
 - **Přikyvování.** AI ráda souhlasí s vaším názorem. Chtějte vždy i nejsilnější
   protiargument, zvlášť u kontroverzních bodů.
-- **Propaganda ve zdrojích.** Workshop cituje test Dosimeteru, podle kterého chatboty
-  převzaly proruské narativy ve 125 z 1 000 odpovědí **(ověřit ve zdroji)**. U
-  zahraničních témat vždy ověřte zdroj.
+- **Propaganda ve zdrojích.** Podle
+  [studie projektu Dosimeter](https://dosimeteraudit.org/research/ai-chatbots-us-midterms-2026)
+  z 28. 10. 2026 citovalo 12,5 % z 1 000 odpovědí chatbotů na otázky k americkým volbám
+  kremelské propagandistické weby (RT, Sputnik, TASS a další). Nejhůř dopadlo Perplexity
+  (37 %), dále Claude (24 %) a DeepSeek (22 %); ChatGPT a Gemini měly 0 %. Test běžel
+  anglicky s americkou polohou, pro češtinu podobná čísla nemáme. U zahraničních témat
+  si vždy otevřete zdroj, který AI cituje.
 
 AI připraví, zastupitel rozhodne a podepíše. Na jednání mluvíte vy, ne model.
 
