@@ -116,8 +116,12 @@ Usnesení bez termínu a odpovědné osoby se nedá kontrolovat. Chtějte i krá
 pro jednání a jednu větu do zápisu.
 
 **Právní rámec ověřujte konektorem na legislativu, ne z paměti modelu.** Co je vyhrazeno
-zastupitelstvu, upravují § 84 a 85 zákona o obcích; AI má přes konektor (e-Sbírka,
-Zákony pro lidi) přečíst platné znění a citovat paragraf. Finální znění konzultujte
+zastupitelstvu, upravují [§ 84](https://www.zakonyprolidi.cz/cs/2000-128#p84) (např.
+rozpočet, závěrečný účet, zřizování příspěvkových organizací, zakládání právnických osob)
+a [§ 85](https://www.zakonyprolidi.cz/cs/2000-128#p85) zákona o obcích (majetková právní
+jednání: nabytí a převod nemovitých věcí, dary nad 100 000 Kč, dotace nad 250 000 Kč
+a další). AI má přes konektor (e-Sbírka, Zákony pro lidi) přečíst platné znění a citovat
+paragraf. Finální znění konzultujte
 s právníkem úřadu nebo s krajským sdružením.
 
 ## 5. Kontrola hospodaření
@@ -130,10 +134,17 @@ s právníkem úřadu nebo s krajským sdružením.
   zastupitele nebo podnět kontrolnímu výboru.
 
 **Pozor na výjimky z uveřejnění.** Zákon o registru smluv má výjimky
-([§ 3 zákona č. 340/2015 Sb.](https://www.zakonyprolidi.cz/cs/2015-340#p3)), mimo jiné
-pro smlouvy s nízkou hodnotou plnění (50 000 Kč bez DPH, **ověřit** aktuální znění přes
-konektor). Když to AI neví, udělá z „chybějící“ smlouvy špatný závěr. „V registru není“
-neznamená „obec porušila zákon“.
+([§ 3 odst. 2 zákona č. 340/2015 Sb.](https://www.zakonyprolidi.cz/cs/2015-340#p3-2)).
+Pro zastupitele jsou nejdůležitější dvě:
+
+- smlouva, jejíž hodnota předmětu je **50 000 Kč bez DPH nebo nižší** (písm. h)),
+- smlouva, jejíž aspoň jednou stranou je **obec, která nevykonává rozšířenou působnost**,
+  příspěvková organizace takové obce nebo právnická osoba, v níž má taková obec (sama nebo
+  s jinými takovými obcemi) většinovou účast (písm. k)).
+
+Malé obce tedy v registru nemusí mít nic a není to porušení zákona; jejich smlouvy
+získáte dotazem zastupitele nebo žádostí podle zákona 106. Když to AI neví, udělá
+z „chybějící“ smlouvy špatný závěr.
 
 Příklad z praxe: u městské firmy AI prošla registr smluv, seřadila smlouvy podle
 dodavatelů a ukázala dodatky. Vznikly z toho konkrétní dotazy místo obecného „jak

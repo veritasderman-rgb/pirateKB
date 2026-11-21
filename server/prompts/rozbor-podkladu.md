@@ -19,8 +19,9 @@ Pokud žádné nepřiložil, nejdřív si je vyžádej a nic nedomýšlej.
    nejasná cena, změna oproti minulé verzi, rozpor s rozpočtem nebo dřívějším usnesením.
 5. **Pět otázek na předkladatele**, konkrétních a zodpověditelných na jednání.
 6. Pokud jde o smlouvu nebo dodavatele a je připojený Hlídač státu, dohledej předchozí
-   smlouvy a dodatky téhož dodavatele s obcí. Pozor na výjimky z uveřejnění (§ 3 zákona
-   č. 340/2015 Sb.): „v registru není“ neznamená porušení zákona.
+   smlouvy a dodatky téhož dodavatele s obcí. Pozor na výjimky z uveřejnění (§ 3 odst. 2
+   zákona č. 340/2015 Sb.: smlouvy do 50 000 Kč bez DPH, smlouvy obcí bez rozšířené
+   působnosti a jejich organizací): „v registru není“ neznamená porušení zákona.
 7. Kontext z báze jen na vyžádání nebo když pomůže: `profil_obce` (sdružení, zvolení
    Piráti), `get_position` / `get_program` (postoj strany k tématu).
 

@@ -644,7 +644,8 @@ def _brand_fallback() -> dict:
             y = yaml.safe_load((b / "barvy.yaml").read_text(encoding="utf-8")) or {}
             for skupina, items in (y.get("barvy") or {}).items():
                 for i in items or []:
-                    brand["barvy"].append({"skupina": skupina, "nazev": i.get("nazev"), "hex": i.get("hex")})
+                    brand["barvy"].append({"skupina": skupina, "nazev": i.get("nazev"), "hex": i.get("hex"),
+                                           "paleta": i.get("paleta"), "trida": i.get("trida")})
             brand["styleguide"] = {"url": y.get("zdroj"), "verze": _s(y.get("verze_styleguide")),
                                    "stazeno": _s(y.get("stazeno"))}
         if (b / "fonty.yaml").exists():
@@ -683,10 +684,18 @@ def _fmt_barvy(brand: dict) -> str:
     out = []
     for g, items in groups.items():
         out.append(f"### {names.get(g, g)}")
-        out.append("| název | hex |\n|---|---|")
-        out.extend(f"| {_s(c.get('nazev'))} | `{_s(c.get('hex'))}` |" for c in items)
+        if any(c.get("trida") or c.get("paleta") for c in items):
+            out.append("| název | hex | paleta | třída ve styleguide |\n|---|---|---|---|")
+            out.extend(f"| {_s(c.get('nazev'))} | `{_s(c.get('hex'))}` | {_s(c.get('paleta'))} | "
+                       + (f"`{_s(c.get('trida'))}`" if c.get("trida") else "") + " |" for c in items)
+        else:
+            out.append("| název | hex |\n|---|---|")
+            out.extend(f"| {_s(c.get('nazev'))} | `{_s(c.get('hex'))}` |" for c in items)
         out.append("")
-    out.append("Klíčové: Pirati Yellow `#fec934` (akcent), Primary Black `#000000`, White `#ffffff`.")
+    out.append("Klíčové: Pirati Yellow `#fec934` (akcent), Black `#000000` (paleta Primary), White `#ffffff`.")
+    if any(c.get("trida") for c in barvy):
+        out.append("Třída je utility třída pozadí ve stylech styleguide (web); třídy `text-…` a `border-…` "
+                   "existují jen pro některé barvy. Pro tisk a grafiku mimo web používej hex.")
     return "\n".join(out)
 
 

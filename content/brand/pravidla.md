@@ -1,6 +1,7 @@
 ---
 zdroj: https://styleguide.pirati.cz/2.22.0/
 zdroje:
+- https://styleguide.pirati.cz/latest/
 - data/brand/styleguide.md
 - data/brand/barvy.yaml
 - data/brand/fonty.yaml
@@ -15,7 +16,7 @@ stazeno: '2026-10-06'
 stav: navrh
 schvalil: null
 schvaleno_dne: null
-reviewed_at: '2026-10-06'
+reviewed_at: '2026-11-21'
 platnost_do: null
 poznamka: "Návrh. Oddíl 1 je převzatý ze styleguide.pirati.cz a pirati.cz/download (ověřitelné). Oddíl 2 jsou obecná pravidla práce se značkou; přesné hodnoty doplní kurátor z grafického manuálu na mraku."
 ---
@@ -27,7 +28,9 @@ Dokument má dvě části, které se **nesmí zaměňovat**:
 1. **Ověřeno ze styleguide**: hodnoty převzaté beze změny ze
    [styleguide.pirati.cz verze 2.22.0](https://styleguide.pirati.cz/2.22.0/) (knihovna,
    kterou používají weby pirati.cz a lide.pirati.cz) a odkazy na loga z
-   [pirati.cz/download](https://www.pirati.cz/download/). Stav k 2026-10-06.
+   [pirati.cz/download](https://www.pirati.cz/download/). Barvy ověřeny 2026-11-21 proti
+   [styleguide.pirati.cz/latest](https://styleguide.pirati.cz/latest/) (stále verze 2.22.0), ostatní
+   stav k 2026-10-06.
 2. **Obecné doporučení, doplnit z grafického manuálu na mraku**: běžná pravidla práce
    s logem a barvami. Neplatí jako oficiální manuál, dokud kurátor nedoplní přesné hodnoty
    z grafického manuálu na [mrak.pirati.cz](https://mrak.pirati.cz/) (místa označená
@@ -40,59 +43,67 @@ doporučení, ne jako pravidlo strany.
 
 ### 1.1 Hlavní barvy
 
-| role | název ve styleguide | hex |
-|---|---|---|
-| značková žlutá (akcent) | Pirati Yellow | `#fec934` |
-| základní černá | Primary Black | `#000000` |
-| bílá | White | `#ffffff` |
+| role | název ve styleguide | hex | paleta | třída |
+|---|---|---|---|---|
+| značková žlutá (akcent) | Pirati Yellow | `#fec934` | Pirati | `bg-pirati-yellow` |
+| základní černá | Black | `#000000` | Primary | `bg-black` |
+| bílá | White | `#ffffff` | Primary | `bg-white` |
+
+Sloupec „třída“ je utility třída pozadí, kterou barvu ukazuje styleguide (web). Třídy
+`text-…` a `border-…` existují ve stylech jen pro některé barvy. Pro tisk a grafiku mimo
+web použijte hex.
 
 ### 1.2 Doplňkové značkové barvy
 
-| název | hex |
-|---|---|
-| Olive 100 | `#d6e8b3` |
-| Green 200 | `#92c6ab` |
-| Green 300 | `#76cc9f` |
-| Green 400 | `#4ca971` |
-| Yellow 100 | `#fff7bf` |
-| Yellow 200 | `#f7f38a` |
-| Yellow 300 | `#ffea5a` |
-| Yellow 400 | `#fde119` |
-| Blue 100 | `#abcdef` |
-| Blue 200 | `#76b4cf` |
-| Blue 300 | `#027da8` |
-| Cyan 100 | `#a7d4d1` |
-| Cyan 200 | `#57b3bd` |
-| Cyan 300 | `#3e8793` |
-| Cyan 400 | `#497280` |
-| Cyan 500 | `#004958` |
-| Orange 100 | `#f2d29f` |
-| Orange 200 | `#f1ae7b` |
-| Orange 300 | `#ed9654` |
-| Violet 100 | `#edc8bd` |
-| Violet 200 | `#d28c94` |
-| Violet 300 | `#8d415f` |
-| Violet 400 | `#840048` |
-| Violet 500 | `#670047` |
-| Red 600 | `#d60d53` |
+Styleguide je řadí do palet Olive, Green, Yellow, Blue, Cyan, Orange, Violet a Red.
+Číslo udává odstín (vyšší = tmavší); palety nemají všechny stupně.
+
+| název | hex | paleta | třída |
+|---|---|---|---|
+| Olive 100 | `#d6e8b3` | Olive | `bg-olive-100` |
+| Green 200 | `#92c6ab` | Green | `bg-green-200` |
+| Green 300 | `#76cc9f` | Green | `bg-green-300` |
+| Green 400 | `#4ca971` | Green | `bg-green-400` |
+| Yellow 100 | `#fff7bf` | Yellow | `bg-yellow-100` |
+| Yellow 200 | `#f7f38a` | Yellow | `bg-yellow-200` |
+| Yellow 300 | `#ffea5a` | Yellow | `bg-yellow-300` |
+| Yellow 400 | `#fde119` | Yellow | `bg-yellow-400` |
+| Blue 100 | `#abcdef` | Blue | `bg-blue-100` |
+| Blue 200 | `#76b4cf` | Blue | `bg-blue-200` |
+| Blue 300 | `#027da8` | Blue | `bg-blue-300` |
+| Cyan 100 | `#a7d4d1` | Cyan | `bg-cyan-100` |
+| Cyan 200 | `#57b3bd` | Cyan | `bg-cyan-200` |
+| Cyan 300 | `#3e8793` | Cyan | `bg-cyan-300` |
+| Cyan 400 | `#497280` | Cyan | `bg-cyan-400` |
+| Cyan 500 | `#004958` | Cyan | `bg-cyan-500` |
+| Orange 100 | `#f2d29f` | Orange | `bg-orange-100` |
+| Orange 200 | `#f1ae7b` | Orange | `bg-orange-200` |
+| Orange 300 | `#ed9654` | Orange | `bg-orange-300` |
+| Violet 100 | `#edc8bd` | Violet | `bg-violet-100` |
+| Violet 200 | `#d28c94` | Violet | `bg-violet-200` |
+| Violet 300 | `#8d415f` | Violet | `bg-violet-300` |
+| Violet 400 | `#840048` | Violet | `bg-violet-400` |
+| Violet 500 | `#670047` | Violet | `bg-violet-500` |
+| Red 600 | `#d60d53` | Red | `bg-red-600` |
 
 ### 1.3 Neutrální (šedé) barvy
 
-| název | hex |
-|---|---|
-| Grey 50 | `#f7f7f7` |
-| Grey 100 | `#f3f3f3` |
-| Grey 125 | `#f0f0f0` |
-| Grey 200 | `#adadad` |
-| Grey 300 | `#4c4c4c` |
-| Grey 400 | `#343434` |
-| Grey 500 | `#303132` |
-| Grey 600 | `#262626` |
-| Grey 700 | `#202020` |
-| Grey 800 | `#1f1f1f` |
+| název | hex | třída |
+|---|---|---|
+| Grey 50 | `#f7f7f7` | `bg-grey-50` |
+| Grey 100 | `#f3f3f3` | `bg-grey-100` |
+| Grey 125 | `#f0f0f0` | `bg-grey-125` |
+| Grey 200 | `#adadad` | `bg-grey-200` |
+| Grey 300 | `#4c4c4c` | `bg-grey-300` |
+| Grey 400 | `#343434` | `bg-grey-400` |
+| Grey 500 | `#303132` | `bg-grey-500` |
+| Grey 600 | `#262626` | `bg-grey-600` |
+| Grey 700 | `#202020` | `bg-grey-700` |
+| Grey 800 | `#1f1f1f` | `bg-grey-800` |
 
 Barvy cizích značek (Facebook `#067ceb`, Twitter `#00c9ff`, Gmail `#ec230e`, LinkedIn
-`#0066a9`) používá styleguide jen pro ikony sítí. Nejsou to pirátské barvy.
+`#0066a9`; třídy `bg-brands-facebook`, `bg-brands-twitter`, `bg-brands-gmail`,
+`bg-brands-linkedin`) používá styleguide jen pro ikony sítí. Nejsou to pirátské barvy.
 
 Strojově čitelně: [`data/brand/barvy.yaml`](../../data/brand/barvy.yaml).
 
