@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-08-07'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 112
+delka_s: 111
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-21'
+stazeno: '2026-11-22'
 ---
 
 # Vraťme zemi budoucnost: Blanka Lednická a Milan Daďourek
 
-Video na kanálu Piráti, zveřejněno 2021-08-07, délka 01:52. <https://www.youtube.com/watch?v=KU0L_85wcQc>
+Video na kanálu Piráti, zveřejněno 2021-08-07, délka 01:51. <https://www.youtube.com/watch?v=KU0L_85wcQc>
 
 ## Popis videa
 

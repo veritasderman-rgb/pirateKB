@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-09-02'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 53
+delka_s: 52
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-21'
+stazeno: '2026-11-22'
 ---
 
 # Pan premiér je strašně nevychovaný člověk
 
-Video na kanálu Piráti, zveřejněno 2021-09-02, délka 00:53. <https://www.youtube.com/watch?v=pe5YUuMPJHI>
+Video na kanálu Piráti, zveřejněno 2021-09-02, délka 00:52. <https://www.youtube.com/watch?v=pe5YUuMPJHI>
 
 ## Popis videa
 

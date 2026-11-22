@@ -9,7 +9,7 @@ delka_s: 616
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-10'
+stazeno: '2026-11-22'
 ---
 
 # Tisková konference pondělí 9.11. 2026
@@ -31,9 +31,9 @@ Video na kanálu Piráti, zveřejněno 2026-11-09, délka 10:16. <https://www.yo
 > 🛍️ Pirátský obchod: https://piratskyobchod.cz
 >
 > Sleduj nás i jinde:
-> 📘 Facebook:   / ceska.piratska.strana  
-> 📸 Instagram:   / pirati.cz  
-> 🐦 X / Twitter:   / piratskastrana
+> 📘 Facebook: https://www.facebook.com/ceska.piratska.strana
+> 📸 Instagram: https://www.instagram.com/pirati.cz
+> 🐦 X / Twitter: https://twitter.com/PiratskaStrana
 
 ## Přepis
 

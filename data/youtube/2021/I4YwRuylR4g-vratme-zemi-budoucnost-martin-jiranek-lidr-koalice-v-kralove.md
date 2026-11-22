@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-09-05'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 110
+delka_s: 109
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-21'
+stazeno: '2026-11-22'
 ---
 
 # Vraťme zemi budoucnost: Martin Jiránek, lídr koalice v Královéhradeckém kraji
 
-Video na kanálu Piráti, zveřejněno 2021-09-05, délka 01:50. <https://www.youtube.com/watch?v=I4YwRuylR4g>
+Video na kanálu Piráti, zveřejněno 2021-09-05, délka 01:49. <https://www.youtube.com/watch?v=I4YwRuylR4g>
 
 ## Popis videa
 

@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-08-13'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 199
+delka_s: 198
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-21'
+stazeno: '2026-11-22'
 ---
 
 # Otázky budoucnosti z Mostu: Jak nastartujeme strádající regiony
 
-Video na kanálu Piráti, zveřejněno 2021-08-13, délka 03:19. <https://www.youtube.com/watch?v=umqxMuNz11k>
+Video na kanálu Piráti, zveřejněno 2021-08-13, délka 03:18. <https://www.youtube.com/watch?v=umqxMuNz11k>
 
 ## Popis videa
 

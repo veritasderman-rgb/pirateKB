@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-08-13'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 96
+delka_s: 95
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-21'
+stazeno: '2026-11-22'
 ---
 
 # Ukončeme plýtvání a vraťme zemi budoucnost
 
-Video na kanálu Piráti, zveřejněno 2021-08-13, délka 01:36. <https://www.youtube.com/watch?v=ru3AsMWNwoA>
+Video na kanálu Piráti, zveřejněno 2021-08-13, délka 01:35. <https://www.youtube.com/watch?v=ru3AsMWNwoA>
 
 ## Popis videa
 

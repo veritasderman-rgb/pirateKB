@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-08-23'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 76
+delka_s: 75
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-21'
+stazeno: '2026-11-22'
 ---
 
 # Korupce: Babišova administrativa pustila do ČR stovky Íránců
 
-Video na kanálu Piráti, zveřejněno 2021-08-23, délka 01:16. <https://www.youtube.com/watch?v=H9-N3k_GD0s>
+Video na kanálu Piráti, zveřejněno 2021-08-23, délka 01:15. <https://www.youtube.com/watch?v=H9-N3k_GD0s>
 
 ## Popis videa
 

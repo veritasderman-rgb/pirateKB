@@ -9,7 +9,7 @@ delka_s: 106
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-21'
+stazeno: '2026-11-22'
 ---
 
 # Dejme lidem rovné šance!
@@ -31,9 +31,9 @@ Video na kanálu Piráti, zveřejněno 2021-09-15, délka 01:46. <https://www.yo
 >
 > Vrátíme zemi budoucnost.
 > Jestli máte 5 minut, podívejte se na náš stručný program:
-> https://www.piratiastarostove.cz/prog...
+> https://www.piratiastarostove.cz/program-v-kostce/
 >
-> Pokud vás zajímá oblast práce a sociálních věcí, více se dozvíte zde: https://www.piratiastarostove.cz/prog...
+> Pokud vás zajímá oblast práce a sociálních věcí, více se dozvíte zde: https://www.piratiastarostove.cz/program/resort/prace-a-socialni-veci/
 >
 > #vratmezemibudoucnost
 

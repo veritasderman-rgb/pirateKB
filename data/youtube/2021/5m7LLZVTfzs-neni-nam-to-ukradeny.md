@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-09-03'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 34
+delka_s: 33
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-21'
+stazeno: '2026-11-22'
 ---
 
 # Není nám to ukradený!
 
-Video na kanálu Piráti, zveřejněno 2021-09-03, délka 00:34. <https://www.youtube.com/watch?v=5m7LLZVTfzs>
+Video na kanálu Piráti, zveřejněno 2021-09-03, délka 00:33. <https://www.youtube.com/watch?v=5m7LLZVTfzs>
 
 ## Popis videa
 
