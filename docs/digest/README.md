@@ -15,6 +15,7 @@ a bez nutnosti cokoli připojovat. Totéž nabízí MCP server toolem `novinky`.
 
 ## Digesty
 
+- [2026-11-16 – 2026-11-22](2026-T47.md)
 - [2026-11-09 – 2026-11-15](2026-T46.md)
 - [2026-11-02 – 2026-11-08](2026-T45.md)
 - [2026-10-26 – 2026-11-01](2026-T44.md)
