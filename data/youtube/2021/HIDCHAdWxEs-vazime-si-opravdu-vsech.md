@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-07-01'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 88
+delka_s: 89
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-22'
+stazeno: '2026-11-23'
 ---
 
 # Vážíme si opravdu všech!
 
-Video na kanálu Piráti, zveřejněno 2021-07-01, délka 01:28. <https://www.youtube.com/watch?v=HIDCHAdWxEs>
+Video na kanálu Piráti, zveřejněno 2021-07-01, délka 01:29. <https://www.youtube.com/watch?v=HIDCHAdWxEs>
 
 ## Popis videa
 

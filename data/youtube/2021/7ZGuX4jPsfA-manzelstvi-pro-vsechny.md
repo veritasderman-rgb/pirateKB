@@ -9,7 +9,7 @@ delka_s: 11
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-22'
+stazeno: '2026-11-23'
 ---
 
 # MANŽELSTVÍ PRO VŠECHNY
@@ -23,7 +23,7 @@ Video na kanálu Piráti, zveřejněno 2021-08-07, délka 00:11. <https://www.yo
 > Rovnoprávné sňatky mají podporu 2/3 české populace. Podporu státu ale nikoli. 🤷‍♂️ Sňatek nesmí uzavřít statisíce stejnopohlavních párů. Jejich vztah je ochuzen o spoustu právních jistot. O šanci na plnohodnotný život tím přichází i tisícovky českých dětí bez rodin.
 >
 > Ve Sněmovně jsme pomáhali s novelou zákona o manželství pro všechny a dál bojujeme za skutečnou rovnost pohlaví. 👇
-> https://www.piratiastarostove.cz/program/rovnopravne-snatky
+> https://www.piratiastarostove.cz/prog...
 
 ## Přepis
 

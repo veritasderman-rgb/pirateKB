@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-08-03'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 11
+delka_s: 12
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-22'
+stazeno: '2026-11-23'
 ---
 
 # Piráti a Starostové: Zastavíme plýtvání
 
-Video na kanálu Piráti, zveřejněno 2021-08-03, délka 00:11. <https://www.youtube.com/watch?v=2YIEl5VHROo>
+Video na kanálu Piráti, zveřejněno 2021-08-03, délka 00:12. <https://www.youtube.com/watch?v=2YIEl5VHROo>
 
 ## Popis videa
 
@@ -25,7 +25,7 @@ Video na kanálu Piráti, zveřejněno 2021-08-03, délka 00:11. <https://www.yo
 > My na to jsme připravení – máme plán, jak do roku 2025 vyrovnat státní rozpočet a zároveň nastartovat českou ekonomiku.
 >
 > Více o našem přístupu ke státním financím čtěte zde 👇
-> https://www.piratiastarostove.cz/program/finance-rizene-podle-planu/
+> https://www.piratiastarostove.cz/prog...
 >
 > #vratmezemibudoucnost
 

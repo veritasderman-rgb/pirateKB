@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2021-07-04'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 123
+delka_s: 124
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-22'
+stazeno: '2026-11-23'
 ---
 
 # Nezaspěme svoji chvíli! ⚫⬛
 
-Video na kanálu Piráti, zveřejněno 2021-07-04, délka 02:03. <https://www.youtube.com/watch?v=lWcVCM6PByU>
+Video na kanálu Piráti, zveřejněno 2021-07-04, délka 02:04. <https://www.youtube.com/watch?v=lWcVCM6PByU>
 
 ## Popis videa
 

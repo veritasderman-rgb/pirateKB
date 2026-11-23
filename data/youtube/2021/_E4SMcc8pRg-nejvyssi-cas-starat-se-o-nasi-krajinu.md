@@ -9,7 +9,7 @@ delka_s: 11
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-22'
+stazeno: '2026-11-23'
 ---
 
 # Nejvyšší čas starat se o naši krajinu
@@ -18,7 +18,7 @@ Video na kanálu Piráti, zveřejněno 2021-08-02, délka 00:11. <https://www.yo
 
 ## Popis videa
 
-> https://www.piratiastarostove.cz/program/plan/duraz-na-klima/
+> https://www.piratiastarostove.cz/prog...
 
 ## Přepis
 
