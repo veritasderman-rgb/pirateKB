@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-09-01'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 95
+delka_s: 94
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Podpořte knihu Česko inspirativní!
 
-Video na kanálu Piráti, zveřejněno 2020-09-01, délka 01:35. <https://www.youtube.com/watch?v=hhs-cWWrKoY>
+Video na kanálu Piráti, zveřejněno 2020-09-01, délka 01:34. <https://www.youtube.com/watch?v=hhs-cWWrKoY>
 
 ## Popis videa
 

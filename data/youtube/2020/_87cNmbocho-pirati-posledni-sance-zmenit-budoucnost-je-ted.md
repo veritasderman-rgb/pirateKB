@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-09-15'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 128
+delka_s: 127
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Piráti: Poslední šance změnit budoucnost je teď!
 
-Video na kanálu Piráti, zveřejněno 2020-09-15, délka 02:08. <https://www.youtube.com/watch?v=_87cNmbocho>
+Video na kanálu Piráti, zveřejněno 2020-09-15, délka 02:07. <https://www.youtube.com/watch?v=_87cNmbocho>
 
 ## Popis videa
 
@@ -30,7 +30,7 @@ Video na kanálu Piráti, zveřejněno 2020-09-15, délka 02:08. <https://www.yo
 > https://senat.pirati.cz/
 >
 > Podpořit nás v kampani můžete na webu ➡️
-> https://dary.pirati.cz/projekty-kampa...
+> https://dary.pirati.cz/projekty-kampane/pomoz-nam-v-krajskych-volbach/
 >
 > Děkujeme vám za důvěru, podporu i sdílení. Společnými silami to dokážeme!
 

@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-10-06'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 41
+delka_s: 40
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Volte Daniela Kůse do Senátu!
 
-Video na kanálu Piráti, zveřejněno 2020-10-06, délka 00:41. <https://www.youtube.com/watch?v=PwIoNjlUn1k>
+Video na kanálu Piráti, zveřejněno 2020-10-06, délka 00:40. <https://www.youtube.com/watch?v=PwIoNjlUn1k>
 
 ## Popis videa
 

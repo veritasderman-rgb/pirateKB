@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-09-14'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 100
+delka_s: 99
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Naloď se!
 
-Video na kanálu Piráti, zveřejněno 2020-09-14, délka 01:40. <https://www.youtube.com/watch?v=1LusDCYd5GI>
+Video na kanálu Piráti, zveřejněno 2020-09-14, délka 01:39. <https://www.youtube.com/watch?v=1LusDCYd5GI>
 
 ## Popis videa
 

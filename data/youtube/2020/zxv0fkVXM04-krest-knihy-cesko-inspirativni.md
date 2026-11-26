@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-09-26'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 32
+delka_s: 31
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Křest knihy Česko inspirativní
 
-Video na kanálu Piráti, zveřejněno 2020-09-26, délka 00:32. <https://www.youtube.com/watch?v=zxv0fkVXM04>
+Video na kanálu Piráti, zveřejněno 2020-09-26, délka 00:31. <https://www.youtube.com/watch?v=zxv0fkVXM04>
 
 ## Popis videa
 

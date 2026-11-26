@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-09-16'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 275
+delka_s: 274
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Politické hejtíčky: Jiří Kadeřávek
 
-Video na kanálu Piráti, zveřejněno 2020-09-16, délka 04:35. <https://www.youtube.com/watch?v=GgRCPE2WcaI>
+Video na kanálu Piráti, zveřejněno 2020-09-16, délka 04:34. <https://www.youtube.com/watch?v=GgRCPE2WcaI>
 
 ## Popis videa
 

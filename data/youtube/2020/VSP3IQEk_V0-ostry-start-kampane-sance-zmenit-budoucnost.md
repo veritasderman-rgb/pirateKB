@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-09-07'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 97
+delka_s: 96
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Ostrý start kampaně Šance změnit budoucnost
 
-Video na kanálu Piráti, zveřejněno 2020-09-07, délka 01:37. <https://www.youtube.com/watch?v=VSP3IQEk_V0>
+Video na kanálu Piráti, zveřejněno 2020-09-07, délka 01:36. <https://www.youtube.com/watch?v=VSP3IQEk_V0>
 
 ## Popis videa
 

@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-10-06'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 40
+delka_s: 39
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Volte Davida Smoljaka do Senátu!
 
-Video na kanálu Piráti, zveřejněno 2020-10-06, délka 00:40. <https://www.youtube.com/watch?v=rKlEgviyiDI>
+Video na kanálu Piráti, zveřejněno 2020-10-06, délka 00:39. <https://www.youtube.com/watch?v=rKlEgviyiDI>
 
 ## Popis videa
 

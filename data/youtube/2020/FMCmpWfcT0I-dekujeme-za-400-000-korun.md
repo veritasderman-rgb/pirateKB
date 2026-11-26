@@ -5,20 +5,20 @@ typ: prepis-videa
 datum: '2020-09-22'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 62
+delka_s: 61
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Děkujeme za 400 000 korun!
 
-Video na kanálu Piráti, zveřejněno 2020-09-22, délka 01:02. <https://www.youtube.com/watch?v=FMCmpWfcT0I>
+Video na kanálu Piráti, zveřejněno 2020-09-22, délka 01:01. <https://www.youtube.com/watch?v=FMCmpWfcT0I>
 
 ## Popis videa
 
-> Pokud byste chtěli Piráty podpořit i vy, můžete! Stačí kliknout na web https://dary.pirati.cz/projekty-kampa... a přispět libovolnou částkou. Každá koruna se počítá. I díky vám jsou Piráti výborně připraveni!
+> Pokud byste chtěli Piráty podpořit i vy, můžete! Stačí kliknout na web https://dary.pirati.cz/projekty-kampane/pomoz-nam-v-krajskych-volbach/ a přispět libovolnou částkou. Každá koruna se počítá. I díky vám jsou Piráti výborně připraveni!
 
 ## Přepis
 

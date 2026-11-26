@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-09-20'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 97
+delka_s: 96
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-25'
+stazeno: '2026-11-26'
 ---
 
 # Piráti: Šance žít v souladu s přírodou!
 
-Video na kanálu Piráti, zveřejněno 2020-09-20, délka 01:37. <https://www.youtube.com/watch?v=s2GvxHBd2Zc>
+Video na kanálu Piráti, zveřejněno 2020-09-20, délka 01:36. <https://www.youtube.com/watch?v=s2GvxHBd2Zc>
 
 ## Popis videa
 
