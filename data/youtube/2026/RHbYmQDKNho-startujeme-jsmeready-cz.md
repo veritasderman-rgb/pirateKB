@@ -9,7 +9,7 @@ delka_s: 81
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-26'
+stazeno: '2026-11-27'
 ---
 
 # Startujeme jsmeready.cz!
@@ -35,9 +35,9 @@ Video na kanálu Piráti, zveřejněno 2026-11-19, délka 01:21. <https://www.yo
 > 🛍️ Pirátský obchod: https://piratskyobchod.cz
 >
 > Sleduj nás i jinde:
-> 📘 Facebook: https://www.facebook.com/ceska.piratska.strana
-> 📸 Instagram: https://www.instagram.com/pirati.cz
-> 🐦 X / Twitter: https://twitter.com/PiratskaStrana
+> 📘 Facebook:   / ceska.piratska.strana  
+> 📸 Instagram:   / pirati.cz  
+> 🐦 X / Twitter:   / piratskastrana
 
 ## Přepis
 

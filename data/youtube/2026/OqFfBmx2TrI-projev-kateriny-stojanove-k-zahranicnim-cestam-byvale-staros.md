@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2026-11-25'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 426
+delka_s: 428
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-26'
+stazeno: '2026-11-27'
 ---
 
 # 📣 Projev Kateřiny Stojanové k zahraničním cestám bývalé starostky města Bílina ❗️
 
-Video na kanálu Piráti, zveřejněno 2026-11-25, délka 07:06. <https://www.youtube.com/watch?v=OqFfBmx2TrI>
+Video na kanálu Piráti, zveřejněno 2026-11-25, délka 07:08. <https://www.youtube.com/watch?v=OqFfBmx2TrI>
 
 ## Popis videa
 

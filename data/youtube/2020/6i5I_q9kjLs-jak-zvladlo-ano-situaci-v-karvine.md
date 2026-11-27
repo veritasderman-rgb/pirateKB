@@ -5,16 +5,16 @@ typ: prepis-videa
 datum: '2020-07-09'
 autor: Piráti
 kanal_url: https://www.youtube.com/@CeskaPiratskaStrana
-delka_s: 22
+delka_s: 23
 titulky: zadne
 viditelnost: verejne
 autorita: web
-stazeno: '2026-11-26'
+stazeno: '2026-11-27'
 ---
 
 # Jak zvládlo ANO situaci v Karviné?
 
-Video na kanálu Piráti, zveřejněno 2020-07-09, délka 00:22. <https://www.youtube.com/watch?v=6i5I_q9kjLs>
+Video na kanálu Piráti, zveřejněno 2020-07-09, délka 00:23. <https://www.youtube.com/watch?v=6i5I_q9kjLs>
 
 ## Popis videa
 

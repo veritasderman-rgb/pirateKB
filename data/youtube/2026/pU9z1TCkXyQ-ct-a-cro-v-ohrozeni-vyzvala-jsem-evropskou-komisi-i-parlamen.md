@@ -5,17 +5,17 @@ typ: prepis-videa
 datum: '2026-11-25'
 autor: 'Markéta Gregorová '
 kanal_url: https://www.youtube.com/channel/UCcf12G_5igxOSZBFSt4eEAQ
-delka_s: 59
+delka_s: 60
 titulky: zadne
 osoba: Markéta Gregorová
 viditelnost: verejne
 autorita: vyjadreni-politika
-stazeno: '2026-11-26'
+stazeno: '2026-11-27'
 ---
 
 # ČT a ČRo v ohrožení. Vyzvala jsem Evropskou komisi i Parlament k obraně jejich nezávislosti
 
-Video na kanálu Markéta Gregorová , zveřejněno 2026-11-25, délka 00:59. <https://www.youtube.com/watch?v=pU9z1TCkXyQ>
+Video na kanálu Markéta Gregorová , zveřejněno 2026-11-25, délka 01:00. <https://www.youtube.com/watch?v=pU9z1TCkXyQ>
 
 ## Popis videa
 
