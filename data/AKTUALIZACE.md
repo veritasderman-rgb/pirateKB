@@ -4,7 +4,7 @@ nazev: Stav aktualizací
 typ: materialy
 viditelnost: verejne
 autorita: oficialni-evidence
-stazeno: 2026-11-27
+stazeno: 2026-11-28
 ---
 
 # Stav aktualizací znalostní báze
@@ -15,35 +15,36 @@ jak dopadl a kolik dat v bázi je. Řádek, který v posledním běhu nebyl spu�
 neobnovuje týdenní zdroje), zůstává z předchozího běhu. Sloupce `Soubory` a `Řádky` se vždy
 přepočítají z aktuálního obsahu `data/`.
 
-Poslední běh: **2026-11-27 13:52 UTC, režim denni**.
+Poslední běh: **2026-11-28 13:00 UTC, režim denni**.
 
 | Zdroj | Poslední běh (UTC) | Výsledek | Poslední úspěšný běh | Soubory .md | Řádky .jsonl |
 |---|---|---|---|---|---|
 | `styleguide` styleguide.pirati.cz (barvy, písma) | — | nespuštěno | — | 1 | 0 |
-| `psp` psp.cz otevřená data (poslanci, hlasování) | 2026-11-27 13:52 (denni, 18 s) | OK | 2026-11-27 13:52 | 2837 | 33326 |
-| `steno` psp.cz stenozáznamy (vystoupení pirátských poslanců) | 2026-11-27 13:52 (denni, 40 s) | OK | 2026-11-27 13:52 | 1364 | 7913 |
+| `psp` psp.cz otevřená data (poslanci, hlasování) | 2026-11-28 13:00 (denni, 12 s) | OK | 2026-11-28 13:00 | 2837 | 33326 |
+| `steno` psp.cz stenozáznamy (vystoupení pirátských poslanců) | 2026-11-28 13:00 (denni, 98 s) | CHYBA: skript skončil s kódem 1 | 2026-11-27 13:52 | 1364 | 7913 |
 | `tisky` psp.cz sněmovní tisky a interpelace Pirátů | — | nespuštěno | — | 346 | 1188 |
 | `pozmenovaky` psp.cz pozměňovací návrhy a výbory Pirátů | — | nespuštěno | — | 1123 | 1123 |
 | `predpisy` předpisy a usnesení orgánů strany (rv.pirati.cz, rejstřík MV, archiv sbírky) | — | nespuštěno | — | 285 | 321 |
 | `ep_aktivita` Evropský parlament: projevy, otázky a zprávy pirátských europoslanců | — | nespuštěno | — | 422 | 555 |
 | `lide_pirati` lide.pirati.cz (struktura, lidé s funkcí) | — | nespuštěno | — | 293 | 735 |
-| `pirati_web` pirati.cz (aktuality, program, profily) | 2026-11-27 13:52 (denni, 115 s) | OK | 2026-11-27 13:52 | 3718 | 3631 |
+| `pirati_web` pirati.cz (aktuality, program, profily) | 2026-11-28 13:00 (denni, 118 s) | OK | 2026-11-28 13:00 | 3718 | 3631 |
 | `flickr` Flickr Pirátů (metadata alb) | — | nespuštěno | — | 1 | 125 |
-| `evidence` evidence.pirati.cz (lobbistické schůzky) | 2026-11-27 13:52 (denni, 4 s) | OK | 2026-11-27 13:52 | 7265 | 7766 |
-| `volby` volby.gov.cz (výsledky voleb a zvolení Piráti, ČSÚ) | 2026-11-27 13:52 (denni, 0 s) | OK | 2026-11-27 13:52 | 125 | 2080 |
+| `evidence` evidence.pirati.cz (lobbistické schůzky) | 2026-11-28 13:00 (denni, 3 s) | OK | 2026-11-28 13:00 | 7265 | 7766 |
+| `volby` volby.gov.cz (výsledky voleb a zvolení Piráti, ČSÚ) | 2026-11-28 13:00 (denni, 0 s) | OK | 2026-11-28 13:00 | 125 | 2080 |
 | `financovani` financování strany (ÚDH, transparentní účty Fio, Piroplácení) | — | nespuštěno | — | 38 | 204 |
-| `socialni_site` X a Bluesky poslanců | 2026-11-27 13:52 (denni, 70 s) | CHYBA: skript skončil s kódem 3 | 2026-11-26 13:54 | 389 | 1293 |
-| `kalendar` Pirátský kalendář akcí (veřejný Google kalendář, ICS) | 2026-11-27 13:52 (denni, 10 s) | OK | 2026-11-27 13:52 | 25 | 413 |
+| `socialni_site` X a Bluesky poslanců | 2026-11-28 13:00 (denni, 71 s) | CHYBA: skript skončil s kódem 3 | 2026-11-26 13:54 | 389 | 1293 |
+| `kalendar` Pirátský kalendář akcí (veřejný Google kalendář, ICS) | 2026-11-28 13:00 (denni, 9 s) | OK | 2026-11-28 13:00 | 25 | 413 |
 | `kraje` krajská zastupitelstva: usnesení a hlasování Pirátů (Plzeňský kraj) | — | nespuštěno | — | 746 | 1467 |
 | `subweby` subwebů strany | — | nespuštěno | — | 3640 | 0 |
 | `dokumenty` dokumenty strany (PDF) | — | nespuštěno | — | 8 | 0 |
 | `frankbold` publikace Frank Bold (frankbold.org; karty, plný text jen s licencí CC) | — | nespuštěno | — | 134 | 96 |
-| `media` média | 2026-11-27 13:52 (denni, 98 s) | OK | 2026-11-27 13:52 | 224 | 5098 |
+| `media` média | 2026-11-28 13:00 (denni, 87 s) | OK | 2026-11-28 13:00 | 224 | 5130 |
 | `systemy` systémy a návody | — | nespuštěno | — | 2 | 359 |
 
 ## Chyby posledního běhu
 
 - CHYBA: socialni_site (kód 3)
+- CHYBA: steno (kód 1)
 
 ## Jak to číst
 
